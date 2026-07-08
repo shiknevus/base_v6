@@ -1,0 +1,11 @@
+*.log
+*.jou
+*.buckup.log
+*.buckup.jou
+*netlist.v
+*netlist.vhdl
+*.xml
+*.veo
+*.vho
+*_stub.v
+*_stub.vhdl

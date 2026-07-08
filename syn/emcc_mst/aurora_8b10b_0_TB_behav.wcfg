@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="aurora_8b10b_0_TB_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="aurora_8b10b_0_TB" />
+            <top_module name="axi_bram_ctrl_funcs" />
+            <top_module name="axi_vip_pkg" />
+            <top_module name="glbl" />
+            <top_module name="ipif_pkg" />
+            <top_module name="std" />
+            <top_module name="vcomponents" />
+            <top_module name="xil_common_vip_pkg" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="0fs"></ZoomStartTime>
+      <ZoomEndTime time="138619443001fs"></ZoomEndTime>
+      <Cursor1Time time="86856247814fs"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="335"></NameColumnWidth>
+      <ValueColumnWidth column_width="102"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="43" />
+   <wvobject fp_name="/aurora_8b10b_0_TB/emmcc_mst_top_u/emcc_comp_top_u/roller_1000_u/roller_comp_cfg_u/ps_reg_clk" type="logic">
+      <obj_property name="ElementShortName">ps_reg_clk</obj_property>
+      <obj_property name="ObjectShortName">ps_reg_clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/aurora_8b10b_0_TB/emmcc_mst_top_u/emcc_comp_top_u/roller_1000_u/roller_comp_cfg_u/ps_reg_reset" type="logic">
+      <obj_property name="ElementShortName">ps_reg_reset</obj_property>
+      <obj_property name="ObjectShortName">ps_reg_reset</obj_property>
+   </wvobject>
+   <wvobject fp_name="/aurora_8b10b_0_TB/emmcc_mst_top_u/emcc_comp_top_u/roller_1000_u/roller_comp_cfg_u/ps_reg_we" type="logic">
+      <obj_property name="ElementShortName">ps_reg_we</obj_property>
+      <obj_property name="ObjectShortName">ps_reg_we</obj_property>
+   </wvobject>
+   <wvobject fp_name="/aurora_8b10b_0_TB/emmcc_mst_top_u/emcc_comp_top_u/roller_1000_u/roller_comp_cfg_u/ps_reg_addr" type="array">
+      <obj_property name="ElementShortName">ps_reg_addr[19:0]</obj_property>
+      <obj_property name="ObjectShortName">ps_reg_addr[19:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/aurora_8b10b_0_TB/emmcc_mst_top_u/emcc_comp_top_u/roller_1000_u/roller_comp_cfg_u/ps_reg_wr_dat" type="array">
+      <obj_property name="ElementShortName">ps_reg_wr_dat[31:0]</obj_property>
+      <obj_property name="ObjectShortName">ps_reg_wr_dat[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/aurora_8b10b_0_TB/emmcc_mst_top_u/emcc_comp_top_u/roller_1000_u/roller_comp_cfg_u/ps_reg_re" type="logic">
+      <obj_property name="ElementShortName">ps_reg_re</obj_property>
+      <obj_property name="ObjectShortName">ps_reg_re</obj_property>
+   </wvobject>
+   <wvobject fp_name="/aurora_8b10b_0_TB/emmcc_mst_top_u/emcc_comp_top_u/roller_1000_u/roller_comp_cfg_u/ps_reg_rd_addr" type="array">
+      <obj_property name="ElementShortName">ps_reg_rd_addr[19:0]</obj_property>
+      <obj_property name="ObjectShortName">ps_reg_rd_addr[19:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/aurora_8b10b_0_TB/emmcc_mst_top_u/emcc_comp_top_u/roller_1000_u/roller_comp_cfg_u/ps_reg_rd_vld" type="logic">
+      <obj_property name="ElementShortName">ps_reg_rd_vld</obj_property>
+      <obj_property name="ObjectShortName">ps_reg_rd_vld</obj_property>
+   </wvobject>
+   <wvobject fp_name="/aurora_8b10b_0_TB/emmcc_mst_top_u/emcc_comp_top_u/roller_1000_u/roller_comp_cfg_u/ps_reg_rd_dat" type="array">
+      <obj_property name="ElementShortName">ps_reg_rd_dat[31:0]</obj_property>
+      <obj_property name="ObjectShortName">ps_reg_rd_dat[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/aurora_8b10b_0_TB/emmcc_mst_top_u/emcc_comp_top_u/roller_1000_u/roller_comp_cfg_u/comp_wk_para" type="array">
+      <obj_property name="ElementShortName">comp_wk_para[31:0]</obj_property>
+      <obj_property name="ObjectShortName">comp_wk_para[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/aurora_8b10b_0_TB/emmcc_mst_top_u/emcc_comp_top_u/roller_1000_u/roller_comp_cfg_u/beh_dly_time" type="array">
+      <obj_property name="ElementShortName">beh_dly_time[31:0]</obj_property>
+      <obj_property name="ObjectShortName">beh_dly_time[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/aurora_8b10b_0_TB/emmcc_mst_top_u/emcc_comp_top_u/roller_1000_u/roller_comp_cfg_u/int_ack_vld" type="logic">
+      <obj_property name="ElementShortName">int_ack_vld</obj_property>
+      <obj_property name="ObjectShortName">int_ack_vld</obj_property>
+   </wvobject>
+   <wvobject fp_name="/aurora_8b10b_0_TB/emmcc_mst_top_u/emcc_comp_top_u/roller_1000_u/roller_comp_cfg_u/int_ack_dat" type="array">
+      <obj_property name="ElementShortName">int_ack_dat[7:0]</obj_property>
+      <obj_property name="ObjectShortName">int_ack_dat[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/aurora_8b10b_0_TB/emmcc_mst_top_u/emcc_comp_top_u/roller_1000_u/roller_comp_cfg_u/path_msg_vld" type="logic">
+      <obj_property name="ElementShortName">path_msg_vld</obj_property>
+      <obj_property name="ObjectShortName">path_msg_vld</obj_property>
+   </wvobject>
+   <wvobject fp_name="/aurora_8b10b_0_TB/emmcc_mst_top_u/emcc_comp_top_u/roller_1000_u/roller_comp_cfg_u/path_msg_dat" type="array">
+      <obj_property name="ElementShortName">path_msg_dat[13:0]</obj_property>
+      <obj_property name="ObjectShortName">path_msg_dat[13:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/aurora_8b10b_0_TB/emmcc_mst_top_u/emcc_comp_top_u/roller_1000_u/roller_comp_cfg_u/extra_msg" type="array">
+      <obj_property name="ElementShortName">extra_msg[3:0]</obj_property>
+      <obj_property name="ObjectShortName">extra_msg[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/aurora_8b10b_0_TB/emmcc_mst_top_u/emcc_comp_top_u/roller_1000_u/roller_comp_cfg_u/comp_irq_type" type="array">
+      <obj_property name="ElementShortName">comp_irq_type[7:0]</obj_property>
+      <obj_property name="ObjectShortName">comp_irq_type[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/aurora_8b10b_0_TB/emmcc_mst_top_u/emcc_comp_top_u/roller_1000_u/roller_comp_cfg_u/cur_token_dat" type="array">
+      <obj_property name="ElementShortName">cur_token_dat[15:0]</obj_property>
+      <obj_property name="ObjectShortName">cur_token_dat[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/aurora_8b10b_0_TB/emmcc_mst_top_u/emcc_comp_top_u/roller_1000_u/roller_comp_cfg_u/ps_cfg_token_vld" type="logic">
+      <obj_property name="ElementShortName">ps_cfg_token_vld</obj_property>
+      <obj_property name="ObjectShortName">ps_cfg_token_vld</obj_property>
+   </wvobject>
+   <wvobject fp_name="/aurora_8b10b_0_TB/emmcc_mst_top_u/emcc_comp_top_u/roller_1000_u/roller_comp_cfg_u/ps_cfg_token_dat" type="array">
+      <obj_property name="ElementShortName">ps_cfg_token_dat[15:0]</obj_property>
+      <obj_property name="ObjectShortName">ps_cfg_token_dat[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/aurora_8b10b_0_TB/emmcc_mst_top_u/emcc_comp_top_u/roller_1000_u/roller_comp_cfg_u/ps_cfg_wk_mode" type="array">
+      <obj_property name="ElementShortName">ps_cfg_wk_mode[2:0]</obj_property>
+      <obj_property name="ObjectShortName">ps_cfg_wk_mode[2:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/aurora_8b10b_0_TB/emmcc_mst_top_u/emcc_comp_top_u/roller_1000_u/roller_comp_cfg_u/wk_state" type="array">
+      <obj_property name="ElementShortName">wk_state[5:0]</obj_property>
+      <obj_property name="ObjectShortName">wk_state[5:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/aurora_8b10b_0_TB/emmcc_mst_top_u/emcc_comp_top_u/roller_1000_u/roller_comp_cfg_u/AI1_data" type="array">
+      <obj_property name="ElementShortName">AI1_data[31:0]</obj_property>
+      <obj_property name="ObjectShortName">AI1_data[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/aurora_8b10b_0_TB/emmcc_mst_top_u/emcc_comp_top_u/roller_1000_u/roller_comp_cfg_u/AI2_data" type="array">
+      <obj_property name="ElementShortName">AI2_data[31:0]</obj_property>
+      <obj_property name="ObjectShortName">AI2_data[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/aurora_8b10b_0_TB/emmcc_mst_top_u/emcc_comp_top_u/roller_1000_u/roller_comp_cfg_u/AI3_data" type="array">
+      <obj_property name="ElementShortName">AI3_data[31:0]</obj_property>
+      <obj_property name="ObjectShortName">AI3_data[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/aurora_8b10b_0_TB/emmcc_mst_top_u/emcc_comp_top_u/roller_1000_u/roller_comp_cfg_u/ps_reg_re_d1" type="logic">
+      <obj_property name="ElementShortName">ps_reg_re_d1</obj_property>
+      <obj_property name="ObjectShortName">ps_reg_re_d1</obj_property>
+   </wvobject>
+   <wvobject fp_name="/aurora_8b10b_0_TB/emmcc_mst_top_u/emcc_comp_top_u/roller_1000_u/roller_comp_cfg_u/ps_reg_re_d2" type="logic">
+      <obj_property name="ElementShortName">ps_reg_re_d2</obj_property>
+      <obj_property name="ObjectShortName">ps_reg_re_d2</obj_property>
+   </wvobject>
+   <wvobject fp_name="/aurora_8b10b_0_TB/emmcc_mst_top_u/emcc_comp_top_u/roller_1000_u/roller_comp_cfg_u/wr_space_select" type="logic">
+      <obj_property name="ElementShortName">wr_space_select</obj_property>
+      <obj_property name="ObjectShortName">wr_space_select</obj_property>
+   </wvobject>
+   <wvobject fp_name="/aurora_8b10b_0_TB/emmcc_mst_top_u/emcc_comp_top_u/roller_1000_u/roller_comp_cfg_u/rd_space_select" type="logic">
+      <obj_property name="ElementShortName">rd_space_select</obj_property>
+      <obj_property name="ObjectShortName">rd_space_select</obj_property>
+   </wvobject>
+   <wvobject fp_name="/aurora_8b10b_0_TB/emmcc_mst_top_u/emcc_comp_top_u/roller_1000_u/roller_comp_cfg_u/comp_irq_type1" type="array">
+      <obj_property name="ElementShortName">comp_irq_type1[7:0]</obj_property>
+      <obj_property name="ObjectShortName">comp_irq_type1[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/aurora_8b10b_0_TB/emmcc_mst_top_u/emcc_comp_top_u/roller_1000_u/roller_comp_cfg_u/extral_explain" type="array">
+      <obj_property name="ElementShortName">extral_explain[3:0]</obj_property>
+      <obj_property name="ObjectShortName">extral_explain[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/aurora_8b10b_0_TB/emmcc_mst_top_u/emcc_comp_top_u/roller_1000_u/roller_comp_cfg_u/rd_reg_addr" type="array">
+      <obj_property name="ElementShortName">rd_reg_addr[19:0]</obj_property>
+      <obj_property name="ObjectShortName">rd_reg_addr[19:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/aurora_8b10b_0_TB/emmcc_mst_top_u/emcc_comp_top_u/roller_1000_u/roller_comp_cfg_u/rd_reg_addr_d1" type="array">
+      <obj_property name="ElementShortName">rd_reg_addr_d1[19:0]</obj_property>
+      <obj_property name="ObjectShortName">rd_reg_addr_d1[19:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/aurora_8b10b_0_TB/emmcc_mst_top_u/emcc_comp_top_u/roller_1000_u/roller_comp_cfg_u/rd_reg_addr_d2" type="array">
+      <obj_property name="ElementShortName">rd_reg_addr_d2[19:0]</obj_property>
+      <obj_property name="ObjectShortName">rd_reg_addr_d2[19:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/aurora_8b10b_0_TB/emmcc_mst_top_u/emcc_comp_top_u/roller_1000_u/roller_comp_cfg_u/REG_SPACE_BIAS" type="array">
+      <obj_property name="ElementShortName">REG_SPACE_BIAS[19:0]</obj_property>
+      <obj_property name="ObjectShortName">REG_SPACE_BIAS[19:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/aurora_8b10b_0_TB/emmcc_mst_top_u/emcc_comp_top_u/roller_1000_u/roller_comp_cfg_u/REG_SPACE_SIZE" type="array">
+      <obj_property name="ElementShortName">REG_SPACE_SIZE[31:0]</obj_property>
+      <obj_property name="ObjectShortName">REG_SPACE_SIZE[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/aurora_8b10b_0_TB/emmcc_mst_top_u/emcc_comp_top_u/roller_1000_u/roller_comp_cfg_u/PS_REG_AWIDTH" type="array">
+      <obj_property name="ElementShortName">PS_REG_AWIDTH[31:0]</obj_property>
+      <obj_property name="ObjectShortName">PS_REG_AWIDTH[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/aurora_8b10b_0_TB/emmcc_mst_top_u/emcc_comp_top_u/roller_1000_u/roller_comp_cfg_u/PS_REG_DWIDTH" type="array">
+      <obj_property name="ElementShortName">PS_REG_DWIDTH[31:0]</obj_property>
+      <obj_property name="ObjectShortName">PS_REG_DWIDTH[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/aurora_8b10b_0_TB/emmcc_mst_top_u/emcc_comp_top_u/roller_1000_u/roller_comp_cfg_u/CUR_LOCATION" type="array">
+      <obj_property name="ElementShortName">CUR_LOCATION[13:0]</obj_property>
+      <obj_property name="ObjectShortName">CUR_LOCATION[13:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/aurora_8b10b_0_TB/emmcc_mst_top_u/emcc_comp_top_u/roller_1000_u/roller_comp_cfg_u/TOKEN_DWIDTH" type="array">
+      <obj_property name="ElementShortName">TOKEN_DWIDTH[31:0]</obj_property>
+      <obj_property name="ObjectShortName">TOKEN_DWIDTH[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/aurora_8b10b_0_TB/emmcc_mst_top_u/emcc_comp_top_u/roller_1000_u/roller_comp_cfg_u/SLAVE_PCB_NUM" type="array">
+      <obj_property name="ElementShortName">SLAVE_PCB_NUM[31:0]</obj_property>
+      <obj_property name="ObjectShortName">SLAVE_PCB_NUM[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/aurora_8b10b_0_TB/emmcc_mst_top_u/emcc_comp_top_u/roller_1000_u/roller_comp_cfg_u/LOCK_SCAN_ADDR" type="array">
+      <obj_property name="ElementShortName">LOCK_SCAN_ADDR[31:0]</obj_property>
+      <obj_property name="ObjectShortName">LOCK_SCAN_ADDR[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/aurora_8b10b_0_TB/emmcc_mst_top_u/prot_clk_rst" type="logic">
+      <obj_property name="ElementShortName">prot_clk_rst</obj_property>
+      <obj_property name="ObjectShortName">prot_clk_rst</obj_property>
+   </wvobject>
+</wave_config>
