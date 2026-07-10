@@ -1,0 +1,40 @@
+打开虚拟机
+scrt 10.201.3.176 su 密码 abc123！
+cd /home/share/fpga
+复制并替换 top.bit
+./fpga_mk.sh
+取出fpga.bin.img 到tftp
+
+run netfpga																			fpga.bin.img
+
+
+
+
+
+
+##############################UBOOT  			命令
+tftp升级
+
+tftp32目录指向 升级文件的当前目录
+
+reboot断电重启按shift+7 进入uboot模式
+1、setenv netmask		255.255.255.0
+2、setenv serverip		192.168.100.22    	//PC
+3、setenv ipaddr		192.168.100.200       //embedded
+4、saveenv
+run netupdate																		update.img
+run netboot																			u-boot.bin.img
+5、run netfpga																			fpga.bin.img
+6、重启 reset
+
+
+
+
+#################################linux												命令
+ifconfig eth0 10.201.3.179																		设置开发版的ip地址
+mount -t nfs -o nolock 10.201.3.176:/home/share/ /mnt    			10.201.3.176            服务器ip地址
+df																														查看                                             
+cp /mnt/sunny_arm   /run/media/sda/                                 拷贝服务器上的主程序到固态硬盘上去
+cd  /run/media/sda/          																		进入固态硬盘目录
+./sunny_arm																										 执行主程序                                                       
+
