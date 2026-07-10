@@ -64,7 +64,6 @@
 `timescale 1 ns / 100 ps
 `include  "./../include_files/mst_global_cfg/components_param.vh"
 `include  "./../include_files/mst_global_cfg/globe_includes.vh"
-//`include "E:/FPGA_Prj/gitlab_repo/bykz_v6.0/syn/src/new_v6/reg_addr_pl.vh"
 `include "./../../new_v6/reg_addr_pl.vh"
 
 module aurora_8b10b_0_TB;
