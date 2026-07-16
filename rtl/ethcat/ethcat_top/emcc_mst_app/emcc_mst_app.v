@@ -14,7 +14,8 @@
 //Description:
 //
 /////////////////////////////////////////////////////////////////
-`include  "components_param.vh"
+
+`include "./../../../include_files/components_param.vh"
 
 module emcc_mst_app
 #(
