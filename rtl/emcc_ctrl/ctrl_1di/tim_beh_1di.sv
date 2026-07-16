@@ -19,18 +19,16 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
-module tim_beh(
+module tim_beh_1di(
     input                  		clk_i                
 	,input                  	rst_i              	
 	,input                  	i_time_1ms_vld   	
 	,input                  	i_time_1s_vld    	
 	
-	,output	reg	[31:0]			task_time_cnt	
+	,output	reg	[19:0]			task_time_cnt	
 
 	,input						pre_sta_allow		
 	,input						post_sta_allow	
-
-	,input		[31:0]			bhv_en		//unuse
 
 	,input						c_en				
 	,output reg [7:0]			c_bhv_id   
@@ -236,6 +234,8 @@ module tim_beh(
     always@(posedge clk_i)begin
         if(rst_i)
             c_tx_id <= 8'd0;
+		else if(!c_en)
+            c_tx_id <= 8'd0;
         else if(curr_state == S_READY_10)
             c_tx_id <= 8'd10;
         else if(curr_state == S_EXE_20)
@@ -250,6 +250,8 @@ module tim_beh(
 	
 	always@(posedge clk_i)begin
         if(rst_i)
+            irq_o <= 1'b0;
+		else if(!c_en)
             irq_o <= 1'b0;
 		else if(irq_ack_i)    //The interrupt arbiter receives the interrupt.
             irq_o <= 1'b0;
@@ -267,6 +269,8 @@ module tim_beh(
 	
 	always@(posedge clk_i)begin
         if(rst_i)
+            c_alm_num <= 8'd0;
+		else if(!c_en)
             c_alm_num <= 8'd0;
         else if(curr_state == S_BHA_PRE_DET && timout)						//The pre - full inspection is not met.
             c_alm_num <= 8'd1;    
@@ -293,6 +297,8 @@ module tim_beh(
 	//Timeout count
     always@(posedge clk_i)begin
         if(rst_i)
+			timout_cnt <= 20'd0;
+		else if(!c_en)
             timout_cnt <= 20'd0;
 		else if(curr_state != curr_state_1d)
 			timout_cnt <= 20'd0;
@@ -324,41 +330,43 @@ reg [2:0] curr_state1;
 reg [2:0] next_state1;
 
 always @(posedge clk_i) begin
-    if (rst_i) begin
+    if (rst_i)
         curr_state1 <= TASK_IDLE;
-    end else begin
+    else
         curr_state1 <= next_state1;
-    end
 end
 
 always @(*) begin
     next_state1 = TASK_IDLE;
     case (curr_state1)
+	
         TASK_IDLE: begin
-            if (!c_en || c_gap_crl == 32'd0) begin
+            if (!c_en || c_gap_crl == 20'd0)
                 next_state1 = TASK_IDLE;
-            end else begin
+            else
                 next_state1 = TASK_COUNT;
-            end
         end
+		
         TASK_COUNT: begin
-            if (task_time_cnt >= c_gap_crl - 1) begin
+            if (task_time_cnt >= c_gap_crl - 1)
                 next_state1 = TASK_IRQ_WAIT;
-            end else begin
+            else
                 next_state1 = TASK_COUNT;
-            end
         end
+		
         TASK_IRQ_WAIT: begin
-            if (irq_ack_i) begin
+            if (irq_ack_i)		//After the interrupt is responded to, start counting again.
                 next_state1 = TASK_BACK;
-            end else begin
+            else
                 next_state1 = TASK_IRQ_WAIT;
-            end
         end
+		
         TASK_BACK: begin
             next_state1 = TASK_IDLE;
         end
+		
         default: next_state1 = TASK_IDLE;
+		
     endcase
 end
 
@@ -374,7 +382,7 @@ always @(posedge clk_i) begin
                 if (task_time_cnt >= c_gap_crl - 1)
                     task_time_cnt <= 'd0;
                 else
-                    task_time_cnt <= task_time_cnt + i_time_1ms_vld;
+                    task_time_cnt <= task_time_cnt + i_time_1s_vld;
             end
 			
             TASK_IRQ_WAIT:

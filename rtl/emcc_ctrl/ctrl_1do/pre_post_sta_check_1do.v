@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module pre_post_sta_check#(
+module pre_post_sta_check_1do#(
 		parameter		A_BHA_NUM	=	2      	
 		,parameter		B_BHA_NUM	=	1      		
 )(
@@ -41,47 +41,50 @@ module pre_post_sta_check#(
 		
 		,input							di				
 		
-		,input							b_en				//通道B使能 ps-pl
-		,input							c_en				//通道C使能 ps-pl
+		,input							a_en
+		,input							b_en			
+		,input							c_en			
 		
 		,input							ec_cha_st		
 		,input							ec_chb_st       
 		,input							ec_chc_st       
 		
-		,input 		[31:0] 				c_circle_time		//通道C时间周期
-		,input 		[31:0]				task_time_cnt		//通道C当前计数值
+		,input 		[19:0] 				c_circle_time	
+		,input 		[19:0]				task_time_cnt	
 
-		,output	reg	[A_BHA_NUM-1:0]		a_pre_sta_allow		//通道A 前充分状态允许
-		,output	reg	[A_BHA_NUM-1:0]		a_post_sta_allow	//通道A 后充分状态允许
-		,output	reg	[B_BHA_NUM-1:0]		b_pre_sta_allow		//通道B 前充分状态允许
-		,output	reg	[B_BHA_NUM-1:0]		b_post_sta_allow	//通道B 后充分状态允许
-		,output	reg						c_pre_sta_allow		//通道C 前充分状态允许
-		,output	reg						c_post_sta_allow	//通道C 后充分状态允许
+		,output	reg	[A_BHA_NUM-1:0]		a_pre_sta_allow	
+		,output	reg	[A_BHA_NUM-1:0]		a_post_sta_allow
+		,output	reg	[B_BHA_NUM-1:0]		b_pre_sta_allow	
+		,output	reg	[B_BHA_NUM-1:0]		b_post_sta_allow
+		,output	reg						c_pre_sta_allow	
+		,output	reg						c_post_sta_allow
     );
 	
 	//========================================================================================//
-	//--------------------------------- 通道A前充分、后充分检查 ------------------------------//
+	//---------------------------------  Channel A check -------------------------------------//
 	//========================================================================================//
 	
-	//前充分条件检查
 	always@(posedge clk_i)begin
 	if(rst_i)
 		a_pre_sta_allow <= 2'b00;
-	else
+	else if(a_en)
 		a_pre_sta_allow <= 2'b11;
+	else
+		a_pre_sta_allow <= 2'b00;
 	end
 	
-	//后充分条件检查
 	always@(posedge clk_i)begin
 	if(rst_i)
 		a_post_sta_allow <= 2'b00;
-	else
+	else if(a_en)
 		a_post_sta_allow <= 2'b11;
+	else
+		a_post_sta_allow <= 2'b00;
 	end
 		
 	
 	//========================================================================================//
-	//--------------------------------- 通道B前充分、后充分检查 ------------------------------//
+	//---------------------------------  Channel B check -------------------------------------//
 	//========================================================================================//
 
 	always@(posedge clk_i)begin
@@ -103,7 +106,7 @@ module pre_post_sta_check#(
 	end
 
 	//========================================================================================//
-	//--------------------------------- 通道C前充分、后充分检查 ------------------------------//
+	//---------------------------------  Channel C check -------------------------------------//
 	//========================================================================================//
 
 	always@(posedge clk_i)begin
@@ -118,7 +121,7 @@ module pre_post_sta_check#(
 	always@(posedge clk_i)begin
 	if(rst_i)
 		c_post_sta_allow <= 1'b0;
-	else if(c_en && (task_time_cnt >= c_circle_time-1))
+	else if(c_en)
 		c_post_sta_allow <= 1'b1;
 	else
 		c_post_sta_allow <= 1'b0;

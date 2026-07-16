@@ -671,7 +671,7 @@
           },
           "xlconcat_1": {
             "vlnv": "xilinx.com:ip:xlconcat:2.1",
-            "xci_name": "mststa_mpsoc_v2_xlconcat_0_1",
+            "xci_name": "mststa_mpsoc_v2_xlconcat_1_0",
             "parameters": {
               "IN0_WIDTH": {
                 "value": "32"
@@ -683,7 +683,7 @@
           },
           "xlconcat_2": {
             "vlnv": "xilinx.com:ip:xlconcat:2.1",
-            "xci_name": "mststa_mpsoc_v2_xlconcat_0_2",
+            "xci_name": "mststa_mpsoc_v2_xlconcat_2_0",
             "parameters": {
               "IN0_WIDTH": {
                 "value": "32"
@@ -695,7 +695,7 @@
           },
           "xlconcat_3": {
             "vlnv": "xilinx.com:ip:xlconcat:2.1",
-            "xci_name": "mststa_mpsoc_v2_xlconcat_0_3",
+            "xci_name": "mststa_mpsoc_v2_xlconcat_3_0",
             "parameters": {
               "IN0_WIDTH": {
                 "value": "32"
@@ -713,6 +713,7 @@
               "axi_crossbar_0/M00_AXI"
             ]
           },
+<<<<<<< HEAD
           "axi_crossbar_0_M01_AXI": {
             "interface_ports": [
               "axi_intc_1/s_axi",
@@ -725,16 +726,30 @@
               "axi_crossbar_0/M03_AXI"
             ]
           },
+=======
+>>>>>>> origin/cgliu
           "axi_crossbar_0_M02_AXI": {
             "interface_ports": [
               "axi_intc_2/s_axi",
               "axi_crossbar_0/M02_AXI"
             ]
           },
+          "axi_crossbar_0_M01_AXI": {
+            "interface_ports": [
+              "axi_intc_1/s_axi",
+              "axi_crossbar_0/M01_AXI"
+            ]
+          },
           "S00_AXI_1": {
             "interface_ports": [
               "S00_AXI",
               "axi_crossbar_0/S00_AXI"
+            ]
+          },
+          "axi_crossbar_0_M03_AXI": {
+            "interface_ports": [
+              "axi_intc_3/s_axi",
+              "axi_crossbar_0/M03_AXI"
             ]
           }
         },
@@ -1062,7 +1077,7 @@
           },
           "xlconcat_0": {
             "vlnv": "xilinx.com:ip:xlconcat:2.1",
-            "xci_name": "mststa_mpsoc_v2_xlconcat_0_4",
+            "xci_name": "mststa_mpsoc_v2_xlconcat_0_1",
             "parameters": {
               "IN0_WIDTH": {
                 "value": "32"
@@ -1074,7 +1089,11 @@
           },
           "xlconcat_1": {
             "vlnv": "xilinx.com:ip:xlconcat:2.1",
+<<<<<<< HEAD
             "xci_name": "mststa_mpsoc_v2_xlconcat_1_4",
+=======
+            "xci_name": "mststa_mpsoc_v2_xlconcat_1_1",
+>>>>>>> origin/cgliu
             "parameters": {
               "IN0_WIDTH": {
                 "value": "32"
@@ -1086,7 +1105,11 @@
           },
           "xlconcat_2": {
             "vlnv": "xilinx.com:ip:xlconcat:2.1",
+<<<<<<< HEAD
             "xci_name": "mststa_mpsoc_v2_xlconcat_2_4",
+=======
+            "xci_name": "mststa_mpsoc_v2_xlconcat_2_1",
+>>>>>>> origin/cgliu
             "parameters": {
               "IN0_WIDTH": {
                 "value": "32"
@@ -1098,7 +1121,11 @@
           },
           "xlconcat_3": {
             "vlnv": "xilinx.com:ip:xlconcat:2.1",
+<<<<<<< HEAD
             "xci_name": "mststa_mpsoc_v2_xlconcat_3_4",
+=======
+            "xci_name": "mststa_mpsoc_v2_xlconcat_3_1",
+>>>>>>> origin/cgliu
             "parameters": {
               "IN0_WIDTH": {
                 "value": "32"
@@ -1116,10 +1143,25 @@
               "axi_crossbar_0/S00_AXI"
             ]
           },
+<<<<<<< HEAD
+=======
+          "axi_crossbar_0_M01_AXI": {
+            "interface_ports": [
+              "axi_crossbar_0/M01_AXI",
+              "axi_intc_1/s_axi"
+            ]
+          },
+>>>>>>> origin/cgliu
           "axi_crossbar_0_M00_AXI": {
             "interface_ports": [
               "axi_crossbar_0/M00_AXI",
               "axi_intc_0/s_axi"
+            ]
+          },
+          "axi_crossbar_0_M03_AXI": {
+            "interface_ports": [
+              "axi_crossbar_0/M03_AXI",
+              "axi_intc_3/s_axi"
             ]
           },
           "axi_crossbar_0_M02_AXI": {
@@ -1465,7 +1507,11 @@
           },
           "xlconcat_0": {
             "vlnv": "xilinx.com:ip:xlconcat:2.1",
+<<<<<<< HEAD
             "xci_name": "mststa_mpsoc_v2_xlconcat_0_5",
+=======
+            "xci_name": "mststa_mpsoc_v2_xlconcat_0_2",
+>>>>>>> origin/cgliu
             "parameters": {
               "IN0_WIDTH": {
                 "value": "32"
@@ -1477,7 +1523,11 @@
           },
           "xlconcat_1": {
             "vlnv": "xilinx.com:ip:xlconcat:2.1",
+<<<<<<< HEAD
             "xci_name": "mststa_mpsoc_v2_xlconcat_1_5",
+=======
+            "xci_name": "mststa_mpsoc_v2_xlconcat_1_2",
+>>>>>>> origin/cgliu
             "parameters": {
               "IN0_WIDTH": {
                 "value": "32"
@@ -1489,7 +1539,11 @@
           },
           "xlconcat_2": {
             "vlnv": "xilinx.com:ip:xlconcat:2.1",
+<<<<<<< HEAD
             "xci_name": "mststa_mpsoc_v2_xlconcat_2_5",
+=======
+            "xci_name": "mststa_mpsoc_v2_xlconcat_2_2",
+>>>>>>> origin/cgliu
             "parameters": {
               "IN0_WIDTH": {
                 "value": "32"
@@ -1501,7 +1555,11 @@
           },
           "xlconcat_3": {
             "vlnv": "xilinx.com:ip:xlconcat:2.1",
+<<<<<<< HEAD
             "xci_name": "mststa_mpsoc_v2_xlconcat_3_5",
+=======
+            "xci_name": "mststa_mpsoc_v2_xlconcat_3_2",
+>>>>>>> origin/cgliu
             "parameters": {
               "IN0_WIDTH": {
                 "value": "32"
@@ -1513,22 +1571,16 @@
           }
         },
         "interface_nets": {
-          "axi_crossbar_0_M03_AXI": {
-            "interface_ports": [
-              "axi_crossbar_0/M03_AXI",
-              "axi_intc_3/s_axi"
-            ]
-          },
           "S00_AXI_1": {
             "interface_ports": [
               "S00_AXI",
               "axi_crossbar_0/S00_AXI"
             ]
           },
-          "axi_crossbar_0_M01_AXI": {
+          "axi_crossbar_0_M03_AXI": {
             "interface_ports": [
-              "axi_crossbar_0/M01_AXI",
-              "axi_intc_1/s_axi"
+              "axi_crossbar_0/M03_AXI",
+              "axi_intc_3/s_axi"
             ]
           },
           "axi_crossbar_0_M02_AXI": {
@@ -1541,6 +1593,12 @@
             "interface_ports": [
               "axi_crossbar_0/M00_AXI",
               "axi_intc_0/s_axi"
+            ]
+          },
+          "axi_crossbar_0_M01_AXI": {
+            "interface_ports": [
+              "axi_crossbar_0/M01_AXI",
+              "axi_intc_1/s_axi"
             ]
           }
         },
@@ -5251,12 +5309,23 @@
               }
             },
             "interface_nets": {
+<<<<<<< HEAD
               "axi_interconnect_0_to_s00_couplers": {
+=======
+              "m03_couplers_to_axi_interconnect_0": {
+                "interface_ports": [
+                  "M03_AXI",
+                  "m03_couplers/M_AXI"
+                ]
+              },
+              "xbar_to_m02_couplers": {
+>>>>>>> origin/cgliu
                 "interface_ports": [
                   "S00_AXI",
                   "s00_couplers/S_AXI"
                 ]
               },
+<<<<<<< HEAD
               "m00_couplers_to_axi_interconnect_0": {
                 "interface_ports": [
                   "M00_AXI",
@@ -5267,6 +5336,18 @@
                 "interface_ports": [
                   "s00_couplers/M_AXI",
                   "xbar/S00_AXI"
+=======
+              "xbar_to_m00_couplers": {
+                "interface_ports": [
+                  "xbar/M00_AXI",
+                  "m00_couplers/S_AXI"
+                ]
+              },
+              "m01_couplers_to_axi_interconnect_0": {
+                "interface_ports": [
+                  "M01_AXI",
+                  "m01_couplers/M_AXI"
+>>>>>>> origin/cgliu
                 ]
               },
               "xbar_to_m00_couplers": {
@@ -5281,6 +5362,7 @@
                   "m01_couplers/M_AXI"
                 ]
               },
+<<<<<<< HEAD
               "m02_couplers_to_axi_interconnect_0": {
                 "interface_ports": [
                   "M02_AXI",
@@ -5300,9 +5382,28 @@
                 ]
               },
               "m03_couplers_to_axi_interconnect_0": {
+=======
+              "axi_interconnect_0_to_s00_couplers": {
+>>>>>>> origin/cgliu
                 "interface_ports": [
                   "M03_AXI",
                   "m03_couplers/M_AXI"
+                ]
+              },
+<<<<<<< HEAD
+              "xbar_to_m03_couplers": {
+=======
+              "m00_couplers_to_axi_interconnect_0": {
+                "interface_ports": [
+                  "M00_AXI",
+                  "m00_couplers/M_AXI"
+                ]
+              },
+              "s00_couplers_to_xbar": {
+>>>>>>> origin/cgliu
+                "interface_ports": [
+                  "xbar/M03_AXI",
+                  "m03_couplers/S_AXI"
                 ]
               },
               "xbar_to_m03_couplers": {
@@ -5349,7 +5450,11 @@
           },
           "xlconcat_0": {
             "vlnv": "xilinx.com:ip:xlconcat:2.1",
+<<<<<<< HEAD
             "xci_name": "mststa_mpsoc_v2_xlconcat_0_6",
+=======
+            "xci_name": "mststa_mpsoc_v2_xlconcat_0_3",
+>>>>>>> origin/cgliu
             "parameters": {
               "IN0_WIDTH": {
                 "value": "32"
@@ -5361,7 +5466,11 @@
           },
           "xlconcat_1": {
             "vlnv": "xilinx.com:ip:xlconcat:2.1",
+<<<<<<< HEAD
             "xci_name": "mststa_mpsoc_v2_xlconcat_1_6",
+=======
+            "xci_name": "mststa_mpsoc_v2_xlconcat_1_3",
+>>>>>>> origin/cgliu
             "parameters": {
               "IN0_WIDTH": {
                 "value": "32"
@@ -5373,7 +5482,11 @@
           },
           "xlconcat_2": {
             "vlnv": "xilinx.com:ip:xlconcat:2.1",
+<<<<<<< HEAD
             "xci_name": "mststa_mpsoc_v2_xlconcat_2_6",
+=======
+            "xci_name": "mststa_mpsoc_v2_xlconcat_2_3",
+>>>>>>> origin/cgliu
             "parameters": {
               "IN0_WIDTH": {
                 "value": "32"
@@ -5385,7 +5498,11 @@
           },
           "xlconcat_3": {
             "vlnv": "xilinx.com:ip:xlconcat:2.1",
+<<<<<<< HEAD
             "xci_name": "mststa_mpsoc_v2_xlconcat_3_6",
+=======
+            "xci_name": "mststa_mpsoc_v2_xlconcat_3_3",
+>>>>>>> origin/cgliu
             "parameters": {
               "IN0_WIDTH": {
                 "value": "32"
@@ -5397,10 +5514,10 @@
           }
         },
         "interface_nets": {
-          "S00_AXI_1": {
+          "axi_interconnect_0_M03_AXI": {
             "interface_ports": [
-              "S00_AXI",
-              "axi_interconnect_0/S00_AXI"
+              "axi_intc_3/s_axi",
+              "axi_interconnect_0/M03_AXI"
             ]
           },
           "axi_interconnect_0_M02_AXI": {
@@ -5421,10 +5538,10 @@
               "axi_interconnect_0/M01_AXI"
             ]
           },
-          "axi_interconnect_0_M03_AXI": {
+          "S00_AXI_1": {
             "interface_ports": [
-              "axi_intc_3/s_axi",
-              "axi_interconnect_0/M03_AXI"
+              "S00_AXI",
+              "axi_interconnect_0/S00_AXI"
             ]
           }
         },
@@ -5550,10 +5667,90 @@
       }
     },
     "interface_nets": {
+      "smartconnect_0_M02_AXI": {
+        "interface_ports": [
+          "smartconnect_0/M02_AXI",
+          "intc_subsys_2/S00_AXI"
+        ]
+      },
+      "BRAM_PORTB_0_1": {
+        "interface_ports": [
+          "TX_BRAM_PORTB",
+          "blk_mem_gen_0/BRAM_PORTB"
+        ]
+      },
+      "smartconnect_0_M01_AXI": {
+        "interface_ports": [
+          "smartconnect_0/M01_AXI",
+          "intc_subsys_1/S00_AXI"
+        ]
+      },
+<<<<<<< HEAD
+      "smartconnect_1_M01_AXI": {
+        "interface_ports": [
+          "smartconnect_1/M01_AXI",
+          "axi_bram_ctrl_1/S_AXI"
+=======
+      "BRAM_PORTB_1_1": {
+        "interface_ports": [
+          "RX_BRAM_PORTB",
+          "blk_mem_gen_1/BRAM_PORTB"
+>>>>>>> origin/cgliu
+        ]
+      },
+      "BRAM_PORTB_0_1": {
+        "interface_ports": [
+          "TX_BRAM_PORTB",
+          "blk_mem_gen_0/BRAM_PORTB"
+        ]
+      },
+<<<<<<< HEAD
+      "zynq_ultra_ps_e_0_GPIO_0": {
+        "interface_ports": [
+          "GPIO",
+          "zynq_ultra_ps_e_0/GPIO_0"
+        ]
+      },
+=======
+>>>>>>> origin/cgliu
+      "zynq_ultra_ps_e_0_M_AXI_HPM1_FPD": {
+        "interface_ports": [
+          "smartconnect_1/S00_AXI",
+          "zynq_ultra_ps_e_0/M_AXI_HPM1_FPD"
+        ]
+      },
+<<<<<<< HEAD
+      "smartconnect_0_M02_AXI": {
+=======
+      "axi_bram_ctrl_0_BRAM_PORTA": {
+        "interface_ports": [
+          "blk_mem_gen_0/BRAM_PORTA",
+          "axi_bram_ctrl_0/BRAM_PORTA"
+        ]
+      },
+      "smartconnect_1_M01_AXI": {
+        "interface_ports": [
+          "smartconnect_1/M01_AXI",
+          "axi_bram_ctrl_1/S_AXI"
+        ]
+      },
+      "zynq_ultra_ps_e_0_M_AXI_HPM0_FPD": {
+        "interface_ports": [
+          "zynq_ultra_ps_e_0/M_AXI_HPM0_FPD",
+          "smartconnect_0/S00_AXI"
+        ]
+      },
       "smartconnect_0_M00_AXI1": {
+>>>>>>> origin/cgliu
         "interface_ports": [
           "smartconnect_0/M00_AXI",
           "intc_subsys_0/S00_AXI"
+        ]
+      },
+      "smartconnect_1_M02_AXI": {
+        "interface_ports": [
+          "PLCFG_M_AXI",
+          "smartconnect_1/M02_AXI"
         ]
       },
       "smartconnect_0_M03_AXI": {
@@ -5566,54 +5763,6 @@
         "interface_ports": [
           "axi_bram_ctrl_1/BRAM_PORTA",
           "blk_mem_gen_1/BRAM_PORTA"
-        ]
-      },
-      "smartconnect_1_M02_AXI": {
-        "interface_ports": [
-          "PLCFG_M_AXI",
-          "smartconnect_1/M02_AXI"
-        ]
-      },
-      "smartconnect_1_M01_AXI": {
-        "interface_ports": [
-          "smartconnect_1/M01_AXI",
-          "axi_bram_ctrl_1/S_AXI"
-        ]
-      },
-      "BRAM_PORTB_0_1": {
-        "interface_ports": [
-          "TX_BRAM_PORTB",
-          "blk_mem_gen_0/BRAM_PORTB"
-        ]
-      },
-      "zynq_ultra_ps_e_0_GPIO_0": {
-        "interface_ports": [
-          "GPIO",
-          "zynq_ultra_ps_e_0/GPIO_0"
-        ]
-      },
-      "zynq_ultra_ps_e_0_M_AXI_HPM1_FPD": {
-        "interface_ports": [
-          "smartconnect_1/S00_AXI",
-          "zynq_ultra_ps_e_0/M_AXI_HPM1_FPD"
-        ]
-      },
-      "smartconnect_0_M02_AXI": {
-        "interface_ports": [
-          "smartconnect_0/M02_AXI",
-          "intc_subsys_2/S00_AXI"
-        ]
-      },
-      "smartconnect_0_M01_AXI": {
-        "interface_ports": [
-          "smartconnect_0/M01_AXI",
-          "intc_subsys_1/S00_AXI"
-        ]
-      },
-      "BRAM_PORTB_1_1": {
-        "interface_ports": [
-          "RX_BRAM_PORTB",
-          "blk_mem_gen_1/BRAM_PORTB"
         ]
       },
       "zynq_ultra_ps_e_0_M_AXI_HPM0_FPD": {

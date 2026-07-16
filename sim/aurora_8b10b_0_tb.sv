@@ -1,10 +1,11 @@
 `timescale 1 ns / 100 ps
-`include  "base_addr.vh"
-`include  "para_reg_addr.vh"
-`include  "depot_addr_map.vh"
-`include  "reg_addr_pl.vh"
-`include  "globe_includes.vh"
-`include  "components_param.vh"
+
+`include "./../rtl/include_files/base_addr.vh"
+`include "./../rtl/include_files/para_reg_addr.vh"
+`include "./../rtl/include_files/depot_addr_map.vh"
+`include "./../rtl/include_files/reg_addr_pl.vh"
+`include "./../rtl/include_files/globe_includes.vh"
+`include "./../rtl/include_files/components_param.vh"
 
 module aurora_8b10b_0_TB;
 
