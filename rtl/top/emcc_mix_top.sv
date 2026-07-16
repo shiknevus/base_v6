@@ -415,21 +415,22 @@ module emcc_mix_top
 	
 	// --- component_v6_inst-----//
 	
-        ec_1di_check #(
-			.REG_SPACE_BIAS (`ROLLER_1003_REG_BIAS),	
-			.REG_SPACE_SIZE (512),
+        ec_1di_check #
+        (
+			.REG_SPACE_BIAS (20'h0000),	
+			.REG_SPACE_SIZE (10'h200),
 			.A_BHA_NUM      (2),
 			.B_BHA_NUM      (1)
 		) 
 		ec_1di_check_u0 
 		(
-			.clk_i           (clk),
-			.rst             (reset),
-			.aurora_reset    (1'b0),     // unuse
+			.clk_i           (clk   ),
+			.rst             (reset ),
+			.aurora_reset    (1'b0  ),     // unuse
 			.i_time_1ms_vld  (i_time_1ms_vld),
 			.i_time_1s_vld   (1'd0),
-			.ps_reg_clk		(ps_reg_clk),
-			.ps_reg_reset   (ps_reg_reset   ),
+			.ps_reg_clk		 (ps_reg_clk),
+			.ps_reg_reset    (ps_reg_reset   ),
 			.i_st_wr_en      (ps_reg_we),
 			.i_st_wr_addr    (ps_reg_addr),
 			.i_st_wr_data    (ps_reg_wr_dat),
@@ -437,7 +438,7 @@ module emcc_mix_top
 			.i_st_rd_addr    (ps_reg_rd_addr),
 			.o_st_rd_data    (sub_comp_rd_dat[27]),
 			.o_st_rd_vld     (sub_comp_rd_vld[27]),
-			.di              (1'd1),
+			.di              (di_mst_msg[31:31]),
 			.o_intr_irq      (map_irq[27] )
 		);
 		
