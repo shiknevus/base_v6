@@ -30,7 +30,6 @@
 
 /syn/**/**.sim/**
 !/syn/**/**.sim/**/
-!/syn/**/**.sim/**/**/**/wave.do
 
 /syn/src/**
 
