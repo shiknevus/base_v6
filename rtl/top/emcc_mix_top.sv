@@ -384,64 +384,6 @@ module emcc_mix_top
     // ------------------------------------------------------------------------------------------------------------------------------------
     // -------------------------------- The following is the flow components --------------------------------------------------------------
     // ------------------------------------------------------------------------------------------------------------------------------------
-<<<<<<< HEAD
-    assign  emcc_irq[0]   = map_irq[0];
-    assign  emcc_irq[1]   = map_irq[1];
-    assign  emcc_irq[2]   = map_irq[2];
-    assign  emcc_irq[3]   = map_irq[3];
-    assign  emcc_irq[4]   = map_irq[4];
-    assign  emcc_irq[5]   = map_irq[5];
-    assign  emcc_irq[6]   = map_irq[6];
-    assign  emcc_irq[7]   = map_irq[7];
-    assign  emcc_irq[8]   = map_irq[8];
-    assign  emcc_irq[9]   = map_irq[9];
-    assign  emcc_irq[10]   = map_irq[10];
-    assign  emcc_irq[11]   = map_irq[11];
-    assign  emcc_irq[12]   = map_irq[12];
-    assign  emcc_irq[13]   = map_irq[13];
-    assign  emcc_irq[14]   = map_irq[14];
-    assign  emcc_irq[15]   = map_irq[15];
-    assign  emcc_irq[16]   = map_irq[16];
-    assign  emcc_irq[17]   = map_irq[17];
-    assign  emcc_irq[18]   = map_irq[18];
-    assign  emcc_irq[19]   = map_irq[19];
-    assign  emcc_irq[20]   = map_irq[20];
-    assign  emcc_irq[21]   = map_irq[21];
-    assign  emcc_irq[22]   = map_irq[22];
-    assign  emcc_irq[23]   = map_irq[23];
-    assign  emcc_irq[25]   = map_irq[25];
-    assign  emcc_irq[26]   = map_irq[26];
-	assign  emcc_irq[27]   = map_irq[27];
-	
-	// --- component_v6_inst-----//
-	
-        ec_1di_check #
-        (
-			.REG_SPACE_BIAS (20'h0000),	
-			.REG_SPACE_SIZE (10'h200),
-			.A_BHA_NUM      (2),
-			.B_BHA_NUM      (1)
-		) 
-		ec_1di_check_u0 
-		(
-			.clk_i           (clk   ),
-			.rst             (reset ),
-			.aurora_reset    (1'b0  ),     // unuse
-			.i_time_1ms_vld  (i_time_1ms_vld),
-			.i_time_1s_vld   (1'd0),
-			.ps_reg_clk		 (ps_reg_clk),
-			.ps_reg_reset    (ps_reg_reset   ),
-			.i_st_wr_en      (ps_reg_we),
-			.i_st_wr_addr    (ps_reg_addr),
-			.i_st_wr_data    (ps_reg_wr_dat),
-			.i_st_rd_en      (ps_reg_re),
-			.i_st_rd_addr    (ps_reg_rd_addr),
-			.o_st_rd_data    (sub_comp_rd_dat[27]),
-			.o_st_rd_vld     (sub_comp_rd_vld[27]),
-			.di              (di_mst_msg[31:31]),
-			.o_intr_irq      (map_irq[27] )
-		);
-=======
     assign  emcc_irq[0]   	= map_irq[0];
     assign  emcc_irq[1]   	= map_irq[1];
     assign  emcc_irq[2]   	= map_irq[2];
@@ -515,7 +457,6 @@ module emcc_mix_top
 				,.do_o					(do_mst_msg[0]			)
 				,.o_intr_irq			(map_irq[1]				)
 			);
->>>>>>> origin/cgliu
 		
 			ec_2di_2do#(
 				.REG_SPACE_BIAS			(`ROLLER_1048_REG_BIAS	),	//Component offset address
