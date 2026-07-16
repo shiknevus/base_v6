@@ -27,8 +27,8 @@
     <Option Name="IPCachePermission" Val="write"/>
     <Option Name="EnableCoreContainer" Val="FALSE"/>
     <Option Name="CreateRefXciForCoreContainers" Val="FALSE"/>
-    <Option Name="IPUserFilesDir" Val="E:/folder/bykz_base_v6.0/syn/bykz_base_v6.0/bykz_base_v6.0.ip_user_files"/>
-    <Option Name="IPStaticSourceDir" Val="E:/folder/bykz_base_v6.0/syn/bykz_base_v6.0/bykz_base_v6.0.ip_user_files/ipstatic"/>
+    <Option Name="IPUserFilesDir" Val="$PIPUSERFILESDIR"/>
+    <Option Name="IPStaticSourceDir" Val="$PIPUSERFILESDIR/ipstatic"/>
     <Option Name="EnableBDX" Val="FALSE"/>
     <Option Name="DSAVendor" Val="xilinx"/>
     <Option Name="DSANumComputeUnits" Val="60"/>
