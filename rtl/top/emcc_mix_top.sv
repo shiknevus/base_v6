@@ -457,7 +457,7 @@ module emcc_mix_top
 				,.do_o					(do_mst_msg[0]			)
 				,.o_intr_irq			(map_irq[1]				)
 			);
-		
+            
 			ec_2di_2do#(
 				.REG_SPACE_BIAS			(`ROLLER_1048_REG_BIAS	),	//Component offset address
 				.REG_SPACE_SIZE			(512					)
@@ -478,6 +478,28 @@ module emcc_mix_top
 				,.di_i					(di_mst_msg[2:1]		)
 				,.do_o					(do_mst_msg[2:1]		)
 				,.o_intr_irq			(map_irq[2]				)
+			);
+
+			ec_3di_2do#(
+				.REG_SPACE_BIAS			(`ROLLER_2126_REG_BIAS  ),	//Component offset address
+				.REG_SPACE_SIZE			(`REG_SPACE_SIZE        )
+			)ec_3di_2do_u0(
+				.clk_i					(clk					)
+				,.rst					(reset					)
+				,.i_time_1ms_vld		(time_1ms_vld			)
+				,.i_time_1s_vld 		(time_1s_vld			)
+				,.ps_reg_clk			(ps_reg_clk				)
+				,.ps_reg_reset			(ps_reg_reset			)
+				,.i_st_wr_en			(ps_reg_we				)
+				,.i_st_wr_addr  		(ps_reg_addr			)
+				,.i_st_wr_data  		(ps_reg_wr_dat			)
+				,.i_st_rd_en    		(ps_reg_re				)
+				,.i_st_rd_addr  		(ps_reg_rd_addr			)
+				,.o_st_rd_data  		(sub_comp_rd_dat[2]		)
+				,.o_st_rd_vld   		(sub_comp_rd_vld[2]		)
+				,.di_i					(di_mst_msg[5:3]		)
+				,.do_o					(do_mst_msg[4:3]		)
+				,.o_intr_irq			(map_irq[3]				)
 			);
 		
 		
