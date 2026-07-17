@@ -1,5 +1,5 @@
 
-`timescale 1 ns / 100 ps
+`timescale 1 ns / 1 ns
 `include "./../rtl/include_files/reg_addr_pl.vh"
 `include "./../rtl/include_files/globe_includes.vh"
 `include "./../rtl/include_files/components_param.vh"
@@ -185,7 +185,7 @@ emcc_mst_top emcc_mst_top_u
 				//ps写复�??
 				
 				ps_write_word(	EC_BIAS_ADDR + `RST_EN,32'h0000_0001,resp1);
-				
+
 				ps_write_word(	EC_BIAS_ADDR + `SC_ID,32'h0000_0066,resp1);
 				
 				ps_write_word(	EC_BIAS_ADDR + `EC_ID,32'h0000_0088,resp1);
@@ -205,22 +205,22 @@ emcc_mst_top emcc_mst_top_u
 				
 				//行为超时
 				ps_write_word(	EC_BIAS_ADDR + `A_TX_OT,32'hFFFF_0000,resp1);
-				
-				loop_end = 1'b0;
-				while(loop_end == 1'b0) 
-				begin
-					ps_read_word(EC_BIAS_ADDR + `EC_CHA_ST, read_data);
-					@(posedge init_clk_p); 
+				$stop;
+				// loop_end = 1'b0;
+				// while(loop_end == 1'b0) 
+				// begin
+				// 	ps_read_word(EC_BIAS_ADDR + `EC_CHA_ST, read_data);
+				// 	@(posedge init_clk_p); 
 					
-					if(read_data == 32'h0000_0000) begin
-						loop_end = 1'b1; 
-					end
-				end
+				// 	if(read_data == 32'h0000_0000) begin
+				// 		loop_end = 1'b1; 
+				// 	end
+				// end
 				
 				//============================================	行为ID=1		==================================
 
 				force `EC_COMP_INST_DI = 3'b001;	//position  1 arrive
-				
+				#100;
 				ps_write_word(	EC_BIAS_ADDR + `A_BHV_ID,32'h0000_0001,resp1);	
 				
 				//10
@@ -523,14 +523,27 @@ task automatic ps_write_word;
 endtask
 
 task automatic ps_read_word;
-	input	[31:0]	rd_addr;
-	output	[31:0]	read_data;
-	reg				resp;
+    input   [31:0]  rd_addr;
+    output  [31:0]  read_data;
+    reg     [127:0] bus_data;      // 128bit 整拍读回
+    reg     [1:0]   word_sel;
+    reg     [1:0]   resp;
 begin
-tb_ec_3di_2do.emcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.read_burst// 2配置的size
-					(rd_addr,0,2,1,0,0,0,read_data,resp);
+    word_sel = rd_addr[3:2];       // 与写一致:地址选 word
+    tb_ec_3di_2do.emcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.read_burst(
+        {rd_addr[31:4],4'b0000},   // 对齐到 16 字节边界(同写)
+        8'd0,               	   // len=0 单拍
+        3'd4,                       // size=4 → 128bit/拍(同写)
+        2'b01,                      // burst=INCR
+        1'b0,                       // lock
+        4'b0000,                    // cache
+        3'b000,                     // prot
+        bus_data,                   // 128bit 读数据
+        resp                        // RRESP
+    );
+    read_data = bus_data[word_sel*32 +: 32];   //抠出被寻址的那个 32bit word
 end
-endtask	
+endtask
 
 
 endmodule
