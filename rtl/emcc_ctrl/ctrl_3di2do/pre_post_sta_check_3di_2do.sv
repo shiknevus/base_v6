@@ -47,7 +47,7 @@ module pre_post_sta_check_3di_2do#(
 		
 		,input							valid_sig_1
 		,input							valid_sig_2
-		
+		,input							valid_sig_3
 		,input							a_en
 		,input							b_en			
 		,input							c_en	

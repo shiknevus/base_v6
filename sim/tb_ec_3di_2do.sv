@@ -183,7 +183,7 @@ emcc_mst_top emcc_mst_top_u
                 //PS RX PORT
                 wait (tb_ec_3di_2do.emcc_mst_top_u.prot_clk_rst == 0)                                                                                                           //
 				//ps写复�??
-				
+				read_data = 32'd0;
 				ps_write_word(	EC_BIAS_ADDR + `RST_EN,32'h0000_0001,resp1);
 
 				ps_write_word(	EC_BIAS_ADDR + `SC_ID,32'h0000_0066,resp1);
@@ -199,13 +199,13 @@ emcc_mst_top emcc_mst_top_u
 				ps_write_word(	EC_BIAS_ADDR + `BHV_PRIORITY,32'h0000_0000,resp1);
 				
 				//信号有效�??
-				ps_write_word(	EC_BIAS_ADDR + `PARAM26,32'h0000_0001,resp1);
+				ps_write_word(	EC_BIAS_ADDR + `PARAM1,32'h0000_0001,resp1);
 				
-				ps_write_word(	EC_BIAS_ADDR + `PARAM27,32'h0000_0001,resp1);
-				
+				ps_write_word(	EC_BIAS_ADDR + `PARAM2,32'h0000_0001,resp1);
+
+				ps_write_word(	EC_BIAS_ADDR + `PARAM3,32'h0000_0001,resp1);
 				//行为超时
 				ps_write_word(	EC_BIAS_ADDR + `A_TX_OT,32'hFFFF_0000,resp1);
-				$stop;
 				// loop_end = 1'b0;
 				// while(loop_end == 1'b0) 
 				// begin
@@ -219,13 +219,13 @@ emcc_mst_top emcc_mst_top_u
 				
 				//============================================	行为ID=1		==================================
 
-				force `EC_COMP_INST_DI = 3'b001;	//position  1 arrive
-				#100;
+				// force `EC_COMP_INST_DI = 3'b001;	//position  1 arrive
+				// #100;
 				ps_write_word(	EC_BIAS_ADDR + `A_BHV_ID,32'h0000_0001,resp1);	
 				
 				//10
 				wait (`EC_COMP_INST_IRQ_O == 1'b1);
-				ps_read_word(EC_BIAS_ADDR + `IRQ_REG2, read_data);
+				ps_write_word(	EC_BIAS_ADDR + `A_TX_RSULT_RPT,32'h010a_5167,resp1);//写事务回应寄存器
 				if(read_data == 32'd0)	begin	//no alart
 					ps_read_word(EC_BIAS_ADDR + `IRQ_REG1, read_data);
 					if(read_data == {8'h88,8'h66,8'd1,8'd10})	
@@ -245,12 +245,14 @@ emcc_mst_top emcc_mst_top_u
 					else if(read_data == {8'h88,8'h66,8'd1,8'd40})//fail
 						ps_write_word(	EC_BIAS_ADDR + `A_TX_RSULT_RPT,32'h0128_5199,resp1);//写事务回应寄存器
 				end else
-					$stop;
+					// $stop;
+				
+				
 				
 				
 				//============================================	行为ID=2		==================================
 				
-				#6000;
+				#600;
 				force `EC_COMP_INST_DI = 3'b010;	//position  2 arrive
 				
 				ps_write_word(	EC_BIAS_ADDR + `A_BHV_ID,32'h0000_0002,resp1);	
@@ -523,27 +525,13 @@ task automatic ps_write_word;
 endtask
 
 task automatic ps_read_word;
-    input   [31:0]  rd_addr;
-    output  [31:0]  read_data;
-    reg     [127:0] bus_data;      // 128bit 整拍读回
-    reg     [1:0]   word_sel;
-    reg     [1:0]   resp;
+	input	[31:0]	rd_addr;
+	output	[31:0]	read_data;
+	reg				resp;
 begin
-    word_sel = rd_addr[3:2];       // 与写一致:地址选 word
-    tb_ec_3di_2do.emcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.read_burst(
-        {rd_addr[31:4],4'b0000},   // 对齐到 16 字节边界(同写)
-        8'd0,               	   // len=0 单拍
-        3'd4,                       // size=4 → 128bit/拍(同写)
-        2'b01,                      // burst=INCR
-        1'b0,                       // lock
-        4'b0000,                    // cache
-        3'b000,                     // prot
-        bus_data,                   // 128bit 读数据
-        resp                        // RRESP
-    );
-    read_data = bus_data[word_sel*32 +: 32];   //抠出被寻址的那个 32bit word
+tb_ec_3di_2do.emcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.read_burst// 2配置的size
+					(rd_addr,0,2,1,0,0,0,read_data,resp);
 end
-endtask
-
+endtask	
 
 endmodule

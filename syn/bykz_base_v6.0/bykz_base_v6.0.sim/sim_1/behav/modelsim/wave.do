@@ -88,8 +88,21 @@ add wave -noupdate /tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/a_
 add wave -noupdate /tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/di
 add wave -noupdate /tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/irq_o
 add wave -noupdate /tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/irq_ack_i
+add wave -noupdate /tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/ps_rw_pl_reg_u0/i_st_wr_en
+add wave -noupdate /tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/ps_rw_pl_reg_u0/i_st_wr_addr
+add wave -noupdate /tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/ps_rw_pl_reg_u0/i_st_wr_data
+add wave -noupdate /tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/ps_rw_pl_reg_u0/i_st_rd_en
+add wave -noupdate /tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/ps_rw_pl_reg_u0/i_st_rd_addr
+add wave -noupdate /tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/ps_rw_pl_reg_u0/o_st_rd_data
+add wave -noupdate /tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/ps_rw_pl_reg_u0/o_st_rd_vld
+add wave -noupdate /tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/proactive_beh_3di_2do_u0/a_en
+add wave -noupdate /tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/proactive_beh_3di_2do_u0/a_bhv_id
+add wave -noupdate /tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/proactive_beh_3di_2do_u0/di_i
+add wave -noupdate /tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/proactive_beh_3di_2do_u0/do_o
+add wave -noupdate /tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/proactive_beh_3di_2do_u0/curr_state_1d
+add wave -noupdate /tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/proactive_beh_3di_2do_u0/next_state
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {27636005237 fs} 0}
+WaveRestoreCursors {{Cursor 1} {28731362404 fs} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 150
 configure wave -valuecolwidth 100
@@ -103,6 +116,6 @@ configure wave -gridoffset 0
 configure wave -gridperiod 1
 configure wave -griddelta 40
 configure wave -timeline 0
-configure wave -timelineunits fs
+configure wave -timelineunits ns
 update
-WaveRestoreZoom {0 fs} {83949098100 fs}
+WaveRestoreZoom {23080662020 fs} {52993580560 fs}

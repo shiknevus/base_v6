@@ -312,8 +312,9 @@ module ec_3di_2do#(
     ,.i_time_1s_vld        	(i_time_1s_vld  	)
     ,.pre_sta_allow        	(a_pre_sta_allow	)
     ,.post_sta_allow       	(a_post_sta_allow	)
-    ,.valid_sig_1			(param26			)
-	,.valid_sig_2			(param27			)
+    ,.valid_sig_1			(param1			)
+	,.valid_sig_2			(param2			)
+	,.valid_sig_3			(param3			)
 	,.a_en			       	(a_en				)
     ,.a_bhv_id             	(a_bhv_id       	)
     ,.a_bhv_vld            	(a_bhv_vld      	)
@@ -394,8 +395,9 @@ module ec_3di_2do#(
 			.ec_id           	(ec_id          ),
 			.di_i				(di_i			),
 			.do_o				(do_o			),
-			.valid_sig_1		(param26		),
-			.valid_sig_2		(param27		),
+			.valid_sig_1		(param1		),
+			.valid_sig_2		(param2		),
+			.valid_sig_3		(param3		),
 			.a_en				(a_en			),
 			.b_en				(b_en			),	
 			.c_en				(c_en			),	

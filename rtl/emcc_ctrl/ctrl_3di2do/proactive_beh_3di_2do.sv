@@ -34,7 +34,9 @@ module proactive_beh_3di_2do#(
 
     ,input                      valid_sig_1       //Signal validity ps-pl
 	,input						valid_sig_2
-	
+	,input						valid_sig_3		//set vaild signal for behavior 8
+
+	,input      [7:0]           ec_id
 	,input						a_en			//A enable
     ,input      [7:0]           a_bhv_id
     ,input                      a_bhv_vld
@@ -70,18 +72,18 @@ module proactive_beh_3di_2do#(
 	reg			detect_flag;
 	
 	
-	localparam  S_IDLE          = 8'd0; 
-    localparam  S_BHA_PRE_DET	= 8'd1; 
-	localparam	S_READY_10		= 8'd2;
-    localparam  S_READY_10_ACK  = 8'd3; 
-    localparam  S_EXE_20     	= 8'd4; 
-    localparam  S_EXE_20_ACK	= 8'd5; 
-    localparam  S_BHA_POST_DET  = 8'd6; 
-    localparam  S_SUCC_30       = 8'd7; 
-    localparam  S_SUCC_30_ACK	= 8'd8; 
-	localparam 	S_ALERT_40		= 8'd9;
-	localparam 	S_ALERT_40_ACK	= 8'd10;
-	localparam	S_EXE			= 8'd11;
+	localparam  S_IDLE          = 8'h00; 
+    localparam  S_BHA_PRE_DET	= 8'h01; 
+	localparam	S_READY_10		= 8'h02;
+    localparam  S_READY_10_ACK  = 8'h03; 
+    localparam  S_EXE_20     	= 8'h04; 
+    localparam  S_EXE_20_ACK	= 8'h05; 
+    localparam  S_BHA_POST_DET  = 8'h06; 
+    localparam  S_SUCC_30       = 8'h07; 
+    localparam  S_SUCC_30_ACK	= 8'h08; 
+	localparam 	S_ALERT_40		= 8'h09;
+	localparam 	S_ALERT_40_ACK	= 8'h0a;
+	localparam	S_EXE			= 8'h0b;
 
     localparam  IRQ_OK          = 8'h51;
     localparam  IRQ_NO_OK       = 8'h52;
@@ -233,6 +235,8 @@ module proactive_beh_3di_2do#(
 						next_state = S_BHA_POST_DET;
 					else if((a_bhv_id_r == 8'd6 || a_bhv_id_r == 8'd7) && di_i == {~valid_sig_2,~valid_sig_1})
 						next_state = S_BHA_POST_DET;
+					else if((a_bhv_id_r == 8'd8 && di_i[2] == valid_sig_3)) 
+						next_state = S_BHA_POST_DET;
 					else
 						next_state = S_ALERT_40;
 				end else
@@ -253,6 +257,8 @@ module proactive_beh_3di_2do#(
 				else if(a_bhv_id_r == 8'd6 && post_sta_allow[5])
                     next_state = S_SUCC_30;
 				else if(a_bhv_id_r == 8'd7 && post_sta_allow[6])
+                    next_state = S_SUCC_30;
+				else if(a_bhv_id_r == 8'd8 && post_sta_allow[7])
                     next_state = S_SUCC_30;
                 else
                     next_state = S_ALERT_40;
