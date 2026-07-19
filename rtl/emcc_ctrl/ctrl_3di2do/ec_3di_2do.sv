@@ -20,22 +20,18 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module ec_1di_check#(
-		parameter  				REG_SPACE_BIAS 		= 	2000	,	//组件基地址
-		parameter  				REG_SPACE_SIZE 		= 	512	,	//组件偏移地址
-		parameter 				A_BHA_NUM			=	2    ,
-		parameter 				B_BHA_NUM			=	1   
-		
+module ec_3di_2do#(
+		parameter  				REG_SPACE_BIAS 		= 	2000	,
+		parameter  				REG_SPACE_SIZE 		= 	512	
 )(
 		input					clk_i			,
 		input					rst				,
-		input					aurora_reset	,	//unuse
 		input                   i_time_1ms_vld  ,
 		input                   i_time_1s_vld   ,
 		
 		input					ps_reg_clk		,
 		input					ps_reg_reset	,
-		input  		            i_st_wr_en		,//bram总线
+		input  		            i_st_wr_en		,
 		input  		 [19:0]     i_st_wr_addr    ,
 		input  		 [31:0]     i_st_wr_data    ,
 		input  		            i_st_rd_en      ,
@@ -43,9 +39,16 @@ module ec_1di_check#(
 		output 		 [31:0]     o_st_rd_data    ,
 		output 		            o_st_rd_vld     ,
 
-		input					di				,
-		output 	            	o_intr_irq		//组件中断请求
+		input		 [2:0]		di_i			,	//In - position sensor signal
+		output		 [1:0]		do_o			,	//switch
+		
+		output 	            	o_intr_irq	
     );
+	
+	
+	localparam		A_BHA_NUM		=	8;	
+	localparam		B_BHA_NUM		=	1;	
+	localparam		ARV_SIG_DET_TIM	=	5;
 	
 	//PS-PL    
 	wire 	[7:0]	unit_id         ;     	
@@ -60,18 +63,17 @@ module ec_1di_check#(
 	wire 	[7:0]	sc_id			;		
 	wire 	[7:0]	ec_id           ;       
 	wire 			rst_en_n        ;	
-	wire	[31:0]	bhv_num			;
 
 	wire	[7:0]	a_bhv_id        ;       
 	wire			a_bhv_vld        ;       
-	wire	[7:0]	a_task_id       ;       
-	wire	[31:0]	a_tx_ot         ;       
+	wire	[31:0]	a_task_id       ;       
+	wire	[19:0]	a_tx_ot         ;       
 	wire	[31:0]	a_tx_result_rpt ;       
-	wire	[31:0]	b_tx_ot         ;       
+	wire	[19:0]	b_tx_ot         ;       
 	wire	[31:0]	b_tx_result_rpt ;       
 	wire			b_en			;
-	wire	[31:0]	c_tx_ot         ;       
-	wire	[31:0]	c_gap_crl       ;       
+	wire	[19:0]	c_tx_ot         ;       
+	wire	[19:0]	c_gap_crl       ;       
 	wire	[31:0]	c_tx_result_rpt ;    
 	wire			c_en			;
 	
@@ -124,24 +126,24 @@ module ec_1di_check#(
 	//PL-PS
 	wire 	[31:0]	param51 ;
 	wire 	[31:0]	param52 ;
-	//wire 	[31:0]	param53 ;
-	//wire 	[31:0]	param54 ;
-	//wire 	[31:0]	param55 ;
-	//wire 	[19:0]	param56 ;
-	//wire 	[19:0]	param57 ;
-	//wire 	[19:0]	param58 ;
-	//wire 	[19:0]	param59 ;
-	//wire 	[19:0]	param60 ;
-	//wire 	[7:0]	param61 ;
-	//wire 	[7:0]	param62 ;
-	//wire 	[7:0]	param63 ;
-	//wire 	[7:0]	param64 ;
-	//wire 	[7:0]	param65 ;
-	//wire 			param66 ;
-	//wire 			param67 ;
-	//wire 			param68 ;
-	//wire 			param69 ;
-	//wire 			param70 ;
+	wire 	[31:0]	param53 ;
+	wire 	[31:0]	param54 ;
+	wire 	[31:0]	param55 ;
+	wire 	[19:0]	param56 ;
+	wire 	[19:0]	param57 ;
+	wire 	[19:0]	param58 ;
+	wire 	[19:0]	param59 ;
+	wire 	[19:0]	param60 ;
+	wire 	[7:0]	param61 ;
+	wire 	[7:0]	param62 ;
+	wire 	[7:0]	param63 ;
+	wire 	[7:0]	param64 ;
+	wire 	[7:0]	param65 ;
+	wire 			param66 ;
+	wire 			param67 ;
+	wire 			param68 ;
+	wire 			param69 ;
+	wire 			param70 ;
 
 
 	wire	[31:0]	task_time_cnt	;
@@ -178,11 +180,23 @@ module ec_1di_check#(
 	wire			a_en;
 	wire 	[31:0]	bhv_en;
 	
+	reg		[7:0]	a_bhv_id_r;
+	
+	always@(posedge clk_i)
+	begin
+		if(rst_i)
+			a_bhv_id_r <= 8'd0;
+		else if(a_bhv_vld)
+			a_bhv_id_r <= a_bhv_id;
+		else
+			a_bhv_id_r <= a_bhv_id_r;
+	end
+	
 	
 	ps_rw_pl_reg#(
-		.REG_SPACE_BIAS 	(REG_SPACE_BIAS		),	//组件基地址
-		.REG_SPACE_SIZE 	(REG_SPACE_SIZE		)	//组件偏移地址
-) ps_rw_pl_reg_inst (
+		.REG_SPACE_BIAS 	(REG_SPACE_BIAS		),
+		.REG_SPACE_SIZE 	(REG_SPACE_SIZE		)
+)ps_rw_pl_reg_u0(
 	.clk_i			        (ps_reg_clk		)
 	,.rst_i			        (ps_reg_reset	)
 	,.i_st_wr_en		    (i_st_wr_en		)
@@ -192,7 +206,7 @@ module ec_1di_check#(
     ,.i_st_rd_addr	        (i_st_rd_addr 	)
     ,.o_st_rd_data	        (o_st_rd_data 	)
 	,.o_st_rd_vld 	        (o_st_rd_vld  	)
-	,.rst_en_n              (rst_en_n		)
+	,.rst_en_n              (rst_en_n		)	//board error
 	,.ec_id                 (ec_id			)
 	,.sc_id			        (sc_id			)
 	,.chl_priority	        (chl_priority	)
@@ -268,38 +282,39 @@ module ec_1di_check#(
 	,.c_bhv_id              (c_bhv_id 		)
 	,.param51               (param51		)
 	,.param52               (param52		)
-	,.param53               ('d0			)
-	,.param54               ('d0			)
-	,.param55               ('d0			)
-	,.param56               ('d0			)
-	,.param57               ('d0			)
-	,.param58               ('d0			)
-	,.param59               ('d0			)
-	,.param60               ('d0			)
-	,.param61               ('d0			)
-	,.param62               ('d0			)
-	,.param63               ('d0			)
-	,.param64               ('d0			)
-	,.param65               ('d0			)
-	,.param66               ('d0			)
-	,.param67               ('d0			)
-	,.param68               ('d0			)
-	,.param69               ('d0			)
-	,.param70               ('d0			)
+	,.param53               (param53		)
+	,.param54               (param54		)
+	,.param55               (param55		)
+	,.param56               (param56		)
+	,.param57               (param57		)
+	,.param58               (param58		)
+	,.param59               (param59		)
+	,.param60               (param60		)
+	,.param61               (param61		)
+	,.param62               (param62		)
+	,.param63               (param63		)
+	,.param64               (param64		)
+	,.param65               (param65		)
+	,.param66               (di				)
+	,.param67               (param67		)
+	,.param68               (param68		)
+	,.param69               (param69		)
+	,.param70               (param70		)
 	);
 
-	
-
-	proactive_beh#(
-	.BHA_NUM 				(A_BHA_NUM   )	//Number of active behaviors
-)proactive_beh_u0(
+	proactive_beh_3di_2do#(	
+	.BHA_NUM 				(A_BHA_NUM  	 	),	//Number of active behaviors
+	.ARV_SIG_DET_TIM		(ARV_SIG_DET_TIM	)		//In - place signal detection time
+)proactive_beh_3di_2do_u0(
     .clk_i                 	(clk_i				)
     ,.rst_i                	(rst_i				)
     ,.i_time_1ms_vld       	(i_time_1ms_vld 	)
     ,.i_time_1s_vld        	(i_time_1s_vld  	)
     ,.pre_sta_allow        	(a_pre_sta_allow	)
     ,.post_sta_allow       	(a_post_sta_allow	)
-    ,.valid_sig            	(param1[0]			)
+    ,.valid_sig_1			(param1			)
+	,.valid_sig_2			(param2			)
+	,.valid_sig_3			(param3			)
 	,.a_en			       	(a_en				)
     ,.a_bhv_id             	(a_bhv_id       	)
     ,.a_bhv_vld            	(a_bhv_vld      	)
@@ -309,21 +324,22 @@ module ec_1di_check#(
     ,.ec_cha_st            	(ec_cha_st			)
     ,.a_tx_id              	(a_tx_id        	)
     ,.a_alm_num            	(a_alm_num      	)
-    ,.di                   	(di					)
+    ,.di_i                  (di_i				)
+	,.do_o					(do_o				)
     ,.irq_o                	(irq_a				)
     ,.irq_ack_i       		(irq_a_grant		)
     );
+
 	 
-	status_beh#(
+	status_beh_3di_2do#(
 		.BHA_NUM(B_BHA_NUM	)
-)status_beh_u0(
+)status_beh_3di_2do_u0(
 	.clk_i			        (clk_i				)
 	,.rst_i			        (rst_i				)
 	,.i_time_1ms_vld		(i_time_1ms_vld 	)
 	,.i_time_1s_vld 		(i_time_1s_vld  	)
 	,.pre_sta_allow	        (b_pre_sta_allow	)
 	,.post_sta_allow	    (b_post_sta_allow	)
-	,.bhv_en				(bhv_en				)
 	,.b_en	                (b_en				)
 	,.b_bhv_id              (b_bhv_id			)
 	,.b_tx_ot               (b_tx_ot			)
@@ -337,15 +353,14 @@ module ec_1di_check#(
 	,.irq_ack_i	            (irq_ack_i			)	
     );
 	 
-	tim_beh tim_beh_u0(
+	tim_beh_3di_2do tim_beh_3di_2do_u0(
     .clk_i                      (clk_i          	)
 	,.rst_i              	    (rst_i         		)
 	,.i_time_1ms_vld   	        (i_time_1ms_vld 	)
 	,.i_time_1s_vld    	        (i_time_1s_vld  	)
-	,.task_time_cnt	            (task_time_cnt		)//当前计数值
+	,.task_time_cnt	            (task_time_cnt		)
 	,.pre_sta_allow		        (c_pre_sta_allow	)
 	,.post_sta_allow	        (c_post_sta_allow	)
-	,.bhv_en					(bhv_en				)
 	,.c_en				        (c_en				)
 	,.c_bhv_id                  (c_bhv_id			)
 	,.c_tx_ot          	        (c_tx_ot			)
@@ -359,39 +374,49 @@ module ec_1di_check#(
 	,.irq_ack_i                 (irq_ack_i			)
    );
 	
-	pre_post_sta_check#(
-		.A_BHA_NUM			(A_BHA_NUM	 )    ,	
-		.B_BHA_NUM			(B_BHA_NUM	 )    
-)pre_post_sta_check_u0(
-		.clk_i				(clk_i			),
-		.rst_i				(rst_i			),
-		.unit_id         	(unit_id        ),
-		.unit_ectrl      	(unit_ectrl     ),
-		.unit_st         	(unit_st        ),
-		.m_id            	(m_id           ),
-		.m_ectrl         	(m_ectrl        ),
-		.m_st            	(m_st           ),
-		.m_wk_mod        	(m_wk_mod       ),
-		.m_saf_st        	(m_saf_st       ),
-		.link_m_saf_st   	(link_m_saf_st  ),
-		.sc_id				(sc_id			),
-		.ec_id           	(ec_id          ),
-		.di					(di				),
-		.b_en				(b_en			),	//通道B使能 ps-pl
-		.c_en				(c_en			),	//通道C使能 ps-pl
-		.ec_cha_st			(ec_cha_st		),
-		.ec_chb_st       	(ec_chb_st		),
-		.ec_chc_st       	(ec_chc_st		),
-		.c_circle_time		(c_gap_crl		),	//通道C时间周期
-		.task_time_cnt		(task_time_cnt	),	//通道C当前计数值
-		.a_pre_sta_allow	(a_pre_sta_allow),	//通道A 前充分状态允许
-		.a_post_sta_allow	(a_post_sta_allow),	//通道A 后充分状态允许
-		.b_pre_sta_allow	(b_pre_sta_allow),	//通道B 前充分状态允许
-		.b_post_sta_allow	(b_post_sta_allow),	//通道B 后充分状态允许
-		.c_pre_sta_allow	(c_pre_sta_allow),	//通道C 前充分状态允许
-		.c_post_sta_allow	(c_post_sta_allow)	//通道C 后充分状态允许
-    );
-	
+		pre_post_sta_check_3di_2do#(
+			.A_BHA_NUM			(A_BHA_NUM	 		)    ,	
+			.B_BHA_NUM			(B_BHA_NUM	 		)  
+	)pre_post_sta_check_3di_2do_u0(
+			.clk_i				(clk_i			),
+			.rst_i				(rst_i			),
+			.i_time_1ms_vld		(i_time_1ms_vld	),
+			.i_time_1s_vld 		(i_time_1s_vld 	),
+			.unit_id         	(unit_id        ),
+			.unit_ectrl      	(unit_ectrl     ),
+			.unit_st         	(unit_st        ),
+			.m_id            	(m_id           ),
+			.m_ectrl         	(m_ectrl        ),
+			.m_st            	(m_st           ),
+			.m_wk_mod        	(m_wk_mod       ),
+			.m_saf_st        	(m_saf_st       ),
+			.link_m_saf_st   	(link_m_saf_st  ),
+			.sc_id				(sc_id			),
+			.ec_id           	(ec_id          ),
+			.di_i				(di_i			),
+			.do_o				(do_o			),
+			.valid_sig_1		(param1		),
+			.valid_sig_2		(param2		),
+			.valid_sig_3		(param3		),
+			.a_en				(a_en			),
+			.b_en				(b_en			),	
+			.c_en				(c_en			),	
+			.a_bhv_id			(a_bhv_id_r		),
+			.b_bhv_id			(b_bhv_id		),
+			.c_bhv_id			(c_bhv_id		),
+			.ec_cha_st			(ec_cha_st		),
+			.ec_chb_st       	(ec_chb_st		),
+			.ec_chc_st       	(ec_chc_st		),
+			.c_circle_time		(c_gap_crl		),	
+			.task_time_cnt		(task_time_cnt	),	
+			.a_pre_sta_allow	(a_pre_sta_allow),	
+			.a_post_sta_allow	(a_post_sta_allow),	
+			.b_pre_sta_allow	(b_pre_sta_allow),	
+			.b_post_sta_allow	(b_post_sta_allow),	
+			.c_pre_sta_allow	(c_pre_sta_allow),	
+			.c_post_sta_allow	(c_post_sta_allow)	
+		);
+		
 	irq_3i1o_arbitrator irq_3i1o_arbitrator_u0(
 		.clk_i              (clk_i            	)
 		,.rst_i             (rst_i           	)
@@ -400,7 +425,7 @@ module ec_1di_check#(
 		,.chl_priority		(chl_priority		)
 		,.irq_a_i			(irq_a				)
 		,.irq_a_grant_o		(irq_a_grant		)
-		,.a_bhv_id          (a_bhv_id         	)
+		,.a_bhv_id          (a_bhv_id_r         )
 		,.a_tx_id           (a_tx_id          	)
 		,.a_alm_num         (a_alm_num        	)
 		,.irq_b_i			(irq_b				)

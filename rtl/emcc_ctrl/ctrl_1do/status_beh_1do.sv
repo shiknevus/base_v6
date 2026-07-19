@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module status_beh#(
+module status_beh_1do#(
 	parameter	BHA_NUM	=	1
 )(
 	input						clk_i			
@@ -30,8 +30,6 @@ module status_beh#(
 	
 	,input		[BHA_NUM-1:0]	pre_sta_allow	
 	,input		[BHA_NUM-1:0]	post_sta_allow	
-	
-	,input		[31:0]			bhv_en		//unuse
 
 	,input						b_en	
 	,output	reg [7:0]			b_bhv_id    
@@ -42,7 +40,7 @@ module status_beh#(
 	,output	reg [7:0]			b_tx_id     
 	,output	reg [7:0]			b_alm_num   
 	
-	,input						di				
+	//,input						di				
 	
 	,output	reg					irq_o			
 	,input						irq_ack_i	
@@ -61,9 +59,8 @@ module status_beh#(
 	reg	[7:0]		ack_ps_alart_num;
 	
 	
-	wire		[BHA_NUM-1:0]	sta_allow		;	//Bit width = number of behaviors
-
-	assign		sta_allow = 'd0;
+	localparam  IRQ_OK          = 8'h51;
+    localparam  IRQ_NO_OK       = 8'h52;
 	
 	always@(posedge clk_i)begin
 	if(rst_i)begin
@@ -95,10 +92,27 @@ module status_beh#(
 	always @(posedge clk_i) begin
 		if(rst_i)
 			b_bhv_id <= 8'd0;
-		else if(sta_allow[0])
-			b_bhv_id <= 8'd101;
 		else
-			b_bhv_id <= b_bhv_id;
+			b_bhv_id <= 8'd101;
+	end
+	
+	reg match_10;
+	reg match_20;
+	reg match_30;
+	reg match_40;
+	
+	always @(posedge clk_i) begin
+    if(rst_i) begin
+        match_10 <= 1'b0;
+		match_20 <= 1'b0;
+		match_30 <= 1'b0;
+		match_40 <= 1'b0;
+    end else begin
+        match_10 <= (ack_tx_result == IRQ_OK && ack_tx_id == 8'd10 && ack_beh_id == b_bhv_id);
+		match_20 <= (ack_tx_result == IRQ_OK && ack_tx_id == 8'd20 && ack_beh_id == b_bhv_id);
+		match_30 <= (ack_tx_result == IRQ_OK && ack_tx_id == 8'd30 && ack_beh_id == b_bhv_id);
+		match_40 <= (ack_tx_result == IRQ_OK && ack_tx_id == 8'd40 && ack_beh_id == b_bhv_id);
+    end
 	end
 	
 	localparam  S_IDLE          = 8'd0; 
@@ -114,8 +128,6 @@ module status_beh#(
 	localparam 	S_ALERT_40_ACK	= 8'd10;
 	localparam	S_EXE			= 8'd11;
 
-    localparam  IRQ_OK          = 8'h51;
-    localparam  IRQ_NO_OK       = 8'h52;
 	
 	always @(posedge clk_i) begin
         if (rst_i)
@@ -128,7 +140,7 @@ module status_beh#(
         next_state = curr_state;
         case (curr_state)
             S_IDLE: begin
-                if (b_en && sta_allow != 0)
+                if (b_en && pre_sta_allow != 0)
                     next_state = S_READY_10;
                 else
                     next_state = S_IDLE;
@@ -139,7 +151,7 @@ module status_beh#(
             end
 			
 			S_READY_10_ACK: begin
-				if(ack_tx_result == IRQ_OK && ack_tx_id == 8'd10 && ack_beh_id == b_bhv_id)  //Transaction 10 Acknowledged OK
+				if(match_10)  //Transaction 10 Acknowledged OK
                     next_state = S_EXE_20;
                 else if(ack_tx_result == IRQ_NO_OK || timout)
                     next_state = S_ALERT_40;
@@ -152,7 +164,7 @@ module status_beh#(
             end
 			
 			S_EXE_20_ACK: begin
-				if(ack_tx_result == IRQ_OK && ack_tx_id == 8'd20 && ack_beh_id == b_bhv_id) 	//Transaction 20 Acknowledged OK
+				if(match_20) 	//Transaction 20 Acknowledged OK
                     next_state = S_EXE;
                 else if(ack_tx_result == IRQ_NO_OK || timout)
                     next_state = S_ALERT_40;
@@ -178,7 +190,7 @@ module status_beh#(
             end
 			
 			S_SUCC_30_ACK:begin
-				if(ack_tx_result == IRQ_OK  && ack_tx_id == 8'd30 && ack_beh_id == b_bhv_id)    //30 response success
+				if(match_30)    //30 response success
                     next_state = S_IDLE;
                 else if(ack_tx_result == IRQ_NO_OK || timout)
                     next_state = S_ALERT_40;
@@ -191,7 +203,7 @@ module status_beh#(
             end
 			
 			S_ALERT_40_ACK:begin
-				if((ack_tx_result == IRQ_OK && ack_tx_id == 8'd40 && ack_beh_id == b_bhv_id) || timout) //40 response
+				if(match_40 || timout) //40 response
                     next_state = S_IDLE;
                 else
                     next_state = S_ALERT_40_ACK;
@@ -211,6 +223,8 @@ module status_beh#(
     always@(posedge clk_i)begin
         if(rst_i)
             b_tx_id <= 8'd0;
+		else if(!b_en)
+			b_tx_id <= 8'd0;
         else if(curr_state == S_READY_10)
             b_tx_id <= 8'd10;
         else if(curr_state == S_EXE_20)
@@ -226,6 +240,8 @@ module status_beh#(
 	always@(posedge clk_i)begin
         if(rst_i)
             irq_o <= 1'b0;
+		else if(!b_en)
+			irq_o <= 1'b0;
 		else if(irq_ack_i)    //The interrupt arbiter receives the interrupt.
             irq_o <= 1'b0;
         else if(curr_state == S_READY_10)
@@ -244,6 +260,8 @@ module status_beh#(
 	always@(posedge clk_i)begin
         if(rst_i)
             b_alm_num <= 8'd0;
+		else if(!b_en)
+			b_alm_num <= 8'd0;
         else if(curr_state == S_BHA_PRE_DET && timout)						//The pre - full inspection is not met.
             b_alm_num <= 8'd1;    
         else if(curr_state == S_READY_10_ACK && ack_tx_result == IRQ_NO_OK)	//Transaction 10 ps response error
@@ -271,6 +289,8 @@ module status_beh#(
     always@(posedge clk_i)begin
         if(rst_i)
             timout_cnt <= 20'd0;
+		else if(!b_en)
+			timout_cnt <= 20'd0;
 		else if(curr_state != curr_state_1d)
 			timout_cnt <= 20'd0;
         else if(timout_cnt >= b_tx_ot-1)

@@ -11,7 +11,7 @@
 // Tool Versions: 
 // Description: 
 // 														
-// Dependencies: 
+// Dependencies: 			
 // 
 // Revision:
 // Revision 0.01 - File Created
@@ -19,10 +19,10 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
-`include "reg_addr_pl.vh"
+`include "./../../include_files/reg_addr_pl.vh"
 module ps_rw_pl_reg#(
-    parameter  					REG_SPACE_BIAS 	= 	200	,	//组件基地�?
-    parameter  					REG_SPACE_SIZE 	= 	512		//组件偏移地址
+    parameter  					REG_SPACE_BIAS 	= 	200	,
+    parameter  					REG_SPACE_SIZE 	= 	1024	
 )(
 	input						clk_i			
 	,input						rst_i			
@@ -35,7 +35,7 @@ module ps_rw_pl_reg#(
     ,output 	reg  [31:0]     o_st_rd_data	
 	,output 	reg             o_st_rd_vld 	
 
-	,output		reg 	 		rst_en_n       
+	,output		reg 	 		rst_en_n       	//General parameters
 	,output		reg [13:0]	 	ec_id          
 	,output		reg [11:0]	 	sc_id			
 	,output		reg [3:0]	 	chl_priority	
@@ -103,19 +103,23 @@ module ps_rw_pl_reg#(
 	
 	,input 			[31:0]		irq_reg1	
 	,input 			[31:0]		irq_reg2	
+	
 	,input 						a_st 
 	,input 			[7:0]		a_alm_num 
 	,input 			[7:0]		a_tsc_id   
+	
 	,input 						b_st 
 	,input 			[7:0]		b_alm_num 
 	,input 			[7:0]		b_tsc_id   
 	,input 			[7:0]		b_bhv_id  
+	
 	,input 						c_st 
 	,input 			[7:0]		c_alm_num 
 	,input 			[7:0]		c_tsc_id   
 	,input 			[7:0]		c_bhv_id    
-	,input 			[31:0]		param51   
-	,input 			[31:0]		param52   
+	
+	,input 			[31:0]		param51 
+	,input 			[31:0]		param52 
 	,input 			[31:0]		param53   
 	,input 			[31:0]		param54   
 	,input 			[31:0]		param55   
@@ -147,7 +151,7 @@ module ps_rw_pl_reg#(
 	wire [19:0] wr_task_addr;
 	
 	//================================================================================================//
-	//----------------------------------------- 组件地址选中 -----------------------------------------//
+	//---------------------------------Component address is selected --------------------------------//
 	//================================================================================================//
 
 	assign  rd_space_select = ((i_st_rd_addr >= REG_SPACE_BIAS) & (i_st_rd_addr < (REG_SPACE_BIAS + REG_SPACE_SIZE))) ? 1'b1 : 1'b0;
@@ -179,12 +183,11 @@ module ps_rw_pl_reg#(
 	end
 	
 	//========================================================================================================================//
-   //--------------------------------------------------PS写PL寄存�?----------------------------------------------------------//
+   //--------------------------------------------- PS writes to PL register------------------------------------------------//
    //========================================================================================================================//
    
 	always@(posedge clk_i) begin
 		if(rst_i) begin
-			//基础配置参数
 			rst_en_n        	<=	1'b0     		;
 			ec_id          		<=	14'd0	 		; 
 			sc_id				<=	12'd0	 		;
@@ -200,30 +203,26 @@ module ps_rw_pl_reg#(
 			link_m_saf_st  		<=	1'b0     		;
 			bhv_en				<=	32'd0			;
 			
-			//通道A
 			a_task_id      		<=	32'd0		  	;
 			a_task_bhv_id		<=	32'd0		  	;
 			a_en				<=	1'b0			;
 			a_bhv_ot        	<=	20'd0		  	;
 			a_tsc_result_rpt	<=	32'd0		  	;
-			a_tsc_result_vld	<= 	1'b0			;	//有效信号，非寄存�?
+			a_tsc_result_vld	<= 	1'b0			;	
 			a_bhv_id       		<=	8'd0		   	;
-			a_bhv_vld			<=  1'b0			;	//有效信号，非寄存�?
+			a_bhv_vld			<=  1'b0			;
 			
-			//通道B
 			b_en				<=	1'b0		   	;
 			b_bhv_ot 			<= 	20'd0		  	;
 			b_tsc_result_rpt	<=	32'd0		   	;
-			b_tsc_result_vld	<= 	1'b0			;	//有效信号，非寄存�?
+			b_tsc_result_vld	<= 	1'b0			;	
 			
-			//通道C
 			c_en				<=	1'b0		   	;
 			c_bhv_ot 			<= 	20'd0		   	;
 			c_tsc_result_rpt	<=	32'd0		   	;
-			c_tsc_result_vld	<= 	1'b0			;	//有效信号，非寄存�?
+			c_tsc_result_vld	<= 	1'b0			;	
 			c_bhv_gap_crl      	<=	20'd0		   	;
 
-			//动�?�参数PS-PL
 			param1				<=	32'd0	  	;
 			param2				<=	32'd0	  	;
 			param3				<=	32'd0	  	;
@@ -258,7 +257,7 @@ module ps_rw_pl_reg#(
 			rst_en_n        <=	(wr_task_vld && wr_task_addr == `RST_EN        	) ? i_st_wr_data[0] 	: rst_en_n      ;
 			ec_id          	<=	(wr_task_vld && wr_task_addr == `EC_ID         	) ? i_st_wr_data[13:0] 	: ec_id         ;
 			sc_id			<=	(wr_task_vld && wr_task_addr == `SC_ID		 	) ? i_st_wr_data[11:0] 	: sc_id			;
-			chl_priority	<= 	(wr_task_vld && wr_task_addr == `BHV_PRIORITY	) ? i_st_wr_data[3:0] 	: chl_priority	 ;
+			chl_priority	<= 	(wr_task_vld && wr_task_addr == `BHV_PRIORITY	) ? i_st_wr_data[3:0] 	: chl_priority	;
 			unit_id      	<=	(wr_task_vld && wr_task_addr == `UNIT_ID       	) ? i_st_wr_data[7:0] 	: unit_id      	;
 			unit_ectrl     	<=	(wr_task_vld && wr_task_addr == `UNIT_ECTRL    	) ? i_st_wr_data[3:0] 	: unit_ectrl   	;
 			unit_st        	<=	(wr_task_vld && wr_task_addr == `UNIT_ST       	) ? i_st_wr_data[3:0] 	: unit_st       ;
@@ -268,14 +267,14 @@ module ps_rw_pl_reg#(
 			m_wk_mod       	<=	(wr_task_vld && wr_task_addr == `M_WK_MOD      	) ? i_st_wr_data[3:0] 	: m_wk_mod      ;
 			m_saf_st       	<=	(wr_task_vld && wr_task_addr == `M_SAF_ST      	) ? i_st_wr_data[0] 	: m_saf_st      ;
 			link_m_saf_st  	<=	(wr_task_vld && wr_task_addr == `LINK_M_SAF_ST 	) ? i_st_wr_data[0] 	: link_m_saf_st ;
-			bhv_en  		<=	(wr_task_vld && wr_task_addr == `BHV_EN	 		) ? i_st_wr_data	 	: bhv_en 			;
+			bhv_en  		<=	(wr_task_vld && wr_task_addr == `BHV_EN	 		) ? i_st_wr_data	 	: bhv_en 		;
 			
-			a_task_id      	<=	(wr_task_vld && wr_task_addr == `A_TASK_ID     	) ? i_st_wr_data	 	: a_task_id      ;
-			a_task_bhv_id   <=	(wr_task_vld && wr_task_addr == `A_TASK_BHV_ID  ) ? i_st_wr_data	 	: a_task_bhv_id  ;
+			a_task_id      	<=	(wr_task_vld && wr_task_addr == `A_TASK_ID     	) ? i_st_wr_data	 	: a_task_id     ;
+			a_task_bhv_id   <=	(wr_task_vld && wr_task_addr == `A_TASK_BHV_ID  ) ? i_st_wr_data	 	: a_task_bhv_id ;
 			a_en			<=	(wr_task_vld && wr_task_addr == `A_EN			) ? i_st_wr_data[0] 	: a_en  		;
-			a_bhv_ot        <=	(wr_task_vld && wr_task_addr == `A_TX_OT       	) ? i_st_wr_data[19:0] 	: a_bhv_ot        ;
+			a_bhv_ot        <=	(wr_task_vld && wr_task_addr == `A_TX_OT       	) ? i_st_wr_data[19:0] 	: a_bhv_ot      ;
 			a_tsc_result_rpt<=	(wr_task_vld && wr_task_addr == `A_TX_RSULT_RPT	) ? i_st_wr_data 		: a_tsc_result_rpt;
-			a_tsc_result_vld<=	(wr_task_vld && wr_task_addr == `A_TX_RSULT_RPT	) ? 1'b1: 1'b0;
+			a_tsc_result_vld<=	(wr_task_vld && wr_task_addr == `A_TX_RSULT_RPT	) ? 1'b1: 1'b0							;
 			a_bhv_id       	<=	(wr_task_vld && wr_task_addr == `A_BHV_ID      	) ? i_st_wr_data[7:0]	: a_bhv_id      ;
 			a_bhv_vld       <=	(wr_task_vld && wr_task_addr == `A_BHV_ID      	) ? 1'b1: 1'b0;
 			
@@ -288,7 +287,7 @@ module ps_rw_pl_reg#(
 			c_bhv_ot		<=	(wr_task_vld && wr_task_addr == `C_TX_OT		) ? i_st_wr_data[19:0] 	: c_bhv_ot		 ;
 			c_tsc_result_rpt<=	(wr_task_vld && wr_task_addr == `C_TX_RSULT_RPT	) ? i_st_wr_data 		: c_tsc_result_rpt;
 			c_tsc_result_vld<=	(wr_task_vld && wr_task_addr == `C_TX_RSULT_RPT	) ? 1'b1: 1'b0							 ;
-			c_bhv_gap_crl   <=	(wr_task_vld && wr_task_addr == `C_GAP_CRL     	) ? i_st_wr_data[19:0] 	: c_bhv_gap_crl      ;
+			c_bhv_gap_crl   <=	(wr_task_vld && wr_task_addr == `C_GAP_CRL     	) ? i_st_wr_data[19:0] 	: c_bhv_gap_crl	;
 			
 			param1			<=	(wr_task_vld && wr_task_addr == `PARAM1			) ? i_st_wr_data 		: param1	;
 			param2			<=	(wr_task_vld && wr_task_addr == `PARAM2			) ? i_st_wr_data 		: param2	;
@@ -325,14 +324,13 @@ module ps_rw_pl_reg#(
 	
 
 	//========================================================================================================================//
-	//--------------------------------------------------PS读PL寄存�?----------------------------------------------------------//
+	//---------------------------------------------------PS reads the PL register--------------------------------------------//
 	//========================================================================================================================//
-	//根据行为ID区分行为类型
+	//Distinguish behavior types according to behavior ID.
 
 	always @(posedge clk_i) begin
 		
-    case ( rd_addr_d2 )
-		//中断请求寄存�?		
+    case ( rd_addr_d2 )		
 		`IRQ_REG1		:	o_st_rd_data <= 		irq_reg1		;
 		`IRQ_REG2		:	o_st_rd_data <= 		irq_reg2		 ;
 
@@ -350,7 +348,6 @@ module ps_rw_pl_reg#(
 		`C_TX_ID		: 	o_st_rd_data <= {24'd0,	c_tsc_id   };
 		`C_BHV_ID 		: 	o_st_rd_data <= {24'd0,	c_bhv_id  }; 
 
-		//动�?�参数PL-PS
 		`PARAM51		:	o_st_rd_data <= 		param51     	;
 		`PARAM52		:	o_st_rd_data <= 		param52     	;
 		`PARAM53		:	o_st_rd_data <= 		param53     	;
@@ -372,7 +369,7 @@ module ps_rw_pl_reg#(
 		`PARAM69		:	o_st_rd_data <= 		{31'd0,param69  };
 		`PARAM70		:	o_st_rd_data <= 		{31'd0,param70  };
 
-		//ps写寄存器可读
+
 		`RST_EN        	      	:		o_st_rd_data <= {31'd0,rst_en_n		}   ;
 		`EC_ID         	      	:		o_st_rd_data <= {18'd0,ec_id		}   ;   
 		`SC_ID		 	      	:		o_st_rd_data <= {20'd0,sc_id		}	;
@@ -389,47 +386,47 @@ module ps_rw_pl_reg#(
 		`BHV_EN					:		o_st_rd_data <= bhv_en					;
 		`A_TASK_ID     	      	:		o_st_rd_data <= a_task_id 				;
 		`A_TASK_BHV_ID        	:		o_st_rd_data <= a_task_bhv_id			; 
-		`A_EN			      	:		o_st_rd_data <= {31'd0,a_en			}	;
-		`A_TX_OT       	      	:		o_st_rd_data <= {12'd0,a_bhv_ot}        		    ;
-		`A_TX_RSULT_RPT	      	:		o_st_rd_data <= a_tsc_result_rpt		    ;
-		`A_BHV_ID      	      	:		o_st_rd_data <= {24'd0,a_bhv_id 	}   ; 
-		`B_EN			      	:		o_st_rd_data <= {31'd0,b_en			}	;
-		`B_TX_OT		      	:		o_st_rd_data <= {12'd0,b_bhv_ot }	;
-		`B_TX_RSULT_RPT	      	:		o_st_rd_data <= b_tsc_result_rpt		    ;
-		`C_EN			      	:		o_st_rd_data <= {31'd0,c_en			}	;
-		`C_TX_OT		      	:		o_st_rd_data <= {12'd0,c_bhv_ot} 			    ;
-		`C_TX_RSULT_RPT	      	:		o_st_rd_data <= c_tsc_result_rpt		    ;
-		`C_GAP_CRL     	      	:		o_st_rd_data <= {12'd0,c_bhv_gap_crl}      		    ;
-		`PARAM1			      	:		o_st_rd_data <= param1			;
-		`PARAM2			      	:		o_st_rd_data <= param2			;
-		`PARAM3			      	:		o_st_rd_data <= param3			;
-		`PARAM4			      	:		o_st_rd_data <= param4			;
-		`PARAM5			      	:		o_st_rd_data <= param5			;
-		`PARAM6			      	:		o_st_rd_data <= {12'd0,param6	};
-		`PARAM7			      	:		o_st_rd_data <= {12'd0,param7	};
-		`PARAM8			      	:		o_st_rd_data <= {12'd0,param8	};
-		`PARAM9			      	:		o_st_rd_data <= {12'd0,param9	};
-		`PARAM10		      	:		o_st_rd_data <= {12'd0,param10	};
-		`PARAM11		      	:		o_st_rd_data <= {12'd0,param11	};
-		`PARAM12		      	:		o_st_rd_data <= {12'd0,param12	};
-		`PARAM13		      	:		o_st_rd_data <= {12'd0,param13	};
-		`PARAM14		      	:		o_st_rd_data <= {12'd0,param14	};
-		`PARAM15		      	:		o_st_rd_data <= {12'd0,param15	};
-		`PARAM16		      	:		o_st_rd_data <= {24'd0,param16	};
-		`PARAM17		      	:		o_st_rd_data <= {24'd0,param17	};
-		`PARAM18		      	:		o_st_rd_data <= {24'd0,param18	};
-		`PARAM19		      	:		o_st_rd_data <= {24'd0,param19	};
-		`PARAM20		      	:		o_st_rd_data <= {24'd0,param20	};
-		`PARAM21		      	:		o_st_rd_data <= {24'd0,param21	};
-		`PARAM22		      	:		o_st_rd_data <= {24'd0,param22	};
-		`PARAM23		      	:		o_st_rd_data <= {24'd0,param23	};
-		`PARAM24		      	:		o_st_rd_data <= {24'd0,param24	};
-		`PARAM25		      	:		o_st_rd_data <= {24'd0,param25	};
-		`PARAM26		      	:		o_st_rd_data <= {31'd0,param26	};
-		`PARAM27		      	:		o_st_rd_data <= {31'd0,param27	};
-		`PARAM28		      	:		o_st_rd_data <= {31'd0,param28	};
-		`PARAM29		      	:		o_st_rd_data <= {31'd0,param29	};
-		`PARAM30		      	:		o_st_rd_data <= {31'd0,param30	};
+		`A_EN			      	:		o_st_rd_data <= {31'd0,a_en		}		;
+		`A_TX_OT       	      	:		o_st_rd_data <= {12'd0,a_bhv_ot	}   	;
+		`A_TX_RSULT_RPT	      	:		o_st_rd_data <= a_tsc_result_rpt		;
+		`A_BHV_ID      	      	:		o_st_rd_data <= {24'd0,a_bhv_id }   	;
+		`B_EN			      	:		o_st_rd_data <= {31'd0,b_en		}		;
+		`B_TX_OT		      	:		o_st_rd_data <= {12'd0,b_bhv_ot }		;
+		`B_TX_RSULT_RPT	      	:		o_st_rd_data <= b_tsc_result_rpt		;
+		`C_EN			      	:		o_st_rd_data <= {31'd0,c_en		}		;
+		`C_TX_OT		      	:		o_st_rd_data <= {12'd0,c_bhv_ot	} 		;
+		`C_TX_RSULT_RPT	      	:		o_st_rd_data <= c_tsc_result_rpt		;
+		`C_GAP_CRL     	      	:		o_st_rd_data <= {12'd0,c_bhv_gap_crl}   ;
+		`PARAM1			      	:		o_st_rd_data <= param1					;
+		`PARAM2			      	:		o_st_rd_data <= param2					;
+		`PARAM3			      	:		o_st_rd_data <= param3					;
+		`PARAM4			      	:		o_st_rd_data <= param4					;
+		`PARAM5			      	:		o_st_rd_data <= param5					;
+		`PARAM6			      	:		o_st_rd_data <= {12'd0,param6	}		;
+		`PARAM7			      	:		o_st_rd_data <= {12'd0,param7	}		;
+		`PARAM8			      	:		o_st_rd_data <= {12'd0,param8	}		;
+		`PARAM9			      	:		o_st_rd_data <= {12'd0,param9	}		;
+		`PARAM10		      	:		o_st_rd_data <= {12'd0,param10	}		;
+		`PARAM11		      	:		o_st_rd_data <= {12'd0,param11	}		;
+		`PARAM12		      	:		o_st_rd_data <= {12'd0,param12	}		;
+		`PARAM13		      	:		o_st_rd_data <= {12'd0,param13	}		;
+		`PARAM14		      	:		o_st_rd_data <= {12'd0,param14	}		;
+		`PARAM15		      	:		o_st_rd_data <= {12'd0,param15	}		;
+		`PARAM16		      	:		o_st_rd_data <= {24'd0,param16	}		;
+		`PARAM17		      	:		o_st_rd_data <= {24'd0,param17	}		;
+		`PARAM18		      	:		o_st_rd_data <= {24'd0,param18	}		;
+		`PARAM19		      	:		o_st_rd_data <= {24'd0,param19	}		;
+		`PARAM20		      	:		o_st_rd_data <= {24'd0,param20	}		;
+		`PARAM21		      	:		o_st_rd_data <= {24'd0,param21	}		;
+		`PARAM22		      	:		o_st_rd_data <= {24'd0,param22	}		;
+		`PARAM23		      	:		o_st_rd_data <= {24'd0,param23	}		;
+		`PARAM24		      	:		o_st_rd_data <= {24'd0,param24	}		;
+		`PARAM25		      	:		o_st_rd_data <= {24'd0,param25	}		;
+		`PARAM26		      	:		o_st_rd_data <= {31'd0,param26	}		;
+		`PARAM27		      	:		o_st_rd_data <= {31'd0,param27	}		;
+		`PARAM28		      	:		o_st_rd_data <= {31'd0,param28	}		;
+		`PARAM29		      	:		o_st_rd_data <= {31'd0,param29	}		;
+		`PARAM30		      	:		o_st_rd_data <= {31'd0,param30	}		;
        default : o_st_rd_data <= 32'h7FFFFFFF;
    endcase    
 end   
