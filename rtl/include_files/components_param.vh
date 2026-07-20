@@ -238,10 +238,10 @@
 
 
 `define ERR_RANGE  9'h050 // 80
-`define PARAM_1 9'h1d8 // 472
-`define PARAM_2 9'h1dc // 476
-`define PARAM_3 9'h1e0 // 480
-`define PARAM_4 9'h1e4 // 484
+// `define PARAM_1 9'h1d8 // 472
+// `define PARAM_2 9'h1dc // 476
+// `define PARAM_3 9'h1e0 // 480
+// `define PARAM_4 9'h1e4 // 484
 
 
 `define CON_PARAM_4 9'h1e8 // 488
