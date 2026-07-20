@@ -24,9 +24,6 @@ module app_mst_tx_ctrl(
     ,input  wire[15:0]  each_dg_length  //PS config each datagram length
     ,output reg         app_err_flag    //the error type of slave station is valid
     ,output reg [15:0]  app_err_type    //the error type of slave station
-	,output reg			init_finish
-	,input wire         init_error
-	,input wire         run_en
 
     ,output reg [15:0]  hb_err_slvsta   //indicate the index of the error station
     ,output reg         mst_prcs_hb_flag
@@ -35,11 +32,6 @@ module app_mst_tx_ctrl(
 
     ,output reg             prot_send_req
     ,input  wire            prot_send_ack
-	
-	,input  wire            init_err_clr
-	,output reg             init_err
-	,input  wire            cnt_err_clr
-	,output reg	[31:0]      cnt_err
 
     //down layer config signals
     ,output reg         pkg_trsf_start  //APP notice datagram layer could transfer datagram
@@ -65,8 +57,7 @@ module app_mst_tx_ctrl(
 //    localparam  WAIT_CNT            = `SIM_SLV_STA_NUM * 'd25_000;//MAX time intervall between two packets
     localparam  WAIT_CNT            = 'd250_000;//MAX time intervall between two packets
 `else
-    //localparam  WAIT_CNT            = 'd156_250_000;//MAX time intervall between two package. clock period is 6.4ns
-	localparam  WAIT_CNT            = 'd781_250;
+    localparam  WAIT_CNT            = 'd156_250_000;//MAX time intervall between two package. clock period is 6.4ns
 `endif
     
     localparam  STM_IDLE            = 'd0;
@@ -91,28 +82,15 @@ module app_mst_tx_ctrl(
     reg     [4:0]   wk_state  = 'd0;
     reg     [7:0]   ck_hb_sta_cnt;  //the index of slate station during check heart beat
     wire            last_ck_hb_sta; 
-	reg             mst_sta_restart_d1  =   'd0;//master station restart transfer
+    reg             mst_sta_restart_d1  =   'd0;//master station restart transfer
     reg             mst_sta_restart_r   =   'd0;
     reg             latch_sta_rs_flag;
-	
-	always @(posedge clk)begin
+    always @(posedge clk)begin
         mst_sta_restart_d1  <=  mst_sta_restart;
         mst_sta_restart_r   <=  mst_sta_restart & !mst_sta_restart_d1;
     end
 
-        always @(posedge clk) begin
-        if(reset)begin
-            init_finish   <=  'h0;
-        end else if (wk_state == STM_POST_PRCS_INIT)begin
-            init_finish   <=  1;
-		end else if (wk_state == STM_END)begin	
-			init_finish   <=  'h0;
-        end else begin
-            init_finish   <=  init_finish;
-        end
-    end
-	
-	always @(posedge clk)begin
+    always @(posedge clk)begin
         if(reset)begin
             latch_sta_rs_flag   <=  'd0;
         end else if(mst_sta_restart_r)begin
@@ -123,29 +101,6 @@ module app_mst_tx_ctrl(
             latch_sta_rs_flag   <=  latch_sta_rs_flag;
         end
     end
-	
-	always @(posedge clk)begin
-        if(reset)begin
-            init_err   <=  'd0;
-		end else if(init_err_clr)begin
-			init_err   <=  'd0;
-		end else if((wk_state == STM_INIT_WAIT_ACK)&(timer_done|
-		(one_ecat_frm_done & (ecat_frm_rslt == `ETHCAT_PRCS_CRC_FAIL))))begin
-			init_err   <=  'd1;
-		end
-	end	
-	
-	always @(posedge clk)begin
-        if(reset)begin
-            cnt_err   <=  'd0;
-		end else if(cnt_err_clr)begin
-			cnt_err   <=  'd0;
-		end else if(((wk_state == STM_INIT_WAIT_ACK)&(timer_done|(one_ecat_frm_done & (ecat_frm_rslt == `ETHCAT_PRCS_CRC_FAIL))))
-		|((wk_state == STM_WAIT_ACK)&(timer_done|(one_ecat_frm_done & (ecat_frm_rslt == `ETHCAT_PRCS_CRC_FAIL))))
-		|((wk_state == STM_HB_WAIT_ACK)&(timer_done|(one_ecat_frm_done & (ecat_frm_rslt == `ETHCAT_PRCS_CRC_FAIL)))))begin
-			cnt_err   <=  cnt_err + 'd1;
-		end
-	end	
     
     always @(posedge clk) begin
         if(reset)begin
@@ -153,7 +108,7 @@ module app_mst_tx_ctrl(
         end else begin
             case(wk_state)
                 STM_IDLE: begin
-                    if(app_trsf_en)begin
+                    if(app_trsf_en & latch_sta_rs_flag)begin
                         wk_state  <=  STM_INIT_SLV_STA;
                     end else begin
                         wk_state  <=  wk_state;
@@ -163,8 +118,10 @@ module app_mst_tx_ctrl(
                     wk_state  <=  STM_INIT_WAIT_ACK;
                 end
                 STM_INIT_WAIT_ACK:begin
-					if((one_ecat_frm_done & (ecat_frm_rslt == `ETHCAT_PRCS_CRC_FAIL))|timer_done)begin
-						wk_state <= STM_END;
+                    if(timer_done)begin
+                        wk_state <= STM_END;
+                    end else if (one_ecat_frm_done & (ecat_frm_rslt == `ETHCAT_PRCS_CRC_FAIL))begin
+                        wk_state <= STM_CK_SLV_HB;
                     end else if (one_ecat_frm_done & (ecat_frm_rslt == `ETHCAT_PRCS_SUCCESS) & 
                                  (rx_eth_type == `ETHCAT_TYPE_INITIAL))begin
                         wk_state <= STM_POST_PRCS_INIT;
@@ -184,9 +141,9 @@ module app_mst_tx_ctrl(
                 end
                 STM_WAIT_ACK:begin
                     if(timer_done)begin
-                        wk_state <= STM_POST_PRCS_DG;
+                        wk_state <= STM_CK_SLV_HB;
                     end else if (one_ecat_frm_done & (ecat_frm_rslt == `ETHCAT_PRCS_CRC_FAIL))begin
-                        wk_state <= STM_POST_PRCS_DG;
+                        wk_state <= STM_CK_SLV_HB;
                     end else if (one_ecat_frm_done & (ecat_frm_rslt == `ETHCAT_PRCS_SUCCESS) & 
                                  (rx_eth_type == `ETHCAT_TYPE_DATAGRAM))begin
                         wk_state <= STM_POST_PRCS_DG;
@@ -211,7 +168,7 @@ module app_mst_tx_ctrl(
                 end
                 STM_CK_HB_SUCCES:begin
                     if(last_ck_hb_sta)begin
-                        if(1)begin
+                        if(loop_link_success)begin
                             wk_state <= STM_ALL_LINK_PASS;
                         end else begin
                             wk_state <= STM_POST_PRCS_HB;
@@ -223,12 +180,8 @@ module app_mst_tx_ctrl(
                 STM_POST_PRCS_INIT:begin
                     if(~app_trsf_en)begin
                         wk_state <= STM_END;
-					end else if(init_error)begin
-						wk_state <= STM_END;
-					end else if(run_en)begin
-						wk_state <= STM_TX_HS;
                     end else begin
-                        wk_state <= STM_POST_PRCS_INIT;
+                        wk_state <= STM_TX_HS;
                     end
                 end
                 STM_POST_PRCS_DG:begin
@@ -293,7 +246,7 @@ module app_mst_tx_ctrl(
                 ping_pong_flag  <=  0;
             end
             STM_ALL_LINK_PASS:begin
-                ping_pong_flag  <=  0;
+                ping_pong_flag  <=  1;
             end
             default: begin
               ping_pong_flag    <=  ping_pong_flag;
@@ -343,7 +296,7 @@ module app_mst_tx_ctrl(
     
     //
     always @(posedge clk) begin
-        if(reset | (wk_state == STM_TX_HS))begin
+        if(reset | (app_trsf_en & latch_sta_rs_flag) | (wk_state == STM_TX_HS))begin
             hb_err_slvsta   <=  'd0;
         end else if (wk_state == STM_POST_PRCS_HB)begin
             hb_err_slvsta   <=  dg_hb_dst_addr;

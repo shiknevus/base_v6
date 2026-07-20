@@ -11,8 +11,8 @@ module app_protocal_top
     ,input                  mst_sta_restart     //master station restart control signal.
     ,input  wire    [15:0]  each_dg_length      //indicate that each datagram length
     ,output wire            app_err_flag        //the error type of slave station is valid
-    ,output wire    [7:0]  	app_err_type        //the error type of slave station
-    ,output wire    [7:0]  	hb_err_slvsta       //no use
+    ,output wire    [15:0]  app_err_type        //the error type of slave station
+    ,output wire    [15:0]  hb_err_slvsta       //no use
     ,output wire            mst_prcs_hb_flag
     ,output wire            mst_sta_trsf_flag
     ,output wire    [7:0]   slv_sta_num         //this signals only update during first initial datagram.It indicate the number of slave station
@@ -23,9 +23,6 @@ module app_protocal_top
     ,input  wire            prot_send_ack
     ,output wire            prot_rcv_req
     ,input  wire            prot_rcv_ack
-	
-	,input wire             init_error
-	,input wire             run_en
     //slave mode systerm signal
     ,output         [1:0]   slvsta_rcv_hb_flag  //slave station receive heartbeat flag[1:0]
                                                     //[1bit]: receive hb fram; [0]:check slave station address is match
@@ -44,13 +41,6 @@ module app_protocal_top
     ,output wire    [3:0]   slv_id_we
     ,output wire    [15:0]  slv_id_addr
     ,output wire    [31:0]  slv_id_din
-    ,output wire    [31:0]  slv_fpga_version
-	
-	,input  wire            init_err_clr
-	,output wire            init_err
-	,input  wire            cnt_err_clr
-	,output wire	[31:0]  cnt_err
-	,output wire			init_finish
 
     //master AXI interface to aurora IP:send port
     ,output                 m_boroa_tx_tvalid
@@ -145,12 +135,6 @@ module app_protocal_top
             
             ,.prot_rcv_req      (prot_rcv_req       )
             ,.prot_rcv_ack      (prot_rcv_ack       )
-			
-			,.init_err_clr		(init_err_clr)
-			,.init_err			(init_err)
-			,.cnt_err_clr		(cnt_err_clr)
-			,.cnt_err			(cnt_err)
-			,.init_finish		(init_finish)
 
             ,.prot_send_req     (prot_send_req_slv      )
             ,.prot_send_ack     (prot_send_ack_slv      )
@@ -175,8 +159,6 @@ module app_protocal_top
                 //this signal is only used by hearbeat,which is used to indicate
                 //what is dst_addr message in heartbeat datagram layer.
             ,.dg_hb_dst_addr        (dg_hb_dst_addr     )
-			,.init_error		(init_error			)
-			,.run_en			(run_en				)
             
                 //app layer ll interface with application depot
             ,.depot_rden        (depot_rden_slv)
@@ -188,7 +170,6 @@ module app_protocal_top
             ,.slv_id_we         (slv_id_we          )
             ,.slv_id_addr       (slv_id_addr        )
             ,.slv_id_din        (slv_id_din         )
-            ,.slv_fpga_version  (slv_fpga_version   )
 
                 //ll interface which is used between app layer and ethcat layer
             ,.cache_we              (cache_we           )

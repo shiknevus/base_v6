@@ -54,6 +54,7 @@ genvar j;
        end
     endgenerate
 
+`ifndef SIM_PLATFORM_MST
     always @(posedge clk)begin
         slv_sta_msg_dat <= 0;
         for (int k = 0; k < RAM_DWIDTH; k++) begin
@@ -62,7 +63,30 @@ genvar j;
             end
         end
     end
+`else
+    reg [RAM_AWIDTH-1:0]    slv_sta_msg_addr_d1;
+    reg [RAM_AWIDTH-1:0]    slv_sta_msg_addr_d2;
+    reg [RAM_AWIDTH-1:0]    slv_sta_msg_addr_d3;
+    always @(posedge clk)begin
+        slv_sta_msg_addr_d1 <= slv_sta_msg_addr;
+        slv_sta_msg_addr_d2 <= slv_sta_msg_addr_d1;
+        slv_sta_msg_addr_d3 <= slv_sta_msg_addr_d2;
+    end
 
+    always @(posedge clk)begin
+        if(slv_sta_msg_addr_d3 == 0)begin
+            slv_sta_msg_dat <= 32'hdead_b0a0;
+        end else if(slv_sta_msg_addr_d3 == 1)begin
+            slv_sta_msg_dat <= 32'hdead_b1a0;
+        end else if(slv_sta_msg_addr_d3 == 2)begin
+            slv_sta_msg_dat <= 32'hdead_b2a0;
+        end else if(slv_sta_msg_addr_d3 == 3)begin
+            slv_sta_msg_dat <= 32'hdead_b3a0;
+        end else begin
+            slv_sta_msg_dat <= slv_sta_msg_addr_d3 << 1;
+        end
+    end
+`endif
 endmodule
 
 
