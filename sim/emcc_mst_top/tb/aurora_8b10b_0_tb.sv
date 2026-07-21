@@ -1,11 +1,7 @@
 `timescale 1 ns / 100 ps
-
-`include "./../rtl/include_files/base_addr.vh"
-`include "./../rtl/include_files/para_reg_addr.vh"
-`include "./../rtl/include_files/depot_addr_map.vh"
-`include "./../rtl/include_files/reg_addr_pl.vh"
-`include "./../rtl/include_files/globe_includes.vh"
-`include "./../rtl/include_files/components_param.vh"
+`include "../../../rtl/include_files/components_param.vh"
+`include "../../../rtl/include_files/reg_addr_pl.vh"
+`include "../../../rtl/include_files/globe_includes.vh"
 
 module aurora_8b10b_0_TB;
 
@@ -145,7 +141,7 @@ module aurora_8b10b_0_TB;
     end
     //________________________Instantiate Dut 1 ________________
 
-    emcc_mst_top emmcc_mst_top_u
+    emcc_mst_top emcc_mst_top_u
     (
         // Status Signals
         .INIT_CLK_P (init_clk_p),

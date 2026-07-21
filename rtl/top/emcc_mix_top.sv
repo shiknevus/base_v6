@@ -479,8 +479,7 @@ module emcc_mix_top
 				,.do_o					(do_mst_msg[2:1]		)
 				,.o_intr_irq			(map_irq[2]				)
 			);
-            reg [2:0] di;
-            wire irq;
+
 			ec_3di_2do#(
 				.REG_SPACE_BIAS			(`ROLLER_2126_REG_BIAS  ),	//Component offset address
 				.REG_SPACE_SIZE			(`REG_SPACE_SIZE        )
@@ -498,11 +497,10 @@ module emcc_mix_top
 				,.i_st_rd_addr  		(ps_reg_rd_addr			)
 				,.o_st_rd_data  		(sub_comp_rd_dat[3]		)
 				,.o_st_rd_vld   		(sub_comp_rd_vld[3]		)
-				,.di_i					(di	)
-				,.do_o					(b		)
-				,.o_intr_irq			(irq3			)
+				,.di_i					(di_mst_msg[5:3]	)
+				,.do_o					(do_mst_msg[4:3]	)
+				,.o_intr_irq			(map_irq[3]		)
 			);
-		assign do_mst_msg[4:3]=b;
 		
 	//==========================================================================================================//
 	// ----------------------------------- don't care next context----------------------------------------------//

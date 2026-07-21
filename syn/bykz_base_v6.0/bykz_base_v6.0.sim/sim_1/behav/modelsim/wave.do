@@ -1,5 +1,6 @@
 onerror {resume}
 quietly WaveActivateNextPane {} 0
+add wave -noupdate -color Magenta /tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/proactive_beh_3di_2do_u0/curr_state
 add wave -noupdate /tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/clk_i
 add wave -noupdate /tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/rst
 add wave -noupdate /tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/i_time_1ms_vld
@@ -13,9 +14,9 @@ add wave -noupdate /tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/i_
 add wave -noupdate /tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/i_st_rd_addr
 add wave -noupdate /tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/o_st_rd_data
 add wave -noupdate /tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/o_st_rd_vld
-add wave -noupdate /tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/di_i
-add wave -noupdate /tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/do_o
-add wave -noupdate /tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/o_intr_irq
+add wave -noupdate -color Cyan -subitemconfig {{/tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/di_i[2]} {-color Cyan} {/tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/di_i[1]} {-color Cyan} {/tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/di_i[0]} {-color Cyan}} /tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/di_i
+add wave -noupdate -color Cyan /tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/do_o
+add wave -noupdate -color Cyan /tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/o_intr_irq
 add wave -noupdate /tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/unit_id
 add wave -noupdate /tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/unit_ectrl
 add wave -noupdate /tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/unit_st
@@ -65,7 +66,7 @@ add wave -noupdate /tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/a_
 add wave -noupdate /tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/b_tx_result_vld
 add wave -noupdate /tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/c_tx_result_vld
 add wave -noupdate /tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/a_pre_sta_allow
-add wave -noupdate /tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/a_post_sta_allow
+add wave -noupdate -color Magenta -expand -subitemconfig {{/tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/a_post_sta_allow[12]} {-color Magenta} {/tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/a_post_sta_allow[11]} {-color Magenta} {/tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/a_post_sta_allow[10]} {-color Magenta} {/tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/a_post_sta_allow[9]} {-color Magenta} {/tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/a_post_sta_allow[8]} {-color Magenta} {/tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/a_post_sta_allow[7]} {-color Magenta} {/tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/a_post_sta_allow[6]} {-color Magenta} {/tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/a_post_sta_allow[5]} {-color Magenta} {/tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/a_post_sta_allow[4]} {-color Magenta} {/tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/a_post_sta_allow[3]} {-color Magenta} {/tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/a_post_sta_allow[2]} {-color Magenta} {/tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/a_post_sta_allow[1]} {-color Magenta} {/tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/a_post_sta_allow[0]} {-color Magenta}} /tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/a_post_sta_allow
 add wave -noupdate /tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/b_pre_sta_allow
 add wave -noupdate /tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/b_post_sta_allow
 add wave -noupdate /tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/c_pre_sta_allow
@@ -88,21 +89,8 @@ add wave -noupdate /tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/a_
 add wave -noupdate /tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/di
 add wave -noupdate /tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/irq_o
 add wave -noupdate /tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/irq_ack_i
-add wave -noupdate /tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/ps_rw_pl_reg_u0/i_st_wr_en
-add wave -noupdate /tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/ps_rw_pl_reg_u0/i_st_wr_addr
-add wave -noupdate /tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/ps_rw_pl_reg_u0/i_st_wr_data
-add wave -noupdate /tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/ps_rw_pl_reg_u0/i_st_rd_en
-add wave -noupdate /tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/ps_rw_pl_reg_u0/i_st_rd_addr
-add wave -noupdate /tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/ps_rw_pl_reg_u0/o_st_rd_data
-add wave -noupdate /tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/ps_rw_pl_reg_u0/o_st_rd_vld
-add wave -noupdate /tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/proactive_beh_3di_2do_u0/a_en
-add wave -noupdate /tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/proactive_beh_3di_2do_u0/a_bhv_id
-add wave -noupdate /tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/proactive_beh_3di_2do_u0/di_i
-add wave -noupdate /tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/proactive_beh_3di_2do_u0/do_o
-add wave -noupdate /tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/proactive_beh_3di_2do_u0/curr_state_1d
-add wave -noupdate /tb_ec_3di_2do/emcc_mst_top_u/emcc_mix_top_u/ec_3di_2do_u0/proactive_beh_3di_2do_u0/next_state
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {28731362404 fs} 0}
+WaveRestoreCursors {{Cursor 1} {29979176379 fs} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 150
 configure wave -valuecolwidth 100
@@ -118,4 +106,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
 update
-WaveRestoreZoom {23080662020 fs} {52993580560 fs}
+WaveRestoreZoom {29768188867 fs} {30059609741 fs}

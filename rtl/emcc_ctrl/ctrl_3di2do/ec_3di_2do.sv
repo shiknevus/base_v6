@@ -46,7 +46,7 @@ module ec_3di_2do#(
     );
 	
 	
-	localparam		A_BHA_NUM		=	8;	
+	localparam		A_BHA_NUM		=	13;	
 	localparam		B_BHA_NUM		=	1;	
 	localparam		ARV_SIG_DET_TIM	=	5;
 	

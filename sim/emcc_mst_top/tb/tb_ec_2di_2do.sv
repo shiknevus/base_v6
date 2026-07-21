@@ -1,8 +1,7 @@
 
 `timescale 1 ns / 100 ps
-`include "./../rtl/include_files/reg_addr_pl.vh"
-`include "./../rtl/include_files/globe_includes.vh"
-`include "./../rtl/include_files/components_param.vh"
+`include "../../../rtl/include_files/components_param.vh"
+`include "../../../rtl/include_files/reg_addr_pl.vh"
 module tb_ec_2di_2do;
 
 //*************************Parameter Declarations**************************
@@ -189,14 +188,14 @@ emcc_mst_top emcc_mst_top_u
                 wait (tb_ec_2di_2do.emcc_mst_top_u.prot_clk_rst == 0)                                                                                                           //
          //////////////////////       tb_ec_1do.emcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.write_from_file("./../../../../../src//hdl/sim_src/ps_tx_depot_init.dat",32'hB000_0000,512* `SIM_SLV_STA_NUM *4, resp);//unit:BUYTE ,so the number of config must be mult 4
 //                tb_ec_1do.emcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.read_to_file   ("./../../../../../src//hdl/sim_src/ps_tx_depot_read.dat",32'hB000_0000,4096, resp);
-                //400行对应100个AXI时钟  800对应200个AXI时钟，AXI的总线位宽为32bit,由此可见此处的值以BYTE为单位
+                //400行对�?100个AXI时钟  800对应200个AXI时钟，AXI的�?�线位宽�?32bit,由此可见此处的�?�以BYTE为单�?
 
 //                optical_fiber_case0;
                 //tst_roller_component;
 				
 				//tb_ec_1do.emcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.wait_interrupt(4'd0, rddata);
 
-				//ps写复位
+				//ps写复�?
 				
 				ps_write_word(	`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `RST_EN,32'h0000_0001,resp1);
 				
@@ -212,7 +211,7 @@ emcc_mst_top emcc_mst_top_u
 				
 				ps_write_word(	`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `BHV_PRIORITY,32'h0000_0000,resp1);
 				
-				//信号有效性
+				//信号有效�?
 				ps_write_word(	`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `PARAM26,32'h0000_0001,resp1);
 				
 				ps_write_word(	`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `PARAM27,32'h0000_0001,resp1);
@@ -505,31 +504,31 @@ emcc_mst_top emcc_mst_top_u
 	
 
 task automatic ps_write_word;
-    input   [31:0]  addr;       //目标4字节偏移地址(需4字节对齐)
+    input   [31:0]  addr;       //目标4字节偏移地址(�?4字节对齐)
     input   [31:0]  w_data;     //要写入的32bit数据
     output  [1:0]   resp;       //AXI BRESP
     reg     [127:0] bus_data;   //128bit总线数据
-    reg     [15:0]  wstrb;      //128bit总线对应的16bit WSTRB
+    reg     [15:0]  wstrb;      //128bit总线对应�?16bit WSTRB
     reg     [1:0]   word_sel;   //选中总线上的哪个word(0~3)
 	
     begin
-        word_sel = addr[3:2];                           //addr[3:2]决定word在128bit总线中的位置
+        word_sel = addr[3:2];                           //addr[3:2]决定word�?128bit总线中的位置
         bus_data = 128'd0;
-        bus_data[word_sel*32 +: 32] = w_data;           //把32bit数据放到对应word槽
+        bus_data[word_sel*32 +: 32] = w_data;           //�?32bit数据放到对应word�?
         wstrb    = 16'h0000;
-        wstrb[word_sel*4 +: 4] = 4'b1111;               //只使能对应4字节通道的WSTRB
+        wstrb[word_sel*4 +: 4] = 4'b1111;               //只使能对�?4字节通道的WSTRB
         tb_ec_2di_2do.emcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.write_burst_strb(
-            {addr[31:4],4'b0000},                       //AWADDR对齐到16字节边界
+            {addr[31:4],4'b0000},                       //AWADDR对齐�?16字节边界
             8'd0,                                        //len=0(单拍)
-            3'd4,                                        //size=4(2^4=16字节/拍,即128bit)
+            3'd4,                                        //size=4(2^4=16字节/�?,�?128bit)
             2'b01,                                       //burst=INCR
             1'b0,                                        //lock
             4'b0000,                                     //cache
             3'b000,                                      //prot
-            bus_data,                                    //128bit写数据
+            bus_data,                                    //128bit写数�?
             1'b1,                                        //strb_en=1,使用自定义WSTRB
             wstrb,                                       //16bit WSTRB掩码
-            16,                                          //datasize=16字节(一整拍)
+            16,                                          //datasize=16字节(�?整拍)
             resp                                         //BRESP
         );
     end
