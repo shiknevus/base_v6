@@ -224,10 +224,7 @@ module emcc_mix_top
   ,.probe_out30( do_mst_msg_force[30]  )
   ,.probe_out31( do_mst_msg_force[31]  )
 );
-	
-	
-	
-	
+
 	pkg_route
     #(
          .RAM_DEPTH             (RAM_DEPTH          )
@@ -416,8 +413,10 @@ module emcc_mix_top
 	// --------------------------------------------user component_v6_inst---------------------------------------//
 	//==========================================================================================================//
 
+			reg		di1;
+	
 			ec_1di #(
-				.REG_SPACE_BIAS 		(`ROLLER_1003_REG_BIAS	)	
+				.REG_SPACE_BIAS 		(`ROLLER_1003_REG_BIAS	)	//B010_0800
 				,.REG_SPACE_SIZE 		(512					)
 			) ec_1di_u0 (	
 				.clk_i           		(clk					)
@@ -433,7 +432,7 @@ module emcc_mix_top
 				,.i_st_rd_addr    		(ps_reg_rd_addr			)
 				,.o_st_rd_data    		(sub_comp_rd_dat[0]		)
 				,.o_st_rd_vld     		(sub_comp_rd_vld[0]		)
-				,.di              		(di_mst_msg[0]			)
+				,.di              		(di1					)
 				,.o_intr_irq      		(map_irq[0] 			)
 			);
 			
@@ -457,6 +456,10 @@ module emcc_mix_top
 				,.do_o					(do_mst_msg[0]			)
 				,.o_intr_irq			(map_irq[1]				)
 			);
+			
+			wire	[1:0]	do_2di_2do;
+			reg 	[1:0]	di_2di_2do;
+			
 		
 			ec_2di_2do#(
 				.REG_SPACE_BIAS			(`ROLLER_1048_REG_BIAS	),	//Component offset address
@@ -475,10 +478,84 @@ module emcc_mix_top
 				,.i_st_rd_addr  		(ps_reg_rd_addr			)
 				,.o_st_rd_data  		(sub_comp_rd_dat[2]		)
 				,.o_st_rd_vld   		(sub_comp_rd_vld[2]		)
-				,.di_i					(di_mst_msg[2:1]		)
-				,.do_o					(do_mst_msg[2:1]		)
+				,.di_i					(di_2di_2do				)
+				,.do_o					(do_2di_2do				)
 				,.o_intr_irq			(map_irq[2]				)
 			);
+			
+			reg [1:0]	do_2do;
+			
+			ec_2do#(
+				.REG_SPACE_BIAS 		(`ROLLER_1089_REG_BIAS	),	//Component offset address
+				.REG_SPACE_SIZE 		(512					)		//Component register size
+			)ec_2do_u0(
+				.clk_i					(clk					)
+				,.rst					(reset					)
+				,.i_time_1ms_vld		(time_1ms_vld			)
+				,.i_time_1s_vld 		(time_1s_vld			)
+				,.ps_reg_clk			(ps_reg_clk				)
+				,.ps_reg_reset			(ps_reg_reset			)
+				,.i_st_wr_en			(ps_reg_we				)
+				,.i_st_wr_addr  		(ps_reg_addr			)
+				,.i_st_wr_data  		(ps_reg_wr_dat			)
+				,.i_st_rd_en    		(ps_reg_re				)
+				,.i_st_rd_addr  		(ps_reg_rd_addr			)
+				,.o_st_rd_data  		(sub_comp_rd_dat[3]		)
+				,.o_st_rd_vld   		(sub_comp_rd_vld[3]		)
+				,.do_o					(do_2do					)
+				,.o_intr_irq			(map_irq[3]				)
+			);
+	
+			reg		[1:0]	di_2di_3do;
+			wire	[2:0]	do_2di_3do;
+				
+	
+			ec_2di_3do#(
+				.REG_SPACE_BIAS 		(`ROLLER_2004_REG_BIAS	),
+				.REG_SPACE_SIZE 		(512					)
+			)ec_2di_3do_u0	(
+				.clk_i					(clk					)
+				,.rst					(reset					)
+				,.i_time_1ms_vld		(time_1ms_vld			)
+				,.i_time_1s_vld 		(time_1s_vld			)
+				,.ps_reg_clk			(ps_reg_clk				)
+				,.ps_reg_reset			(ps_reg_reset			)
+				,.i_st_wr_en			(ps_reg_we				)
+				,.i_st_wr_addr  		(ps_reg_addr			)
+				,.i_st_wr_data  		(ps_reg_wr_dat			)
+				,.i_st_rd_en    		(ps_reg_re				)
+				,.i_st_rd_addr  		(ps_reg_rd_addr			)
+				,.o_st_rd_data  		(sub_comp_rd_dat[4]		)
+				,.o_st_rd_vld   		(sub_comp_rd_vld[4]		)
+				,.di_i					(di_2di_3do				)
+				,.do_o					(do_2di_3do				)
+				,.o_intr_irq			(map_irq[4]				)
+			);
+			
+			reg				di_i1;
+			wire	[1:0]	do_o1;
+			
+		ec_1di_2do#(
+			.REG_SPACE_BIAS 			(`ROLLER_1079_REG_BIAS	)
+			,.REG_SPACE_SIZE 			(512					)
+		)ec_1di_2do_u0(
+			.clk_i						(clk)
+			,.rst						(reset)
+			,.i_time_1ms_vld			(time_1ms_vld		)
+			,.i_time_1s_vld 			(time_1s_vld		)
+			,.ps_reg_clk				(ps_reg_clk			)
+			,.ps_reg_reset				(ps_reg_reset		)
+			,.i_st_wr_en				(ps_reg_we			)
+			,.i_st_wr_addr  			(ps_reg_addr		)
+			,.i_st_wr_data  			(ps_reg_wr_dat		)
+			,.i_st_rd_en    			(ps_reg_re			)
+			,.i_st_rd_addr  			(ps_reg_rd_addr		)
+			,.o_st_rd_data  			(sub_comp_rd_dat[5]	)
+			,.o_st_rd_vld   			(sub_comp_rd_vld[5]	)
+			,.di_i						(di_i1				)
+			,.do_o						(do_o1				)
+			,.o_intr_irq				(map_irq[5]			)
+    );
 		
 		
 	//==========================================================================================================//

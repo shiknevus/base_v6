@@ -3,9 +3,9 @@
 // Company: 
 // Engineer: cgliu
 // 
-// Create Date: 2026/07/14 22:38:46
+// Create Date: 2026/06/29 22:38:46
 // Design Name: 
-// Module Name: 
+// Module Name: proactive_beh
 // Project Name: 
 // Target Devices: 
 // Tool Versions: 
@@ -20,8 +20,8 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module proactive_beh_1do#(
-    parameter                 	BHA_NUM = 2   //Number of active behaviors
+module proactive_beh_1di_2do#(
+    parameter                 	BHA_NUM 		= 2   //Number of active behaviors
 )(
     input                       clk_i
     ,input                      rst_i
@@ -41,7 +41,7 @@ module proactive_beh_1do#(
     ,output reg [7:0]           a_tx_id
     ,output reg	[7:0]           a_alm_num
 
-    ,output reg                 do_o
+	,output	reg	[1:0]			do_o
 
     ,output reg                 irq_o
     ,input                      irq_ack_i       //Interrupt response
@@ -49,7 +49,7 @@ module proactive_beh_1do#(
 
     reg  [7:0]      a_bhv_id_r;
 
-    reg [7:0]    	curr_state;
+	reg	[7:0]		curr_state;
 	reg [7:0]    	curr_state_1d;
     reg [7:0]    	next_state;
 
@@ -60,7 +60,6 @@ module proactive_beh_1do#(
 	reg [7:0]		ack_tx_id;
 	reg [7:0]		ack_tx_result;
 	reg	[7:0]		ack_ps_alart_num;
-	
 	
 	localparam  S_IDLE          = 8'd0; 
     localparam  S_BHA_PRE_DET	= 8'd1; 
@@ -152,9 +151,9 @@ module proactive_beh_1do#(
         else
             curr_state <= next_state;
     end
-
-    always @(*) begin
-        case (curr_state)
+	
+    always @(*) begin			
+        case (curr_state)	
             S_IDLE: begin	//0
                 if (a_en && a_bhv_id != 8'd0 && a_bhv_vld)    //ps behavior execution instruction
                     next_state = S_BHA_PRE_DET;
@@ -167,6 +166,16 @@ module proactive_beh_1do#(
 					next_state = S_READY_10;	
 				else if(a_bhv_id_r == 8'd2 && pre_sta_allow[1])	
 					next_state = S_READY_10;	
+				else if(a_bhv_id_r == 8'd3 && pre_sta_allow[2])	
+					next_state = S_READY_10;
+				else if(a_bhv_id_r == 8'd4 && pre_sta_allow[3])	
+					next_state = S_READY_10;
+				else if(a_bhv_id_r == 8'd5 && pre_sta_allow[4])	
+					next_state = S_READY_10;
+				else if(a_bhv_id_r == 8'd6 && pre_sta_allow[5])	
+					next_state = S_READY_10;
+				else if(a_bhv_id_r == 8'd7 && pre_sta_allow[6])	
+					next_state = S_READY_10;
                 else if(timout)
                     next_state = S_ALERT_40;
                 else
@@ -201,10 +210,7 @@ module proactive_beh_1do#(
 			//end
 			
 			S_EXE:begin		//11								//active Execution
-				if(a_bhv_id_r == 8'd1 || a_bhv_id_r == 8'd2) 
-					next_state = S_BHA_POST_DET;
-				else
-					next_state = S_EXE;
+				next_state = S_BHA_POST_DET;
 			end
 			
             S_BHA_POST_DET: begin	//6
@@ -212,10 +218,20 @@ module proactive_beh_1do#(
                     next_state = S_SUCC_30;
                 else if(a_bhv_id_r == 8'd2 && post_sta_allow[1])
                     next_state = S_SUCC_30;
+				else if(a_bhv_id_r == 8'd3 && post_sta_allow[2])
+                    next_state = S_SUCC_30;
+				else if(a_bhv_id_r == 8'd4 && post_sta_allow[3])
+                    next_state = S_SUCC_30;
+				else if(a_bhv_id_r == 8'd5 && post_sta_allow[4])
+                    next_state = S_SUCC_30;
+				else if(a_bhv_id_r == 8'd6 && post_sta_allow[5])
+                    next_state = S_SUCC_30;
+				else if(a_bhv_id_r == 8'd7 && post_sta_allow[6])
+                    next_state = S_SUCC_30;
                 else if(timout)
                     next_state = S_ALERT_40;
-                else
-                    next_state = S_BHA_POST_DET;
+				else
+					next_state = S_BHA_POST_DET;
             end
 
             S_SUCC_30: begin		//7						//Send Interrupt 30
@@ -254,10 +270,8 @@ module proactive_beh_1do#(
 
     //Channel A transaction ID: 10 20 30 40
     always@(posedge clk_i)begin
-        if(rst_i)
+        if(rst_i || !a_en)
             a_tx_id <= 8'd0;
-		else if(!a_en)
-			a_tx_id <= 8'd0;
         else if(curr_state == S_READY_10)
             a_tx_id <= 8'd10;
         //else if(curr_state == S_EXE_20)
@@ -292,10 +306,8 @@ module proactive_beh_1do#(
     always@(posedge clk_i)begin
         if(rst_i || !a_en)
             a_alm_num <= 8'd0;
-		else if(curr_state == S_IDLE)
-			a_alm_num <= 8'd0;
-        else if(curr_state == S_BHA_PRE_DET && timout)
-            a_alm_num <= 8'd101;    
+        else if(curr_state == S_BHA_PRE_DET && timout)						
+			a_alm_num <= 8'd101;
         else if(curr_state == S_READY_10_ACK && ack_tx_result == IRQ_NO_OK)	
             a_alm_num <= ack_ps_alart_num;    
         else if(curr_state == S_READY_10_ACK && timout)						
@@ -303,17 +315,15 @@ module proactive_beh_1do#(
 		//else if(curr_state == S_EXE_20_ACK && ack_tx_result == IRQ_NO_OK)	
         //    a_alm_num <= ack_ps_alart_num;    
         //else if(curr_state == S_EXE_20_ACK && timout)						
-        //    a_alm_num <= 8'd103;    
-		//else if(curr_state_1d == S_EXE && curr_state == S_ALERT_40 && a_bhv_id_r == 8'd1)
-		//	a_alm_num <= 8'd104; 
-		//else if(curr_state_1d == S_EXE && curr_state == S_ALERT_40 && a_bhv_id_r == 8'd2)
-		//	a_alm_num <= 8'd105;
-		else if(curr_state == S_BHA_POST_DET && timout)
-            a_alm_num <= 8'd103;    
+        //    a_alm_num <= 8'd103;      
+		else if(curr_state_1d == S_BHA_POST_DET && curr_state == S_ALERT_40)
+			a_alm_num <= 8'd103;    
 		else if(curr_state == S_SUCC_30_ACK && ack_tx_result == IRQ_NO_OK)	
 			a_alm_num <= ack_ps_alart_num;
 		else if(curr_state == S_SUCC_30_ACK && timout)						
             a_alm_num <= 8'd104;
+		else if(match_40)
+			a_alm_num <= 8'd0;
         else
             a_alm_num <= a_alm_num;
     end
@@ -342,25 +352,32 @@ module proactive_beh_1do#(
     end
 	
 	
-	
 	//===============================================================================================================
 	//------------------------------------------------ user logic start ---------------------------------------------
 	//===============================================================================================================
+	
+	
 	always@(posedge clk_i)
 	begin
-		if(rst_i)
-			do_o <= 1'b0;
-		else if(curr_state == S_EXE && a_bhv_id_r == 8'd1)
-			do_o <= 1;
-		else if(curr_state == S_EXE && a_bhv_id_r == 8'd2)
-			do_o <= 0;
+		if(rst_i || !a_en)
+			do_o <= 2'b00;
+		else if(curr_state == S_EXE)
+			case(a_bhv_id_r)
+				8'd1	:	do_o <= 2'b01;
+				8'd2	:	do_o <= 2'b10;
+				8'd3	:	do_o <= 2'b00;
+				8'd4	:	do_o <= 2'b00;
+				8'd5	:	do_o <= 2'b00;
+				8'd6	:	do_o <= 2'b01;
+				8'd7	:	do_o <= 2'b10;
+				default	:	do_o <= 2'b00;
+			endcase
 		else
 			do_o <= do_o;
 	end
-	
+
 	//===============================================================================================================
 	//------------------------------------------------ user logic start ---------------------------------------------
 	//===============================================================================================================
-	
-	
+
 endmodule
