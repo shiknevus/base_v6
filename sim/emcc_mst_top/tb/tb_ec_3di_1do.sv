@@ -3,9 +3,9 @@
 `include "../../../rtl/include_files/components_param.vh"
 `include "../../../rtl/include_files/reg_addr_pl.vh"
 
-module tb_ec_3di_2do;
+module tb_ec_3di_1do;
 //********************************Defines*********************************
-`define EC_COMP_INST_DI tb_ec_3di_2do.emcc_mst_top_u.emcc_mix_top_u.ec_3di_2do_u0.di_i
+`define EC_COMP_INST_DI tb_ec_3di_1do.emcc_mst_top_u.emcc_mix_top_u.ec_3di_1do_u0.di_i
 //*************************Parameter Declarations**************************
 
 parameter       SIM_MAX_TIME  = 9500000; //To quit the simulation
@@ -136,7 +136,7 @@ emcc_mst_top emcc_mst_top_u
     .TXN_1(txn_11_i)
 );
 
-			localparam	EC_BIAS_ADDR = `PL_CFG_BASE_ADDR + `ROLLER_2126_REG_BIAS;
+			localparam	EC_BIAS_ADDR = `PL_CFG_BASE_ADDR + `ROLLER_2037_REG_BIAS;
 
 
             reg tb_ACLK;
@@ -171,18 +171,18 @@ emcc_mst_top emcc_mst_top_u
                 @(posedge tb_ACLK);
                 repeat(5) @(posedge tb_ACLK);
 
-                tb_ec_3di_2do.emcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.set_debug_level_info(1'b0);
-                tb_ec_3di_2do.emcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.por_srstb_reset(1'b1);
+                tb_ec_3di_1do.emcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.set_debug_level_info(1'b0);
+                tb_ec_3di_1do.emcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.por_srstb_reset(1'b1);
                 #200;
-                tb_ec_3di_2do.emcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.por_srstb_reset(1'b0);
-                tb_ec_3di_2do.emcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.fpga_soft_reset(32'h1);
+                tb_ec_3di_1do.emcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.por_srstb_reset(1'b0);
+                tb_ec_3di_1do.emcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.fpga_soft_reset(32'h1);
                 #2000 ;  // This delay depends on your clock frequency. It should be at least 16 clock cycles. 
-                tb_ec_3di_2do.emcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.por_srstb_reset(1'b1);
-                tb_ec_3di_2do.emcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.fpga_soft_reset(32'h0);
+                tb_ec_3di_1do.emcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.por_srstb_reset(1'b1);
+                tb_ec_3di_1do.emcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.fpga_soft_reset(32'h0);
                 #2000 ;
 
                 //PS RX PORT
-                wait (tb_ec_3di_2do.emcc_mst_top_u.prot_clk_rst == 0)                                                                                                           //
+                wait (tb_ec_3di_1do.emcc_mst_top_u.prot_clk_rst == 0)                                                                                                           //
 				//ps write rst
 				ps_write_word(	EC_BIAS_ADDR + `RST_EN,32'h0000_0001,resp1);
 
@@ -198,7 +198,7 @@ emcc_mst_top emcc_mst_top_u
 				
 				ps_write_word(	EC_BIAS_ADDR + `BHV_PRIORITY,32'h0000_0000,resp1);
 				
-				//信号有效�?????
+				//信号有效�??????
 				ps_write_word(	EC_BIAS_ADDR + `PARAM1,32'h0000_0001,resp1);
 				
 				ps_write_word(	EC_BIAS_ADDR + `PARAM2,32'h0000_0001,resp1);
@@ -209,10 +209,10 @@ emcc_mst_top emcc_mst_top_u
 				
 				
 				//============================================	行为ID=1		==================================
-				// force `EC_COMP_INST_DI = 3'b001;	//position 1 arrive
+				force `EC_COMP_INST_DI = 3'b000;	//position 1 arrive
 				ps_write_word(	EC_BIAS_ADDR + `A_BHV_ID,32'h0000_0001,resp1);
 				//10
-				@tb_ec_3di_2do.emcc_mst_top_u.emcc_mix_top_u.ec_3di_2do_u0.o_intr_irq;
+				@tb_ec_3di_1do.emcc_mst_top_u.emcc_mix_top_u.ec_3di_1do_u0.o_intr_irq;
 				ps_read_word(EC_BIAS_ADDR + `IRQ_REG2, read_data);
 				if(read_data == 32'd0)	
 				begin	//no alart
@@ -226,7 +226,7 @@ emcc_mst_top emcc_mst_top_u
 				else
 					$stop;
 				//30 / 40
-				@tb_ec_3di_2do.emcc_mst_top_u.emcc_mix_top_u.ec_3di_2do_u0.o_intr_irq;
+				@tb_ec_3di_1do.emcc_mst_top_u.emcc_mix_top_u.ec_3di_1do_u0.o_intr_irq;
 				ps_read_word(EC_BIAS_ADDR + `IRQ_REG2, read_data);
 				if(read_data == 32'd0)	
 				begin	//no alart
@@ -246,10 +246,10 @@ emcc_mst_top emcc_mst_top_u
 				//============================================	行为ID=2		==================================
 
 				#600;
-				// force `EC_COMP_INST_DI = 3'b010;	//position  2 arrive
+				force `EC_COMP_INST_DI = 3'b000;	//position  2 arrive
 				ps_write_word(	EC_BIAS_ADDR + `A_BHV_ID,32'h0000_0002,resp1);
 				//10
-				@tb_ec_3di_2do.emcc_mst_top_u.emcc_mix_top_u.ec_3di_2do_u0.o_intr_irq;
+				@tb_ec_3di_1do.emcc_mst_top_u.emcc_mix_top_u.ec_3di_1do_u0.o_intr_irq;
 				ps_read_word(EC_BIAS_ADDR + `IRQ_REG2, read_data);
 				if(read_data == 32'd0)
 				begin	//no alart
@@ -263,7 +263,7 @@ emcc_mst_top emcc_mst_top_u
 				else
 					$stop;
 				//30 / 40
-				@tb_ec_3di_2do.emcc_mst_top_u.emcc_mix_top_u.ec_3di_2do_u0.o_intr_irq;
+				@tb_ec_3di_1do.emcc_mst_top_u.emcc_mix_top_u.ec_3di_1do_u0.o_intr_irq;
 				ps_read_word(EC_BIAS_ADDR + `IRQ_REG2, read_data);
 				if(read_data == 32'd0)
 				begin	//no alart
@@ -282,10 +282,10 @@ emcc_mst_top emcc_mst_top_u
 				//============================================	行为ID=3		==================================
 
 				#600;
-				// force `EC_COMP_INST_DI = 3'b001;	//position  1 arrive
+				force `EC_COMP_INST_DI = 3'b000;	//position  1 arrive
 				ps_write_word(	EC_BIAS_ADDR + `A_BHV_ID,32'h0000_0003,resp1);
 				//10
-				@tb_ec_3di_2do.emcc_mst_top_u.emcc_mix_top_u.ec_3di_2do_u0.o_intr_irq;
+				@tb_ec_3di_1do.emcc_mst_top_u.emcc_mix_top_u.ec_3di_1do_u0.o_intr_irq;
 				ps_read_word(EC_BIAS_ADDR + `IRQ_REG2, read_data);
 				if(read_data == 32'd0)
 				begin	//no alart
@@ -299,7 +299,7 @@ emcc_mst_top emcc_mst_top_u
 				else
 					$stop;
 				//30 / 40
-				@tb_ec_3di_2do.emcc_mst_top_u.emcc_mix_top_u.ec_3di_2do_u0.o_intr_irq;
+				@tb_ec_3di_1do.emcc_mst_top_u.emcc_mix_top_u.ec_3di_1do_u0.o_intr_irq;
 				ps_read_word(EC_BIAS_ADDR + `IRQ_REG2, read_data);
 				if(read_data == 32'd0)
 				begin	//no alart
@@ -318,10 +318,10 @@ emcc_mst_top emcc_mst_top_u
 				//============================================	行为ID=4		==================================
 
 				#600;
-				// force `EC_COMP_INST_DI = 3'b001;	//position  1 arrive
+				force `EC_COMP_INST_DI = 3'b000;	//position  1 arrive
 				ps_write_word(	EC_BIAS_ADDR + `A_BHV_ID,32'h0000_0004,resp1);
 				//10
-				@tb_ec_3di_2do.emcc_mst_top_u.emcc_mix_top_u.ec_3di_2do_u0.o_intr_irq;
+				@tb_ec_3di_1do.emcc_mst_top_u.emcc_mix_top_u.ec_3di_1do_u0.o_intr_irq;
 				ps_read_word(EC_BIAS_ADDR + `IRQ_REG2, read_data);
 				if(read_data == 32'd0)
 				begin	//no alart
@@ -335,7 +335,7 @@ emcc_mst_top emcc_mst_top_u
 				else
 					$stop;
 				//30 / 40
-				@tb_ec_3di_2do.emcc_mst_top_u.emcc_mix_top_u.ec_3di_2do_u0.o_intr_irq;
+				@tb_ec_3di_1do.emcc_mst_top_u.emcc_mix_top_u.ec_3di_1do_u0.o_intr_irq;
 				ps_read_word(EC_BIAS_ADDR + `IRQ_REG2, read_data);
 				if(read_data == 32'd0)
 				begin	//no alart
@@ -354,10 +354,10 @@ emcc_mst_top emcc_mst_top_u
 				//============================================	行为ID=5		==================================
 
 				#600;
-				// force `EC_COMP_INST_DI = 3'b001;	//position  1 arrive
+				force `EC_COMP_INST_DI = 3'b000;	//position  1 arrive
 				ps_write_word(	EC_BIAS_ADDR + `A_BHV_ID,32'h0000_0005,resp1);
 				//10
-				@tb_ec_3di_2do.emcc_mst_top_u.emcc_mix_top_u.ec_3di_2do_u0.o_intr_irq;
+				@tb_ec_3di_1do.emcc_mst_top_u.emcc_mix_top_u.ec_3di_1do_u0.o_intr_irq;
 				ps_read_word(EC_BIAS_ADDR + `IRQ_REG2, read_data);
 				if(read_data == 32'd0)
 				begin	//no alart
@@ -371,7 +371,7 @@ emcc_mst_top emcc_mst_top_u
 				else
 					$stop;
 				//30 / 40
-				@tb_ec_3di_2do.emcc_mst_top_u.emcc_mix_top_u.ec_3di_2do_u0.o_intr_irq;
+				@tb_ec_3di_1do.emcc_mst_top_u.emcc_mix_top_u.ec_3di_1do_u0.o_intr_irq;
 				ps_read_word(EC_BIAS_ADDR + `IRQ_REG2, read_data);
 				if(read_data == 32'd0)
 				begin	//no alart
@@ -389,10 +389,10 @@ emcc_mst_top emcc_mst_top_u
 				//============================================	行为ID=6		==================================
 
 				#600;
-				force `EC_COMP_INST_DI = 3'b001;
+				force `EC_COMP_INST_DI = 3'b000;
 				ps_write_word(	EC_BIAS_ADDR + `A_BHV_ID,32'h0000_0006,resp1);
 				//10
-				@tb_ec_3di_2do.emcc_mst_top_u.emcc_mix_top_u.ec_3di_2do_u0.o_intr_irq;
+				@tb_ec_3di_1do.emcc_mst_top_u.emcc_mix_top_u.ec_3di_1do_u0.o_intr_irq;
 				ps_read_word(EC_BIAS_ADDR + `IRQ_REG2, read_data);
 				if(read_data == 32'd0)
 				begin	//no alart
@@ -406,7 +406,7 @@ emcc_mst_top emcc_mst_top_u
 				else
 					$stop;
 				//30 / 40
-				@tb_ec_3di_2do.emcc_mst_top_u.emcc_mix_top_u.ec_3di_2do_u0.o_intr_irq;
+				@tb_ec_3di_1do.emcc_mst_top_u.emcc_mix_top_u.ec_3di_1do_u0.o_intr_irq;
 				ps_read_word(EC_BIAS_ADDR + `IRQ_REG2, read_data);
 				if(read_data == 32'd0)
 				begin	//no alart
@@ -425,10 +425,10 @@ emcc_mst_top emcc_mst_top_u
 				//============================================	行为ID=7		==================================
 
 				#600;
-				force `EC_COMP_INST_DI = 3'b001;
+				force `EC_COMP_INST_DI = 3'b000;
 				ps_write_word(	EC_BIAS_ADDR + `A_BHV_ID,32'h0000_0007,resp1);
 				//10
-				@tb_ec_3di_2do.emcc_mst_top_u.emcc_mix_top_u.ec_3di_2do_u0.o_intr_irq;
+				@tb_ec_3di_1do.emcc_mst_top_u.emcc_mix_top_u.ec_3di_1do_u0.o_intr_irq;
 				ps_read_word(EC_BIAS_ADDR + `IRQ_REG2, read_data);
 				if(read_data == 32'd0)
 				begin	//no alart
@@ -442,7 +442,7 @@ emcc_mst_top emcc_mst_top_u
 				else
 					$stop;
 				//30 / 40
-				@tb_ec_3di_2do.emcc_mst_top_u.emcc_mix_top_u.ec_3di_2do_u0.o_intr_irq;
+				@tb_ec_3di_1do.emcc_mst_top_u.emcc_mix_top_u.ec_3di_1do_u0.o_intr_irq;
 				ps_read_word(EC_BIAS_ADDR + `IRQ_REG2, read_data);
 				if(read_data == 32'd0)
 				begin	//no alart
@@ -464,7 +464,7 @@ emcc_mst_top emcc_mst_top_u
 				force `EC_COMP_INST_DI = 3'b001;	//position  1 arrive
 				ps_write_word(	EC_BIAS_ADDR + `A_BHV_ID,32'h0000_0001,resp1);
 				//10
-				@tb_ec_3di_2do.emcc_mst_top_u.emcc_mix_top_u.ec_3di_2do_u0.o_intr_irq;
+				@tb_ec_3di_1do.emcc_mst_top_u.emcc_mix_top_u.ec_3di_1do_u0.o_intr_irq;
 				ps_read_word(EC_BIAS_ADDR + `IRQ_REG2, read_data);
 				if(read_data == 32'd0)
 				begin	//no alart
@@ -478,7 +478,7 @@ emcc_mst_top emcc_mst_top_u
 				else
 					$stop;
 				//30 / 40
-				@tb_ec_3di_2do.emcc_mst_top_u.emcc_mix_top_u.ec_3di_2do_u0.o_intr_irq;
+				@tb_ec_3di_1do.emcc_mst_top_u.emcc_mix_top_u.ec_3di_1do_u0.o_intr_irq;
 				ps_read_word(EC_BIAS_ADDR + `IRQ_REG2, read_data);
 				if(read_data == 32'd0)
 				begin	//no alart
@@ -504,31 +504,31 @@ emcc_mst_top emcc_mst_top_u
 	
 
 task automatic ps_write_word;
-    input   [31:0]  addr;       //目标4字节偏移地址(�?????4字节对齐)
+    input   [31:0]  addr;       //目标4字节偏移地址(�??????4字节对齐)
     input   [31:0]  w_data;     //要写入的32bit数据
     output  [1:0]   resp;       //AXI BRESP
     reg     [127:0] bus_data;   //128bit总线数据
-    reg     [15:0]  wstrb;      //128bit总线对应�?????16bit WSTRB
+    reg     [15:0]  wstrb;      //128bit总线对应�??????16bit WSTRB
     reg     [1:0]   word_sel;   //选中总线上的哪个word(0~3)
 	
     begin
-        word_sel = addr[3:2];                           //addr[3:2]决定word�?????128bit总线中的位置
+        word_sel = addr[3:2];                           //addr[3:2]决定word�??????128bit总线中的位置
         bus_data = 128'd0;
-        bus_data[word_sel*32 +: 32] = w_data;           //�?????32bit数据放到对应word�?????
+        bus_data[word_sel*32 +: 32] = w_data;           //�??????32bit数据放到对应word�??????
         wstrb    = 16'h0000;
-        wstrb[word_sel*4 +: 4] = 4'b1111;               //只使能对�?????4字节通道的WSTRB
-        tb_ec_3di_2do.emcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.write_burst_strb(
-            {addr[31:4],4'b0000},                       //AWADDR对齐�?????16字节边界
+        wstrb[word_sel*4 +: 4] = 4'b1111;               //只使能对�??????4字节通道的WSTRB
+        tb_ec_3di_1do.emcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.write_burst_strb(
+            {addr[31:4],4'b0000},                       //AWADDR对齐??????16字节边界
             8'd0,                                        //len=0(单拍)
-            3'd4,                                        //size=4(2^4=16字节/�?????,�?????128bit)
+            3'd4,                                        //size=4(2^4=16字节/�??????,�??????128bit)
             2'b01,                                       //burst=INCR
             1'b0,                                        //lock
             4'b0000,                                     //cache
             3'b000,                                      //prot
-            bus_data,                                    //128bit写数�?????
+            bus_data,                                    //128bit写数�??????
             1'b1,                                        //strb_en=1,使用自定义WSTRB
             wstrb,                                       //16bit WSTRB掩码
-            16,                                          //datasize=16字节(�?????整拍)
+            16,                                          //datasize=16字节(�??????整拍)
             resp                                         //BRESP
         );
     end
@@ -539,7 +539,7 @@ task automatic ps_read_word;
 	output	[31:0]	read_data;
 	reg				resp;
 begin
-tb_ec_3di_2do.emcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.read_burst// 2配置的size
+tb_ec_3di_1do.emcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.read_burst// 2配置的size
 					(rd_addr,0,2,1,0,0,0,read_data,resp);
 end
 endtask	
