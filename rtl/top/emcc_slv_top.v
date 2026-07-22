@@ -500,26 +500,26 @@ ethcat_axi_rout
  (* MARK_DEBUG="true" *) wire    [12:0]   ch_2;
 /////////////////////////////////////////////////////////////////////////////
 
-//`ifdef SIM_PLATFORM_MST
-//
-//`else
+`ifdef SIM_PLATFORM_MST
+
+`else
 //    vio_7series vio_top_u(
 //  .clk(prot_clk),                // input wire clk
 //  .probe_in0(id_op_f),    // input wire [0 : 0] probe_in0
 //  .probe_in1(id_op_data),    // input wire [31 : 0] probe_in1
 //  .probe_in2(id_out_data),// input wire [31 : 0] probe_in2
-//  
+  
 //  .probe_in3(ch_1),    // input wire [31 : 0] probe_in1
 //  .probe_in4(ch_2),// input wire [31 : 0] probe_in2
 //  .probe_in5(ai_regoin_msg),// input wire [31 : 0] probe_in2
-//  
+  
 //  .probe_out0(iid_data),  // output wire [31 : 0] probe_out0
 //  .probe_out1(iid_addr),  // output wire [15 : 0] probe_out1
 //  .probe_out2(id_w_en),  // output wire [0 : 0] probe_out2
 //  .probe_out3(id_r_en),  // output wire [0 : 0] probe_out3
 //  .probe_out4(did)  // output wire [0 : 0] probe_out3
 //);  
-//`endif
+`endif
 
     app_depot_top
     #(
@@ -690,20 +690,20 @@ id id_u(
 //
  //(* MARK_DEBUG="true" *) wire    [12:0]   ch_1;
  //(* MARK_DEBUG="true" *) wire    [12:0]   ch_2;
-adc_dac 
-  adc_dac_u
-       ( 
-             .clk10m(clk10m)
-             ,.locked(~ll_clk_rst)
-             
-             ,.sclk(adc_sclk1)
-             ,.sdin1(adc_sdin1)
-             ,.sdout1(adc_dout1)
-             ,.cs1(adc_cs1)
-             
-             ,.ch_1(ch_1)
-             ,.ch_2(ch_2)
-  );
+//	adc_dac 
+//	  adc_dac_u
+//	       ( 
+//	             .clk10m(clk10m)
+//	             ,.locked(~ll_clk_rst)
+//	             
+//	             ,.sclk(adc_sclk1)
+//	             ,.sdin1(adc_sdin1)
+//	             ,.sdout1(adc_dout1)
+//	             ,.cs1(adc_cs1)
+//	             
+//	             ,.ch_1(ch_1)
+//	             ,.ch_2(ch_2)
+//	  );
 
 //
  //   assign  ao_regoin_msg   =   {cfg_sta_addr[7:0],24'h02_cdef};

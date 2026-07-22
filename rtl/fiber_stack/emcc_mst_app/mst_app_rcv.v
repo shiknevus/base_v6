@@ -14,7 +14,6 @@
 //Description:
 //
 /////////////////////////////////////////////////////////////////
-`include  "depot_addr_map.vh"
 module mst_app_rcv
 #(
      parameter  RAM_DEPTH   =   4096
@@ -31,7 +30,7 @@ module mst_app_rcv
     ,input      [15:0]  each_dg_len
     
 //while ps test module,rx module generate rx interrupt,PS clear tx module to idle,and then this signal was reset to 0
-    ,input  wire[31:0]  cur_tx_trsf_pkg_id
+    ,(* MARK_DEBUG="true" *)input  wire[31:0]  cur_tx_trsf_pkg_id
 
     ,output reg         app_rcv_req
     ,input              app_rcv_ack
@@ -39,21 +38,23 @@ module mst_app_rcv
     //receive buffer
     ,output wire                        rcv_buf_ena
     ,output reg     [RAM_AWIDTH-1:0]    rcv_buf_addra
-    ,input  wire    [RAM_DWIDTH-1:0]    rcv_buf_douta
+    ,(* MARK_DEBUG="true" *)input  wire    [RAM_DWIDTH-1:0]    rcv_buf_douta
     
-    ,input  wire                        ps_rd_depot_flag
+    ,(* MARK_DEBUG="true" *)input  wire                        ps_rd_depot_flag
     ,output reg                         rcv_intf_tst_dg_done
     ,output reg                         rx_dg_done
     ,output wire    [3:0]               slv_sta_msg_vld     //slave station status message
     ,output wire    [RAM_AWIDTH-1:0]    slv_sta_msg_addr
     ,output wire    [RAM_DWIDTH-1:0]    slv_sta_msg_dat
 
-    ,output reg     [3:0]               ps_depot_we     //slave station status message
-    ,output reg     [RAM_AWIDTH-1:0]    ps_depot_addr
-    ,output reg     [RAM_DWIDTH-1:0]    ps_depot_din
+    ,(* MARK_DEBUG="true" *)output reg     [3:0]               ps_depot_we     //slave station status message
+    ,(* MARK_DEBUG="true" *)output reg     [RAM_AWIDTH-1:0]    ps_depot_addr
+    ,(* MARK_DEBUG="true" *)output reg     [RAM_DWIDTH-1:0]    ps_depot_din
+
+    ,output reg         tst_sig
 );
 
-    reg [31:0]  work_cnt = 0;
+(* MARK_DEBUG="true" *)    reg [31:0]  work_cnt = 0;
 
     localparam  STM_IDLE        = 'd0;
     localparam  STM_RD_RCV_UID  = 'd1;
@@ -66,11 +67,11 @@ module mst_app_rcv
     localparam  STM_CHECK_RSLT  = 'd10;
     localparam  STM_ID_UNMATCH  = 'd11;
     localparam  STM_END         = 'd12;
-    reg [4:0] wk_state  = 'd0;
+   (* MARK_DEBUG="true" *)    reg [4:0] wk_state  = 'd0;
     reg [4:0] wk_state_d1 = 'd0;
     reg [4:0] wk_state_d2 = 'd0;
     reg         gen_dat_done;
-	reg [RAM_DWIDTH-1:0]    rcv_buf_douta_d1;
+    (* MARK_DEBUG="true" *)reg [RAM_DWIDTH-1:0]    rcv_buf_douta_d1;
     reg [15:0]  slv_dg_index;
     reg [7:0]   slv_sta_num_d1;
     reg [7:0]   slv_sta_num_d2;
@@ -85,6 +86,7 @@ module mst_app_rcv
     reg [RAM_AWIDTH-1:0]    app_rslt_addra;
     reg [RAM_DWIDTH-1:0]    app_rslt_dina;
     reg                     intf_tst_flag;
+(* MARK_DEBUG="true" *)    reg [15:0]  frm_cnt;
 
     always @(posedge clk)begin
         slv_sta_num_d1  <=  slv_sta_num;
@@ -126,7 +128,9 @@ module mst_app_rcv
                 end
                 STM_CK_RCV_UID:begin
                     if(rcv_buf_douta !== rcv_buf_douta_d1)begin
+//                    if(1)begin
                         if(rcv_buf_douta == cur_tx_trsf_pkg_id)begin
+//                        if(1)begin
                             wk_state  <=  STM_TX_HS;
                         end else begin
                             wk_state  <=  STM_ID_UNMATCH;
@@ -182,6 +186,15 @@ module mst_app_rcv
         end
     end
 
+    always @(posedge clk) begin
+        if(reset)begin
+            frm_cnt <=  'd0;
+        end else if(wk_state == STM_RD_FINISH)begin
+            frm_cnt <=  frm_cnt + 'd1;
+        end else begin
+            frm_cnt <=  frm_cnt;
+        end
+    end
 
     always @(posedge clk) begin
         case(wk_state)
@@ -336,6 +349,21 @@ module mst_app_rcv
             ps_depot_we     <=  (rcv_buf_rden_d2) ? 4'hf : 4'h0;
             ps_depot_addr   <=  (rcv_buf_rden_d2) ? rcv_buf_addra_d2 : 'd0;
             ps_depot_din    <=  (rcv_buf_rden_d2) ? rcv_buf_douta : 'd0;
+/*
+        if(intf_tst_flag)begin
+            ps_depot_we     <=  (rcv_buf_rden_d2) ? 4'hf : 4'h0;
+            ps_depot_addr   <=  (rcv_buf_rden_d2) ? rcv_buf_addra_d2 : 'd0;
+            ps_depot_din    <=  (rcv_buf_rden_d2) ? rcv_buf_douta : 'd0;
+        end else begin
+            ps_depot_we     <=  ((~latch_ps_rd_depot_flag) & rcv_buf_rden_d2) ? 4'hf : 4'h0;
+            ps_depot_addr   <=  ((~latch_ps_rd_depot_flag) & rcv_buf_rden_d2) ? rcv_buf_addra_d2 : 'd0;
+            ps_depot_din    <=  ((~latch_ps_rd_depot_flag) & rcv_buf_rden_d2) ? rcv_buf_douta : 'd0;
+        end
+*/
+    end
+
+    always @(posedge clk)begin
+        tst_sig <=  | frm_cnt;
     end
 
 endmodule
