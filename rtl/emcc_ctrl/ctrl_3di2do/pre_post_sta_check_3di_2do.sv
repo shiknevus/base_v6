@@ -87,19 +87,19 @@ module pre_post_sta_check_3di_2do#(
 
 	wire [A_BHA_NUM-1:0]	post_sta	;
 
-	assign	post_sta[0 ] = (a_bhv_id == 1 )&&(di_i ==3'b001);//&& (do_o == 2'b01)
-	assign	post_sta[1 ] = (a_bhv_id == 2 )&&(di_i ==3'b010);//&& (do_o == 2'b10)
-	assign	post_sta[2 ] = (a_bhv_id == 3 )&&(di_i ==3'b001);//&& (do_o == 2'b00)
-	assign	post_sta[3 ] = (a_bhv_id == 4 )&&(di_i ==3'b001);//&& (do_o == 2'b00)
-	assign	post_sta[4 ] = (a_bhv_id == 5 )&&(di_i ==3'b001);//&& (do_o == 2'b00)
-	assign	post_sta[5 ] = (a_bhv_id == 6 )&&(di_i ==3'b001);//&& (do_o == 2'b00)
-	assign	post_sta[6 ] = (a_bhv_id == 7 )&&(di_i ==3'b001);//&& (do_o == 2'b00)
-	assign	post_sta[7 ] = (a_bhv_id == 8 )&&(di_i ==3'b001);//&& (do_o == 2'b00)
-	assign	post_sta[8 ] = (a_bhv_id == 9 )&&(di_i ==3'b001);//&& (do_o == 2'b00)
-	assign	post_sta[9 ] = (a_bhv_id == 10)&&(di_i ==3'b001);//&& (do_o == 2'b00)
-	assign	post_sta[10] = (a_bhv_id == 11)&&(di_i ==3'b001);//&& (do_o == 2'b00)
-	assign	post_sta[11] = (a_bhv_id == 12)&&(di_i ==3'b001);//&& (do_o == 2'b00)
-	assign	post_sta[12] = (a_bhv_id == 13)&&(di_i ==3'b001);//&& (do_o == 2'b00)
+	assign	post_sta[0 ] = (a_bhv_id == 1 )&&(di_i ==3'b000);//&& (do_o == 2'b01)
+	assign	post_sta[1 ] = (a_bhv_id == 2 )&&(di_i ==3'b000);//&& (do_o == 2'b10)
+	assign	post_sta[2 ] = (a_bhv_id == 3 )&&(di_i ==3'b000);//&& (do_o == 2'b00)
+	assign	post_sta[3 ] = (a_bhv_id == 4 )&&(di_i ==3'b000);//&& (do_o == 2'b00)
+	assign	post_sta[4 ] = (a_bhv_id == 5 )&&(di_i ==3'b000);//&& (do_o == 2'b00)
+	assign	post_sta[5 ] = (a_bhv_id == 6 )&&(di_i ==3'b000);//&& (do_o == 2'b00)
+	assign	post_sta[6 ] = (a_bhv_id == 7 )&&(di_i ==3'b000);//&& (do_o == 2'b00)
+	assign	post_sta[7 ] = (a_bhv_id == 8 )&&(di_i ==3'b000);//&& (do_o == 2'b00)
+	assign	post_sta[8 ] = (a_bhv_id == 9 )&&(di_i ==3'b000);//&& (do_o == 2'b00)
+	assign	post_sta[9 ] = (a_bhv_id == 10)&&(di_i ==3'b000);//&& (do_o == 2'b00)
+	assign	post_sta[10] = (a_bhv_id == 11)&&(di_i ==3'b000);//&& (do_o == 2'b00)
+	assign	post_sta[11] = (a_bhv_id == 12)&&(di_i ==3'b000);//&& (do_o == 2'b00)
+	assign	post_sta[12] = (a_bhv_id == 13)&&(di_i ==3'b000);//&& (do_o == 2'b00)
 
 
 	always@(posedge clk_i) 
