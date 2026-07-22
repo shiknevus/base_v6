@@ -50,7 +50,7 @@ module axi_cache(
     wire    [BUF_WIDTH-1:0] buf_rd_dat;
     
     assign  buf_wr_en   =   s_axi_tvalid & s_axi_tready;
-    assign  buf_wr_dat  =   {0,s_axi_tlast,s_axi_tdata[31:0]};
+    assign  buf_wr_dat  =   {4'h0,s_axi_tlast,s_axi_tdata[31:0]};
     assign  s_axi_tready = ~buf_full;
     gen_fifo
     #(

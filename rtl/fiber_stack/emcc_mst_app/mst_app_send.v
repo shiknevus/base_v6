@@ -34,9 +34,9 @@ module mst_app_send
 
     //send buffer
     ,output wire                        send_buf_ena
-    ,(* MARK_DEBUG="true" *)output reg     [4-1:0]             send_buf_wea
-    ,(* MARK_DEBUG="true" *)output reg     [RAM_AWIDTH-1:0]    send_buf_addra
-    ,(* MARK_DEBUG="true" *)output reg     [RAM_DWIDTH-1:0]    send_buf_dina
+    ,output reg     [4-1:0]             send_buf_wea
+    ,output reg     [RAM_AWIDTH-1:0]    send_buf_addra
+    ,output reg     [RAM_DWIDTH-1:0]    send_buf_dina
 
     ,output reg                         slv_cfg_msg_rden
     ,output reg     [RAM_AWIDTH-1:0]    slv_cfg_msg_addr
@@ -53,7 +53,7 @@ module mst_app_send
     ,output reg     [RAM_AWIDTH-1:0]    ps_tx_depot_addr
     ,input  wire    [RAM_DWIDTH-1:0]    ps_tx_depot_dout
 
-    ,(* MARK_DEBUG="true" *)output reg            app_trsf_en
+    ,output reg            app_trsf_en
     
     ,output reg [31:0]                  cur_tx_trsf_pkg_id = 0
     ,output reg                         tx_dg_done
@@ -62,7 +62,7 @@ module mst_app_send
     ,output reg         tst_sig
 );
 
-(* MARK_DEBUG="true" *)    reg [31:0]  work_cnt = 0;
+    reg [31:0]  work_cnt = 0;
 
     localparam  STM_IDLE            = 'd0;
     localparam  STM_WAIT_PS_REQ     = 'd1;
@@ -76,7 +76,7 @@ module mst_app_send
     localparam  STM_WAIT_PS_FINISH  = 'd8;
     localparam  STM_TX_POST_PRCS    = 'd9;
     localparam  STM_END             = 'd10;
-   (* MARK_DEBUG="true" *)    reg [4:0] wk_state  = 'd0;
+    reg [4:0] wk_state  = 'd0;
     reg [4:0] wk_state_d1 = 'd0;
     reg [4:0] wk_state_d2 = 'd0;
     reg [4:0] wk_state_d3 = 'd0;
@@ -84,20 +84,20 @@ module mst_app_send
     reg         gen_dat_done;
     reg [7:0]   slv_sta_num_d1;
     reg [7:0]   slv_sta_num_d2;
-(* MARK_DEBUG="true" *)    reg [15:0]  slv_dg_index;
-(* MARK_DEBUG="true" *)    reg [15:0]  frm_cnt;
+    reg [15:0]  slv_dg_index;
+    reg [15:0]  frm_cnt;
     reg [7:0]   wait_cnt = 0;
     reg         wait_cnt_done;
-(* MARK_DEBUG="true" *)    reg link_success_d1;
+    reg link_success_d1;
     reg link_success_d2;
     reg link_success_d3;
     reg link_success_r;
-(* MARK_DEBUG="true" *)    reg ps_tx_req_d1;
+    reg ps_tx_req_d1;
     reg ps_tx_req_d2;
     reg ps_tx_req_r;
-(* MARK_DEBUG="true" *)    reg ps_trsf_port_en_d1;
+    reg ps_trsf_port_en_d1;
     reg ps_trsf_port_en_d2;
-(* MARK_DEBUG="true" *)    reg ps_tst_trsf_port_d1;
+    reg ps_tst_trsf_port_d1;
     reg ps_tst_trsf_port_d2;
     reg [RAM_AWIDTH-1:0]    ps_tx_depot_addr_reg;
     reg [RAM_AWIDTH-1:0]    ps_tx_depot_addr_d1;
@@ -160,7 +160,7 @@ module mst_app_send
                 STM_IDLE: begin
                     if((link_success_d3 & ps_trsf_port_en_d2) & (~ps_tst_trsf_port_d2)) begin
                         wk_state  <=  STM_TX_HS;
-                    end else if((link_success_d3 & ps_trsf_port_en_d2)  & (ps_tst_trsf_port_d2)) begin
+                    end else if((link_success_d3 & ps_trsf_port_en_d2) & (ps_tst_trsf_port_d2)) begin
                         wk_state  <=  STM_WAIT_PS_REQ;
                     end else begin
                         wk_state  <=  wk_state;
@@ -488,7 +488,6 @@ module mst_app_send
     end
 
     always @(posedge clk)begin
-//        tst_sig <=  & (douta_r);
         tst_sig <=  & (frm_cnt);
     end
 
@@ -530,21 +529,12 @@ module mst_app_send
         end
     end
     
-//    `ifdef SIM_PLATFORM_MST
-//        always @(posedge clk)begin
-//            if(reset)begin
-//                app_trsf_en <=  1'b0;
-//            end else if (wk_state !== STM_IDLE) begin
-//                app_trsf_en <=  1;
-//            end
-//        end
-//    `else
-        always @(posedge clk)begin
-            if(reset)begin
-                app_trsf_en <=  1'b0;
-            end else begin
-                app_trsf_en <=  (trsf_dly_cnt == DLY_CYCLE_NUM) ? 1'b1 : 1'b0;
-            end
+    always @(posedge clk)begin
+        if(reset)begin
+            app_trsf_en <=  1'b0;
+        end else begin
+            app_trsf_en <=  (trsf_dly_cnt == DLY_CYCLE_NUM) ? 1'b1 : 1'b0;
         end
-//    `endif
+    end
+
 endmodule

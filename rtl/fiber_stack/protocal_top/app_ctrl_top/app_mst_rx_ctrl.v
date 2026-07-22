@@ -20,7 +20,7 @@ module app_mst_rx_ctrl(
     
     ,output reg             one_ecat_frm_done   //rx channel notice to app ctrl module that one complete return package has been recived.
     ,output reg     [3:0]   ecat_frm_rslt       //pkg crc result
-    ,(* MARK_DEBUG="true" *)output reg     [7:0]   slv_sta_num         //this signals only update during first initial datagram.It indicate the number of slave station
+    ,output reg     [7:0]   slv_sta_num         //this signals only update during first initial datagram.It indicate the number of slave station
     ,output reg     [3:0]   rx_eth_type         //the type of package has been received by rx channel
 
     ,output reg             prot_rcv_req
@@ -36,20 +36,20 @@ module app_mst_rx_ctrl(
     ,input  wire            rx_crc_pass
     
     //app layer ll interface with application depot
-    ,(* MARK_DEBUG="true" *)output reg     [3:0]   depot_we
-    ,(* MARK_DEBUG="true" *)output reg     [15:0]  depot_addr
-    ,(* MARK_DEBUG="true" *)output wire    [31:0]  depot_din
+    ,output reg     [3:0]   depot_we
+    ,output reg     [15:0]  depot_addr
+    ,output wire    [31:0]  depot_din
     ,input  wire    [31:0]  depot_dout
 
     //the interface which is used to stors all of slave station id
-    ,(* MARK_DEBUG="true" *)output reg     [3:0]   slv_id_we       = 'd0
-    ,(* MARK_DEBUG="true" *)output reg     [15:0]  slv_id_addr     = 'd0
-    ,(* MARK_DEBUG="true" *)output reg     [31:0]  slv_id_din      = 'd0
+    ,output reg     [3:0]   slv_id_we        = 'd0
+    ,output reg     [15:0]  slv_id_addr      = 'd0
+    ,output reg     [31:0]  slv_id_din       = 'd0
     
     //heart beat check result
-    ,(* MARK_DEBUG="true" *)output reg             ck_slv_hb_vld
-    ,(* MARK_DEBUG="true" *)output reg     [15:0]  ck_slv_hb_addr  //slave station address
-    ,(* MARK_DEBUG="true" *)output reg     [15:0]  ck_slv_hb_data  //salve staiton timestamp
+    ,output reg             ck_slv_hb_vld
+    ,output reg     [15:0]  ck_slv_hb_addr  //slave station address
+    ,output reg     [15:0]  ck_slv_hb_data  //salve staiton timestamp
 );
 
     localparam  STM_IDLE            = 'd0;
