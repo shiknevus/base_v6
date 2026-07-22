@@ -502,7 +502,7 @@ module emcc_mix_top
 				,.do_o					(m_3di_2do_do	)
 				,.o_intr_irq			(map_irq[3]		)
 			);
-            assign m_3di_2do_do = do_mst_msg[4:3];
+            assign   do_mst_msg[4:3] = ~m_3di_2do_do;
 
             wire [0:0] m_3di_1do_do;
 			ec_3di_1do#(
@@ -526,7 +526,7 @@ module emcc_mix_top
 				,.do_o					(m_3di_1do_do	)
 				,.o_intr_irq			(map_irq[4]		)
 			);
-            assign m_3di_1do_do = do_mst_msg[5];
+            assign   do_mst_msg[5] = ~m_3di_1do_do;
 
 
 	//==========================================================================================================//
