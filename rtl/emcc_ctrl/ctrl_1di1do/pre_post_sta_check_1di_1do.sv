@@ -87,13 +87,13 @@ module pre_post_sta_check_1di_1do#(
 
 	wire [A_BHA_NUM-1:0]	post_sta	;
 
-	assign	post_sta[0 ] = (a_bhv_id == 1 )&&(di_i ==1'b0);//&& (do_o == 1'b0)
-	assign	post_sta[1 ] = (a_bhv_id == 2 )&&(di_i ==1'b0);//&& (do_o == 1'b0)
-	assign	post_sta[2 ] = (a_bhv_id == 3 )&&(di_i ==1'b0);//&& (do_o == 1'b0)
-	assign	post_sta[3 ] = (a_bhv_id == 4 )&&(di_i ==1'b0);//&& (do_o == 1'b0)
-	assign	post_sta[4 ] = (a_bhv_id == 5 )&&(di_i ==1'b0);//&& (do_o == 1'b0)
-	assign	post_sta[5 ] = (a_bhv_id == 6 )&&(di_i ==1'b0);//&& (do_o == 1'b0)
-	assign	post_sta[6 ] = (a_bhv_id == 7 )&&(di_i ==1'b0);//&& (do_o == 1'b0)
+	assign	post_sta[0 ] = (a_bhv_id == 1 )&&(di_i ==1'b0);
+	assign	post_sta[1 ] = (a_bhv_id == 2 )&&(di_i ==1'b1);
+	assign	post_sta[2 ] = (a_bhv_id == 3 )&&(di_i ==1'bx);
+	assign	post_sta[3 ] = (a_bhv_id == 4 )&&(di_i ==1'b0);
+	assign	post_sta[4 ] = (a_bhv_id == 5 )&&(di_i ==1'b1);
+	assign	post_sta[5 ] = (a_bhv_id == 6 )&&(di_i ==1'b0);
+	assign	post_sta[6 ] = (a_bhv_id == 7 )&&(di_i ==1'b1);
 
 
 	always@(posedge clk_i) 

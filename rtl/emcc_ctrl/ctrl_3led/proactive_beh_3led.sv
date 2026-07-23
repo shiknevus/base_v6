@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module proactive_beh_1di_1do#(
+module proactive_beh_3di_2do#(
     parameter                 	BHA_NUM 		= 2   //Number of active behaviors
 	,parameter					ARV_SIG_DET_TIM	= 5
 )(
@@ -44,12 +44,14 @@ module proactive_beh_1di_1do#(
     ,output reg [7:0]           a_tx_id
     ,output reg	[7:0]           a_alm_num
 
-    ,input      [2:0]           di_i
-	,output	reg					do_o
+    ,input      [0:0]           di_i  //invaild
+	,output	reg [3:0]			do_o  //0 yellow; 1 green; 2 red; 3 buzzer
 
     ,output reg                 irq_o
     ,input                      irq_ack_i       //Interrupt response
 	,output reg [31:0]			state_monitor_o
+	,input		[31:0]		   	i_blink_times		//Blink times set for 3led and buzzer
+	,input		[31:0]		   	i_exe_times		
     );
 
     reg  [7:0]      a_bhv_id_r;
@@ -68,6 +70,10 @@ module proactive_beh_1di_1do#(
 	
 	reg	[7:0]	detect_tim;	//s
 	reg			detect_flag;
+
+	reg [31:0] m_exe_time_cnt;
+	reg [0:0] m_exe_flag;
+
 	
 	
 	localparam  S_IDLE          = 8'h00; 
@@ -164,7 +170,7 @@ module proactive_beh_1di_1do#(
         else
             curr_state <= next_state;
     end
-	
+
 	//state monitor
 	reg [7:0] curr_state_m1;
 	reg [7:0] curr_state_m2;
@@ -226,7 +232,15 @@ module proactive_beh_1di_1do#(
 						
 			S_EXE:
 			begin		//5								//active Execution
+				if(m_exe_flag) begin
 					next_state = S_BHA_POST_DET;
+				end
+				else if(timout) begin
+					next_state = S_ALERT_40;
+				end
+				else begin
+					next_state = S_EXE;
+				end
 			end
 			
             S_BHA_POST_DET:
@@ -330,7 +344,7 @@ module proactive_beh_1di_1do#(
         //else if(curr_state == S_EXE_20_ACK && timout)						//For Transaction 20, waiting for the ps response timed out.
         //    a_alm_num <= 8'd103;    
 		else if(curr_state_1d == S_EXE && curr_state == S_ALERT_40)			//The execution of Behavior 1 failed.
-				a_alm_num <= 8'd109;    
+				a_alm_num <= 8'd109;   
 		else if(curr_state_1d == S_BHA_POST_DET && curr_state == S_ALERT_40)//The post - full inspection is not met.
 				a_alm_num <= 8'd116;    
 		else if(curr_state == S_SUCC_30_ACK && ack_tx_result == IRQ_NO_OK)	//Transaction 30 has a ps response error.
@@ -365,8 +379,8 @@ module proactive_beh_1di_1do#(
         else
             timout <= 1'b0;
     end
-	
-	
+
+    
 	//===============================================================================================================
 	//------------------------------------------------ user logic start ---------------------------------------------
 	//===============================================================================================================
@@ -387,36 +401,91 @@ module proactive_beh_1di_1do#(
     	        detect_flag <= 1'b1;  
     	    end
     	    else begin
-    	        //detect_tim  <= detect_tim + i_time_1s_vld;	//actual
+    	        // detect_tim  <= detect_tim + i_time_1s_vld;	//actual
 				detect_tim  <= detect_tim + 1;	//sim
     	        detect_flag <= 1'b0;	
     	    end
     	end
 	end
 	
-	
+	//0 green; 1 yellow; 2 red; 3 buzzer
+	reg [0:0] m_blink_flag;
 	always@(posedge clk_i)
 	begin
 		if(rst_i || !a_en)
-			do_o <= 1'b0;
-		else if(curr_state == S_EXE && a_bhv_id_r == 8'd1 )		//Drive to position 1
-			do_o <= 1'b0; 
-		else if(curr_state == S_EXE && a_bhv_id_r == 8'd2 )		//Drive to position 2
-			do_o <= 1'b1; 
-		else if(curr_state == S_EXE && a_bhv_id_r == 8'd3 )		//invalid behavior
-			do_o <= 1'b0; 
-		else if(curr_state == S_EXE && a_bhv_id_r == 8'd4 )		//Sense position 1
-			do_o <= 1'b0; 
-		else if(curr_state == S_EXE && a_bhv_id_r == 8'd5 )		//Sense position 2
-			do_o <= 1'b0; 
-		else if(curr_state == S_EXE && a_bhv_id_r == 8'd6 )		//Drive to position 1 [safe]
-			do_o <= 1'b0; 
-		else if(curr_state == S_EXE && a_bhv_id_r == 8'd7 )		//Drive to position 2 [safe]
-			do_o <= 1'b1; 
+			do_o <= 4'b0010;
+		else if(curr_state == S_EXE && a_bhv_id_r == 8'd1)		//green always on
+			do_o <= 4'b0001;
+		else if(curr_state == S_EXE && a_bhv_id_r == 8'd2)		//yellow always on
+			do_o <= 4'b0010;
+		else if(curr_state == S_EXE && a_bhv_id_r == 8'd3)		//red always on
+			do_o <= 4'b0100;
+		else if(curr_state == S_EXE && a_bhv_id_r == 8'd4)		//buzzer blink
+			do_o <= 4'b1000;
+		else if(curr_state == S_EXE && a_bhv_id_r == 8'd5)		//buzzer off
+			do_o <= 4'b0000;
+		else if(curr_state == S_EXE && a_bhv_id_r == 8'd6)		//green blink
+			do_o <= {1'b0,1'b0,1'b0,m_blink_flag};
+		else if(curr_state == S_EXE && a_bhv_id_r == 8'd7 )		//yellow blink
+			do_o <= {1'b0,1'b0,m_blink_flag,1'b0};
+		else if(curr_state == S_EXE && a_bhv_id_r == 8'd8 )		//red blink
+			do_o <= {1'b0,m_blink_flag,1'b0,1'b0};
 		else
 			do_o <= do_o;
 	end
 
+	reg [31:0]	m_blink_time_cnt;
+	always@(posedge clk_i)
+	begin
+		if(rst_i || !a_en) begin
+			m_blink_time_cnt <= 32'b0;
+			m_blink_flag     <= 1'b0;
+		end
+		else if(curr_state == S_EXE && (a_bhv_id_r == 8'd6 || a_bhv_id_r == 8'd7 || a_bhv_id_r == 8'd8)) begin
+			if(i_blink_times == 32'd0) begin				
+				m_blink_time_cnt <= 32'b0;
+				m_blink_flag     <= 1'b1;
+			end
+			else if(i_time_1ms_vld) begin
+				if(m_blink_time_cnt >= i_blink_times - 32'd1) begin
+					m_blink_time_cnt <= 32'b0;
+					m_blink_flag     <= ~m_blink_flag;
+				end
+				else
+					m_blink_time_cnt <= m_blink_time_cnt + 32'd1;
+			end
+		end
+		else begin
+			m_blink_time_cnt <= 32'b0;
+			m_blink_flag     <= 1'b0;
+		end
+	end
+
+		//execution time count
+    always@(posedge clk_i)begin
+		if(rst_i || !a_en) begin
+			m_exe_time_cnt <= 32'b0;
+			m_exe_flag     <= 1'b0;
+		end
+		else if(curr_state == S_EXE) begin
+			if(i_exe_times == 32'd0) begin				
+				m_exe_time_cnt <= 32'b0;
+				m_exe_flag     <= 1'b1;
+			end
+			else if(i_time_1ms_vld) begin
+				if(m_exe_time_cnt >= i_exe_times - 32'd1) begin
+					m_exe_time_cnt <= 32'b0;
+					m_exe_flag     <= 1'b1;
+				end
+				else
+					m_exe_time_cnt <= m_exe_time_cnt + 32'd1;
+			end
+		end
+		else begin
+			m_exe_time_cnt <= 32'b0;
+			m_exe_flag     <= 1'b0;
+		end
+	end
 
 	//===============================================================================================================
 	//------------------------------------------------ user logic start ---------------------------------------------

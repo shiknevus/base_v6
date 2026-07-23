@@ -5,11 +5,11 @@
 // 
 // Create Date: 2026/06/30 10:25:54
 // Design Name: 
-// Module Name: ec_1di_check
+// Module Name: 
 // Project Name: 
 // Target Devices: 
 // Tool Versions: 
-// Description: 
+// Description: ASS00630
 // 
 // Dependencies: 
 // 
@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module ec_3di_2do#(
+module ec_2di#(
 		parameter  				REG_SPACE_BIAS 		= 	2000	,
 		parameter  				REG_SPACE_SIZE 		= 	512	
 )(
@@ -39,14 +39,14 @@ module ec_3di_2do#(
 		output 		 [31:0]     o_st_rd_data    ,
 		output 		            o_st_rd_vld     ,
 
-		input		 [2:0]		di_i			,	//In - position sensor signal
-		output		 [1:0]		do_o			,	//switch
+		input		 [1:0]		di_i			,	//In - position sensor signal
+		output		 			do_o			,	//invaild
 		
 		output 	            	o_intr_irq	
     );
 	
 	
-	localparam		A_BHA_NUM		=	13;	
+	localparam		A_BHA_NUM		=	2;	
 	localparam		B_BHA_NUM		=	1;	
 	localparam		ARV_SIG_DET_TIM	=	5;
 	
@@ -295,17 +295,17 @@ module ec_3di_2do#(
 	,.param63               (param63		)
 	,.param64               (param64		)
 	,.param65               (param65		)
-	,.param66               (param66		)
+	,.param66               (di				)
 	,.param67               (param67		)
 	,.param68               (param68		)
 	,.param69               (param69		)
 	,.param70               (param70		)
 	);
 
-	proactive_beh_3di_2do#(	
+	proactive_beh_3di_1do#(	
 	.BHA_NUM 				(A_BHA_NUM  	 	),	//Number of active behaviors
 	.ARV_SIG_DET_TIM		(ARV_SIG_DET_TIM	)		//In - place signal detection time
-)proactive_beh_3di_2do_u0(
+)proactive_beh_3di_1do_u0(
     .clk_i                 	(clk_i				)
     ,.rst_i                	(rst_i				)
     ,.i_time_1ms_vld       	(i_time_1ms_vld 	)
@@ -329,9 +329,9 @@ module ec_3di_2do#(
     );
 
 	 
-	status_beh_3di_2do#(
+	status_beh_2di#(
 		.BHA_NUM(B_BHA_NUM	)
-)status_beh_3di_2do_u0(
+)status_beh_2di_u0(
 	.clk_i			        (clk_i				)
 	,.rst_i			        (rst_i				)
 	,.i_time_1ms_vld		(i_time_1ms_vld 	)
@@ -351,7 +351,7 @@ module ec_3di_2do#(
 	,.irq_ack_i	            (irq_b_grant		)	
     );
 	 
-	tim_beh_3di_2do tim_beh_3di_2do_u0(
+	tim_beh_2di tim_beh_2di_u0(
     .clk_i                      (clk_i          	)
 	,.rst_i              	    (rst_i         		)
 	,.i_time_1ms_vld   	        (i_time_1ms_vld 	)
@@ -372,10 +372,10 @@ module ec_3di_2do#(
 	,.irq_ack_i                 (irq_c_grant		)
    );
 	
-		pre_post_sta_check_3di_2do#(
+		pre_post_sta_check_2di#(
 			.A_BHA_NUM			(A_BHA_NUM	 		)    ,	
 			.B_BHA_NUM			(B_BHA_NUM	 		)  
-	)pre_post_sta_check_3di_2do_u0(
+	)pre_post_sta_check_2di_u0(
 			.clk_i				(clk_i			),
 			.rst_i				(rst_i			),
 			.i_time_1ms_vld		(i_time_1ms_vld	),

@@ -32,9 +32,6 @@ module proactive_beh_3di_1do#(
     ,input      [BHA_NUM-1:0]   pre_sta_allow   //Pre - sufficient condition satisfied signal. 0: Not satisfied. 1: Satisfied.
     ,input      [BHA_NUM-1:0]   post_sta_allow  //Post - sufficient condition satisfied signal
 
-    ,input                      valid_sig_1       //Signal validity ps-pl
-	,input						valid_sig_2
-	,input						valid_sig_3		//set vaild signal for behavior 8
 
 	,input      [7:0]           ec_id
 	,input						a_en			//A enable
@@ -52,6 +49,7 @@ module proactive_beh_3di_1do#(
 
     ,output reg                 irq_o
     ,input                      irq_ack_i       //Interrupt response
+	,output reg [31:0]			state_monitor_o
     );
 
     reg  [7:0]      a_bhv_id_r;
@@ -167,6 +165,26 @@ module proactive_beh_3di_1do#(
             curr_state <= next_state;
     end
 	
+	//state monitor
+	reg [7:0] curr_state_m1;
+	reg [7:0] curr_state_m2;
+	reg [7:0] curr_state_m3;
+    always @(posedge clk_i) 
+	begin
+        if (rst_i)begin
+			curr_state_m1 <= 8'b0;
+			curr_state_m2 <= 8'b0;
+			curr_state_m3 <= 8'b0;
+			state_monitor_o <= 32'b0;
+			end
+        else if (curr_state != curr_state_m1) begin
+            curr_state_m1 <= curr_state;
+            curr_state_m2 <= curr_state_m1;
+            curr_state_m3 <= curr_state_m2;
+			state_monitor_o <= {curr_state_m3,curr_state_m2,curr_state_m1, curr_state};
+		end
+    end
+
     always @(*) begin			
         case (curr_state)	
             S_IDLE: 

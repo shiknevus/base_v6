@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module proactive_beh_1di_1do#(
+module proactive_beh_2di#(
     parameter                 	BHA_NUM 		= 2   //Number of active behaviors
 	,parameter					ARV_SIG_DET_TIM	= 5
 )(
@@ -44,7 +44,7 @@ module proactive_beh_1di_1do#(
     ,output reg [7:0]           a_tx_id
     ,output reg	[7:0]           a_alm_num
 
-    ,input      [2:0]           di_i
+    ,input      [1:0]           di_i
 	,output	reg					do_o
 
     ,output reg                 irq_o
@@ -399,20 +399,6 @@ module proactive_beh_1di_1do#(
 	begin
 		if(rst_i || !a_en)
 			do_o <= 1'b0;
-		else if(curr_state == S_EXE && a_bhv_id_r == 8'd1 )		//Drive to position 1
-			do_o <= 1'b0; 
-		else if(curr_state == S_EXE && a_bhv_id_r == 8'd2 )		//Drive to position 2
-			do_o <= 1'b1; 
-		else if(curr_state == S_EXE && a_bhv_id_r == 8'd3 )		//invalid behavior
-			do_o <= 1'b0; 
-		else if(curr_state == S_EXE && a_bhv_id_r == 8'd4 )		//Sense position 1
-			do_o <= 1'b0; 
-		else if(curr_state == S_EXE && a_bhv_id_r == 8'd5 )		//Sense position 2
-			do_o <= 1'b0; 
-		else if(curr_state == S_EXE && a_bhv_id_r == 8'd6 )		//Drive to position 1 [safe]
-			do_o <= 1'b0; 
-		else if(curr_state == S_EXE && a_bhv_id_r == 8'd7 )		//Drive to position 2 [safe]
-			do_o <= 1'b1; 
 		else
 			do_o <= do_o;
 	end

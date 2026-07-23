@@ -26,7 +26,7 @@
 /syn/**/**.cache
 /syn/**/**.ip_user_files
 /syn/**/**.hw
-
+/syn/**/**.sdk
 
 /syn/**/**.sim/**
 !/syn/**/**.sim/**/

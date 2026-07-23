@@ -187,7 +187,7 @@ module emcc_mix_top
     wire    [31:0]              do_mst_msg_force      ;
     assign ov_dbg_enable = 0;
     
-	assign do_relay_mst_msg =  di_mst_msg[12]?do_mst_msg_force:do_mst_msg ;
+	assign do_relay_mst_msg =  do_mst_msg ;//di_mst_msg[12]?do_mst_msg_force:do_mst_msg
 	
 	vio_0 vio (
    .clk(clk),     
@@ -527,6 +527,54 @@ module emcc_mix_top
 				,.o_intr_irq			(map_irq[4]		)
 			);
             assign   do_mst_msg[5] = ~m_3di_1do_do;
+
+            wire [0:0] m_1di_1do_do;
+			ec_1di_1do#(
+				.REG_SPACE_BIAS			(`ROLLER_2037_REG_BIAS  ),	//Component offset address h'a00
+				.REG_SPACE_SIZE			(`REG_SPACE_SIZE        )
+			)ec_1di_1do_u0(
+				.clk_i					(clk					)
+				,.rst					(reset					)
+				,.i_time_1ms_vld		(time_1ms_vld			)
+				,.i_time_1s_vld 		(time_1s_vld			)
+				,.ps_reg_clk			(ps_reg_clk				)
+				,.ps_reg_reset			(ps_reg_reset			)
+				,.i_st_wr_en			(ps_reg_we				)
+				,.i_st_wr_addr  		(ps_reg_addr			)
+				,.i_st_wr_data  		(ps_reg_wr_dat			)
+				,.i_st_rd_en    		(ps_reg_re				)
+				,.i_st_rd_addr  		(ps_reg_rd_addr			)
+				,.o_st_rd_data  		(sub_comp_rd_dat[5]		)
+				,.o_st_rd_vld   		(sub_comp_rd_vld[5]		)
+				,.di_i					(~di_mst_msg[9]	)
+				,.do_o					(m_1di_1do_do	)
+				,.o_intr_irq			(map_irq[5]		)
+			);
+            assign   do_mst_msg[6] = ~m_1di_1do_do;
+
+            wire [1:0] m_4di_2do_do;
+			ec_4di_2do#(
+				.REG_SPACE_BIAS			(`ROLLER_2126_REG_BIAS  ),	//Component offset address h'800
+				.REG_SPACE_SIZE			(`REG_SPACE_SIZE        )
+			)ec_4di_2do_u0(
+				.clk_i					(clk					)
+				,.rst					(reset					)
+				,.i_time_1ms_vld		(time_1ms_vld			)
+				,.i_time_1s_vld 		(time_1s_vld			)
+				,.ps_reg_clk			(ps_reg_clk				)
+				,.ps_reg_reset			(ps_reg_reset			)
+				,.i_st_wr_en			(ps_reg_we				)
+				,.i_st_wr_addr  		(ps_reg_addr			)
+				,.i_st_wr_data  		(ps_reg_wr_dat			)
+				,.i_st_rd_en    		(ps_reg_re				)
+				,.i_st_rd_addr  		(ps_reg_rd_addr			)
+				,.o_st_rd_data  		(sub_comp_rd_dat[6]		)
+				,.o_st_rd_vld   		(sub_comp_rd_vld[6]		)
+				,.di_i					(~di_mst_msg[13:10]	)
+				,.do_o					(m_4di_2do_do	)
+				,.o_intr_irq			(map_irq[6]		)
+			);
+            assign   do_mst_msg[8:7] = ~m_4di_2do_do;
 
 
 	//==========================================================================================================//

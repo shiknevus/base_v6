@@ -5,11 +5,11 @@
 // 
 // Create Date: 2026/06/30 10:25:54
 // Design Name: 
-// Module Name: ec_1di_check
+// Module Name: 
 // Project Name: 
 // Target Devices: 
 // Tool Versions: 
-// Description: 
+// Description: ASS00629
 // 
 // Dependencies: 
 // 
@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module ec_3di_2do#(
+module ec_3led#(
 		parameter  				REG_SPACE_BIAS 		= 	2000	,
 		parameter  				REG_SPACE_SIZE 		= 	512	
 )(
@@ -39,14 +39,13 @@ module ec_3di_2do#(
 		output 		 [31:0]     o_st_rd_data    ,
 		output 		            o_st_rd_vld     ,
 
-		input		 [2:0]		di_i			,	//In - position sensor signal
-		output		 [1:0]		do_o			,	//switch
+		output		 [3:0]		do_o			,	//0 yellow; 1 green; 2 red; 3 buzzer
 		
 		output 	            	o_intr_irq	
     );
 	
 	
-	localparam		A_BHA_NUM		=	13;	
+	localparam		A_BHA_NUM		=	8;	
 	localparam		B_BHA_NUM		=	1;	
 	localparam		ARV_SIG_DET_TIM	=	5;
 	
@@ -302,10 +301,10 @@ module ec_3di_2do#(
 	,.param70               (param70		)
 	);
 
-	proactive_beh_3di_2do#(	
+	proactive_beh_3led#(	
 	.BHA_NUM 				(A_BHA_NUM  	 	),	//Number of active behaviors
 	.ARV_SIG_DET_TIM		(ARV_SIG_DET_TIM	)		//In - place signal detection time
-)proactive_beh_3di_2do_u0(
+)proactive_beh_3led_u0(
     .clk_i                 	(clk_i				)
     ,.rst_i                	(rst_i				)
     ,.i_time_1ms_vld       	(i_time_1ms_vld 	)
@@ -321,17 +320,19 @@ module ec_3di_2do#(
     ,.ec_cha_st            	(ec_cha_st			)
     ,.a_tx_id              	(a_tx_id        	)
     ,.a_alm_num            	(a_alm_num      	)
-    ,.di_i                  (di_i				)
+    ,.di_i                  (				)
 	,.do_o					(do_o				)
     ,.irq_o                	(irq_a				)
     ,.irq_ack_i       		(irq_a_grant		)
 	,.state_monitor_o		(param51			)
+	,.i_blink_times			(param1		)
+	,.i_exe_times			(param2		)
     );
 
 	 
-	status_beh_3di_2do#(
+	status_beh_3led#(
 		.BHA_NUM(B_BHA_NUM	)
-)status_beh_3di_2do_u0(
+)status_beh_3led_u0(
 	.clk_i			        (clk_i				)
 	,.rst_i			        (rst_i				)
 	,.i_time_1ms_vld		(i_time_1ms_vld 	)
@@ -351,7 +352,7 @@ module ec_3di_2do#(
 	,.irq_ack_i	            (irq_b_grant		)	
     );
 	 
-	tim_beh_3di_2do tim_beh_3di_2do_u0(
+	tim_beh_3led tim_beh_3led_u0(
     .clk_i                      (clk_i          	)
 	,.rst_i              	    (rst_i         		)
 	,.i_time_1ms_vld   	        (i_time_1ms_vld 	)
@@ -372,10 +373,10 @@ module ec_3di_2do#(
 	,.irq_ack_i                 (irq_c_grant		)
    );
 	
-		pre_post_sta_check_3di_2do#(
+		pre_post_sta_check_3led#(
 			.A_BHA_NUM			(A_BHA_NUM	 		)    ,	
 			.B_BHA_NUM			(B_BHA_NUM	 		)  
-	)pre_post_sta_check_3di_2do_u0(
+	)pre_post_sta_check_3led_u0(
 			.clk_i				(clk_i			),
 			.rst_i				(rst_i			),
 			.i_time_1ms_vld		(i_time_1ms_vld	),
@@ -391,7 +392,7 @@ module ec_3di_2do#(
 			.link_m_saf_st   	(link_m_saf_st  ),
 			.sc_id				(sc_id			),
 			.ec_id           	(ec_id          ),
-			.di_i				(di_i			),
+			.di_i				(			),
 			.do_i				(do_o			),
 			.a_en				(a_en			),
 			.b_en				(b_en			),	
