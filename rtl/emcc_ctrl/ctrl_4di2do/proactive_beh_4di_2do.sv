@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module proactive_beh_3di_2do#(
+module proactive_beh_4di_2do#(
     parameter                 	BHA_NUM 		= 2   //Number of active behaviors
 	,parameter					ARV_SIG_DET_TIM	= 5
 )(

@@ -351,7 +351,7 @@ module ec_4di_2do#(
 	,.irq_ack_i	            (irq_b_grant		)	
     );
 	 
-	tim_beh_3di_2do tim_beh_3di_2do_u0(
+	tim_beh_4di_2do tim_beh_4di_2do_u0(
     .clk_i                      (clk_i          	)
 	,.rst_i              	    (rst_i         		)
 	,.i_time_1ms_vld   	        (i_time_1ms_vld 	)
