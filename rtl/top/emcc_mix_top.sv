@@ -416,8 +416,10 @@ module emcc_mix_top
 	// --------------------------------------------user component_v6_inst---------------------------------------//
 	//==========================================================================================================//
 
+			reg		di1;
+	
 			ec_1di #(
-				.REG_SPACE_BIAS 		(`ROLLER_1003_REG_BIAS	)	
+				.REG_SPACE_BIAS 		(`ROLLER_1003_REG_BIAS	)	//B010_0800
 				,.REG_SPACE_SIZE 		(512					)
 			) ec_1di_u0 (	
 				.clk_i           		(clk					)
@@ -433,7 +435,7 @@ module emcc_mix_top
 				,.i_st_rd_addr    		(ps_reg_rd_addr			)
 				,.o_st_rd_data    		(sub_comp_rd_dat[0]		)
 				,.o_st_rd_vld     		(sub_comp_rd_vld[0]		)
-				,.di              		(di_mst_msg[0]			)
+				,.di              		(di1					)
 				,.o_intr_irq      		(map_irq[0] 			)
 			);
 			
@@ -455,9 +457,13 @@ module emcc_mix_top
 				,.o_st_rd_data  		(sub_comp_rd_dat[1]		)
 				,.o_st_rd_vld   		(sub_comp_rd_vld[1]		)
 				,.do_o					(do_mst_msg[0]			)
-				,.o_intr_irq			(map_irq[1]				)
+				,.o_intr_irq			(			)
 			);
-            
+			
+			wire	[1:0]	do_2di_2do;
+			reg 	[1:0]	di_2di_2do;
+			
+		
 			ec_2di_2do#(
 				.REG_SPACE_BIAS			(`ROLLER_1048_REG_BIAS	),	//Component offset address
 				.REG_SPACE_SIZE			(512					)
@@ -475,15 +481,17 @@ module emcc_mix_top
 				,.i_st_rd_addr  		(ps_reg_rd_addr			)
 				,.o_st_rd_data  		(sub_comp_rd_dat[2]		)
 				,.o_st_rd_vld   		(sub_comp_rd_vld[2]		)
-				,.di_i					(di_mst_msg[2:1]		)
-				,.do_o					(do_mst_msg[2:1]		)
+				,.di_i					(di_2di_2do				)
+				,.do_o					(do_2di_2do				)
 				,.o_intr_irq			(map_irq[2]				)
 			);
-
-			ec_3di_2do#(
-				.REG_SPACE_BIAS			(`ROLLER_2126_REG_BIAS  ),	//Component offset address
-				.REG_SPACE_SIZE			(`REG_SPACE_SIZE        )
-			)ec_3di_2do_u0(
+			
+			reg [1:0]	do_2do;
+			
+			ec_2do#(
+				.REG_SPACE_BIAS 		(`ROLLER_1089_REG_BIAS	),	//Component offset address
+				.REG_SPACE_SIZE 		(512					)		//Component register size
+			)ec_2do_u0(
 				.clk_i					(clk					)
 				,.rst					(reset					)
 				,.i_time_1ms_vld		(time_1ms_vld			)
@@ -495,17 +503,246 @@ module emcc_mix_top
 				,.i_st_wr_data  		(ps_reg_wr_dat			)
 				,.i_st_rd_en    		(ps_reg_re				)
 				,.i_st_rd_addr  		(ps_reg_rd_addr			)
-				,.o_st_rd_data  		(sub_comp_rd_dat[2]		)
-				,.o_st_rd_vld   		(sub_comp_rd_vld[2]		)
-				,.di_i					(di_mst_msg[5:3]		)
-				,.do_o					(do_mst_msg[4:3]		)
+				,.o_st_rd_data  		(sub_comp_rd_dat[3]		)
+				,.o_st_rd_vld   		(sub_comp_rd_vld[3]		)
+				,.do_o					(do_2do					)
 				,.o_intr_irq			(map_irq[3]				)
 			);
+	
+			reg		[1:0]	di_2di_3do;
+			wire	[2:0]	do_2di_3do;
+				
+	
+			ec_2di_3do#(
+				.REG_SPACE_BIAS 		(`ROLLER_2004_REG_BIAS	),
+				.REG_SPACE_SIZE 		(512					)
+			)ec_2di_3do_u0	(
+				.clk_i					(clk					)
+				,.rst					(reset					)
+				,.i_time_1ms_vld		(time_1ms_vld			)
+				,.i_time_1s_vld 		(time_1s_vld			)
+				,.ps_reg_clk			(ps_reg_clk				)
+				,.ps_reg_reset			(ps_reg_reset			)
+				,.i_st_wr_en			(ps_reg_we				)
+				,.i_st_wr_addr  		(ps_reg_addr			)
+				,.i_st_wr_data  		(ps_reg_wr_dat			)
+				,.i_st_rd_en    		(ps_reg_re				)
+				,.i_st_rd_addr  		(ps_reg_rd_addr			)
+				,.o_st_rd_data  		(sub_comp_rd_dat[4]		)
+				,.o_st_rd_vld   		(sub_comp_rd_vld[4]		)
+				,.di_i					(di_2di_3do				)
+				,.do_o					(do_2di_3do				)
+				,.o_intr_irq			(map_irq[4]				)
+			);
+			
+			reg				di_i1;
+			wire	[1:0]	do_o1;
+			
+		ec_1di_2do#(
+			.REG_SPACE_BIAS 			(`ROLLER_1079_REG_BIAS	)
+			,.REG_SPACE_SIZE 			(512					)
+		)ec_1di_2do_u0(
+			.clk_i						(clk)
+			,.rst						(reset)
+			,.i_time_1ms_vld			(time_1ms_vld		)
+			,.i_time_1s_vld 			(time_1s_vld		)
+			,.ps_reg_clk				(ps_reg_clk			)
+			,.ps_reg_reset				(ps_reg_reset		)
+			,.i_st_wr_en				(ps_reg_we			)
+			,.i_st_wr_addr  			(ps_reg_addr		)
+			,.i_st_wr_data  			(ps_reg_wr_dat		)
+			,.i_st_rd_en    			(ps_reg_re			)
+			,.i_st_rd_addr  			(ps_reg_rd_addr		)
+			,.o_st_rd_data  			(sub_comp_rd_dat[5]	)
+			,.o_st_rd_vld   			(sub_comp_rd_vld[5]	)
+			,.di_i						(di_i1				)
+			,.do_o						(do_o1				)
+			,.o_intr_irq				(map_irq[5]			)
+    );
+		
+		wire 	spi_do_o	;
+		wire 	spi_clk_o	;
+		wire 	spi_csn_o	;
+		reg 	spi_di_i	;
+	
+	
+		ec_1avi#(
+			.REG_SPACE_BIAS 			(`ROLLER_1036_REG_BIAS	)	//Component offset address
+			,.REG_SPACE_SIZE 			(512					)		//Component register size
+		)ec_1avi_u0(
+			.clk_i						(clk				)
+			,.rst						(reset				)
+			,.i_time_1ms_vld			(time_1ms_vld		)
+			,.i_time_1s_vld 			(time_1s_vld		)
+			,.ps_reg_clk				(ps_reg_clk			)
+			,.ps_reg_reset				(ps_reg_reset		)
+			,.i_st_wr_en				(ps_reg_we			)
+			,.i_st_wr_addr  			(ps_reg_addr		)
+			,.i_st_wr_data  			(ps_reg_wr_dat		)
+			,.i_st_rd_en    			(ps_reg_re			)
+			,.i_st_rd_addr  			(ps_reg_rd_addr		)
+			,.o_st_rd_data  			(sub_comp_rd_dat[6]	)
+			,.o_st_rd_vld   			(sub_comp_rd_vld[6]	)
+			,.spi_do_o	    			(spi_do_o			)
+			,.spi_clk_o	    			(spi_clk_o			)
+			,.spi_csn_o	    			(spi_csn_o			)
+			,.spi_di_i	    			(spi_di_i			)
+			,.o_intr_irq				(map_irq[6]			)
+		);	
+		
+		wire 		o_dac_syn 	;
+		wire 		o_dac_sclk	;
+		wire 		o_dac_din 	;
+		reg			i_dac_dout	;
+		wire		o_dac_load	;
+		wire		o_dac_clr 	;
+
+		ec_1avo#(
+			.REG_SPACE_BIAS 			(`ROLLER_1023_REG_BIAS	)	//Component offset address
+			,.REG_SPACE_SIZE 			(512					)		//Component register size
+		)ec_1avo_u0(
+			.clk_i						(clk				)
+			,.rst						(reset				)
+			,.i_time_1ms_vld			(time_1ms_vld		)
+			,.i_time_1s_vld 			(time_1s_vld		)
+			,.ps_reg_clk				(ps_reg_clk			)
+			,.ps_reg_reset				(ps_reg_reset		)
+			,.i_st_wr_en				(ps_reg_we			)
+			,.i_st_wr_addr  			(ps_reg_addr		)
+			,.i_st_wr_data  			(ps_reg_wr_dat		)
+			,.i_st_rd_en    			(ps_reg_re			)
+			,.i_st_rd_addr  			(ps_reg_rd_addr		)
+			,.o_st_rd_data  			(sub_comp_rd_dat[7]	)
+			,.o_st_rd_vld   			(sub_comp_rd_vld[7]	)
+			,.o_dac_syn     			(o_dac_syn 			)
+			,.o_dac_sclk				(o_dac_sclk			)
+			,.o_dac_din 				(o_dac_din 			)
+			,.i_dac_dout				(i_dac_dout			)
+			,.o_dac_load				(o_dac_load			)
+			,.o_dac_clr 				(o_dac_clr 			)
+			,.o_intr_irq				(map_irq[7]			)
+		);
+	
+		ec_1avi_1avo#(
+			.REG_SPACE_BIAS 			(2000		)	//Component offset address
+			,.REG_SPACE_SIZE 			(512		)		//Component register size
+		)(
+			.clk_i						(clk				)
+			,.rst						(reset				)
+			,.i_time_1ms_vld			(time_1ms_vld		)
+			,.i_time_1s_vld 			(time_1s_vld		)
+			,.ps_reg_clk				(ps_reg_clk			)
+			,.ps_reg_reset				(ps_reg_reset		)
+			,.i_st_wr_en				(ps_reg_we			)
+			,.i_st_wr_addr  			(ps_reg_addr		)
+			,.i_st_wr_data  			(ps_reg_wr_dat		)
+			,.i_st_rd_en    			(ps_reg_re			)
+			,.i_st_rd_addr  			(ps_reg_rd_addr		)
+			,.o_st_rd_data  			(sub_comp_rd_dat[8]	)
+			,.o_st_rd_vld   			(sub_comp_rd_vld[8]	)
+			,.spi_do_o	    			(spi_do_o			)
+			,.spi_clk_o	    			(spi_clk_o			)
+			,.spi_csn_o	    			(spi_csn_o			)
+			,.spi_di_i	    			(spi_di_i			)
+			,.o_dac_syn 				(o_dac_syn 			)
+			,.o_dac_sclk				(o_dac_sclk			)
+			,.o_dac_din 				(o_dac_din 			)
+			,.i_dac_dout				(i_dac_dout			)
+			,.o_dac_load				(o_dac_load			)
+			,.o_dac_clr					(o_dac_clr			)
+			,.o_intr_irq				(map_irq[8]			)
+    );
+	
+	reg	[1:0]	di_i1;
+	wire		do_o1;
+	
+	
+	ec_2di_1do#(
+			.REG_SPACE_BIAS 			(ROLLER_1055_REG_BIAS	),
+			,.REG_SPACE_SIZE 			(512					)
+	)ec_2di_1do_u0(
+		.clk_i							(clk				)
+		,.rst							(reset				)
+		,.i_time_1ms_vld				(time_1ms_vld		)
+		,.i_time_1s_vld 				(time_1s_vld		)
+		,.ps_reg_clk					(ps_reg_clk			)
+		,.ps_reg_reset					(ps_reg_reset		)
+		,.i_st_wr_en					(ps_reg_we			)
+		,.i_st_wr_addr  				(ps_reg_addr		)
+		,.i_st_wr_data  				(ps_reg_wr_dat		)
+		,.i_st_rd_en    				(ps_reg_re			)
+		,.i_st_rd_addr  				(ps_reg_rd_addr		)
+		,.o_st_rd_data  				(sub_comp_rd_dat[9]	)
+		,.o_st_rd_vld   				(sub_comp_rd_vld[9]	)
+		,.di_i							(di_i1				)
+		,.do_o							(do_o1				)
+		,.o_intr_irq					(map_irq[9]			)
+    );
+	
+	
+	wire	[1:0]	do_o3;
+	reg		[2:0]	di_i3;
+	
+	ec_3di_2do#(
+		.REG_SPACE_BIAS 				(2000				),
+		,.REG_SPACE_SIZE 				(512				)
+	)ec_3di_2do_u0(                                  
+		.clk_i					        (clk				)
+		,.rst						    (reset				)
+		,.i_time_1ms_vld  		        (time_1ms_vld		)
+		,.i_time_1s_vld   		        (time_1s_vld		)
+		,.ps_reg_clk				    (ps_reg_clk			)
+		,.ps_reg_reset			        (ps_reg_reset		)
+		,.i_st_wr_en				    (ps_reg_we			)
+		,.i_st_wr_addr    		        (ps_reg_addr		)
+		,.i_st_wr_data    		        (ps_reg_wr_dat		)
+		,.i_st_rd_en      		        (ps_reg_re			)
+		,.i_st_rd_addr    		        (ps_reg_rd_addr		)
+		,.o_st_rd_data    		        (sub_comp_rd_dat[10])
+		,.o_st_rd_vld     		        (sub_comp_rd_vld[10])
+		,.di_i					        (di_i3				)
+		,.do_o					        (do_o3				)
+		,.o_intr_irq			        (map_irq[10]		)
+    );                                  
+		
+		reg 		i_req_entry_key ;
+		reg 		i_close_ok_key  ;
+		reg 		i_door_monitor  ;
+		wire 		o_key_light     ;
+		wire 		o_door_dirve    ;
+		wire 		o_close_light   ;
+	
+	ec_sf_door#(
+		.REG_SPACE_BIAS 				(2000				),
+		,.REG_SPACE_SIZE				(512				)
+	)ec_sf_door_u0(
+		.clk_i							(clk				)
+		,.rst							(reset				)
+		,.i_time_1ms_vld				(time_1ms_vld		)
+		,.i_time_1s_vld 				(time_1s_vld		)
+		,.ps_reg_clk					(ps_reg_clk			)
+		,.ps_reg_reset					(ps_reg_reset		)
+		,.i_st_wr_en					(ps_reg_we			)
+		,.i_st_wr_addr  				(ps_reg_addr		)
+		,.i_st_wr_data  				(ps_reg_wr_dat		)
+		,.i_st_rd_en    				(ps_reg_re			)
+		,.i_st_rd_addr  				(ps_reg_rd_addr		)
+		,.o_st_rd_data  				(sub_comp_rd_dat[11])
+		,.o_st_rd_vld   				(sub_comp_rd_vld[11])
+		,.i_req_entry_key 				(i_req_entry_key 	)
+		,.i_close_ok_key  				(i_close_ok_key  	)
+		,.i_door_monitor  				(i_door_monitor  	)
+		,.o_key_light     				(o_key_light     	)
+		,.o_door_dirve    				(o_door_dirve    	)
+		,.o_close_light   				(o_close_light   	)
+		,.o_intr_irq					(map_irq[11]		)
+    );
 		
 		
 	//==========================================================================================================//
 	// ----------------------------------- don't care next context----------------------------------------------//
 	//===========================================================================================================//
+	
 	
 	
 	

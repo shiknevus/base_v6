@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module ec_2di_2do#(
+module ec_sf_door#(
 		parameter  				REG_SPACE_BIAS 		= 	2000	,
 		parameter  				REG_SPACE_SIZE 		= 	512	
 )(
@@ -39,14 +39,18 @@ module ec_2di_2do#(
 		output 		 [31:0]     o_st_rd_data    ,
 		output 		            o_st_rd_vld     ,
 
-		input		 [1:0]		di_i			,	//In - position sensor signal
-		output		 [1:0]		do_o			,	//switch
+		input 					i_req_entry_key ,
+		input 					i_close_ok_key  ,
+		input 					i_door_monitor  ,
+		output 					o_key_light     ,
+		output 					o_door_dirve    ,
+		output 					o_close_light   ,
 		
 		output 	            	o_intr_irq	
     );
 	
 	
-	localparam		A_BHA_NUM		=	11;	
+	localparam		A_BHA_NUM		=	3;	
 	localparam		B_BHA_NUM		=	1;	
 	
 	//PS-PL    
@@ -301,15 +305,16 @@ module ec_2di_2do#(
 	,.param70               (param70		)
 	);
 
-	proactive_beh_2di_2do#(	
+	proactive_beh_safety_door#(	
 	.BHA_NUM 				(A_BHA_NUM  	 	)	//Number of active behaviors
-)proactive_beh_2di_2do_u0(
+)proactive_beh_safety_door_u0(
     .clk_i                 	(clk_i				)
     ,.rst_i                	(rst_i				)
     ,.i_time_1ms_vld       	(i_time_1ms_vld 	)
     ,.i_time_1s_vld        	(i_time_1s_vld  	)
     ,.pre_sta_allow        	(a_pre_sta_allow	)
     ,.post_sta_allow       	(a_post_sta_allow	)
+    ,.mode_sel				(param16[1:0]		)
 	,.a_en			       	(a_en				)
     ,.a_bhv_id             	(a_bhv_id       	)
     ,.a_bhv_vld            	(a_bhv_vld      	)
@@ -319,15 +324,16 @@ module ec_2di_2do#(
     ,.ec_cha_st            	(ec_cha_st			)
     ,.a_tx_id              	(a_tx_id        	)
     ,.a_alm_num            	(a_alm_num      	)
+    ,.di_i                  (di_i				)
 	,.do_o					(do_o				)
     ,.irq_o                	(irq_a				)
     ,.irq_ack_i       		(irq_a_grant		)
     );
 
 	 
-	status_beh_2di_2do#(
+	status_beh_safety_door#(
 		.BHA_NUM(B_BHA_NUM	)
-)status_beh_2di_2do_u0(
+)status_beh_safety_door_u0(
 	.clk_i			        (clk_i				)
 	,.rst_i			        (rst_i				)
 	,.i_time_1ms_vld		(i_time_1ms_vld 	)
@@ -347,7 +353,7 @@ module ec_2di_2do#(
 	,.irq_ack_i	            (irq_ack_i			)	
     );
 	 
-	tim_beh_2di_2do tim_beh_2di_2do_u0(
+	tim_beh_safety_door tim_beh_safety_door_u0(
     .clk_i                      (clk_i          	)
 	,.rst_i              	    (rst_i         		)
 	,.i_time_1ms_vld   	        (i_time_1ms_vld 	)
@@ -368,10 +374,10 @@ module ec_2di_2do#(
 	,.irq_ack_i                 (irq_ack_i			)
    );
 	
-		pre_post_sta_check_2di_2do#(
+		pre_post_sta_check_safety_door#(
 			.A_BHA_NUM			(A_BHA_NUM	 		)    ,	
 			.B_BHA_NUM			(B_BHA_NUM	 		)  
-	)pre_post_sta_check_2di_2do_u0(
+	)pre_post_sta_check_safety_door_u0(
 			.clk_i				(clk_i			),
 			.rst_i				(rst_i			),
 			.i_time_1ms_vld		(i_time_1ms_vld	),

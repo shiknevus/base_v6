@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module status_beh_2di_2do#(
+module status_beh_2di_1do#(
 	parameter	BHA_NUM	=	1
 )(
 	input						clk_i			

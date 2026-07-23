@@ -3,9 +3,9 @@
 // Company: 
 // Engineer: cgliu
 // 
-// Create Date: 2026/07/14 22:38:46
+// Create Date: 2026/06/29 22:38:46
 // Design Name: 
-// Module Name: 
+// Module Name: proactive_beh
 // Project Name: 
 // Target Devices: 
 // Tool Versions: 
@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module proactive_beh_1do#(
+module proactive_beh_1avi_1avo#(
     parameter                 	BHA_NUM = 2   //Number of active behaviors
 )(
     input                       clk_i
@@ -41,12 +41,30 @@ module proactive_beh_1do#(
     ,output reg [7:0]           a_tx_id
     ,output reg	[7:0]           a_alm_num
 
-    ,output reg                 do_o
+	//ADC spi
+    ,output                     spi_do_o
+	,output						spi_clk_o
+	,output						spi_csn_o
+	,input						spi_di_i
+	
+	//DAC spi
+	,output 					o_dac_syn  
+	,output 					o_dac_sclk 
+	,output 					o_dac_din  
+	,input 						i_dac_dout 
+	,output 					o_dac_load 
+	,output 					o_dac_clr
+	
+	//ADC input Voltage value
+	,output	reg	[31:0]			adc_dat_o
+	
+	//DAC output Voltage value
+	,input		[19:0]			v_value			
 
     ,output reg                 irq_o
     ,input                      irq_ack_i       //Interrupt response
     );
-
+	
     reg  [7:0]      a_bhv_id_r;
 
     reg [7:0]    	curr_state;
@@ -60,6 +78,10 @@ module proactive_beh_1do#(
 	reg [7:0]		ack_tx_id;
 	reg [7:0]		ack_tx_result;
 	reg	[7:0]		ack_ps_alart_num;
+	
+	wire 			adc_ch0_data_vld  ;
+	wire [31:0]		adc_ch0_data	  ;
+	
 	
 	
 	localparam  S_IDLE          = 8'd0; 
@@ -152,9 +174,9 @@ module proactive_beh_1do#(
         else
             curr_state <= next_state;
     end
-
-    always @(*) begin
-        case (curr_state)
+	
+    always @(*) begin			
+        case (curr_state)	
             S_IDLE: begin	//0
                 if (a_en && a_bhv_id != 8'd0 && a_bhv_vld)    //ps behavior execution instruction
                     next_state = S_BHA_PRE_DET;
@@ -164,8 +186,6 @@ module proactive_beh_1do#(
 
             S_BHA_PRE_DET: begin	//1
 				if(a_bhv_id_r == 8'd1 && pre_sta_allow[0])  
-					next_state = S_READY_10;	
-				else if(a_bhv_id_r == 8'd2 && pre_sta_allow[1])	
 					next_state = S_READY_10;	
                 else if(timout)
                     next_state = S_ALERT_40;
@@ -201,16 +221,11 @@ module proactive_beh_1do#(
 			//end
 			
 			S_EXE:begin		//11								//active Execution
-				if(a_bhv_id_r == 8'd1 || a_bhv_id_r == 8'd2) 
 					next_state = S_BHA_POST_DET;
-				else
-					next_state = S_EXE;
 			end
 			
             S_BHA_POST_DET: begin	//6
 				if(a_bhv_id_r == 8'd1 && post_sta_allow[0])  
-                    next_state = S_SUCC_30;
-                else if(a_bhv_id_r == 8'd2 && post_sta_allow[1])
                     next_state = S_SUCC_30;
                 else if(timout)
                     next_state = S_ALERT_40;
@@ -254,10 +269,8 @@ module proactive_beh_1do#(
 
     //Channel A transaction ID: 10 20 30 40
     always@(posedge clk_i)begin
-        if(rst_i)
+        if(rst_i || !a_en)
             a_tx_id <= 8'd0;
-		else if(!a_en)
-			a_tx_id <= 8'd0;
         else if(curr_state == S_READY_10)
             a_tx_id <= 8'd10;
         //else if(curr_state == S_EXE_20)
@@ -294,36 +307,36 @@ module proactive_beh_1do#(
             a_alm_num <= 8'd0;
 		else if(curr_state == S_IDLE)
 			a_alm_num <= 8'd0;
-        else if(curr_state == S_BHA_PRE_DET && timout)
+        else if(curr_state == S_BHA_PRE_DET && timout && a_bhv_id_r == 8'd1)						//The pre - full inspection is not met.
             a_alm_num <= 8'd101;    
-        else if(curr_state == S_READY_10_ACK && ack_tx_result == IRQ_NO_OK)	
-            a_alm_num <= ack_ps_alart_num;    
-        else if(curr_state == S_READY_10_ACK && timout)						
+		else if(curr_state == S_BHA_PRE_DET && timout && a_bhv_id_r == 8'd2)						//The pre - full inspection is not met.
             a_alm_num <= 8'd102;    
-		//else if(curr_state == S_EXE_20_ACK && ack_tx_result == IRQ_NO_OK)	
-        //    a_alm_num <= ack_ps_alart_num;    
-        //else if(curr_state == S_EXE_20_ACK && timout)						
-        //    a_alm_num <= 8'd103;    
-		//else if(curr_state_1d == S_EXE && curr_state == S_ALERT_40 && a_bhv_id_r == 8'd1)
-		//	a_alm_num <= 8'd104; 
-		//else if(curr_state_1d == S_EXE && curr_state == S_ALERT_40 && a_bhv_id_r == 8'd2)
-		//	a_alm_num <= 8'd105;
-		else if(curr_state == S_BHA_POST_DET && timout)
+        else if(curr_state == S_READY_10_ACK && ack_tx_result == IRQ_NO_OK)	//Transaction 10 ps response error
+            a_alm_num <= ack_ps_alart_num;    
+        else if(curr_state == S_READY_10_ACK && timout)						//For Transaction 10, waiting for the ps response timed out.
             a_alm_num <= 8'd103;    
-		else if(curr_state == S_SUCC_30_ACK && ack_tx_result == IRQ_NO_OK)	
+		//else if(curr_state == S_EXE_20_ACK && ack_tx_result == IRQ_NO_OK)	//Transaction 20 has a ps response error.
+        //    a_alm_num <= ack_ps_alart_num;    
+        //else if(curr_state == S_EXE_20_ACK && timout)						//For Transaction 20, waiting for the ps response timed out.
+        //    a_alm_num <= 8'd103;    
+		else if(curr_state_1d == S_EXE && curr_state == S_ALERT_40 && a_bhv_id_r == 8'd1)//The execution of Behavior 1 failed.
+			a_alm_num <= 8'd104; 
+		else if(curr_state_1d == S_EXE && curr_state == S_ALERT_40 && a_bhv_id_r == 8'd2)//The execution of Behavior 2 failed.
+			a_alm_num <= 8'd105;
+		else if(curr_state == S_SUCC_30_ACK && ack_tx_result == IRQ_NO_OK)	//Transaction 30 has a ps response error.
 			a_alm_num <= ack_ps_alart_num;
-		else if(curr_state == S_SUCC_30_ACK && timout)						
-            a_alm_num <= 8'd104;
+		else if(curr_state == S_SUCC_30_ACK && timout)						//For Transaction 30, waiting for the ps response timed out.
+            a_alm_num <= 8'd106;
+		else if(match_40)
+			a_alm_num <= 8'd0;
         else
             a_alm_num <= a_alm_num;
     end
 
     //Timeout count
     always@(posedge clk_i)begin
-        if(rst_i)
+        if(rst_i || !a_en)
             timout_cnt <= 20'd0;
-		else if(!a_en)
-			timout_cnt <= 20'd0;
 		else if(curr_state != curr_state_1d)
 			timout_cnt <= 20'd0;
         else if(timout_cnt >= a_tx_ot-1)
@@ -341,26 +354,54 @@ module proactive_beh_1do#(
             timout <= 1'b0;
     end
 	
+	//============================================ user logic begin ===================================================//
+	
+	adc_top adc_top_u0(
+		.i_sys_clk             (clk_i				)
+		,.i_rst_n              (~rst_i				)
+		,.i_time_1ms_vld       (i_time_1ms_vld		)
+		,.o_spi_cs_n           (spi_csn_o			)
+		,.o_spi_clk            (spi_clk_o			)
+		,.o_spi_mosi           (spi_do_o			)
+		,.i_spi_miso           (spi_di_i			)
+		//user
+		,.o_adc_ch0_data_vld   (adc_ch0_data_vld	)
+		,.ov_adc_ch0_data      (adc_ch0_data		)
+		,.o_adc_ch1_data_vld   (					)
+		,.ov_adc_ch1_data      (					)
+	);
 	
 	
-	//===============================================================================================================
-	//------------------------------------------------ user logic start ---------------------------------------------
-	//===============================================================================================================
 	always@(posedge clk_i)
 	begin
 		if(rst_i)
-			do_o <= 1'b0;
-		else if(curr_state == S_EXE && a_bhv_id_r == 8'd1)
-			do_o <= 1;
-		else if(curr_state == S_EXE && a_bhv_id_r == 8'd2)
-			do_o <= 0;
+			adc_dat_o <= 32'd0;
+		else if(adc_ch0_data_vld)
+			adc_dat_o <= adc_ch0_data;
 		else
-			do_o <= do_o;
+			adc_dat_o <= adc_dat_o;
 	end
 	
-	//===============================================================================================================
-	//------------------------------------------------ user logic start ---------------------------------------------
-	//===============================================================================================================
+	dac_top(
+		.i_sys_clk         (clk_i			)
+		,.i_rst_n          (~rst_i			)
+		,.i_time_1ms_vld   (i_time_1ms_vld	)
+		,.i_time_1s_vld    (i_time_1s_vld 	)
+		,.v_value          (v_value			)
+		,.o_dac_syn        (o_dac_syn  		)
+		,.o_dac_sclk       (o_dac_sclk 		)
+		,.o_dac_din        (o_dac_din  		)
+		,.i_dac_dout       (i_dac_dout 		)
+		,.o_dac_load       (o_dac_load 		)
+		,.o_dac_clr        (o_dac_clr  		)
+	);
 	
 	
+	//============================================ user logic end ===================================================//
+	
+	
+	
+	
+	
+
 endmodule

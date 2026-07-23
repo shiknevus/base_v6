@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module pre_post_sta_check_2di_2do#(
+module pre_post_sta_check_2di_3do#(
 		parameter		A_BHA_NUM		=	2      	
 		,parameter		B_BHA_NUM		=	1  
 )(
@@ -43,7 +43,7 @@ module pre_post_sta_check_2di_2do#(
 		,input 		[7:0]				ec_id        
 		
 		,input		[1:0]				di_i
-		
+
 		,input							a_en
 		,input							b_en			
 		,input							c_en	
@@ -71,110 +71,47 @@ module pre_post_sta_check_2di_2do#(
 	//---------------------------------  Channel A check -------------------------------------//
 	//========================================================================================//
 	
+	localparam  S_IDLE          = 8'd0; 
+    localparam  S_BHA_PRE_DET	= 8'd1; 
+	localparam	S_READY_10		= 8'd2;
+    localparam  S_READY_10_ACK  = 8'd3; 
+    localparam  S_EXE_20     	= 8'd4; 
+    localparam  S_EXE_20_ACK	= 8'd5; 
+    localparam  S_BHA_POST_DET  = 8'd6; 
+    localparam  S_SUCC_30       = 8'd7; 
+    localparam  S_SUCC_30_ACK	= 8'd8; 
+	localparam 	S_ALERT_40		= 8'd9;
+	localparam 	S_ALERT_40_ACK	= 8'd10;
+	localparam	S_EXE			= 8'd11;
+	
+	
+	wire [6:0]	post_sta	;
+
 	//pre status
 	always@(posedge clk_i)begin
 	if(rst_i && !a_en)
-		a_pre_sta_allow <= 11'b000_0111_1111;
-	else if(a_bhv_id == 8 && m_saf_st == 0 && link_m_saf_st == 0)
-		a_pre_sta_allow[7] <= 1;
-	else if(a_bhv_id == 9 && m_saf_st == 0 && link_m_saf_st == 0)
-		a_pre_sta_allow[8] <= 1;
-	else if(a_bhv_id == 10 && m_saf_st == 0 && link_m_saf_st == 0)
-		a_pre_sta_allow[9] <= 1;
-	else if(a_bhv_id == 11 && m_saf_st == 0 && link_m_saf_st == 0)
-		a_pre_sta_allow[10] <= 1;
+		a_pre_sta_allow <= 3'b000;
 	else
-		a_pre_sta_allow <= 11'b000_0111_1111;
+		a_pre_sta_allow <= 3'b111;
 	end
-
+	
+	
+	assign	post_sta[0] = (a_bhv_id == 1 && di_i == 2'b01);
+	assign	post_sta[1] = (a_bhv_id == 2 && di_i == 2'b01);
+	assign	post_sta[2] = (a_bhv_id == 3 && di_i == 2'b10);
 	
 	//post status
-	
-	wire [A_BHA_NUM-1:0]	post_sta	;
-	
-	reg		[1:0]			di1_r;
-	reg		[1:0]			di2_r;
-	
-	reg						flag_di1_exit;
-	reg						flag_di2_exit;
-	
-	always@(posedge clk_i)
-	begin
-		if(rst_i)begin
-			di1_r <= 2'b00;
-			di2_r <= 2'b00;
-		end else begin
-			di1_r <= {di1_r[0],di_i[0]};
-			di2_r <= {di2_r[0],di_i[1]};
-		end
-	end
-	
-	always@(posedge clk_i)
-	begin
-		if(rst_i)
-			flag_di1_exit <= 1'b0;
-		else if(ec_cha_st == 0)
-			flag_di1_exit <= 1'b0;
-		else if(di1_r == {1'b1,1'b0})
-			flag_di1_exit <= 1'b1;
-		else 
-			flag_di1_exit <= flag_di1_exit;
-	end
-	
-	
-	always@(posedge clk_i)
-	begin
-		if(rst_i)
-			flag_di2_exit <= 1'b0;
-		else if(ec_cha_st == 0)
-			flag_di2_exit <= 1'b0;
-		else if(di2_r == {1'b1,1'b0})
-			flag_di2_exit <= 1'b1;
-		else 
-			flag_di2_exit <= flag_di2_exit;
-	end
-
-	
-	assign	post_sta[0] 	= (a_bhv_id == 1 	&& di_i == {1'b0,1'b1});
-	assign	post_sta[1] 	= (a_bhv_id == 2 	&& di_i == {1'b1,1'b0});
-	assign	post_sta[2] 	= (a_bhv_id == 3							);
-	assign	post_sta[3] 	= (a_bhv_id == 4 	&& di_i == {1'b0,1'b1});
-	assign	post_sta[4] 	= (a_bhv_id == 5 	&& di_i == {1'b1,1'b0});
-	assign	post_sta[5] 	= (a_bhv_id == 6 	&& di_i == {1'b0,1'b0} && flag_di2_exit);
-	assign	post_sta[6] 	= (a_bhv_id == 7 	&& di_i == {1'b0,1'b0} && flag_di1_exit);
-	assign	post_sta[7] 	= (a_bhv_id == 8 	&& di_i == {1'b0,1'b1});
-	assign	post_sta[8] 	= (a_bhv_id == 9 	&& di_i == {1'b1,1'b0});
-	assign	post_sta[9] 	= (a_bhv_id == 10 	&& di_i == {1'b0,1'b0} && flag_di2_exit);
-	assign	post_sta[10] 	= (a_bhv_id == 11 	&& di_i == {1'b0,1'b0} && flag_di1_exit);
-	
-	
 	always@(posedge clk_i)begin
 	if(rst_i || !a_en)
-		a_post_sta_allow <= 11'b000_0000_0000;
+		a_post_sta_allow <= 3'b000;
 	else if(post_sta[0])
 		a_post_sta_allow[0] <= 1;
 	else if(post_sta[1])
 		a_post_sta_allow[1] <= 1;
 	else if(post_sta[2])
 		a_post_sta_allow[2] <= 1;
-	else if(post_sta[3])
-		a_post_sta_allow[3] <= 1;
-	else if(post_sta[4])
-		a_post_sta_allow[4] <= 1;
-	else if(post_sta[5])
-		a_post_sta_allow[5] <= 1;
-	else if(post_sta[6])
-		a_post_sta_allow[6] <= 1;
-	else if(post_sta[7])
-		a_post_sta_allow[7] <= 1;
-	else if(post_sta[8])
-		a_post_sta_allow[8] <= 1;
-	else if(post_sta[9])
-		a_post_sta_allow[9] <= 1;
-	else if(post_sta[10])
-		a_post_sta_allow[10] <= 1;
 	else
-		a_post_sta_allow <= 7'b000_0000;
+		a_post_sta_allow <= 3'b000;
 	end
 	
 	//========================================================================================//

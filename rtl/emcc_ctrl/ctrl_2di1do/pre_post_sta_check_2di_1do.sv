@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module pre_post_sta_check_2di_2do#(
+module pre_post_sta_check_2di_1do#(
 		parameter		A_BHA_NUM		=	2      	
 		,parameter		B_BHA_NUM		=	1  
 )(

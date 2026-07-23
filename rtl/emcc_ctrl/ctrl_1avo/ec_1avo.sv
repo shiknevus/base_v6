@@ -20,9 +20,9 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module ec_2di_2do#(
-		parameter  				REG_SPACE_BIAS 		= 	2000	,
-		parameter  				REG_SPACE_SIZE 		= 	512	
+module ec_1avo#(
+		parameter  				REG_SPACE_BIAS 		= 	2000	,	//Component offset address
+		parameter  				REG_SPACE_SIZE 		= 	512			//Component register size
 )(
 		input					clk_i			,
 		input					rst				,
@@ -39,15 +39,19 @@ module ec_2di_2do#(
 		output 		 [31:0]     o_st_rd_data    ,
 		output 		            o_st_rd_vld     ,
 
-		input		 [1:0]		di_i			,	//In - position sensor signal
-		output		 [1:0]		do_o			,	//switch
+		output 					o_dac_syn       ,
+		output 					o_dac_sclk	    ,
+		output 					o_dac_din 	    ,
+		input 					i_dac_dout	    ,
+		output 					o_dac_load	    ,
+		output 					o_dac_clr 	    ,
 		
 		output 	            	o_intr_irq	
     );
 	
+	localparam		A_BHA_NUM	=	1;	
+	localparam		B_BHA_NUM	=	1;	
 	
-	localparam		A_BHA_NUM		=	11;	
-	localparam		B_BHA_NUM		=	1;	
 	
 	//PS-PL    
 	wire 	[7:0]	unit_id         ;     	
@@ -294,16 +298,16 @@ module ec_2di_2do#(
 	,.param63               (param63		)
 	,.param64               (param64		)
 	,.param65               (param65		)
-	,.param66               (di_i[0]		)
-	,.param67               (di_i[1]		)
+	,.param66               (di				)
+	,.param67               (param67		)
 	,.param68               (param68		)
 	,.param69               (param69		)
 	,.param70               (param70		)
 	);
 
-	proactive_beh_2di_2do#(	
-	.BHA_NUM 				(A_BHA_NUM  	 	)	//Number of active behaviors
-)proactive_beh_2di_2do_u0(
+	proactive_beh_1avo#(	
+	.BHA_NUM 				(A_BHA_NUM  	 )	//Number of active behaviors
+)proactive_beh_1avo_u0(
     .clk_i                 	(clk_i				)
     ,.rst_i                	(rst_i				)
     ,.i_time_1ms_vld       	(i_time_1ms_vld 	)
@@ -319,15 +323,21 @@ module ec_2di_2do#(
     ,.ec_cha_st            	(ec_cha_st			)
     ,.a_tx_id              	(a_tx_id        	)
     ,.a_alm_num            	(a_alm_num      	)
-	,.do_o					(do_o				)
+	,.o_dac_syn             (o_dac_syn    		)
+	,.o_dac_sclk	        (o_dac_sclk			)
+	,.o_dac_din 	        (o_dac_din 			)
+	,.i_dac_dout	        (i_dac_dout			)
+	,.o_dac_load	        (o_dac_load			)
+	,.o_dac_clr 	        (o_dac_clr 			)
+	,.v_value	            (param6				)
     ,.irq_o                	(irq_a				)
     ,.irq_ack_i       		(irq_a_grant		)
     );
 
 	 
-	status_beh_2di_2do#(
+	status_beh_1avo#(
 		.BHA_NUM(B_BHA_NUM	)
-)status_beh_2di_2do_u0(
+)status_beh_1avo_u0(
 	.clk_i			        (clk_i				)
 	,.rst_i			        (rst_i				)
 	,.i_time_1ms_vld		(i_time_1ms_vld 	)
@@ -342,12 +352,12 @@ module ec_2di_2do#(
 	,.ec_chb_st             (ec_chb_st			)
 	,.b_tx_id               (b_tx_id			)
 	,.b_alm_num             (b_alm_num			)
-	,.di				    (di_i				)
+	,.di				    (di					)
 	,.irq_o			        (irq_o				)
 	,.irq_ack_i	            (irq_ack_i			)	
     );
 	 
-	tim_beh_2di_2do tim_beh_2di_2do_u0(
+	tim_beh_1avo tim_beh_1avo_u0(
     .clk_i                      (clk_i          	)
 	,.rst_i              	    (rst_i         		)
 	,.i_time_1ms_vld   	        (i_time_1ms_vld 	)
@@ -368,14 +378,12 @@ module ec_2di_2do#(
 	,.irq_ack_i                 (irq_ack_i			)
    );
 	
-		pre_post_sta_check_2di_2do#(
-			.A_BHA_NUM			(A_BHA_NUM	 		)    ,	
-			.B_BHA_NUM			(B_BHA_NUM	 		)  
-	)pre_post_sta_check_2di_2do_u0(
+		pre_post_sta_check_1avo#(
+			.A_BHA_NUM			(A_BHA_NUM	 )    ,	
+			.B_BHA_NUM			(B_BHA_NUM	 )    
+	)pre_post_sta_check_1avo_u0(
 			.clk_i				(clk_i			),
 			.rst_i				(rst_i			),
-			.i_time_1ms_vld		(i_time_1ms_vld	),
-			.i_time_1s_vld 		(i_time_1s_vld 	),
 			.unit_id         	(unit_id        ),
 			.unit_ectrl      	(unit_ectrl     ),
 			.unit_st         	(unit_st        ),
@@ -387,13 +395,10 @@ module ec_2di_2do#(
 			.link_m_saf_st   	(link_m_saf_st  ),
 			.sc_id				(sc_id			),
 			.ec_id           	(ec_id          ),
-			.di_i				(di_i			),
+			.di					(di				),
 			.a_en				(a_en			),
 			.b_en				(b_en			),	
 			.c_en				(c_en			),	
-			.a_bhv_id			(a_bhv_id_r		),
-			.b_bhv_id			(b_bhv_id		),
-			.c_bhv_id			(c_bhv_id		),
 			.ec_cha_st			(ec_cha_st		),
 			.ec_chb_st       	(ec_chb_st		),
 			.ec_chc_st       	(ec_chc_st		),

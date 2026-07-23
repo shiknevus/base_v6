@@ -20,6 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 `include "./../../include_files/reg_addr_pl.vh"
+
 module ps_rw_pl_reg#(
     parameter  					REG_SPACE_BIAS 	= 	200	,
     parameter  					REG_SPACE_SIZE 	= 	1024	

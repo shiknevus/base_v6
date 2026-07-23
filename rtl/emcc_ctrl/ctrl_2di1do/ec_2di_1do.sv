@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module ec_2di_2do#(
+module ec_2di_1do#(
 		parameter  				REG_SPACE_BIAS 		= 	2000	,
 		parameter  				REG_SPACE_SIZE 		= 	512	
 )(
@@ -40,7 +40,7 @@ module ec_2di_2do#(
 		output 		            o_st_rd_vld     ,
 
 		input		 [1:0]		di_i			,	//In - position sensor signal
-		output		 [1:0]		do_o			,	//switch
+		output		 			do_o			,	//switch
 		
 		output 	            	o_intr_irq	
     );
@@ -180,6 +180,7 @@ module ec_2di_2do#(
 	wire 	[31:0]	bhv_en;
 	
 	reg		[7:0]	a_bhv_id_r;
+	wire	[7:0]	state_monitor;
 	
 	always@(posedge clk_i)
 	begin
@@ -279,7 +280,7 @@ module ec_2di_2do#(
 	,.c_alm_num             (c_alm_num 		)
 	,.c_tsc_id              (c_tx_id  		)
 	,.c_bhv_id              (c_bhv_id 		)
-	,.param51               (param51		)
+	,.param51               (state_monitor	)
 	,.param52               (param52		)
 	,.param53               (param53		)
 	,.param54               (param54		)
@@ -296,14 +297,14 @@ module ec_2di_2do#(
 	,.param65               (param65		)
 	,.param66               (di_i[0]		)
 	,.param67               (di_i[1]		)
-	,.param68               (param68		)
+	,.param68               (do_o			)
 	,.param69               (param69		)
 	,.param70               (param70		)
 	);
 
-	proactive_beh_2di_2do#(	
+	proactive_beh_2di_1do#(	
 	.BHA_NUM 				(A_BHA_NUM  	 	)	//Number of active behaviors
-)proactive_beh_2di_2do_u0(
+)proactive_beh_2di_1do_u0(
     .clk_i                 	(clk_i				)
     ,.rst_i                	(rst_i				)
     ,.i_time_1ms_vld       	(i_time_1ms_vld 	)
@@ -320,14 +321,15 @@ module ec_2di_2do#(
     ,.a_tx_id              	(a_tx_id        	)
     ,.a_alm_num            	(a_alm_num      	)
 	,.do_o					(do_o				)
+	,.state_monitor_o		(state_monitor		)
     ,.irq_o                	(irq_a				)
     ,.irq_ack_i       		(irq_a_grant		)
     );
 
 	 
-	status_beh_2di_2do#(
+	status_beh_2di_1do#(
 		.BHA_NUM(B_BHA_NUM	)
-)status_beh_2di_2do_u0(
+)status_beh_2di_1do_u0(
 	.clk_i			        (clk_i				)
 	,.rst_i			        (rst_i				)
 	,.i_time_1ms_vld		(i_time_1ms_vld 	)
@@ -347,7 +349,7 @@ module ec_2di_2do#(
 	,.irq_ack_i	            (irq_ack_i			)	
     );
 	 
-	tim_beh_2di_2do tim_beh_2di_2do_u0(
+	tim_beh_2di_1do tim_beh_2di_1do_u0(
     .clk_i                      (clk_i          	)
 	,.rst_i              	    (rst_i         		)
 	,.i_time_1ms_vld   	        (i_time_1ms_vld 	)
@@ -368,10 +370,10 @@ module ec_2di_2do#(
 	,.irq_ack_i                 (irq_ack_i			)
    );
 	
-		pre_post_sta_check_2di_2do#(
+		pre_post_sta_check_2di_1do#(
 			.A_BHA_NUM			(A_BHA_NUM	 		)    ,	
 			.B_BHA_NUM			(B_BHA_NUM	 		)  
-	)pre_post_sta_check_2di_2do_u0(
+	)pre_post_sta_check_2di_1do_u0(
 			.clk_i				(clk_i			),
 			.rst_i				(rst_i			),
 			.i_time_1ms_vld		(i_time_1ms_vld	),
