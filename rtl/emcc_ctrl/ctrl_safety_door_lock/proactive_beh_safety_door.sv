@@ -20,8 +20,8 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module proactive_beh_1avi#(
-    parameter                 	BHA_NUM = 2   //Number of active behaviors
+module proactive_beh_safety_door#(
+    parameter                 	BHA_NUM 		= 3   //Number of active behaviors
 )(
     input                       clk_i
     ,input                      rst_i
@@ -30,6 +30,8 @@ module proactive_beh_1avi#(
 
     ,input      [BHA_NUM-1:0]   pre_sta_allow   //Pre - sufficient condition satisfied signal. 0: Not satisfied. 1: Satisfied.
     ,input      [BHA_NUM-1:0]   post_sta_allow  //Post - sufficient condition satisfied signal
+
+    ,input      [1:0]           mode_sel 		//1: Single-key mode 2: Double-key mode
 	
 	,input						a_en			//A enable
     ,input      [7:0]           a_bhv_id
@@ -41,20 +43,16 @@ module proactive_beh_1avi#(
     ,output reg [7:0]           a_tx_id
     ,output reg	[7:0]           a_alm_num
 
-    ,output                     spi_do_o
-	,output						spi_clk_o
-	,output						spi_csn_o
-	,input						spi_di_i
-	
-	,output	reg	[31:0]			adc_dat_o
+    ,input      [1:0]           di_i
+	,output	reg	[2:0]			do_o
 
     ,output reg                 irq_o
     ,input                      irq_ack_i       //Interrupt response
     );
-	
+
     reg  [7:0]      a_bhv_id_r;
 
-    reg [7:0]    	curr_state;
+	reg	[7:0]		curr_state;
 	reg [7:0]    	curr_state_1d;
     reg [7:0]    	next_state;
 
@@ -66,10 +64,7 @@ module proactive_beh_1avi#(
 	reg [7:0]		ack_tx_result;
 	reg	[7:0]		ack_ps_alart_num;
 	
-	wire 			adc_ch0_data_vld  ;
-	wire [31:0]		adc_ch0_data	  ;
-	
-	
+	reg	[8:0]		tim_500ms_cnt;
 	
 	localparam  S_IDLE          = 8'd0; 
     localparam  S_BHA_PRE_DET	= 8'd1; 
@@ -174,6 +169,10 @@ module proactive_beh_1avi#(
             S_BHA_PRE_DET: begin	//1
 				if(a_bhv_id_r == 8'd1 && pre_sta_allow[0])  
 					next_state = S_READY_10;	
+				else if(a_bhv_id_r == 8'd2 && pre_sta_allow[1])	
+					next_state = S_READY_10;	
+				else if(a_bhv_id_r == 8'd3 && pre_sta_allow[2])	
+					next_state = S_READY_10;
                 else if(timout)
                     next_state = S_ALERT_40;
                 else
@@ -208,16 +207,21 @@ module proactive_beh_1avi#(
 			//end
 			
 			S_EXE:begin		//11								//active Execution
+				if(tim_500ms_cnt >= 499)
 					next_state = S_BHA_POST_DET;
+				else
+					next_state = S_EXE;
 			end
 			
             S_BHA_POST_DET: begin	//6
 				if(a_bhv_id_r == 8'd1 && post_sta_allow[0])  
                     next_state = S_SUCC_30;
-                else if(timout)
-                    next_state = S_ALERT_40;
+                else if(a_bhv_id_r == 8'd2 && post_sta_allow[1])
+                    next_state = S_SUCC_30;
+				else if(a_bhv_id_r == 8'd3 && post_sta_allow[2])
+                    next_state = S_SUCC_30;
                 else
-                    next_state = S_BHA_POST_DET;
+                    next_state = S_ALERT_40;
             end
 
             S_SUCC_30: begin		//7						//Send Interrupt 30
@@ -292,28 +296,22 @@ module proactive_beh_1avi#(
     always@(posedge clk_i)begin
         if(rst_i || !a_en)
             a_alm_num <= 8'd0;
-		else if(curr_state == S_IDLE)
-			a_alm_num <= 8'd0;
-        else if(curr_state == S_BHA_PRE_DET && timout && a_bhv_id_r == 8'd1)						//The pre - full inspection is not met.
-            a_alm_num <= 8'd101;    
-		else if(curr_state == S_BHA_PRE_DET && timout && a_bhv_id_r == 8'd2)						//The pre - full inspection is not met.
-            a_alm_num <= 8'd102;    
-        else if(curr_state == S_READY_10_ACK && ack_tx_result == IRQ_NO_OK)	//Transaction 10 ps response error
+        else if(curr_state == S_BHA_PRE_DET && timout)						
+			a_alm_num <= 8'd101;
+        else if(curr_state == S_READY_10_ACK && ack_tx_result == IRQ_NO_OK)	
             a_alm_num <= ack_ps_alart_num;    
-        else if(curr_state == S_READY_10_ACK && timout)						//For Transaction 10, waiting for the ps response timed out.
-            a_alm_num <= 8'd103;    
-		//else if(curr_state == S_EXE_20_ACK && ack_tx_result == IRQ_NO_OK)	//Transaction 20 has a ps response error.
+        else if(curr_state == S_READY_10_ACK && timout)						
+            a_alm_num <= 8'd102;    
+		//else if(curr_state == S_EXE_20_ACK && ack_tx_result == IRQ_NO_OK)	
         //    a_alm_num <= ack_ps_alart_num;    
-        //else if(curr_state == S_EXE_20_ACK && timout)						//For Transaction 20, waiting for the ps response timed out.
+        //else if(curr_state == S_EXE_20_ACK && timout)						
         //    a_alm_num <= 8'd103;    
-		else if(curr_state_1d == S_EXE && curr_state == S_ALERT_40 && a_bhv_id_r == 8'd1)//The execution of Behavior 1 failed.
-			a_alm_num <= 8'd104; 
-		else if(curr_state_1d == S_EXE && curr_state == S_ALERT_40 && a_bhv_id_r == 8'd2)//The execution of Behavior 2 failed.
-			a_alm_num <= 8'd105;
-		else if(curr_state == S_SUCC_30_ACK && ack_tx_result == IRQ_NO_OK)	//Transaction 30 has a ps response error.
+		else if(curr_state_1d == S_BHA_POST_DET && curr_state == S_ALERT_40)
+			a_alm_num <= 8'd103;  
+		else if(curr_state == S_SUCC_30_ACK && ack_tx_result == IRQ_NO_OK)	
 			a_alm_num <= ack_ps_alart_num;
-		else if(curr_state == S_SUCC_30_ACK && timout)						//For Transaction 30, waiting for the ps response timed out.
-            a_alm_num <= 8'd106;
+		else if(curr_state == S_SUCC_30_ACK && timout)						
+            a_alm_num <= 8'd104;
 		else if(match_40)
 			a_alm_num <= 8'd0;
         else
@@ -341,40 +339,65 @@ module proactive_beh_1avi#(
             timout <= 1'b0;
     end
 	
-	//============================================ user logic begin ===================================================//
 	
-	adc_top adc_top_u0(
-		.i_sys_clk             (clk_i				)
-		,.i_rst_n              (~rst_i				)
-		,.i_time_1ms_vld       (i_time_1ms_vld		)
-		,.o_spi_cs_n           (spi_csn_o			)
-		,.o_spi_clk            (spi_clk_o			)
-		,.o_spi_mosi           (spi_do_o			)
-		,.i_spi_miso           (spi_di_i			)
-		//user
-		,.o_adc_ch0_data_vld   (adc_ch0_data_vld	)
-		,.ov_adc_ch0_data      (adc_ch0_data		)
-		,.o_adc_ch1_data_vld   (					)
-		,.ov_adc_ch1_data      (					)
-	);
+	//===============================================================================================================
+	//------------------------------------------------ user logic start ---------------------------------------------
+	//===============================================================================================================
 	
+	reg	[1:0]	mode_sel_r;
 	
 	always@(posedge clk_i)
 	begin
 		if(rst_i)
-			adc_dat_o <= 32'd0;
-		else if(adc_ch0_data_vld)
-			adc_dat_o <= adc_ch0_data;
+			mode_sel_r <= 2'b00;
+		else if(a_bhv_vld)
+			mode_sel_r <= mode_sel;
 		else
-			adc_dat_o <= adc_dat_o;
+			mode_sel_r <= mode_sel_r;
 	end
 	
 	
-	//============================================ user logic end ===================================================//
+	//Count 500ms
+	always@(posedge clk_i)
+	begin
+		if(rst_i || !a_en)
+			tim_500ms_cnt <= 9'd0;
+		else if(curr_state == S_EXE)
+			if(tim_500ms_cnt >= 499)					
+				tim_500ms_cnt <= tim_500ms_cnt;
+			else
+				//tim_500ms_cnt <= tim_500ms_cnt+i_time_1ms_vld;		//actual
+				tim_500ms_cnt <= tim_500ms_cnt+1;						//sim
+		else
+			tim_500ms_cnt <= 9'd0;
+	end
 	
 	
-	
-	
-	
+	always@(posedge clk_i)
+	begin
+		if(rst_i || !a_en)
+			do_o <= 3'b000;
+		else if(curr_state == S_EXE && a_bhv_id_r == 8'd1)
+			case(mode_sel_r)
+				1:do_o <= 3'b010;	//Single-key mode
+				2:do_o <= 3'b011;	//Double-key mode
+				default:do_o <= 3'b011;
+			endcase
+		else if(curr_state == S_EXE && a_bhv_id_r == 8'd2)
+			do_o <= 3'b001;
+		else if(curr_state == S_EXE && a_bhv_id_r == 8'd3)
+			case(mode_sel_r)
+				1:do_o <= 3'b100;	//Single-key mode
+				2:do_o <= 3'b110;	//Double-key mode
+				default:do_o <= 3'b110;
+			endcase
+		else
+			do_o <= 3'b000;
+	end
+
+
+	//===============================================================================================================
+	//------------------------------------------------ user logic start ---------------------------------------------
+	//===============================================================================================================
 
 endmodule

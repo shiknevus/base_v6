@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module ec_1avi#(
+module ec_1avi_1avo#(
 		parameter  				REG_SPACE_BIAS 		= 	2000	,	//Component offset address
 		parameter  				REG_SPACE_SIZE 		= 	512			//Component register size
 )(
@@ -43,6 +43,13 @@ module ec_1avi#(
 		output					spi_clk_o	    ,
 		output					spi_csn_o	    ,
 		input					spi_di_i	    ,
+		
+		output 					o_dac_syn 		,		
+		output 					o_dac_sclk		,		
+		output 					o_dac_din 		,		
+		input 					i_dac_dout		,		
+		output 					o_dac_load		,	
+		output 					o_dac_clr		,	
 		
 		output 	            	o_intr_irq	
     );
@@ -181,6 +188,8 @@ module ec_1avi#(
 	wire			a_en;
 	wire 	[31:0]	bhv_en;
 	
+	wire	[31:0]		adc_dat_o;
+	
 	reg		[7:0]	a_bhv_id_r;
 	
 	always@(posedge clk_i)
@@ -192,9 +201,6 @@ module ec_1avi#(
 		else
 			a_bhv_id_r <= a_bhv_id_r;
 	end
-	
-	wire	[31:0]	adc_dat_o;
-	
 	
 	ps_rw_pl_reg#(
 		.REG_SPACE_BIAS 	(REG_SPACE_BIAS		),
@@ -240,12 +246,12 @@ module ec_1avi#(
 	,.c_tsc_result_rpt	    (c_tx_result_rpt)
 	,.c_tsc_result_vld	    (c_tx_result_vld)
 	,.c_bhv_gap_crl         (c_gap_crl		)
-	,.param1			    (adc_dat_o		)
+	,.param1			    (param1			)
 	,.param2			    (param2			)
 	,.param3			    (param3			)
 	,.param4			    (param4			)
 	,.param5			    (param5			)
-	,.param6			    (param6			)
+	,.param6			    (v_value		)
 	,.param7			    (param7			)
 	,.param8			    (param8			)
 	,.param9			    (param9			)
@@ -283,8 +289,8 @@ module ec_1avi#(
 	,.c_alm_num             (c_alm_num 		)
 	,.c_tsc_id              (c_tx_id  		)
 	,.c_bhv_id              (c_bhv_id 		)
-	,.param51               (param51		)
-	,.param52               (param52		)
+	,.param51               (param51		)	//tiaoshi status
+	,.param52               (adc_dat_o		)
 	,.param53               (param53		)
 	,.param54               (param54		)
 	,.param55               (param55		)
@@ -298,16 +304,16 @@ module ec_1avi#(
 	,.param63               (param63		)
 	,.param64               (param64		)
 	,.param65               (param65		)
-	,.param66               (di				)
+	,.param66               (param66		)
 	,.param67               (param67		)
 	,.param68               (param68		)
 	,.param69               (param69		)
 	,.param70               (param70		)
 	);
 
-	proactive_beh_1avi#(	
+	proactive_beh_1avi_1avo#(	
 	.BHA_NUM 				(A_BHA_NUM  	 )	//Number of active behaviors
-)proactive_beh_1avi_u0(
+)proactive_beh_1avi_1avo_u0(
     .clk_i                 	(clk_i				)
     ,.rst_i                	(rst_i				)
     ,.i_time_1ms_vld       	(i_time_1ms_vld 	)
@@ -327,15 +333,22 @@ module ec_1avi#(
 	,.spi_clk_o				(spi_clk_o			)
 	,.spi_csn_o				(spi_csn_o			)
 	,.spi_di_i				(spi_di_i			)
+	,.o_dac_syn  			(o_dac_syn 			)
+	,.o_dac_sclk 			(o_dac_sclk			)
+	,.o_dac_din  			(o_dac_din 			)
+	,.i_dac_dout 			(i_dac_dout			)
+	,.o_dac_load 			(o_dac_load			)
+	,.o_dac_clr			    (o_dac_clr			)
 	,.adc_dat_o				(adc_dat_o			)
+	,.v_value				(v_value			)
     ,.irq_o                	(irq_a				)
     ,.irq_ack_i       		(irq_a_grant		)
     );
 	
 	 
-	status_beh_1avi#(
+	status_beh_1avi_1avo#(
 		.BHA_NUM(B_BHA_NUM	)
-)status_beh_1avi_u0(
+)status_beh_1avi_1avo_u0(
 	.clk_i			        (clk_i				)
 	,.rst_i			        (rst_i				)
 	,.i_time_1ms_vld		(i_time_1ms_vld 	)
@@ -355,7 +368,7 @@ module ec_1avi#(
 	,.irq_ack_i	            (irq_ack_i			)	
     );
 	 
-	tim_beh_1avi tim_beh_1avi_u0(
+	tim_beh_1avi_1avo tim_beh_1avi_1avo_u0(
     .clk_i                      (clk_i          	)
 	,.rst_i              	    (rst_i         		)
 	,.i_time_1ms_vld   	        (i_time_1ms_vld 	)
@@ -376,10 +389,10 @@ module ec_1avi#(
 	,.irq_ack_i                 (irq_ack_i			)
    );
 	
-		pre_post_sta_check_1avi#(
+		pre_post_sta_check_1avi_1avo#(
 			.A_BHA_NUM			(A_BHA_NUM	 )    ,	
 			.B_BHA_NUM			(B_BHA_NUM	 )    
-	)pre_post_sta_check_1avi_u0(
+	)pre_post_sta_check_1avi_1avo_u0(
 			.clk_i				(clk_i			),
 			.rst_i				(rst_i			),
 			.unit_id         	(unit_id        ),

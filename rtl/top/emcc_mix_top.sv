@@ -454,9 +454,13 @@ module emcc_mix_top
 				,.o_st_rd_data  		(sub_comp_rd_dat[1]		)
 				,.o_st_rd_vld   		(sub_comp_rd_vld[1]		)
 				,.do_o					(do_mst_msg[0]			)
-				,.o_intr_irq			(map_irq[1]				)
+				,.o_intr_irq			(			)
 			);
-            
+			
+			wire	[1:0]	do_2di_2do;
+			reg 	[1:0]	di_2di_2do;
+			
+		
 			ec_2di_2do#(
 				.REG_SPACE_BIAS			(`ROLLER_1048_REG_BIAS	),	//Component offset address
 				.REG_SPACE_SIZE			(512					)
@@ -579,6 +583,7 @@ module emcc_mix_top
 	//==========================================================================================================//
 	// ----------------------------------- don't care next context----------------------------------------------//
 	//===========================================================================================================//
+	
 	
 	
 	

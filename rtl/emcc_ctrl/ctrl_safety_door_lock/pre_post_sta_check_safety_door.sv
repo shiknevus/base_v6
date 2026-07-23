@@ -20,12 +20,15 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module pre_post_sta_check_1avi#(
-		parameter		A_BHA_NUM	=	2      	
-		,parameter		B_BHA_NUM	=	1      		
+module pre_post_sta_check_safety_door#(
+		parameter		A_BHA_NUM		=	2      	
+		,parameter		B_BHA_NUM		=	1  
 )(
 		input							clk_i			
-		,input							rst_i			
+		,input							rst_i	
+
+		,input							i_time_1ms_vld
+		,input							i_time_1s_vld 
 		
 		,input		[7:0]				unit_id         
 		,input 		[3:0]				unit_ectrl      
@@ -37,13 +40,17 @@ module pre_post_sta_check_1avi#(
 		,input 							m_saf_st        
 		,input 							link_m_saf_st   
 		,input 		[7:0]				sc_id			
-		,input 		[7:0]				ec_id           
+		,input 		[7:0]				ec_id        
 		
-		,input							di				
-		
+		,input		[1:0]				di_i
+
 		,input							a_en
 		,input							b_en			
-		,input							c_en			
+		,input							c_en	
+			
+		,input		[7:0]				a_bhv_id
+		,input		[7:0]				b_bhv_id
+		,input		[7:0]				c_bhv_id
 		
 		,input							ec_cha_st		
 		,input							ec_chb_st       
@@ -64,24 +71,48 @@ module pre_post_sta_check_1avi#(
 	//---------------------------------  Channel A check -------------------------------------//
 	//========================================================================================//
 	
+	localparam  S_IDLE          = 8'd0; 
+    localparam  S_BHA_PRE_DET	= 8'd1; 
+	localparam	S_READY_10		= 8'd2;
+    localparam  S_READY_10_ACK  = 8'd3; 
+    localparam  S_EXE_20     	= 8'd4; 
+    localparam  S_EXE_20_ACK	= 8'd5; 
+    localparam  S_BHA_POST_DET  = 8'd6; 
+    localparam  S_SUCC_30       = 8'd7; 
+    localparam  S_SUCC_30_ACK	= 8'd8; 
+	localparam 	S_ALERT_40		= 8'd9;
+	localparam 	S_ALERT_40_ACK	= 8'd10;
+	localparam	S_EXE			= 8'd11;
+	
+	
+	wire [6:0]	post_sta	;
+
+	//pre status
 	always@(posedge clk_i)begin
-	if(rst_i)
-		a_pre_sta_allow <= 1'b1;
-	else if(a_en)
-		a_pre_sta_allow <= 1'b1;
+	if(rst_i && !a_en)
+		a_pre_sta_allow <= 3'b000;
 	else
-		a_pre_sta_allow <= 1'b1;
+		a_pre_sta_allow <= 3'b111;
 	end
 	
+	
+	assign	post_sta[0] = (a_bhv_id == 1 && di_i == 2'b01);
+	assign	post_sta[1] = (a_bhv_id == 2 && di_i == 2'b01);
+	assign	post_sta[2] = (a_bhv_id == 3 && di_i == 2'b10);
+	
+	//post status
 	always@(posedge clk_i)begin
-	if(rst_i)
-		a_post_sta_allow <= 1'b1;
-	else if(a_en)
-		a_post_sta_allow <= 1'b1;
+	if(rst_i || !a_en)
+		a_post_sta_allow <= 3'b000;
+	else if(post_sta[0])
+		a_post_sta_allow[0] <= 1;
+	else if(post_sta[1])
+		a_post_sta_allow[1] <= 1;
+	else if(post_sta[2])
+		a_post_sta_allow[2] <= 1;
 	else
-		a_post_sta_allow <= 1'b1;
+		a_post_sta_allow <= 3'b000;
 	end
-		
 	
 	//========================================================================================//
 	//---------------------------------  Channel B check -------------------------------------//
@@ -111,20 +142,20 @@ module pre_post_sta_check_1avi#(
 
 	always@(posedge clk_i)begin
 	if(rst_i)
-		c_pre_sta_allow <= 1'b0;
+		c_pre_sta_allow <= 'd0;
 	else if(c_en)
-		c_pre_sta_allow <= 1'b1;
+		c_pre_sta_allow <= 'd1;
 	else
-		c_pre_sta_allow <= 1'b0;
+		c_pre_sta_allow <= 'd0;
 	end
 	
 	always@(posedge clk_i)begin
 	if(rst_i)
-		c_post_sta_allow <= 1'b0;
+		c_post_sta_allow <= 'd0;
 	else if(c_en)
-		c_post_sta_allow <= 1'b1;
+		c_post_sta_allow <= 'd0;
 	else
-		c_post_sta_allow <= 1'b0;
+		c_post_sta_allow <= 'd0;
 	end
 
 endmodule

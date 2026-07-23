@@ -37,11 +37,11 @@ module ethcat_axi_rout #
     ,output wire    [31:0]  m_app_rx_tdata
 
     //AXI INTF  upstream
-    ,(* MARK_DEBUG="true" *)output [0:31]      m_axi_tx_tdata_0
-    ,(* MARK_DEBUG="true" *)output [0:3]       m_axi_tx_tkeep_0
-    ,(* MARK_DEBUG="true" *)output             m_axi_tx_tvalid_0
-    ,(* MARK_DEBUG="true" *)output             m_axi_tx_tlast_0
-    ,(* MARK_DEBUG="true" *)input              m_axi_tx_tready_0
+    ,output [0:31]      m_axi_tx_tdata_0
+    ,output [0:3]       m_axi_tx_tkeep_0
+    ,output             m_axi_tx_tvalid_0
+    ,output             m_axi_tx_tlast_0
+    ,input              m_axi_tx_tready_0
         //AXI RX
     ,input  [0:31]      s_axi_rx_tdata_0
     ,input  [0:3]       s_axi_rx_tkeep_0
@@ -55,10 +55,10 @@ module ethcat_axi_rout #
     ,output             m_axi_tx_tlast_1
     ,input              m_axi_tx_tready_1
         //AXI RX
-    ,(* MARK_DEBUG="true" *)input  [0:31]     s_axi_rx_tdata_1
-    ,(* MARK_DEBUG="true" *)input  [0:3]      s_axi_rx_tkeep_1
-    ,(* MARK_DEBUG="true" *)input             s_axi_rx_tvalid_1
-    ,(* MARK_DEBUG="true" *)input             s_axi_rx_tlast_1
+    ,input  [0:31]      s_axi_rx_tdata_1
+    ,input  [0:3]       s_axi_rx_tkeep_1
+    ,input              s_axi_rx_tvalid_1
+    ,input              s_axi_rx_tlast_1
 
 );
     assign  m_app_rx_tvalid =   s_axi_rx_tvalid_0;

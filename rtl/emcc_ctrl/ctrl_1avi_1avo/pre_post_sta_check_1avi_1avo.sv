@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module pre_post_sta_check_1avi#(
+module pre_post_sta_check_1avi_1avo#(
 		parameter		A_BHA_NUM	=	2      	
 		,parameter		B_BHA_NUM	=	1      		
 )(

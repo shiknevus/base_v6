@@ -20,8 +20,8 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module proactive_beh_1avi#(
-    parameter                 	BHA_NUM = 2   //Number of active behaviors
+module proactive_beh_1avo#(
+    parameter                 	BHA_NUM = 1   //Number of active behaviors
 )(
     input                       clk_i
     ,input                      rst_i
@@ -41,12 +41,15 @@ module proactive_beh_1avi#(
     ,output reg [7:0]           a_tx_id
     ,output reg	[7:0]           a_alm_num
 
-    ,output                     spi_do_o
-	,output						spi_clk_o
-	,output						spi_csn_o
-	,input						spi_di_i
+	,output 					o_dac_syn  
+	,output 					o_dac_sclk 
+	,output 					o_dac_din  
+	,input 						i_dac_dout 
+	,output 					o_dac_load 
+	,output 					o_dac_clr  
 	
-	,output	reg	[31:0]			adc_dat_o
+	,input		[19:0]			v_value
+	
 
     ,output reg                 irq_o
     ,input                      irq_ack_i       //Interrupt response
@@ -343,31 +346,19 @@ module proactive_beh_1avi#(
 	
 	//============================================ user logic begin ===================================================//
 	
-	adc_top adc_top_u0(
-		.i_sys_clk             (clk_i				)
-		,.i_rst_n              (~rst_i				)
-		,.i_time_1ms_vld       (i_time_1ms_vld		)
-		,.o_spi_cs_n           (spi_csn_o			)
-		,.o_spi_clk            (spi_clk_o			)
-		,.o_spi_mosi           (spi_do_o			)
-		,.i_spi_miso           (spi_di_i			)
-		//user
-		,.o_adc_ch0_data_vld   (adc_ch0_data_vld	)
-		,.ov_adc_ch0_data      (adc_ch0_data		)
-		,.o_adc_ch1_data_vld   (					)
-		,.ov_adc_ch1_data      (					)
+	dac_top dac_top_u0(
+		.i_sys_clk         (clk_i			)
+		,.i_rst_n          (~rst_i			)
+		,.i_time_1ms_vld   (i_time_1ms_vld	)
+		,.i_time_1s_vld    (i_time_1s_vld 	)
+		,.v_value          (v_value			)
+		,.o_dac_syn        (o_dac_syn  		)
+		,.o_dac_sclk       (o_dac_sclk 		)
+		,.o_dac_din        (o_dac_din  		)
+		,.i_dac_dout       (i_dac_dout 		)
+		,.o_dac_load       (o_dac_load 		)
+		,.o_dac_clr        (o_dac_clr  		)
 	);
-	
-	
-	always@(posedge clk_i)
-	begin
-		if(rst_i)
-			adc_dat_o <= 32'd0;
-		else if(adc_ch0_data_vld)
-			adc_dat_o <= adc_ch0_data;
-		else
-			adc_dat_o <= adc_dat_o;
-	end
 	
 	
 	//============================================ user logic end ===================================================//

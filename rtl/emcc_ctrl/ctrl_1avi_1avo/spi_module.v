@@ -21,13 +21,13 @@
 
 
 module spi_module   #(
-    parameter TRANSACTION_WIDTH =  16           // 8,16,32
+    ,parameter TRANSACTION_WIDTH =  16           // 8,16,32
     ,parameter CPOL              =  1            // 0,1
     ,parameter CPHA              =  0            // 0,1
     ,parameter NOM_OF_SLAVES     =  1            // 1 - 32
 )(
     //input   wire                           ps_reg_clk 
-    input   wire                          	i_sys_clk 
+    ,input   wire                          i_sys_clk 
     ,input   wire                          i_rst_n   
     ,input   wire                          i_tx_start
     ,input   wire                          i_rx_start

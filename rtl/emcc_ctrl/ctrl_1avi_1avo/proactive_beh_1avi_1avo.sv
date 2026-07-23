@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module proactive_beh_1avi#(
+module proactive_beh_1avi_1avo#(
     parameter                 	BHA_NUM = 2   //Number of active behaviors
 )(
     input                       clk_i
@@ -41,12 +41,25 @@ module proactive_beh_1avi#(
     ,output reg [7:0]           a_tx_id
     ,output reg	[7:0]           a_alm_num
 
+	//ADC spi
     ,output                     spi_do_o
 	,output						spi_clk_o
 	,output						spi_csn_o
 	,input						spi_di_i
 	
+	//DAC spi
+	,output 					o_dac_syn  
+	,output 					o_dac_sclk 
+	,output 					o_dac_din  
+	,input 						i_dac_dout 
+	,output 					o_dac_load 
+	,output 					o_dac_clr
+	
+	//ADC input Voltage value
 	,output	reg	[31:0]			adc_dat_o
+	
+	//DAC output Voltage value
+	,input		[19:0]			v_value			
 
     ,output reg                 irq_o
     ,input                      irq_ack_i       //Interrupt response
@@ -368,6 +381,20 @@ module proactive_beh_1avi#(
 		else
 			adc_dat_o <= adc_dat_o;
 	end
+	
+	dac_top(
+		.i_sys_clk         (clk_i			)
+		,.i_rst_n          (~rst_i			)
+		,.i_time_1ms_vld   (i_time_1ms_vld	)
+		,.i_time_1s_vld    (i_time_1s_vld 	)
+		,.v_value          (v_value			)
+		,.o_dac_syn        (o_dac_syn  		)
+		,.o_dac_sclk       (o_dac_sclk 		)
+		,.o_dac_din        (o_dac_din  		)
+		,.i_dac_dout       (i_dac_dout 		)
+		,.o_dac_load       (o_dac_load 		)
+		,.o_dac_clr        (o_dac_clr  		)
+	);
 	
 	
 	//============================================ user logic end ===================================================//
