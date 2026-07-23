@@ -557,7 +557,7 @@ module emcc_mix_top
 
             wire [1:0] m_4di_2do_do;
 			ec_4di_2do#(
-				.REG_SPACE_BIAS			(`ROLLER_2126_REG_BIAS  ),	//Component offset address h'800
+				.REG_SPACE_BIAS			(20'hc00  ),	//Component offset address h'c00
 				.REG_SPACE_SIZE			(`REG_SPACE_SIZE        )
 			)ec_4di_2do_u0(
 				.clk_i					(clk					)
@@ -579,6 +579,29 @@ module emcc_mix_top
 			);
             assign   do_mst_msg[8:7] = ~m_4di_2do_do;
 
+            wire [3:0] m_3led_do;
+			ec_3led#(
+				.REG_SPACE_BIAS			(20'he00  ),	//Component offset address h'c00
+				.REG_SPACE_SIZE			(`REG_SPACE_SIZE        )
+            )ec_3led_u0(
+				.clk_i					(clk					)
+				,.rst					(reset					)
+				,.i_time_1ms_vld		(time_1ms_vld			)
+				,.i_time_1s_vld 		(time_1s_vld			)
+				,.ps_reg_clk			(ps_reg_clk				)
+				,.ps_reg_reset			(ps_reg_reset			)
+				,.i_st_wr_en			(ps_reg_we				)
+				,.i_st_wr_addr  		(ps_reg_addr			)
+				,.i_st_wr_data  		(ps_reg_wr_dat			)
+				,.i_st_rd_en    		(ps_reg_re				)
+				,.i_st_rd_addr  		(ps_reg_rd_addr			)
+				,.o_st_rd_data  		(sub_comp_rd_dat[7]		)
+				,.o_st_rd_vld   		(sub_comp_rd_vld[7]		)
+				,.di_i					(	)//invalid
+				,.do_o					(m_3led_do	)
+				,.o_intr_irq			(map_irq[7]		)
+			);
+            assign   do_mst_msg[12:9] = ~m_3led_do;
 
 	//==========================================================================================================//
 	// ----------------------------------- don't care next context----------------------------------------------//

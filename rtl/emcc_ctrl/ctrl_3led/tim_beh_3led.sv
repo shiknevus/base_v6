@@ -19,7 +19,7 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
-module tim_beh_3di_2do(
+module tim_beh_3led(
     input                  		clk_i                
 	,input                  	rst_i              	
 	,input                  	i_time_1ms_vld   	
