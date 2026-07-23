@@ -224,10 +224,7 @@ module emcc_mix_top
   ,.probe_out30( do_mst_msg_force[30]  )
   ,.probe_out31( do_mst_msg_force[31]  )
 );
-	
-	
-	
-	
+
 	pkg_route
     #(
          .RAM_DEPTH             (RAM_DEPTH          )
@@ -416,8 +413,10 @@ module emcc_mix_top
 	// --------------------------------------------user component_v6_inst---------------------------------------//
 	//==========================================================================================================//
 
+			reg		di1;
+	
 			ec_1di #(
-				.REG_SPACE_BIAS 		(`ROLLER_1003_REG_BIAS	)	
+				.REG_SPACE_BIAS 		(`ROLLER_1003_REG_BIAS	)	//B010_0800
 				,.REG_SPACE_SIZE 		(512					)
 			) ec_1di_u0 (	
 				.clk_i           		(clk					)
@@ -433,7 +432,7 @@ module emcc_mix_top
 				,.i_st_rd_addr    		(ps_reg_rd_addr			)
 				,.o_st_rd_data    		(sub_comp_rd_dat[0]		)
 				,.o_st_rd_vld     		(sub_comp_rd_vld[0]		)
-				,.di              		(di_mst_msg[0]			)
+				,.di              		(di1					)
 				,.o_intr_irq      		(map_irq[0] 			)
 			);
 			
@@ -475,8 +474,8 @@ module emcc_mix_top
 				,.i_st_rd_addr  		(ps_reg_rd_addr			)
 				,.o_st_rd_data  		(sub_comp_rd_dat[2]		)
 				,.o_st_rd_vld   		(sub_comp_rd_vld[2]		)
-				,.di_i					(di_mst_msg[2:1]		)
-				,.do_o					(do_mst_msg[2:1]		)
+				,.di_i					(di_2di_2do				)
+				,.do_o					(do_2di_2do				)
 				,.o_intr_irq			(map_irq[2]				)
 			);
 

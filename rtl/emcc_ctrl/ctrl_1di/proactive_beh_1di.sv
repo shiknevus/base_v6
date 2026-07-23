@@ -30,8 +30,6 @@ module proactive_beh_1di#(
 
     ,input      [BHA_NUM-1:0]   pre_sta_allow   //Pre - sufficient condition satisfied signal. 0: Not satisfied. 1: Satisfied.
     ,input      [BHA_NUM-1:0]   post_sta_allow  //Post - sufficient condition satisfied signal
-
-    ,input                      valid_sig       //Signal validity ps-pl
 	
 	,input						a_en			//A enable
     ,input      [7:0]           a_bhv_id
@@ -46,7 +44,7 @@ module proactive_beh_1di#(
     ,input                      di
 
     ,output reg                 irq_o
-    ,input                      irq_ack_i       //Interrupt response
+    ,input                      irq_ack_i       //Interrupt response pulse
     );
 	
     reg  [7:0]      a_bhv_id_r;
@@ -157,29 +155,29 @@ module proactive_beh_1di#(
 	
     always @(*) begin			
         case (curr_state)	
-            S_IDLE: begin	//0
-                if (a_en && a_bhv_id != 8'd0 && a_bhv_vld)    //ps behavior execution instruction
+            S_IDLE: begin			//curr_state = 0
+                if (a_en && a_bhv_id != 8'd0 && a_bhv_vld)	//behavior start
                     next_state = S_BHA_PRE_DET;
                 else
                     next_state = S_IDLE;
             end
 
-            S_BHA_PRE_DET: begin	//1
+            S_BHA_PRE_DET: begin	//curr_state = 1
 				if(a_bhv_id_r == 8'd1 && pre_sta_allow[0])  
 					next_state = S_READY_10;	
 				else if(a_bhv_id_r == 8'd2 && pre_sta_allow[1])	
 					next_state = S_READY_10;	
-                else if(timout)
+                else if(timout)								//pre-sufficient condition is not satisfied
                     next_state = S_ALERT_40;
                 else
                     next_state = S_BHA_PRE_DET;
             end
 
-            S_READY_10: begin  //2      						//Send 10 interrupt
-				next_state = S_READY_10_ACK;
+            S_READY_10: begin  		//curr_state = 2    					
+				next_state = S_READY_10_ACK;				//Send 10 interrupt
             end
 
-			S_READY_10_ACK: begin	//3
+			S_READY_10_ACK: begin	//curr_state = 3
 				if(match_10) 								//Transaction 10 Acknowledged OK
                     next_state = S_EXE_20;
                 else if(ack_tx_result == IRQ_NO_OK || timout)
@@ -188,9 +186,9 @@ module proactive_beh_1di#(
                     next_state = S_READY_10_ACK;
 			end
 
-            S_EXE_20: begin		//4							//Send 20 interrupt
+            S_EXE_20: begin			//curr_state = 4						
 				//next_state = S_EXE_20_ACK;
-				next_state = S_EXE;
+				next_state = S_EXE;							//Send 20 interrupt
             end
 			
 			//S_EXE_20_ACK: begin
@@ -202,31 +200,31 @@ module proactive_beh_1di#(
             //        next_state = S_EXE_20_ACK;
 			//end
 			
-			S_EXE:begin		//11								//active Execution
-				if(valid_sig != di && a_bhv_id_r == 8'd1) 
+			S_EXE:begin				//curr_state = 11								
+				if(di == 0 && a_bhv_id_r == 8'd1) 			//Invalid detection
 					next_state = S_BHA_POST_DET;
-				else if(valid_sig == di && a_bhv_id_r == 8'd2)
+				else if(di == 1 && a_bhv_id_r == 8'd2)		//valid detection
 					next_state = S_BHA_POST_DET;
 				else
-					next_state = S_ALERT_40;
+					next_state = S_ALERT_40;				//detection failed
 			end
 			
-            S_BHA_POST_DET: begin	//6
+            S_BHA_POST_DET: begin	//curr_state = 6
 				if(a_bhv_id_r == 8'd1 && post_sta_allow[0])  
                     next_state = S_SUCC_30;
                 else if(a_bhv_id_r == 8'd2 && post_sta_allow[1])
                     next_state = S_SUCC_30;
                 else if(timout)
-                    next_state = S_ALERT_40;
+                    next_state = S_ALERT_40;				//post-sufficient condition is not satisfied		
                 else
                     next_state = S_BHA_POST_DET;
             end
 
-            S_SUCC_30: begin		//7						//Send Interrupt 30
-				next_state = S_SUCC_30_ACK;
+            S_SUCC_30: begin		//curr_state = 7					
+				next_state = S_SUCC_30_ACK;					//Send Interrupt 30
             end
 			
-			S_SUCC_30_ACK:begin	//8
+			S_SUCC_30_ACK:begin		//curr_state = 8
 				if(match_30)    							//30 response success
                     next_state = S_IDLE;
                 else if(ack_tx_result == IRQ_NO_OK || timout)
@@ -235,12 +233,12 @@ module proactive_beh_1di#(
                     next_state = S_SUCC_30_ACK;
 			end
 
-            S_ALERT_40: begin		//9						//Send Interrupt 40
-				next_state = S_ALERT_40_ACK;
+            S_ALERT_40: begin		//curr_state = 9					
+				next_state = S_ALERT_40_ACK;				//Send Interrupt 40
             end
 			
-			S_ALERT_40_ACK:begin	//10
-				if(match_40 || timout) 						//40 response
+			S_ALERT_40_ACK:begin	//curr_state = 10
+				if(match_40 || timout) 						//40 Interrupt response
                     next_state = S_IDLE;
                 else
                     next_state = S_ALERT_40_ACK;
@@ -258,10 +256,8 @@ module proactive_beh_1di#(
 
     //Channel A transaction ID: 10 20 30 40
     always@(posedge clk_i)begin
-        if(rst_i)
+        if(rst_i || !a_en)
             a_tx_id <= 8'd0;
-		else if(!a_en)
-			a_tx_id <= 8'd0;
         else if(curr_state == S_READY_10)
             a_tx_id <= 8'd10;
         //else if(curr_state == S_EXE_20)
@@ -270,17 +266,15 @@ module proactive_beh_1di#(
             a_tx_id <= 8'd30;
         else if(curr_state == S_ALERT_40)
             a_tx_id <= 8'd40;
-		else if(match_40)
+		else if(curr_state == S_IDLE || curr_state == S_BHA_PRE_DET)
 			a_tx_id <= 8'd0;
         else
             a_tx_id <= a_tx_id;
     end
 
     always@(posedge clk_i)begin
-        if(rst_i)
+        if(rst_i || !a_en)
             irq_o <= 1'b0;
-		else if(!a_en)
-			irq_o <= 1'b0;
 		else if(irq_ack_i)    		//interrupt arbiter receives the interrupt.
             irq_o <= 1'b0;
         else if(curr_state == S_READY_10)
@@ -296,30 +290,24 @@ module proactive_beh_1di#(
     end
 
     always@(posedge clk_i)begin
-        if(rst_i)
+        if(rst_i || !a_en)
             a_alm_num <= 8'd0;
-		else if(!a_en)
-			a_alm_num <= 8'd0;
-        else if(curr_state == S_BHA_PRE_DET && timout && a_bhv_id_r == 8'd1)						//The pre - full inspection is not met.
-            a_alm_num <= 8'd101;    
-		else if(curr_state == S_BHA_PRE_DET && timout && a_bhv_id_r == 8'd2)						//The pre - full inspection is not met.
-            a_alm_num <= 8'd102;    
-        else if(curr_state == S_READY_10_ACK && ack_tx_result == IRQ_NO_OK)	//Transaction 10 ps response error
+        else if(curr_state == S_BHA_PRE_DET && timout)			
+            a_alm_num <= 8'd101;     
+        else if(curr_state == S_READY_10_ACK && ack_tx_result == IRQ_NO_OK)				
             a_alm_num <= ack_ps_alart_num;    
-        else if(curr_state == S_READY_10_ACK && timout)						//For Transaction 10, waiting for the ps response timed out.
-            a_alm_num <= 8'd103;    
-		//else if(curr_state == S_EXE_20_ACK && ack_tx_result == IRQ_NO_OK)	//Transaction 20 has a ps response error.
+        else if(curr_state == S_READY_10_ACK && timout)									
+            a_alm_num <= 8'd102;    
+		//else if(curr_state == S_EXE_20_ACK && ack_tx_result == IRQ_NO_OK)				
         //    a_alm_num <= ack_ps_alart_num;    
-        //else if(curr_state == S_EXE_20_ACK && timout)						//For Transaction 20, waiting for the ps response timed out.
+        //else if(curr_state == S_EXE_20_ACK && timout)									
         //    a_alm_num <= 8'd103;    
-		else if(curr_state_1d == S_EXE && curr_state == S_ALERT_40 && a_bhv_id_r == 8'd1)//The execution of Behavior 1 failed.
-			a_alm_num <= 8'd104; 
-		else if(curr_state_1d == S_EXE && curr_state == S_ALERT_40 && a_bhv_id_r == 8'd2)//The execution of Behavior 2 failed.
-			a_alm_num <= 8'd105;
-		else if(curr_state == S_SUCC_30_ACK && ack_tx_result == IRQ_NO_OK)	//Transaction 30 has a ps response error.
+		else if(curr_state_1d == S_EXE && curr_state == S_ALERT_40)
+			a_alm_num <= 8'd103; 
+		else if(curr_state == S_SUCC_30_ACK && ack_tx_result == IRQ_NO_OK)				
 			a_alm_num <= ack_ps_alart_num;
-		else if(curr_state == S_SUCC_30_ACK && timout)						//For Transaction 30, waiting for the ps response timed out.
-            a_alm_num <= 8'd106;
+		else if(curr_state == S_SUCC_30_ACK && timout)									
+            a_alm_num <= 8'd104;
 		else if(match_40)
 			a_alm_num <= 8'd0;
         else

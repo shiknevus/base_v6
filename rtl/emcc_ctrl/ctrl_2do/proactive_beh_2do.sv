@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module proactive_beh_1do#(
+module proactive_beh_2do#(
     parameter                 	BHA_NUM = 2   //Number of active behaviors
 )(
     input                       clk_i
@@ -41,7 +41,7 @@ module proactive_beh_1do#(
     ,output reg [7:0]           a_tx_id
     ,output reg	[7:0]           a_alm_num
 
-    ,output reg                 do_o
+    ,output reg [1:0]           do_o
 
     ,output reg                 irq_o
     ,input                      irq_ack_i       //Interrupt response
@@ -115,6 +115,8 @@ module proactive_beh_1do#(
             a_bhv_id_r <= 8'd0;
         else if(a_bhv_vld)
             a_bhv_id_r <= a_bhv_id;
+		else if(curr_state == S_IDLE)
+			a_bhv_id_r <= 8'd0;
         else
             a_bhv_id_r <= a_bhv_id_r;
     end
@@ -155,29 +157,33 @@ module proactive_beh_1do#(
 
     always @(*) begin
         case (curr_state)
-            S_IDLE: begin	//0
+            S_IDLE: begin	// curr_state = 0
                 if (a_en && a_bhv_id != 8'd0 && a_bhv_vld)    //ps behavior execution instruction
                     next_state = S_BHA_PRE_DET;
                 else
                     next_state = S_IDLE;
             end
 
-            S_BHA_PRE_DET: begin	//1
+            S_BHA_PRE_DET: begin	//curr_state = 1
 				if(a_bhv_id_r == 8'd1 && pre_sta_allow[0])  
 					next_state = S_READY_10;	
 				else if(a_bhv_id_r == 8'd2 && pre_sta_allow[1])	
-					next_state = S_READY_10;	
+					next_state = S_READY_10;
+				else if(a_bhv_id_r == 8'd3 && pre_sta_allow[2])	
+					next_state = S_READY_10;
+				else if(a_bhv_id_r == 8'd4 && pre_sta_allow[3])	
+					next_state = S_READY_10;
                 else if(timout)
                     next_state = S_ALERT_40;
                 else
                     next_state = S_BHA_PRE_DET;
             end
 
-            S_READY_10: begin  //2      						//Send 10 interrupt
+            S_READY_10: begin  //curr_state = 2      						//Send 10 interrupt
 				next_state = S_READY_10_ACK;
             end
 
-			S_READY_10_ACK: begin	//3
+			S_READY_10_ACK: begin	//curr_state = 3
 				if(match_10) 								//Transaction 10 Acknowledged OK
                     next_state = S_EXE_20;
                 else if(ack_tx_result == IRQ_NO_OK || timout)
@@ -186,7 +192,7 @@ module proactive_beh_1do#(
                     next_state = S_READY_10_ACK;
 			end
 
-            S_EXE_20: begin		//4							//Send 20 interrupt
+            S_EXE_20: begin		//curr_state = 4							//Send 20 interrupt
 				//next_state = S_EXE_20_ACK;
 				next_state = S_EXE;
             end
@@ -200,17 +206,18 @@ module proactive_beh_1do#(
             //        next_state = S_EXE_20_ACK;
 			//end
 			
-			S_EXE:begin		//11								//active Execution
-				if(a_bhv_id_r == 8'd1 || a_bhv_id_r == 8'd2) 
-					next_state = S_BHA_POST_DET;
-				else
-					next_state = S_EXE;
+			S_EXE:begin		//curr_state = 11								//active Execution
+				next_state = S_BHA_POST_DET;
 			end
 			
-            S_BHA_POST_DET: begin	//6
+            S_BHA_POST_DET: begin	//curr_state = 6
 				if(a_bhv_id_r == 8'd1 && post_sta_allow[0])  
                     next_state = S_SUCC_30;
                 else if(a_bhv_id_r == 8'd2 && post_sta_allow[1])
+                    next_state = S_SUCC_30;
+				else if(a_bhv_id_r == 8'd3 && post_sta_allow[2])
+                    next_state = S_SUCC_30;
+				else if(a_bhv_id_r == 8'd4 && post_sta_allow[3])
                     next_state = S_SUCC_30;
                 else if(timout)
                     next_state = S_ALERT_40;
@@ -218,11 +225,11 @@ module proactive_beh_1do#(
                     next_state = S_BHA_POST_DET;
             end
 
-            S_SUCC_30: begin		//7						//Send Interrupt 30
+            S_SUCC_30: begin		//curr_state = 7						//Send Interrupt 30
 				next_state = S_SUCC_30_ACK;
             end
 			
-			S_SUCC_30_ACK:begin	//8
+			S_SUCC_30_ACK:begin	//curr_state = 8
 				if(match_30)    							//30 response success
                     next_state = S_IDLE;
                 else if(ack_tx_result == IRQ_NO_OK || timout)
@@ -231,11 +238,11 @@ module proactive_beh_1do#(
                     next_state = S_SUCC_30_ACK;
 			end
 
-            S_ALERT_40: begin		//9						//Send Interrupt 40
+            S_ALERT_40: begin		//curr_state = 9						//Send Interrupt 40
 				next_state = S_ALERT_40_ACK;
             end
 			
-			S_ALERT_40_ACK:begin	//10
+			S_ALERT_40_ACK:begin	//curr_state = 10
 				if(match_40 || timout) 						//40 response
                     next_state = S_IDLE;
                 else
@@ -254,10 +261,8 @@ module proactive_beh_1do#(
 
     //Channel A transaction ID: 10 20 30 40
     always@(posedge clk_i)begin
-        if(rst_i)
+        if(rst_i || !a_en)
             a_tx_id <= 8'd0;
-		else if(!a_en)
-			a_tx_id <= 8'd0;
         else if(curr_state == S_READY_10)
             a_tx_id <= 8'd10;
         //else if(curr_state == S_EXE_20)
@@ -294,25 +299,21 @@ module proactive_beh_1do#(
             a_alm_num <= 8'd0;
 		else if(curr_state == S_IDLE)
 			a_alm_num <= 8'd0;
-        else if(curr_state == S_BHA_PRE_DET && timout)
-            a_alm_num <= 8'd101;    
-        else if(curr_state == S_READY_10_ACK && ack_tx_result == IRQ_NO_OK)	
+        else if(curr_state == S_BHA_PRE_DET && timout)//The pre - full inspection is not met.
+			a_alm_num <= 8'd101;
+        else if(curr_state == S_READY_10_ACK && ack_tx_result == IRQ_NO_OK)	//Transaction 10 ps response error
             a_alm_num <= ack_ps_alart_num;    
-        else if(curr_state == S_READY_10_ACK && timout)						
+        else if(curr_state == S_READY_10_ACK && timout)						//For Transaction 10, waiting for the ps response timed out.
             a_alm_num <= 8'd102;    
-		//else if(curr_state == S_EXE_20_ACK && ack_tx_result == IRQ_NO_OK)	
+		//else if(curr_state == S_EXE_20_ACK && ack_tx_result == IRQ_NO_OK)	//Transaction 20 has a ps response error.
         //    a_alm_num <= ack_ps_alart_num;    
-        //else if(curr_state == S_EXE_20_ACK && timout)						
+        //else if(curr_state == S_EXE_20_ACK && timout)						//For Transaction 20, waiting for the ps response timed out.
         //    a_alm_num <= 8'd103;    
-		//else if(curr_state_1d == S_EXE && curr_state == S_ALERT_40 && a_bhv_id_r == 8'd1)
-		//	a_alm_num <= 8'd104; 
-		//else if(curr_state_1d == S_EXE && curr_state == S_ALERT_40 && a_bhv_id_r == 8'd2)
-		//	a_alm_num <= 8'd105;
-		else if(curr_state == S_BHA_POST_DET && timout)
-            a_alm_num <= 8'd103;    
+		else if(curr_state_1d == S_BHA_POST_DET && curr_state == S_ALERT_40)
+			a_alm_num <= 8'd103; 
 		else if(curr_state == S_SUCC_30_ACK && ack_tx_result == IRQ_NO_OK)	
 			a_alm_num <= ack_ps_alart_num;
-		else if(curr_state == S_SUCC_30_ACK && timout)						
+		else if(curr_state == S_SUCC_30_ACK && timout)						//For Transaction 30, waiting for the ps response timed out.
             a_alm_num <= 8'd104;
         else
             a_alm_num <= a_alm_num;
@@ -346,14 +347,20 @@ module proactive_beh_1do#(
 	//===============================================================================================================
 	//------------------------------------------------ user logic start ---------------------------------------------
 	//===============================================================================================================
+
+	
 	always@(posedge clk_i)
 	begin
 		if(rst_i)
-			do_o <= 1'b0;
+			do_o <= 2'b00;
 		else if(curr_state == S_EXE && a_bhv_id_r == 8'd1)
-			do_o <= 1;
+			do_o <= {1'b0,1'b1};
 		else if(curr_state == S_EXE && a_bhv_id_r == 8'd2)
-			do_o <= 0;
+			do_o <= {1'b1,1'b0};
+		else if(curr_state == S_EXE && a_bhv_id_r == 8'd3)
+			do_o <= {1'b0,1'b0};
+		else if(curr_state == S_EXE && a_bhv_id_r == 8'd4)
+			do_o <= {1'b1,1'b1};
 		else
 			do_o <= do_o;
 	end

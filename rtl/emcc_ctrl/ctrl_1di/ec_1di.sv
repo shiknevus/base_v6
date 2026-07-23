@@ -308,7 +308,6 @@ module ec_1di#(
     ,.i_time_1s_vld        	(i_time_1s_vld  	)
     ,.pre_sta_allow        	(a_pre_sta_allow	)
     ,.post_sta_allow       	(a_post_sta_allow	)
-    ,.valid_sig            	(param26			)
 	,.a_en			       	(a_en				)
     ,.a_bhv_id             	(a_bhv_id       	)
     ,.a_bhv_vld            	(a_bhv_vld      	)
