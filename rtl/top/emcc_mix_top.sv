@@ -597,7 +597,6 @@ module emcc_mix_top
 				,.i_st_rd_addr  		(ps_reg_rd_addr			)
 				,.o_st_rd_data  		(sub_comp_rd_dat[7]		)
 				,.o_st_rd_vld   		(sub_comp_rd_vld[7]		)
-				,.di_i					(	)//invalid
 				,.do_o					(m_3led_do	)
 				,.o_intr_irq			(map_irq[7]		)
 			);

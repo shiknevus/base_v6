@@ -43,7 +43,7 @@ module pre_post_sta_check_1di_1do#(
 		,input 		[7:0]				ec_id        
 		
 		,input							di_i
-		,input							do_o
+		,input							do_i
 		
 		,input							valid_sig_1
 		,input							valid_sig_2
