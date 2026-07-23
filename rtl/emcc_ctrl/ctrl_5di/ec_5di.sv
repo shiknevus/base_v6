@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module ec_2di#(
+module ec_5di#(
 		parameter  				REG_SPACE_BIAS 		= 	2000	,
 		parameter  				REG_SPACE_SIZE 		= 	512	
 )(
@@ -39,7 +39,7 @@ module ec_2di#(
 		output 		 [31:0]     o_st_rd_data    ,
 		output 		            o_st_rd_vld     ,
 
-		input		 [1:0]		di_i			,	//In - position sensor signal
+		input		 [4:0]		di_i			,	//In - position sensor signal
 		output		 			do_o			,	//invaild
 		
 		output 	            	o_intr_irq	
@@ -302,10 +302,10 @@ module ec_2di#(
 	,.param70               (param70		)
 	);
 
-	proactive_beh_2di#(	
+	proactive_beh_5di#(	
 	.BHA_NUM 				(A_BHA_NUM  	 	),	//Number of active behaviors
 	.ARV_SIG_DET_TIM		(ARV_SIG_DET_TIM	)		//In - place signal detection time
-	)proactive_beh_2di_u0(
+)proactive_beh_5di_u0(
     .clk_i                 	(clk_i				)
     ,.rst_i                	(rst_i				)
     ,.i_time_1ms_vld       	(i_time_1ms_vld 	)
@@ -329,9 +329,9 @@ module ec_2di#(
     );
 
 	 
-	status_beh_2di#(
+	status_beh_5di#(
 		.BHA_NUM(B_BHA_NUM	)
-)status_beh_2di_u0(
+)status_beh_5di_u0(
 	.clk_i			        (clk_i				)
 	,.rst_i			        (rst_i				)
 	,.i_time_1ms_vld		(i_time_1ms_vld 	)
@@ -351,7 +351,7 @@ module ec_2di#(
 	,.irq_ack_i	            (irq_b_grant		)	
     );
 	 
-	tim_beh_2di tim_beh_2di_u0(
+	tim_beh_5di tim_beh_5di_u0(
     .clk_i                      (clk_i          	)
 	,.rst_i              	    (rst_i         		)
 	,.i_time_1ms_vld   	        (i_time_1ms_vld 	)
@@ -372,10 +372,10 @@ module ec_2di#(
 	,.irq_ack_i                 (irq_c_grant		)
    );
 	
-		pre_post_sta_check_2di#(
+		pre_post_sta_check_5di#(
 			.A_BHA_NUM			(A_BHA_NUM	 		)    ,	
 			.B_BHA_NUM			(B_BHA_NUM	 		)  
-	)pre_post_sta_check_2di_u0(
+	)pre_post_sta_check_5di_u0(
 			.clk_i				(clk_i			),
 			.rst_i				(rst_i			),
 			.i_time_1ms_vld		(i_time_1ms_vld	),
