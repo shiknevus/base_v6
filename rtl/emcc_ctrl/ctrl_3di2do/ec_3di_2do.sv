@@ -46,7 +46,7 @@ module ec_3di_2do#(
     );
 	
 	
-	localparam		A_BHA_NUM		=	8;	
+	localparam		A_BHA_NUM		=	13;	
 	localparam		B_BHA_NUM		=	1;	
 	localparam		ARV_SIG_DET_TIM	=	5;
 	
@@ -144,7 +144,12 @@ module ec_3di_2do#(
 	wire 			param68 ;
 	wire 			param69 ;
 	wire 			param70 ;
-
+	
+	wire	[31:0]	debug_reg1 ;
+	wire	[31:0]	debug_reg2 ;
+	wire	[31:0]	debug_reg3 ;
+	wire	[31:0]	debug_reg4 ;
+	wire	[31:0]	debug_reg5 ;
 
 	wire	[31:0]	task_time_cnt	;
 	
@@ -295,11 +300,16 @@ module ec_3di_2do#(
 	,.param63               (param63		)
 	,.param64               (param64		)
 	,.param65               (param65		)
-	,.param66               (di				)
+	,.param66               (param66		)
 	,.param67               (param67		)
 	,.param68               (param68		)
 	,.param69               (param69		)
 	,.param70               (param70		)
+	,.debug_reg1			(debug_reg1		)
+	,.debug_reg2			(debug_reg2		)
+	,.debug_reg3			(debug_reg3		)
+	,.debug_reg4			(debug_reg4		)
+	,.debug_reg5			(debug_reg5		)
 	);
 
 	proactive_beh_3di_2do#(	
@@ -312,9 +322,6 @@ module ec_3di_2do#(
     ,.i_time_1s_vld        	(i_time_1s_vld  	)
     ,.pre_sta_allow        	(a_pre_sta_allow	)
     ,.post_sta_allow       	(a_post_sta_allow	)
-    ,.valid_sig_1			(param1			)
-	,.valid_sig_2			(param2			)
-	,.valid_sig_3			(param3			)
 	,.a_en			       	(a_en				)
     ,.a_bhv_id             	(a_bhv_id       	)
     ,.a_bhv_vld            	(a_bhv_vld      	)
@@ -328,6 +335,7 @@ module ec_3di_2do#(
 	,.do_o					(do_o				)
     ,.irq_o                	(irq_a				)
     ,.irq_ack_i       		(irq_a_grant		)
+	,.state_monitor_o		(param51			)
     );
 
 	 
@@ -348,9 +356,9 @@ module ec_3di_2do#(
 	,.ec_chb_st             (ec_chb_st			)
 	,.b_tx_id               (b_tx_id			)
 	,.b_alm_num             (b_alm_num			)
-	,.di				    (di					)
-	,.irq_o			        (irq_o				)
-	,.irq_ack_i	            (irq_ack_i			)	
+	,.di				    ( 					)
+	,.irq_o			        (irq_b				)
+	,.irq_ack_i	            (irq_b_grant		)	
     );
 	 
 	tim_beh_3di_2do tim_beh_3di_2do_u0(
@@ -370,8 +378,8 @@ module ec_3di_2do#(
 	,.c_tx_id         	        (c_tx_id			)
 	,.c_alm_num                 (c_alm_num			)
 	,.c_gap_crl                 (c_gap_crl			)
-	,.irq_o 					(irq_o				)
-	,.irq_ack_i                 (irq_ack_i			)
+	,.irq_o 					(irq_c				)
+	,.irq_ack_i                 (irq_c_grant		)
    );
 	
 		pre_post_sta_check_3di_2do#(
@@ -394,10 +402,7 @@ module ec_3di_2do#(
 			.sc_id				(sc_id			),
 			.ec_id           	(ec_id          ),
 			.di_i				(di_i			),
-			.do_o				(do_o			),
-			.valid_sig_1		(param1		),
-			.valid_sig_2		(param2		),
-			.valid_sig_3		(param3		),
+			.do_i				(do_o			),
 			.a_en				(a_en			),
 			.b_en				(b_en			),	
 			.c_en				(c_en			),	

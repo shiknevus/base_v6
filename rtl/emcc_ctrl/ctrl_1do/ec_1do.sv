@@ -141,7 +141,12 @@ module ec_1do#(
 	wire 			param68 ;
 	wire 			param69 ;
 	wire 			param70 ;
-
+	
+	wire	[31:0]	debug_reg1 ;
+	wire	[31:0]	debug_reg2 ;
+	wire	[31:0]	debug_reg3 ;
+	wire	[31:0]	debug_reg4 ;
+	wire	[31:0]	debug_reg5 ;
 
 	wire	[31:0]	task_time_cnt	;
 	
@@ -296,6 +301,11 @@ module ec_1do#(
 	,.param68               (param68		)
 	,.param69               (param69		)
 	,.param70               (param70		)
+	,.debug_reg1			(debug_reg1		)
+	,.debug_reg2			(debug_reg2		)
+	,.debug_reg3			(debug_reg3		)
+	,.debug_reg4			(debug_reg4		)
+	,.debug_reg5			(debug_reg5		)
 	);
 
 	proactive_beh_1do#(	
@@ -307,7 +317,6 @@ module ec_1do#(
     ,.i_time_1s_vld        	(i_time_1s_vld  	)
     ,.pre_sta_allow        	(a_pre_sta_allow	)
     ,.post_sta_allow       	(a_post_sta_allow	)
-    ,.valid_sig            	(param26			)
 	,.a_en			       	(a_en				)
     ,.a_bhv_id             	(a_bhv_id       	)
     ,.a_bhv_vld            	(a_bhv_vld      	)

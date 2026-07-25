@@ -210,13 +210,12 @@ emcc_mst_top emcc_mst_top_u
 				
 				ps_write_word(	`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `C_EN,32'h0000_0000,resp1);
 				
+				ps_write_word(	`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `M_SAF_ST,32'h0000_0000,resp1);
+				
+				ps_write_word(	`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `LINK_M_SAF_ST,32'h0000_0000,resp1);
+				
 				ps_write_word(	`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `BHV_PRIORITY,32'h0000_0000,resp1);
-				
-				//信号有效性
-				ps_write_word(	`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `PARAM26,32'h0000_0001,resp1);
-				
-				ps_write_word(	`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `PARAM27,32'h0000_0001,resp1);
-				
+
 				//行为超时
 				ps_write_word(	`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `A_TX_OT,32'hFFFF_0000,resp1);
 				
@@ -230,9 +229,9 @@ emcc_mst_top emcc_mst_top_u
 					end
 				end
 				
-				//============================================	行为ID=1		==================================
+				//============================================	行为ID=1	正常	==================================
 
-				tb_ec_2di_2do.emcc_mst_top_u.emcc_mix_top_u.di2 = 2'b01;	//position  1 arrive
+				tb_ec_2di_2do.emcc_mst_top_u.emcc_mix_top_u.di_2di_2do = 2'b00;	
 				
 				ps_write_word(	`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `A_BHV_ID,32'h0000_0001,resp1);	
 				
@@ -247,6 +246,8 @@ emcc_mst_top emcc_mst_top_u
 						$stop;
 				end else
 					$stop;
+					
+				tb_ec_2di_2do.emcc_mst_top_u.emcc_mix_top_u.di_2di_2do = 2'b01;	//position  1 arrive
 				
 				//30 / 40
 				wait (tb_ec_2di_2do.emcc_mst_top_u.emcc_mix_top_u.ec_2di_2do_u0.o_intr_irq == 1'b1);
@@ -264,7 +265,7 @@ emcc_mst_top emcc_mst_top_u
 				//============================================	行为ID=2		==================================
 				
 				#6000;
-				tb_ec_2di_2do.emcc_mst_top_u.emcc_mix_top_u.di2 = 2'b10;	//position  2 arrive
+				tb_ec_2di_2do.emcc_mst_top_u.emcc_mix_top_u.di_2di_2do = 2'b00;	
 				
 				ps_write_word(	`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `A_BHV_ID,32'h0000_0002,resp1);	
 				
@@ -279,6 +280,8 @@ emcc_mst_top emcc_mst_top_u
 						$stop;
 				end else
 					$stop;
+					
+				tb_ec_2di_2do.emcc_mst_top_u.emcc_mix_top_u.di_2di_2do = 2'b10;	
 				
 				//30 / 40
 				wait (tb_ec_2di_2do.emcc_mst_top_u.emcc_mix_top_u.ec_2di_2do_u0.o_intr_irq == 1'b1);
@@ -297,7 +300,7 @@ emcc_mst_top emcc_mst_top_u
 				
 				#6000;
 				
-				tb_ec_2di_2do.emcc_mst_top_u.emcc_mix_top_u.di2 = 2'b01;	//position  1 arrive
+				tb_ec_2di_2do.emcc_mst_top_u.emcc_mix_top_u.di_2di_2do = 2'b00;
 				
 				ps_write_word(	`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `A_BHV_ID,32'h0000_0003,resp1);	
 				
@@ -312,6 +315,8 @@ emcc_mst_top emcc_mst_top_u
 						$stop;
 				end else
 					$stop;
+				
+				tb_ec_2di_2do.emcc_mst_top_u.emcc_mix_top_u.di_2di_2do = 2'b01;
 				
 				//30 / 40
 				wait (tb_ec_2di_2do.emcc_mst_top_u.emcc_mix_top_u.ec_2di_2do_u0.o_intr_irq == 1'b1);
@@ -330,7 +335,7 @@ emcc_mst_top emcc_mst_top_u
 					//============================================	行为ID=4		==================================
 				
 				#6000;
-				tb_ec_2di_2do.emcc_mst_top_u.emcc_mix_top_u.di2 = 2'b01;	//position  1 arrive
+				tb_ec_2di_2do.emcc_mst_top_u.emcc_mix_top_u.di_2di_2do = 2'b00;	
 				
 				ps_write_word(	`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `A_BHV_ID,32'h0000_0004,resp1);	
 				
@@ -345,6 +350,8 @@ emcc_mst_top emcc_mst_top_u
 						$stop;
 				end else
 					$stop;
+				
+				tb_ec_2di_2do.emcc_mst_top_u.emcc_mix_top_u.di_2di_2do = 2'b01;	
 				
 				//30 / 40
 				wait (tb_ec_2di_2do.emcc_mst_top_u.emcc_mix_top_u.ec_2di_2do_u0.o_intr_irq == 1'b1);
@@ -362,7 +369,7 @@ emcc_mst_top emcc_mst_top_u
 					//============================================	行为ID=5		==================================
 				
 				#6000;
-				tb_ec_2di_2do.emcc_mst_top_u.emcc_mix_top_u.di2 = 2'b10;	//position  1 arrive
+				tb_ec_2di_2do.emcc_mst_top_u.emcc_mix_top_u.di_2di_2do = 2'b00;	
 				
 				ps_write_word(	`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `A_BHV_ID,32'h0000_0005,resp1);	
 				
@@ -377,6 +384,8 @@ emcc_mst_top emcc_mst_top_u
 						$stop;
 				end else
 					$stop;
+				
+				tb_ec_2di_2do.emcc_mst_top_u.emcc_mix_top_u.di_2di_2do = 2'b10;	
 				
 				//30 / 40
 				wait (tb_ec_2di_2do.emcc_mst_top_u.emcc_mix_top_u.ec_2di_2do_u0.o_intr_irq == 1'b1);
@@ -394,7 +403,7 @@ emcc_mst_top emcc_mst_top_u
 					//============================================	行为ID=6		==================================
 				
 				#6000;
-				tb_ec_2di_2do.emcc_mst_top_u.emcc_mix_top_u.di2 = 2'b00;	
+				tb_ec_2di_2do.emcc_mst_top_u.emcc_mix_top_u.di_2di_2do = 2'b00;	
 				
 				ps_write_word(	`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `A_BHV_ID,32'h0000_0006,resp1);	
 				
@@ -409,6 +418,10 @@ emcc_mst_top emcc_mst_top_u
 						$stop;
 				end else
 					$stop;
+				
+				tb_ec_2di_2do.emcc_mst_top_u.emcc_mix_top_u.di_2di_2do = 2'b10;	//移动到位置2
+				#2000;
+				tb_ec_2di_2do.emcc_mst_top_u.emcc_mix_top_u.di_2di_2do = 2'b00;	//移出位置2
 				
 				//30 / 40
 				wait (tb_ec_2di_2do.emcc_mst_top_u.emcc_mix_top_u.ec_2di_2do_u0.o_intr_irq == 1'b1);
@@ -427,7 +440,7 @@ emcc_mst_top emcc_mst_top_u
 				
 				#6000;
 				
-				tb_ec_2di_2do.emcc_mst_top_u.emcc_mix_top_u.di2 = 2'b00;	
+				tb_ec_2di_2do.emcc_mst_top_u.emcc_mix_top_u.di_2di_2do = 2'b00;	
 				
 				ps_write_word(	`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `A_BHV_ID,32'h0000_0007,resp1);	
 				
@@ -443,6 +456,10 @@ emcc_mst_top emcc_mst_top_u
 				end else
 					$stop;
 				
+				tb_ec_2di_2do.emcc_mst_top_u.emcc_mix_top_u.di_2di_2do = 2'b01;	//移动到位置1
+				#2000;
+				tb_ec_2di_2do.emcc_mst_top_u.emcc_mix_top_u.di_2di_2do = 2'b00;	//移出位置1
+				
 				//30 / 40
 				wait (tb_ec_2di_2do.emcc_mst_top_u.emcc_mix_top_u.ec_2di_2do_u0.o_intr_irq == 1'b1);
 				ps_read_word(`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `IRQ_REG2, read_data);
@@ -456,42 +473,213 @@ emcc_mst_top emcc_mst_top_u
 					$stop;
 				
 				
-				
-				
-				
-				
-				
-				
-				//============================================	行为ID=1		==================================
+				//============================================	行为ID=8	正常	==================================
+				#6000;
 
-				tb_ec_2di_2do.emcc_mst_top_u.emcc_mix_top_u.di2 = 2'b10;	//position  1 arrive
+				tb_ec_2di_2do.emcc_mst_top_u.emcc_mix_top_u.di_2di_2do = 2'b00;	
 				
-				ps_write_word(	`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `A_BHV_ID,32'h0000_0001,resp1);	
+				ps_write_word(	`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `A_BHV_ID,32'h0000_0008,resp1);	
 				
 				//10
 				wait (tb_ec_2di_2do.emcc_mst_top_u.emcc_mix_top_u.ec_2di_2do_u0.o_intr_irq == 1'b1);
 				ps_read_word(`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `IRQ_REG2, read_data);
 				if(read_data == 32'd0)	begin	//no alart
 					ps_read_word(`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `IRQ_REG1, read_data);
-					if(read_data == {8'h88,8'h66,8'd1,8'd10})	
-						ps_write_word(	`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `A_TX_RSULT_RPT,32'h010a_5167,resp1);//写事务回应寄存器
+					if(read_data == {8'h88,8'h66,8'd8,8'd10})	
+						ps_write_word(	`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `A_TX_RSULT_RPT,32'h080a_5167,resp1);//写事务回应寄存器
 					else
 						$stop;
 				end else
 					$stop;
+					
+				tb_ec_2di_2do.emcc_mst_top_u.emcc_mix_top_u.di_2di_2do = 2'b01;	//position  1 arrive
 				
 				//30 / 40
 				wait (tb_ec_2di_2do.emcc_mst_top_u.emcc_mix_top_u.ec_2di_2do_u0.o_intr_irq == 1'b1);
 				ps_read_word(`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `IRQ_REG2, read_data);
 				if(read_data == 32'd0)	begin	//no alart
 					ps_read_word(`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `IRQ_REG1, read_data);
-					if(read_data == {8'h88,8'h66,8'd1,8'd30})	//scuss
-						ps_write_word(	`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `A_TX_RSULT_RPT,32'h011E_5167,resp1);//写事务回应寄存器
-					else if(read_data == {8'h88,8'h66,8'd1,8'd40})//fail
-						ps_write_word(	`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `A_TX_RSULT_RPT,32'h0128_5199,resp1);//写事务回应寄存器
+					if(read_data == {8'h88,8'h66,8'd8,8'd30})	//scuss
+						ps_write_word(	`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `A_TX_RSULT_RPT,32'h081E_5167,resp1);//写事务回应寄存器
+					else if(read_data == {8'h88,8'h66,8'd8,8'd40})//fail
+						ps_write_word(	`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `A_TX_RSULT_RPT,32'h0828_5199,resp1);//写事务回应寄存器
 				end else
 					$stop;
 				
+				
+				//============================================	行为ID=9		==================================
+				
+				#6000;
+				tb_ec_2di_2do.emcc_mst_top_u.emcc_mix_top_u.di_2di_2do = 2'b00;	
+				
+				ps_write_word(	`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `A_BHV_ID,32'h0000_0009,resp1);	
+				
+				//10
+				wait (tb_ec_2di_2do.emcc_mst_top_u.emcc_mix_top_u.ec_2di_2do_u0.o_intr_irq == 1'b1);
+				ps_read_word(`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `IRQ_REG2, read_data);
+				if(read_data == 32'd0)	begin	//no alart
+					ps_read_word(`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `IRQ_REG1, read_data);
+					if(read_data == {8'h88,8'h66,8'd9,8'd10})	
+						ps_write_word(	`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `A_TX_RSULT_RPT,32'h090a_5167,resp1);//写事务回应寄存器
+					else
+						$stop;
+				end else
+					$stop;
+					
+				tb_ec_2di_2do.emcc_mst_top_u.emcc_mix_top_u.di_2di_2do = 2'b10;	
+				
+				//30 / 40
+				wait (tb_ec_2di_2do.emcc_mst_top_u.emcc_mix_top_u.ec_2di_2do_u0.o_intr_irq == 1'b1);
+				ps_read_word(`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `IRQ_REG2, read_data);
+				if(read_data == 32'd0)	begin	//no alart
+					ps_read_word(`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `IRQ_REG1, read_data);
+					if(read_data == {8'h88,8'h66,8'd9,8'd30})	//scuss
+						ps_write_word(	`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `A_TX_RSULT_RPT,32'h091E_5167,resp1);//写事务回应寄存器
+					else if(read_data == {8'h88,8'h66,8'd9,8'd40})//fail
+						ps_write_word(	`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `A_TX_RSULT_RPT,32'h0928_5199,resp1);//写事务回应寄存器
+				end else
+					$stop;
+				
+				
+					//============================================	行为ID=10		==================================
+				
+				#6000;
+				tb_ec_2di_2do.emcc_mst_top_u.emcc_mix_top_u.di_2di_2do = 2'b00;	
+				
+				ps_write_word(	`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `A_BHV_ID,32'h0000_000a,resp1);	
+				
+				//10
+				wait (tb_ec_2di_2do.emcc_mst_top_u.emcc_mix_top_u.ec_2di_2do_u0.o_intr_irq == 1'b1);
+				ps_read_word(`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `IRQ_REG2, read_data);
+				if(read_data == 32'd0)	begin	//no alart
+					ps_read_word(`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `IRQ_REG1, read_data);
+					if(read_data == {8'h88,8'h66,8'd10,8'd10})	
+						ps_write_word(	`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `A_TX_RSULT_RPT,32'h0a0a_5167,resp1);//写事务回应寄存器
+					else
+						$stop;
+				end else
+					$stop;
+				
+				tb_ec_2di_2do.emcc_mst_top_u.emcc_mix_top_u.di_2di_2do = 2'b10;	//移动到位置2
+				#2000;
+				tb_ec_2di_2do.emcc_mst_top_u.emcc_mix_top_u.di_2di_2do = 2'b00;	//移出位置2
+				
+				//30 / 40
+				wait (tb_ec_2di_2do.emcc_mst_top_u.emcc_mix_top_u.ec_2di_2do_u0.o_intr_irq == 1'b1);
+				ps_read_word(`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `IRQ_REG2, read_data);
+				if(read_data == 32'd0)	begin	//no alart
+					ps_read_word(`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `IRQ_REG1, read_data);
+					if(read_data == {8'h88,8'h66,8'd10,8'd30})	//scuss
+						ps_write_word(	`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `A_TX_RSULT_RPT,32'h0a1E_5167,resp1);//写事务回应寄存器
+					else if(read_data == {8'h88,8'h66,8'd10,8'd40})//fail
+						ps_write_word(	`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `A_TX_RSULT_RPT,32'h0a28_5199,resp1);//写事务回应寄存器
+				end else
+					$stop;
+				
+				
+					//============================================	行为ID=11		==================================
+				
+				#6000;
+				
+				tb_ec_2di_2do.emcc_mst_top_u.emcc_mix_top_u.di_2di_2do = 2'b00;	
+				
+				ps_write_word(	`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `A_BHV_ID,32'h0000_000b,resp1);	
+				
+				//10
+				wait (tb_ec_2di_2do.emcc_mst_top_u.emcc_mix_top_u.ec_2di_2do_u0.o_intr_irq == 1'b1);
+				ps_read_word(`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `IRQ_REG2, read_data);
+				if(read_data == 32'd0)	begin	//no alart
+					ps_read_word(`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `IRQ_REG1, read_data);
+					if(read_data == {8'h88,8'h66,8'd11,8'd10})	
+						ps_write_word(	`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `A_TX_RSULT_RPT,32'h0b0a_5167,resp1);//写事务回应寄存器
+					else
+						$stop;
+				end else
+					$stop;
+				
+				tb_ec_2di_2do.emcc_mst_top_u.emcc_mix_top_u.di_2di_2do = 2'b01;	//移动到位置1
+				#2000;
+				tb_ec_2di_2do.emcc_mst_top_u.emcc_mix_top_u.di_2di_2do = 2'b00;	//移出位置1
+				
+				//30 / 40
+				wait (tb_ec_2di_2do.emcc_mst_top_u.emcc_mix_top_u.ec_2di_2do_u0.o_intr_irq == 1'b1);
+				ps_read_word(`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `IRQ_REG2, read_data);
+				if(read_data == 32'd0)	begin	//no alart
+					ps_read_word(`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `IRQ_REG1, read_data);
+					if(read_data == {8'h88,8'h66,8'd11,8'd30})	//scuss
+						ps_write_word(	`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `A_TX_RSULT_RPT,32'h0b1E_5167,resp1);//写事务回应寄存器
+					else if(read_data == {8'h88,8'h66,8'd11,8'd40})//fail
+						ps_write_word(	`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `A_TX_RSULT_RPT,32'h0b28_5199,resp1);//写事务回应寄存器
+				end else
+					$stop;
+
+					
+				
+				//============================================	行为ID=8	 pl 检测di错误	==================================
+
+				//	tb_ec_2di_2do.emcc_mst_top_u.emcc_mix_top_u.di_2di_2do = 2'b00;	
+				//	
+				//	ps_write_word(	`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `A_BHV_ID,32'h0000_0008,resp1);	
+				//	
+				//	//10
+				//	wait (tb_ec_2di_2do.emcc_mst_top_u.emcc_mix_top_u.ec_2di_2do_u0.o_intr_irq == 1'b1);
+				//	ps_read_word(`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `IRQ_REG2, read_data);
+				//	if(read_data == 32'd0)	begin	//no alart
+				//		ps_read_word(`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `IRQ_REG1, read_data);
+				//		if(read_data == {8'h88,8'h66,8'd8,8'd10})	
+				//			ps_write_word(	`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `A_TX_RSULT_RPT,32'h080a_5167,resp1);//写事务回应寄存器
+				//		else
+				//			$stop;
+				//	end else
+				//		$stop;
+				//		
+				//	tb_ec_2di_2do.emcc_mst_top_u.emcc_mix_top_u.di_2di_2do = 2'b01;	//position  1 arrive
+				//	
+				//	//30 / 40
+				//	wait (tb_ec_2di_2do.emcc_mst_top_u.emcc_mix_top_u.ec_2di_2do_u0.o_intr_irq == 1'b1);
+				//	ps_read_word(`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `IRQ_REG2, read_data);
+				//	if(read_data == 32'd0)	begin	//no alart
+				//		ps_read_word(`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `IRQ_REG1, read_data);
+				//		if(read_data == {8'h88,8'h66,8'd8,8'd30})	//scuss
+				//			ps_write_word(	`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `A_TX_RSULT_RPT,32'h081E_5167,resp1);//写事务回应寄存器
+				//		else if(read_data == {8'h88,8'h66,8'd8,8'd40})//fail
+				//			ps_write_word(	`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `A_TX_RSULT_RPT,32'h0828_5199,resp1);//写事务回应寄存器
+				//	end else
+				//		$stop;
+				//		
+					
+				//============================================	行为ID=8	 ps 响应错误	==================================
+				#6000;
+
+				tb_ec_2di_2do.emcc_mst_top_u.emcc_mix_top_u.di_2di_2do = 2'b00;	
+				
+				ps_write_word(	`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `A_BHV_ID,32'h0000_0008,resp1);	
+				
+				//10
+				wait (tb_ec_2di_2do.emcc_mst_top_u.emcc_mix_top_u.ec_2di_2do_u0.o_intr_irq == 1'b1);
+				ps_read_word(`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `IRQ_REG2, read_data);
+				if(read_data == 32'd0)	begin	//no alart
+					ps_read_word(`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `IRQ_REG1, read_data);
+					if(read_data == {8'h88,8'h66,8'd8,8'd10})	
+						ps_write_word(	`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `A_TX_RSULT_RPT,32'h080a_5167,resp1);//写事务回应寄存器
+					else
+						$stop;
+				end else
+					$stop;
+					
+				tb_ec_2di_2do.emcc_mst_top_u.emcc_mix_top_u.di_2di_2do = 2'b01;	//position  1 arrive
+				
+				//30 / 40
+				wait (tb_ec_2di_2do.emcc_mst_top_u.emcc_mix_top_u.ec_2di_2do_u0.o_intr_irq == 1'b1);
+				ps_read_word(`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `IRQ_REG2, read_data);
+				if(read_data == 32'd0)	begin	//no alart
+					ps_read_word(`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `IRQ_REG1, read_data);
+					if(read_data == {8'h88,8'h66,8'd8,8'd30})	//scuss
+						ps_write_word(	`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `A_TX_RSULT_RPT,32'h081E_5267,resp1);//写事务回应寄存器
+					else if(read_data == {8'h88,8'h66,8'd8,8'd40})//fail
+						ps_write_word(	`PL_CFG_BASE_ADDR + EC_BIAS_ADDR + `A_TX_RSULT_RPT,32'h0828_5199,resp1);//写事务回应寄存器
+				end else
+					$stop;
 
 				
 				#2000;

@@ -744,48 +744,48 @@ localparam DO_BIT_WIDTH = 32;
 //	.probe0({rs485_1_rx,rs485_1_tx,rs485_1_de,rs485_2_rx,rs485_2_tx,rs485_2_de})
 //);          
 
-    `ifdef SIM_PLATFORM_MST
-    emcc_mix_top
-    #(
-         .PS_REG_AWIDTH     (PS_REG_AWIDTH  )
-        ,.PS_REG_DWIDTH     (PS_REG_DWIDTH  )
-        ,.RAM_DEPTH         (RAM_DEPTH      )
-        ,.RAM_DWIDTH        (RAM_DWIDTH     )
-    )
-        emcc_mix_top_u
-        (
-             .clk                       (prot_clk        )
-            ,.reset                     (prot_clk_rst    )
-
-            ,.di_mst_msg                (main_board_inio )
-            ,.do_relay_mst_msg          (main_board_outio)
-
-       //component interface
-            ,.slv_cfg_msg_rden  (slv_cfg_msg_rden   )
-            ,.slv_cfg_msg_addr   (slv_cfg_msg_addr    )
-            ,.slv_cfg_msg_dat    (slv_cfg_msg_dat     )
-
-            //read back to master component
-            ,.slv_sta_msg_vld   (slv_sta_msg_vld    )  //slave station status message
-            ,.slv_sta_msg_addr  (slv_sta_msg_addr   )
-            ,.slv_sta_msg_dat   (slv_sta_msg_dat    )
-        //  ps interface
-            //reg cfg interface
-            ,.ps_reg_clk                (ps_reg_clk     )
-            ,.ps_reg_reset              (ps_reg_reset   )
-            ,.ps_reg_we                 (ps_reg_we     )
-            ,.ps_reg_addr               (ps_reg_addr   )
-            ,.ps_reg_wr_dat             (ps_reg_wr_dat )
-            ,.ps_reg_re                 (ps_reg_re     )
-            ,.ps_reg_rd_addr            (ps_reg_rd_addr)
-            ,.ps_comp_rd_vld            (comp_reg_rd_vld )
-            ,.ps_comp_rd_dat            (comp_reg_rd_dat )
-            ,.ps_flow_rd_vld            (flow_reg_rd_vld )
-            ,.ps_flow_rd_dat            (flow_reg_rd_dat )
-            ,.emcc_irq                  (emcc_irq        )
-            ,.flow_irq                  (flow_irq        )
-        );
-    `else
+   // `ifdef SIM_PLATFORM_MST
+    // 	emcc_mix_top
+    // 	#(
+    // 	     .PS_REG_AWIDTH     (PS_REG_AWIDTH  )
+    // 	    ,.PS_REG_DWIDTH     (PS_REG_DWIDTH  )
+    // 	    ,.RAM_DEPTH         (RAM_DEPTH      )
+    // 	    ,.RAM_DWIDTH        (RAM_DWIDTH     )
+    // 	)
+    // 	    emcc_mix_top_u
+    // 	    (
+    // 	         .clk                       (prot_clk        )
+    // 	        ,.reset                     (prot_clk_rst    )
+    // 	
+    // 	        ,.di_mst_msg                (main_board_inio )
+    // 	        ,.do_relay_mst_msg          (main_board_outio)
+    // 	
+    // 	   //component interface
+    // 	        ,.slv_cfg_msg_rden  (slv_cfg_msg_rden   )
+    // 	        ,.slv_cfg_msg_addr   (slv_cfg_msg_addr    )
+    // 	        ,.slv_cfg_msg_dat    (slv_cfg_msg_dat     )
+    // 	
+    // 	        //read back to master component
+    // 	        ,.slv_sta_msg_vld   (slv_sta_msg_vld    )  //slave station status message
+    // 	        ,.slv_sta_msg_addr  (slv_sta_msg_addr   )
+    // 	        ,.slv_sta_msg_dat   (slv_sta_msg_dat    )
+    // 	    //  ps interface
+    // 	        //reg cfg interface
+    // 	        ,.ps_reg_clk                (ps_reg_clk     )
+    // 	        ,.ps_reg_reset              (ps_reg_reset   )
+    // 	        ,.ps_reg_we                 (ps_reg_we     )
+    // 	        ,.ps_reg_addr               (ps_reg_addr   )
+    // 	        ,.ps_reg_wr_dat             (ps_reg_wr_dat )
+    // 	        ,.ps_reg_re                 (ps_reg_re     )
+    // 	        ,.ps_reg_rd_addr            (ps_reg_rd_addr)
+    // 	        ,.ps_comp_rd_vld            (comp_reg_rd_vld )
+    // 	        ,.ps_comp_rd_dat            (comp_reg_rd_dat )
+    // 	        ,.ps_flow_rd_vld            (flow_reg_rd_vld )
+    // 	        ,.ps_flow_rd_dat            (flow_reg_rd_dat )
+    // 	        ,.emcc_irq                  (emcc_irq        )
+    // 	        ,.flow_irq                  (flow_irq        )
+    // 	    );
+   // `else
         emcc_mix_top
         #(
              .PS_REG_AWIDTH     (PS_REG_AWIDTH  )
@@ -891,7 +891,7 @@ localparam DO_BIT_WIDTH = 32;
             ,.iv_do_debug          (   )
        
         );
-    `endif
+    //`endif
 
     /*always @(posedge prot_clk)begin
         if(jtag_irq_select)begin

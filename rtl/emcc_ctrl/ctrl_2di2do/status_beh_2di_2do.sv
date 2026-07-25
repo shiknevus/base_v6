@@ -40,7 +40,7 @@ module status_beh_2di_2do#(
 	,output	reg [7:0]			b_tx_id     
 	,output	reg [7:0]			b_alm_num   
 	
-	,input						di				
+	,input		[1:0]				di				
 	
 	,output	reg					irq_o			
 	,input						irq_ack_i	
