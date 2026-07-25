@@ -57,7 +57,8 @@ module app_mst_tx_ctrl(
 //    localparam  WAIT_CNT            = `SIM_SLV_STA_NUM * 'd25_000;//MAX time intervall between two packets
     localparam  WAIT_CNT            = 'd250_000;//MAX time intervall between two packets
 `else
-    localparam  WAIT_CNT            = 'd156_250_000;//MAX time intervall between two package. clock period is 6.4ns
+    //localparam  WAIT_CNT            = 'd156_250_000;//MAX time intervall between two package. clock period is 6.4ns
+	localparam  WAIT_CNT            = 'd781_250;
 `endif
     
     localparam  STM_IDLE            = 'd0;

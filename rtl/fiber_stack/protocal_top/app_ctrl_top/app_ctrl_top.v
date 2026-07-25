@@ -80,6 +80,7 @@ module app_ctrl_top
     ,output wire    [3:0]   slv_id_we
     ,output wire    [15:0]  slv_id_addr
     ,output wire    [31:0]  slv_id_din
+    ,output wire    [31:0]  slv_fpga_version
 
     //only used by slave mode,which are used to transfer complete package to ethcater tx buffer
     ,output wire            m_slvsta_tx_sof     //slave station tx port
@@ -144,6 +145,7 @@ module app_ctrl_top
                 ,.slv_id_we         (slv_id_we          )
                 ,.slv_id_addr       (slv_id_addr        )
                 ,.slv_id_din        (slv_id_din         )
+                ,.slv_fpga_version  (slv_fpga_version   )
 
                 ,.cache_we          (cache_we           )
                 ,.cache_addr        (cache_addr         )

@@ -138,6 +138,7 @@ module emcc_mst_app
     wire    [3:0]   slv_id_we;
     wire    [15:0]  slv_id_addr;
     wire    [31:0]  slv_id_din;
+    wire    [31:0]  slv_fpga_version;
     wire            ping_pong_flag;//0:aurora link is success;1:aurora link is fail
 (* MARK_DEBUG="true" *)    wire            mst_sta_trsf_flag;
 (* MARK_DEBUG="true" *)    reg [31:0]  wk_cnt  =   'd0;
@@ -192,6 +193,7 @@ module emcc_mst_app
         ,.slv_id_we         (slv_id_we          )
         ,.slv_id_addr       (slv_id_addr        )
         ,.slv_id_din        (slv_id_din         )
+        ,.slv_fpga_version  (slv_fpga_version   )
 
         ,.link_success      (link_success       )
         ,.loop_link_success (loop_link_success  )
@@ -369,6 +371,7 @@ module emcc_mst_app
             ,.slv_id_we         (slv_id_we          )
             ,.slv_id_addr       (slv_id_addr        )
             ,.slv_id_din        (slv_id_din         )
+            ,.slv_fpga_version  (slv_fpga_version   )
 
             //master AXI interface to aurora IP:send port
             ,.m_boroa_tx_tvalid (m_boroa_tx_tvalid)

@@ -433,6 +433,9 @@ module aurora_8b10b_0_TB;
             for (j = 0; j < slv_num; j=j+1) begin
                 aurora_8b10b_0_TB.emmcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.read_data(`MST_APP_REG_BASE + `CACHE_SLV_ID_BIAS_ADDR + {j,4'h0},4, read_data, resp);
                 $display ("the id of 32'h%x slave station is 32'h%x",j, read_data);
+                sunny_ps_write(`MST_APP_REG_BASE + `FPGA_VERSION_RD_ADDR, 32'h0000_0000 + {j,4'h0}, resp);
+                sunny_ps_read(`MST_APP_REG_BASE + `FPGA_VERSION_DATA_ADDR, read_data, resp);
+                $display ("the fpga version of 32'h%x slave station is 32'h%x",j, read_data);
             end
         end
     endtask
@@ -827,6 +830,56 @@ module aurora_8b10b_0_TB;
     //        end
     //    end
     //endtask
+
+  task sunny_ps_write;
+      input [31:0] wr_addr;
+      input [31:0] wr_datar;
+
+      output[1:0] resp;
+
+      begin
+            aurora_8b10b_0_TB.emmcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.write_burst_strb
+            (
+                wr_addr,  // start_addr
+                0,                          // len (0 => 1 beat)
+                2,                          // siz = 4 => 16 bytes/beat (128 bits)
+                1,                          // burst = INCR
+                0,                          // lck
+                0,                          // cache
+                0,                          // prot
+                wr_datar,  // data
+                1,                          // strb_en = 1 (enable byte strobes)
+                8'hFF,                   // strb: byte lane valid mask
+                2,                          // datasize
+                resp
+            );
+      end
+   endtask
+
+  task sunny_ps_read;
+      input [31:0] rd_addr;
+
+      output[31:0] rdata;
+      output[1:0] resp;
+
+      begin
+			
+                aurora_8b10b_0_TB.emmcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.read_burst
+                	(
+                    rd_addr,
+                    0,
+                    2,    // siz to use for the read
+                    1,
+                    0,
+                    0,
+                    0,
+                    rdata,
+                    resp
+                );	
+      end
+   endtask
+		
+
 
 endmodule
 

@@ -41,6 +41,7 @@ module app_protocal_top
     ,output wire    [3:0]   slv_id_we
     ,output wire    [15:0]  slv_id_addr
     ,output wire    [31:0]  slv_id_din
+    ,output wire    [31:0]  slv_fpga_version
 
     //master AXI interface to aurora IP:send port
     ,output                 m_boroa_tx_tvalid
@@ -170,6 +171,7 @@ module app_protocal_top
             ,.slv_id_we         (slv_id_we          )
             ,.slv_id_addr       (slv_id_addr        )
             ,.slv_id_din        (slv_id_din         )
+            ,.slv_fpga_version  (slv_fpga_version   )
 
                 //ll interface which is used between app layer and ethcat layer
             ,.cache_we              (cache_we           )

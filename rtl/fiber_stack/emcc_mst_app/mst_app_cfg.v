@@ -36,6 +36,7 @@ module mst_app_cfg
     ,input  wire    [3:0]               slv_id_we
     ,input  wire    [15:0]              slv_id_addr
     ,input  wire    [31:0]              slv_id_din
+    ,input  wire    [31:0]              slv_fpga_version
 
     ,input                              link_success
     ,input  wire                        loop_link_success
@@ -138,6 +139,39 @@ module mst_app_cfg
         id_buf_rd_addr  <=  rd_reg_addr - `CACHE_SLV_ID_BIAS_ADDR;
     end
 
+
+    // ------ add by qsj start -------------------
+    reg [15:0]  fpga_version_buf_rd_addr = 0;
+    wire[31:0]  fpga_version_buf_rd_dat;
+    always @(posedge ps_reg_clk)begin
+        if(ps_reg_reset)begin
+            fpga_version_buf_rd_addr  <= 'd0;
+        end else if((wr_reg_addr == `FPGA_VERSION_RD_ADDR) & ps_reg_we)begin
+            fpga_version_buf_rd_addr  <= ps_reg_wr_dat ;
+        end else begin
+            fpga_version_buf_rd_addr  <= fpga_version_buf_rd_addr;
+        end
+    end
+    gen_ram
+    #(
+         .RAM_DWIDTH  (RAM_DWIDTH   )
+        ,.RAM_DEPTH   (RAM_DEPTH    )
+        ,.TYPE        (RAM_TYPE     )
+    )
+    fpga_version_buf_u
+    (
+         .clka      (prot_clk   )
+        ,.wea       (&slv_id_we )
+        ,.addra     (slv_id_addr)
+        ,.dina      (slv_fpga_version )
+        ,.clkb      (ps_reg_clk )
+        ,.enb       (1          )
+        ,.addrb     (fpga_version_buf_rd_addr[15:4] )
+        ,.doutb     (fpga_version_buf_rd_dat        )
+    );
+    // ------ add by qsj end  -------------------
+
+
 /////////////////////////////////////////
     
     always @(posedge ps_reg_clk)begin
@@ -159,6 +193,7 @@ module mst_app_cfg
 //            `LINK_STATUS_ADDR:  ps_reg_rd_dat   <=  {8'd0,app_err_type[7:0],hb_err_slvsta[7:0],{6'd0,link_success,loop_link_success}};
             `LINK_STATUS_ADDR:  ps_reg_rd_dat   <=  {8'd0,app_err_type[7:0],hb_err_slvsta[7:0],{6'd0,link_status,link_status}};
             `STAT_TIME_ADDR  :  ps_reg_rd_dat   <=  stat_rslt;
+            `FPGA_VERSION_DATA_ADDR  :  ps_reg_rd_dat   <=  fpga_version_buf_rd_addr==32'h000000FF ? `FPGA_VERSION : fpga_version_buf_rd_dat;
             default : ps_reg_rd_dat <= id_buf_rd_dat;
         endcase
     end
