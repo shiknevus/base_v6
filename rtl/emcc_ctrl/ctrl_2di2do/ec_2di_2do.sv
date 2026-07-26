@@ -46,9 +46,8 @@ module ec_2di_2do#(
     );
 	
 	
-	localparam		A_BHA_NUM		=	7;	
+	localparam		A_BHA_NUM		=	11;	
 	localparam		B_BHA_NUM		=	1;	
-	localparam		ARV_SIG_DET_TIM	=	5;
 	
 	//PS-PL    
 	wire 	[7:0]	unit_id         ;     	
@@ -295,16 +294,15 @@ module ec_2di_2do#(
 	,.param63               (param63		)
 	,.param64               (param64		)
 	,.param65               (param65		)
-	,.param66               (di				)
-	,.param67               (param67		)
+	,.param66               (di_i[0]		)
+	,.param67               (di_i[1]		)
 	,.param68               (param68		)
 	,.param69               (param69		)
 	,.param70               (param70		)
 	);
 
 	proactive_beh_2di_2do#(	
-	.BHA_NUM 				(A_BHA_NUM  	 	),	//Number of active behaviors
-	.ARV_SIG_DET_TIM		(ARV_SIG_DET_TIM	)		//In - place signal detection time
+	.BHA_NUM 				(A_BHA_NUM  	 	)	//Number of active behaviors
 )proactive_beh_2di_2do_u0(
     .clk_i                 	(clk_i				)
     ,.rst_i                	(rst_i				)
@@ -312,8 +310,6 @@ module ec_2di_2do#(
     ,.i_time_1s_vld        	(i_time_1s_vld  	)
     ,.pre_sta_allow        	(a_pre_sta_allow	)
     ,.post_sta_allow       	(a_post_sta_allow	)
-    ,.valid_sig_1			(param26			)
-	,.valid_sig_2			(param27			)
 	,.a_en			       	(a_en				)
     ,.a_bhv_id             	(a_bhv_id       	)
     ,.a_bhv_vld            	(a_bhv_vld      	)
@@ -323,7 +319,6 @@ module ec_2di_2do#(
     ,.ec_cha_st            	(ec_cha_st			)
     ,.a_tx_id              	(a_tx_id        	)
     ,.a_alm_num            	(a_alm_num      	)
-    ,.di_i                  (di_i				)
 	,.do_o					(do_o				)
     ,.irq_o                	(irq_a				)
     ,.irq_ack_i       		(irq_a_grant		)
@@ -347,7 +342,7 @@ module ec_2di_2do#(
 	,.ec_chb_st             (ec_chb_st			)
 	,.b_tx_id               (b_tx_id			)
 	,.b_alm_num             (b_alm_num			)
-	,.di				    (di					)
+	,.di				    (di_i				)
 	,.irq_o			        (irq_o				)
 	,.irq_ack_i	            (irq_ack_i			)	
     );
@@ -393,9 +388,6 @@ module ec_2di_2do#(
 			.sc_id				(sc_id			),
 			.ec_id           	(ec_id          ),
 			.di_i				(di_i			),
-			.do_o				(do_o			),
-			.valid_sig_1		(param26		),
-			.valid_sig_2		(param27		),
 			.a_en				(a_en			),
 			.b_en				(b_en			),	
 			.c_en				(c_en			),	

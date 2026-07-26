@@ -30,8 +30,6 @@ module proactive_beh_1do#(
 
     ,input      [BHA_NUM-1:0]   pre_sta_allow   //Pre - sufficient condition satisfied signal. 0: Not satisfied. 1: Satisfied.
     ,input      [BHA_NUM-1:0]   post_sta_allow  //Post - sufficient condition satisfied signal
-
-    ,input                      valid_sig       //Signal validity ps-pl
 	
 	,input						a_en			//A enable
     ,input      [7:0]           a_bhv_id
@@ -275,10 +273,8 @@ module proactive_beh_1do#(
     end
 
     always@(posedge clk_i)begin
-        if(rst_i)
+        if(rst_i || !a_en)
             irq_o <= 1'b0;
-		else if(!a_en)
-			irq_o <= 1'b0;
 		else if(irq_ack_i)    		//interrupt arbiter receives the interrupt.
             irq_o <= 1'b0;
         else if(curr_state == S_READY_10)
@@ -294,30 +290,30 @@ module proactive_beh_1do#(
     end
 
     always@(posedge clk_i)begin
-        if(rst_i)
+        if(rst_i || !a_en)
             a_alm_num <= 8'd0;
-		else if(!a_en)
+		else if(curr_state == S_IDLE)
 			a_alm_num <= 8'd0;
-        else if(curr_state == S_BHA_PRE_DET && timout && a_bhv_id_r == 8'd1)//The pre - full inspection is not met.
+        else if(curr_state == S_BHA_PRE_DET && timout)
             a_alm_num <= 8'd101;    
-		else if(curr_state == S_BHA_PRE_DET && timout && a_bhv_id_r == 8'd2)//The pre - full inspection is not met.
-            a_alm_num <= 8'd102; 
-        else if(curr_state == S_READY_10_ACK && ack_tx_result == IRQ_NO_OK)	//Transaction 10 ps response error
+        else if(curr_state == S_READY_10_ACK && ack_tx_result == IRQ_NO_OK)	
             a_alm_num <= ack_ps_alart_num;    
-        else if(curr_state == S_READY_10_ACK && timout)						//For Transaction 10, waiting for the ps response timed out.
-            a_alm_num <= 8'd103;    
-		//else if(curr_state == S_EXE_20_ACK && ack_tx_result == IRQ_NO_OK)	//Transaction 20 has a ps response error.
+        else if(curr_state == S_READY_10_ACK && timout)						
+            a_alm_num <= 8'd102;    
+		//else if(curr_state == S_EXE_20_ACK && ack_tx_result == IRQ_NO_OK)	
         //    a_alm_num <= ack_ps_alart_num;    
-        //else if(curr_state == S_EXE_20_ACK && timout)						//For Transaction 20, waiting for the ps response timed out.
+        //else if(curr_state == S_EXE_20_ACK && timout)						
         //    a_alm_num <= 8'd103;    
-		else if(curr_state_1d == S_EXE && curr_state == S_ALERT_40 && a_bhv_id_r == 8'd1)//The execution of Behavior 1 failed.
-			a_alm_num <= 8'd104; 
-		else if(curr_state_1d == S_EXE && curr_state == S_ALERT_40 && a_bhv_id_r == 8'd2)//The execution of Behavior 2 failed.
-			a_alm_num <= 8'd105;
-		else if(curr_state == S_SUCC_30_ACK && ack_tx_result == IRQ_NO_OK)	//Transaction 30 has a ps response error.
+		//else if(curr_state_1d == S_EXE && curr_state == S_ALERT_40 && a_bhv_id_r == 8'd1)
+		//	a_alm_num <= 8'd104; 
+		//else if(curr_state_1d == S_EXE && curr_state == S_ALERT_40 && a_bhv_id_r == 8'd2)
+		//	a_alm_num <= 8'd105;
+		else if(curr_state == S_BHA_POST_DET && timout)
+            a_alm_num <= 8'd103;    
+		else if(curr_state == S_SUCC_30_ACK && ack_tx_result == IRQ_NO_OK)	
 			a_alm_num <= ack_ps_alart_num;
-		else if(curr_state == S_SUCC_30_ACK && timout)						//For Transaction 30, waiting for the ps response timed out.
-            a_alm_num <= 8'd106;
+		else if(curr_state == S_SUCC_30_ACK && timout)						
+            a_alm_num <= 8'd104;
         else
             a_alm_num <= a_alm_num;
     end
@@ -355,9 +351,9 @@ module proactive_beh_1do#(
 		if(rst_i)
 			do_o <= 1'b0;
 		else if(curr_state == S_EXE && a_bhv_id_r == 8'd1)
-			do_o <= valid_sig;
+			do_o <= 1;
 		else if(curr_state == S_EXE && a_bhv_id_r == 8'd2)
-			do_o <= ~valid_sig;
+			do_o <= 0;
 		else
 			do_o <= do_o;
 	end
