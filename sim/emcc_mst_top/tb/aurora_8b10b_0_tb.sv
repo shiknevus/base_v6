@@ -1,11 +1,11 @@
 `timescale 1 ns / 100 ps
 
-`include "./../../../rtl/include_files/base_addr.vh"
-`include "./../../../rtl/include_files/para_reg_addr.vh"
-`include "./../../../rtl/include_files/depot_addr_map.vh"
-`include "./../../../rtl/include_files/reg_addr_pl.vh"
-`include "./../../../rtl/include_files/globe_includes.vh"
-`include "./../../../rtl/include_files/components_param.vh"
+`include "./../rtl/include_files/base_addr.vh"
+`include "./../rtl/include_files/para_reg_addr.vh"
+`include "./../rtl/include_files/depot_addr_map.vh"
+`include "./../rtl/include_files/reg_addr_pl.vh"
+`include "./../rtl/include_files/globe_includes.vh"
+`include "./../rtl/include_files/components_param.vh"
 
 module aurora_8b10b_0_TB;
 
@@ -256,7 +256,7 @@ module aurora_8b10b_0_TB;
         //  $finish;
     end
 
-// mpsoc platform
+//                          mpsoc platform
     generate
         if(GEN_MPSOC == 1) begin:SIM_MPSOC
             reg tb_ACLK;
@@ -296,20 +296,22 @@ module aurora_8b10b_0_TB;
                 aurora_8b10b_0_TB.emmcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.fpga_soft_reset(32'h0);
                 #2000;
                 //PS RX PORT
-                wait (aurora_8b10b_0_TB.emmcc_mst_top_u.prot_clk_rst == 0)                                        
-                #2000 ;
-                $display ("*********************pre STEP1***********************");
-                aurora_8b10b_0_TB.emmcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.write_from_file("./../../../../../src/sim/ps_tx_depot_init.dat",32'hB000_0000,512*2, resp);//unit:BUYTE ,so the number of config must be mult 4
+                wait (aurora_8b10b_0_TB.emmcc_mst_top_u.prot_clk_rst == 0)                                                                                                           //
+//              aurora_8b10b_0_TB.emmcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.write_from_file("./../../../../../src//hdl/sim_src/ps_tx_depot_init.dat",32'hB000_0000,512* `SIM_SLV_STA_NUM *4, resp);//unit:BUYTE ,so the number of config must be mult 4
+//              aurora_8b10b_0_TB.emmcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.read_to_file   ("./../../../../../src//hdl/sim_src/ps_tx_depot_read.dat",32'hB000_0000,4096, resp);
+                // AXI transfer width is 32-bit; the length is counted in BYTE units
 
-                $display ("*********************pre STEP2***********************");
-                aurora_8b10b_0_TB.emmcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.read_to_file   ("./../../../../../src/sim/ps_tx_depot_read.dat",32'hB000_0000,512*2, resp);
-
-                optical_fiber_case0;
-//                tst_roller_component;
-                
+//                optical_fiber_case0;
+                //tst_roller_component;
+				
+				// PS write reset
+				//	aurora_8b10b_0_TB.emmcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.write_data(
+				//	`PL_CFG_BASE_ADDR + `ROLLER_1003_REG_BIAS + `RST_EN,16,128'hfefe_1011_1012_1013_1014_1015_1016_fefe, resp);
+				//	#100 ;
+				
 				aurora_8b10b_0_TB.emmcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.write_burst_strb
                 (
-                    `PL_CFG_BASE_ADDR + 20'h0000 + `RST_EN,  // start_addr
+                    `PL_CFG_BASE_ADDR + `ROLLER_1003_REG_BIAS + `RST_EN,  // start_addr
                     10,                          // len (0 => 1 beat)
                     4,                          // siz = 4 => 16 bytes/beat (128 bits)
                     1,                          // burst = INCR
@@ -324,21 +326,95 @@ module aurora_8b10b_0_TB;
                 );
 
 
-                aurora_8b10b_0_TB.emmcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.read_burst
-                	(
-                    `PL_CFG_BASE_ADDR + 20'h0000 + `RST_EN+4,
-                    0,
-                    2,    // siz to use for the read
-                    1,
-                    0,
-                    0,
-                    0,
-                    rdata,
-                    resp
-                );	
+aurora_8b10b_0_TB.emmcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.read_burst
+	(
+    `PL_CFG_BASE_ADDR + `ROLLER_1003_REG_BIAS + `RST_EN+4,
+    0,
+    2,    // siz to use for the read
+    1,
+    0,
+    0,
+    0,
+    rdata,
+    resp
+);	
 			#1000;	
 				
 				
+				//	aurora_8b10b_0_TB.emmcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.write_data(
+				//	`PL_CFG_BASE_ADDR + `ROLLER_1003_REG_BIAS + `RST_EN+16,16,128'h0010_0011_0012_0013_0014_0015_0016_0017, resp);
+				//	#100 ;
+				//	
+				//	aurora_8b10b_0_TB.emmcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.read_data
+				//	(`PL_CFG_BASE_ADDR + `ROLLER_1003_REG_BIAS + `RST_EN,16, read_data, resp);
+				//	#1000 ;
+				
+
+				
+				
+				
+				
+				 
+				//	// write SC_ID
+				//	aurora_8b10b_0_TB.emmcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.write_data(
+				//	`PL_CFG_BASE_ADDR + `ROLLER_1003_REG_BIAS + `SC_ID,4,32'h0000_0066, resp);
+				//	#100 ;
+				//	 
+				//	// write EC_ID
+				//	 aurora_8b10b_0_TB.emmcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.write_data(
+				//	`PL_CFG_BASE_ADDR + `ROLLER_1003_REG_BIAS + `EC_ID,4,32'h0000_0088, resp);
+				//	#100 ;
+				//	
+				//	// write B_EN (behavior enable)
+				//	aurora_8b10b_0_TB.emmcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.write_data(
+				//	`PL_CFG_BASE_ADDR + `ROLLER_1003_REG_BIAS + `B_EN,4,32'h0000_0000, resp);
+				//	#100 ;
+				//	
+				//	// write C_EN (timer enable)
+				//	aurora_8b10b_0_TB.emmcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.write_data(
+				//	`PL_CFG_BASE_ADDR + `ROLLER_1003_REG_BIAS + `C_EN,4,32'h0000_0000, resp);
+				//	#100 ;
+				//	
+				//	// ps write A_TX_OT (tx timeout)
+				//	aurora_8b10b_0_TB.emmcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.write_data(
+				//	`PL_CFG_BASE_ADDR + `ROLLER_1003_REG_BIAS + `A_TX_OT,4,32'hf000_0000, resp);
+				//	#100 ;
+				//	
+				//	// ps write PARAM1 (signal valid, active low)
+				//	aurora_8b10b_0_TB.emmcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.write_data(
+				//	`PL_CFG_BASE_ADDR + `ROLLER_1003_REG_BIAS + `PARAM1,4,32'h0000_0000, resp);
+				//	#100 ;
+				//	
+				//	aurora_8b10b_0_TB.emmcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.write_data(
+				//	`PL_CFG_BASE_ADDR + `ROLLER_1003_REG_BIAS + `PARAM2,4,32'h0000_0001, resp);
+				//	#100 ;
+				//	
+				//	aurora_8b10b_0_TB.emmcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.read_data
+				//	(`PL_CFG_BASE_ADDR + `ROLLER_1003_REG_BIAS + `PARAM2,4, read_data, resp);
+				//	#100 ;
+				//	
+				//	// set behavior ID = 1
+				//	aurora_8b10b_0_TB.emmcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.write_data(
+				//	`PL_CFG_BASE_ADDR + `ROLLER_1003_REG_BIAS + `A_BHV_ID,4,32'h0000_0001, resp);
+				//	#10000 ;
+				//	
+				//	
+				//	//wait_intr
+				//	
+				//	// ps write result report (value 10)
+				//	aurora_8b10b_0_TB.emmcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.write_data(
+				//	`PL_CFG_BASE_ADDR + `ROLLER_1003_REG_BIAS + `A_TX_RSULT_RPT,4,{8'd1,8'd10,8'h51,8'd0}, resp);
+				//	#10000 ;
+				//	
+				//	// ps write result report (value 20)
+				//	aurora_8b10b_0_TB.emmcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.write_data(
+				//	`PL_CFG_BASE_ADDR + `ROLLER_1003_REG_BIAS + `A_TX_RSULT_RPT,4,{8'd1,8'd20,8'h51,8'd0}, resp);
+				//	#10000 ;
+				//	
+				//	// ps write result report (value 30)
+				//	aurora_8b10b_0_TB.emmcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.write_data(
+				//	`PL_CFG_BASE_ADDR + `ROLLER_1003_REG_BIAS + `A_TX_RSULT_RPT,4,{8'd1,8'd30,8'h51,8'd0}, resp);
+				//	#10000 ;
 				
                 $display ("Simulation completed");
 //                $stop;
@@ -353,50 +429,36 @@ module aurora_8b10b_0_TB;
     endgenerate
 
     task    optical_fiber_case0;
-        reg resp;
         fork
             begin
                 //PS DEOPT TRANSACTION
-                //Step1: Enable optical fiber interface initialization
-                aurora_8b10b_0_TB.emmcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.write_data(`MST_APP_REG_BASE + `OPT_INTF_INIT_EN_ADDR,4, 32'h0000_0001, resp);
-                $display ("PS enable optical fiber interface initialization");
-                //Step2: Enable PS transfer port (ps_trsf_port_en = 1)
-                aurora_8b10b_0_TB.emmcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.write_data(`MST_APP_REG_BASE + `MST_APP_MODE_ADDR,4, 32'h0000_0001, resp);
-                $display ("PS enable transfer port");
-                //Step3: Wait for all slave stations to be initialized
                     wait_all_slv_initial_done;
                 if(1)begin
                         ps_cfg_pl_intf_tst_mode(1);//12
                     //first 
-                        $display ("*************************STEP1***********************");
                         ps_cfg_trsf_req(1);//16
                         wait_mststa_rcv_tst_dg_done;
                         ps_cfg_trsf_req(0);
     //                //second
-                        $display ("*************************STEP2***********************");
                         ps_cfg_trsf_req(1);
                         wait_mststa_rcv_tst_dg_done;
                         ps_cfg_trsf_req(0);
     //                //third
-                        $display ("*************************STEP3***********************");
                         ps_cfg_trsf_req(1);
                         wait_mststa_rcv_tst_dg_done;
                         ps_cfg_trsf_req(0);
                 end
                 #2000 ;
-                $display ("*************************STEP4***********************");
                 gen_slv_do_ao_dat;
                 ps_cfg_pl_intf_tst_mode(0);
                 ps_rd_depot_flag(0);
-                $display ("*************************STEP5***********************");
                 #200000;
-                $display ("*************************STEP6***********************");
                 ps_rd_depot_flag(1);
                 #20000;
-                $display ("*************************STEP7***********************");
                 ps_rd_depot_flag(0);
             end
-/*
+            begin
+            end
             begin
                 gen_link_error[SLV_STA_NUM-1:0] = 0;
 //                #150000 gen_link_error[SLV_STA_NUM-2] = 1;
@@ -405,7 +467,6 @@ module aurora_8b10b_0_TB;
             begin
                 detect_optical_fiber_status;
             end
-*/
         join
     endtask
 
@@ -534,8 +595,8 @@ module aurora_8b10b_0_TB;
         ,`PL_CFG_BASE_ADDR + `ROLLER_1003_REG_BIAS + `PS_CFG_WK_MODE_ADDR
     };
 
-`define ROLLER_1034_PATH        aurora_8b10b_0_TB.emmcc_mst_top_u.emcc_mix_top_u.ec_1di_u0
-`define ROLLER_1002_PATH        aurora_8b10b_0_TB.emmcc_mst_top_u.emcc_mix_top_u.ec_1di_u0
+`define ROLLER_1034_PATH        aurora_8b10b_0_TB.emmcc_mst_top_u.emcc_mix_top_u.ec_1di_check_u0
+`define ROLLER_1002_PATH        aurora_8b10b_0_TB.emmcc_mst_top_u.emcc_mix_top_u.ec_1di_check_u0
 //`define ROLLER_1003_PATH        aurora_8b10b_0_TB.emmcc_mst_top_u.emcc_comp_top_u.roller_1003_u
 
    //task tst_roller_component;

@@ -170,10 +170,8 @@ spi_module#(
     
 ) U_spi_module(
     // .ps_reg_clk   (ps_reg_clk  )
-    ,.i_sys_clk   (i_sys_clk  )
+    .i_sys_clk   (i_sys_clk  )
     ,.i_rst_n     (i_rst_n    )
-    
-    
     ,.iv_sel_slave(0          )
     ,.i_tx_start  (tx_en      )
     ,.i_rx_start  (rx_en      )

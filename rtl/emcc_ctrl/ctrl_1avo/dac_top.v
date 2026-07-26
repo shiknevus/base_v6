@@ -312,14 +312,13 @@ wire [0:0]  spi_cs_n;
 wire spi_ready;
 
 spi_module#( 
-     .MODE              ("Standard")  // "Standard";"Dual";"Quad"
-    ,.TRANSACTION_WIDTH (TRANSACTION_WIDTH)           // 8,16,34,32
+    .TRANSACTION_WIDTH (TRANSACTION_WIDTH)           // 8,16,34,32
     ,.CPOL              (1)            // 0,1
     ,.CPHA              (0)            // 0,1
     ,.NOM_OF_SLAVES     (1)            // 1 - 32
     
 ) U_spi_module(
-    ,.i_sys_clk   (i_sys_clk  )
+    .i_sys_clk   (i_sys_clk  )
     ,.i_rst_n     (i_rst_n    )
     
     

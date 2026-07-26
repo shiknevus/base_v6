@@ -141,6 +141,12 @@ module ec_1di#(
 	wire 			param68 ;
 	wire 			param69 ;
 	wire 			param70 ;
+	
+	wire	[31:0]	debug_reg1 ;
+	wire	[31:0]	debug_reg2 ;
+	wire	[31:0]	debug_reg3 ;
+	wire	[31:0]	debug_reg4 ;
+	wire	[31:0]	debug_reg5 ;
 
 
 	wire	[31:0]	task_time_cnt	;
@@ -297,6 +303,12 @@ module ec_1di#(
 	,.param68               (param68		)
 	,.param69               (param69		)
 	,.param70               (param70		)
+	,.debug_reg1			(debug_reg1		)
+	,.debug_reg2			(debug_reg2		)
+	,.debug_reg3			(debug_reg3		)
+	,.debug_reg4			(debug_reg4		)
+	,.debug_reg5			(debug_reg5		)
+	
 	);
 
 	proactive_beh_1di#(	
