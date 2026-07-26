@@ -33,19 +33,19 @@
     <Option Name="DSAVendor" Val="xilinx"/>
     <Option Name="DSANumComputeUnits" Val="60"/>
     <Option Name="WTXSimLaunchSim" Val="1"/>
-    <Option Name="WTModelSimLaunchSim" Val="70"/>
+    <Option Name="WTModelSimLaunchSim" Val="83"/>
     <Option Name="WTQuestaLaunchSim" Val="0"/>
     <Option Name="WTIesLaunchSim" Val="0"/>
     <Option Name="WTVcsLaunchSim" Val="0"/>
     <Option Name="WTRivieraLaunchSim" Val="0"/>
     <Option Name="WTActivehdlLaunchSim" Val="0"/>
-    <Option Name="WTXSimExportSim" Val="102"/>
-    <Option Name="WTModelSimExportSim" Val="102"/>
-    <Option Name="WTQuestaExportSim" Val="102"/>
-    <Option Name="WTIesExportSim" Val="102"/>
-    <Option Name="WTVcsExportSim" Val="102"/>
-    <Option Name="WTRivieraExportSim" Val="102"/>
-    <Option Name="WTActivehdlExportSim" Val="102"/>
+    <Option Name="WTXSimExportSim" Val="115"/>
+    <Option Name="WTModelSimExportSim" Val="115"/>
+    <Option Name="WTQuestaExportSim" Val="115"/>
+    <Option Name="WTIesExportSim" Val="115"/>
+    <Option Name="WTVcsExportSim" Val="115"/>
+    <Option Name="WTRivieraExportSim" Val="115"/>
+    <Option Name="WTActivehdlExportSim" Val="115"/>
     <Option Name="GenerateIPUpgradeLog" Val="TRUE"/>
     <Option Name="XSimRadix" Val="hex"/>
     <Option Name="XSimTimeUnit" Val="ns"/>
@@ -145,6 +145,13 @@
         </FileInfo>
       </File>
       <File Path="$PPRDIR/../../rtl/fiber_stack/aurora_8b10b_ex/mst/aurora_8b10b_top.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../../rtl/fiber_stack/ethcat_axi_rout/axi_cache.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
@@ -662,14 +669,6 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../rtl/fiber_stack/ethcat_axi_rout/axi_cache.v">
-        <FileInfo>
-          <Attr Name="AutoDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
       <File Path="$PPRDIR/../../rtl/peri/rs232_top/rs232_top.v">
         <FileInfo>
           <Attr Name="AutoDisabled" Val="1"/>
@@ -738,6 +737,14 @@
         </FileInfo>
       </File>
       <File Path="$PPRDIR/../../rtl/top/emcc_slv_top.v">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../../../../0719/bykz_v6.0/rtl/fiber_stack/ethcat_axi_rout/ethcat_axi_rout_mststa.v">
         <FileInfo>
           <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>

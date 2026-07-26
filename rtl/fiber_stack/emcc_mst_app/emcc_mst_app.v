@@ -23,11 +23,16 @@ module emcc_mst_app
     ,parameter  RAM_AWIDTH  =   $clog2(RAM_DEPTH)
 )
 (
-     input              clk
-    ,input              reset
+     input                              clk
+    ,input                              reset
     
-    ,input              link_success
-    ,input  wire        loop_link_success
+    ,input                              link_success
+    ,input  wire                       loop_link_success
+	,input                              downstream_lane_up
+    ,input                              downstream_link
+            //  ps  config  port    //
+    ,output reg                         rcv_intf_tst_dg_done
+    ,output wire    [2:0]              stu
     
     //component interface
     ,output wire                        slv_cfg_msg_rden
@@ -47,13 +52,9 @@ module emcc_mst_app
     ,input  wire    [PS_REG_AWIDTH-1:0] ps_reg_rd_addr
     ,output wire                        ps_reg_rd_vld
     ,output wire    [PS_REG_DWIDTH-1:0] ps_reg_rd_dat
-
     ,output wire    [RAM_AWIDTH-1:0]    ps_tx_depot_addr
     ,input  wire    [RAM_DWIDTH-1:0]    ps_tx_depot_dout
 
-            //  ps  config  port    //
-    ,output reg                         rcv_intf_tst_dg_done
-    
     ,output wire    [3:0]               slv_sta_msg_vld     //slave station status message
     ,output wire    [RAM_AWIDTH-1:0]    slv_sta_msg_addr
     ,output wire    [RAM_DWIDTH-1:0]    slv_sta_msg_dat
@@ -63,11 +64,18 @@ module emcc_mst_app
     ,output reg     [RAM_DWIDTH-1:0]    ps_depot_din
 
     ,output wire                        tst_sig
-////////////
-
-
 //////////////////////////////////
     ,output wire            mst_prcs_hb_flag
+    ,output wire   [31:0]         debug_data
+    
+    ,input  wire    [15:0]              board_temp_82130
+    
+    ,output wire                        o_do_dbg_data_vld
+    ,output wire    [31:0]              ov_io_mode_cfg // set config mode
+    ,input  wire    [31:0]              iv_rd_io_data  // read input or output io data
+    ,output wire    [31:0]              ov_do_dbg_data // write output io data
+    ,output wire                        o_read_dbg_data_done 
+    ,output wire                        o_wr_cfg_data_done 
 
     //master AXI interface to aurora IP:send port
     ,output                 m_boroa_tx_tvalid
@@ -81,6 +89,8 @@ module emcc_mst_app
     ,input  wire    [3:0]   s_aurora_rx_tkeep
     ,input  wire            s_aurora_rx_tlast
     ,input  wire    [31:0]  s_aurora_rx_tdata
+    
+    ,output wire    [7:0]   slv_sta_num
 
 );
     //the signals that PS config master app 
@@ -128,20 +138,28 @@ module emcc_mst_app
 ///////////////////
 
     // master mode systerm signal
-    (* MARK_DEBUG="true" *)wire           app_trsf_en;
+    wire            app_trsf_en;
     wire            app_err_flag;        //the error type of slave station is valid
-    wire    [15:0]  app_err_type;        //the error type of slave station
+    wire    [7:0]   app_err_type;        //the error type of slave station
     wire    [15:0]  each_dg_len;
-    wire    [7:0]   slv_sta_num;         //this signals only update during first initial datagram.It indicate the number of slave station
-    wire    [15:0]  hb_err_slvsta;       //indicate the index of the error station //指示产生链接错误的从站
+//    wire    [7:0]   slv_sta_num;         //this signals only update during first initial datagram.It indicate the number of slave station
+    wire    [7:0]       hb_err_slvsta;       //indicate the index of the error station //指示产生链接错误的从站
 
     wire    [3:0]   slv_id_we;
     wire    [15:0]  slv_id_addr;
     wire    [31:0]  slv_id_din;
     wire    [31:0]  slv_fpga_version;
     wire            ping_pong_flag;//0:aurora link is success;1:aurora link is fail
-(* MARK_DEBUG="true" *)    wire            mst_sta_trsf_flag;
-(* MARK_DEBUG="true" *)    reg [31:0]  wk_cnt  =   'd0;
+    wire            mst_sta_trsf_flag;
+    reg [31:0]  wk_cnt  =   'd0;
+	
+	wire            init_err_clr;
+	wire            init_err;
+	wire            cnt_err_clr;
+	wire	[31:0]  cnt_err;
+	wire			init_finish;
+	wire			init_error;
+	wire			run_en;
 
     always @(posedge clk)begin
         if(reset)begin
@@ -174,8 +192,8 @@ module emcc_mst_app
     #(
          .REG_SPACE_BIAS    (`MST_APP_REG_BIAS  )
         ,.REG_SPACE_SIZE    (`MST_APP_REG_SIZE  )
-        ,.PS_REG_AWIDTH     (PS_REG_AWIDTH  )
-        ,.PS_REG_DWIDTH     (PS_REG_DWIDTH  )
+        ,.PS_REG_AWIDTH     (PS_REG_AWIDTH      )
+        ,.PS_REG_DWIDTH     (PS_REG_DWIDTH      )
     )
     mst_app_cfg_u
     (
@@ -194,6 +212,27 @@ module emcc_mst_app
         ,.slv_id_addr       (slv_id_addr        )
         ,.slv_id_din        (slv_id_din         )
         ,.slv_fpga_version  (slv_fpga_version   )
+        
+        ,.debug_data        (debug_data   )
+		
+		,.board_temp_82130  (board_temp_82130   )
+		,.o_do_dbg_data_vld (o_do_dbg_data_vld  )
+		,.ov_io_mode_cfg    (ov_io_mode_cfg     )
+		,.iv_rd_io_data     (iv_rd_io_data      )
+		,.ov_do_dbg_data    (ov_do_dbg_data     )
+		,.o_read_dbg_data_done    (o_read_dbg_data_done     )
+		,.o_wr_cfg_data_done    (o_wr_cfg_data_done     )
+		
+		,.init_error		(init_error			)
+		,.run_en			(run_en				)
+		,.stu				(stu				)		
+		,.init_err_clr		(init_err_clr		)
+		,.init_err			(init_err			)
+		,.cnt_err_clr		(cnt_err_clr		)
+		,.cnt_err			(cnt_err			)
+		,.init_finish		(init_finish		)
+		,.downstream_lane_up(downstream_lane_up	)
+		,.downstream_link   (downstream_link	)
 
         ,.link_success      (link_success       )
         ,.loop_link_success (loop_link_success  )
@@ -372,6 +411,14 @@ module emcc_mst_app
             ,.slv_id_addr       (slv_id_addr        )
             ,.slv_id_din        (slv_id_din         )
             ,.slv_fpga_version  (slv_fpga_version   )
+			
+			,.init_error		(init_error			)
+			,.run_en			(run_en				)
+			,.init_err_clr		(init_err_clr)
+			,.init_err			(init_err)
+			,.cnt_err_clr		(cnt_err_clr)
+			,.cnt_err			(cnt_err)
+			,.init_finish		(init_finish)
 
             //master AXI interface to aurora IP:send port
             ,.m_boroa_tx_tvalid (m_boroa_tx_tvalid)

@@ -23,6 +23,8 @@ module app_mst_rx_ctrl(
     ,output reg     [7:0]   slv_sta_num         //this signals only update during first initial datagram.It indicate the number of slave station
     ,output reg     [3:0]   rx_eth_type         //the type of package has been received by rx channel
 
+    ,output reg     [7:0]   app_err_type 
+    ,output reg     [7:0]   hb_err_slvsta      
     ,output reg             prot_rcv_req
     ,input                  prot_rcv_ack
     
@@ -492,6 +494,30 @@ module app_mst_rx_ctrl(
                 cache_addr  <=  cache_addr;
             end
         endcase
+    end
+	
+	reg	[15:0]	error_status;
+	always @(posedge clk) begin
+		if(reset)begin
+            app_err_type   	<=  'd0;
+            hb_err_slvsta  	<=  'd0;
+			error_status    <=	'd0;
+        end else begin
+			case(wk_state)
+            STM_DG_HD_L:begin
+				if(cache_addr==3&&latency_cnt_done==1)begin
+					error_status	<=  data_buf[2-0][31:16];
+				end else begin
+					error_status	<=  error_status;
+				end
+            end
+            default: begin
+                error_status	<=  error_status;
+            end
+			endcase
+			app_err_type[7:0]	<= error_status[15:8];
+			hb_err_slvsta[7:0]	<= error_status[7:0];
+		end
     end
 
     always @(posedge clk)begin

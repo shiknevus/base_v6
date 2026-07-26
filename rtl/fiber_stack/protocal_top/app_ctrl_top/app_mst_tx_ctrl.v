@@ -24,6 +24,9 @@ module app_mst_tx_ctrl(
     ,input  wire[15:0]  each_dg_length  //PS config each datagram length
     ,output reg         app_err_flag    //the error type of slave station is valid
     ,output reg [15:0]  app_err_type    //the error type of slave station
+	,output reg			init_finish
+	,input wire         init_error
+	,input wire         run_en
 
     ,output reg [15:0]  hb_err_slvsta   //indicate the index of the error station
     ,output reg         mst_prcs_hb_flag
@@ -32,6 +35,11 @@ module app_mst_tx_ctrl(
 
     ,output reg             prot_send_req
     ,input  wire            prot_send_ack
+	
+	,input  wire            init_err_clr
+	,output reg             init_err
+	,input  wire            cnt_err_clr
+	,output reg	[31:0]      cnt_err
 
     //down layer config signals
     ,output reg         pkg_trsf_start  //APP notice datagram layer could transfer datagram
@@ -86,12 +94,25 @@ module app_mst_tx_ctrl(
     reg             mst_sta_restart_d1  =   'd0;//master station restart transfer
     reg             mst_sta_restart_r   =   'd0;
     reg             latch_sta_rs_flag;
+
     always @(posedge clk)begin
         mst_sta_restart_d1  <=  mst_sta_restart;
         mst_sta_restart_r   <=  mst_sta_restart & !mst_sta_restart_d1;
     end
 
-    always @(posedge clk)begin
+        always @(posedge clk) begin
+        if(reset)begin
+            init_finish   <=  'h0;
+        end else if (wk_state == STM_POST_PRCS_INIT)begin
+            init_finish   <=  1;
+		end else if (wk_state == STM_END)begin	
+			init_finish   <=  'h0;
+        end else begin
+            init_finish   <=  init_finish;
+        end
+    end
+	
+	always @(posedge clk)begin
         if(reset)begin
             latch_sta_rs_flag   <=  'd0;
         end else if(mst_sta_restart_r)begin
@@ -102,6 +123,29 @@ module app_mst_tx_ctrl(
             latch_sta_rs_flag   <=  latch_sta_rs_flag;
         end
     end
+	
+	always @(posedge clk)begin
+        if(reset)begin
+            init_err   <=  'd0;
+		end else if(init_err_clr)begin
+			init_err   <=  'd0;
+		end else if((wk_state == STM_INIT_WAIT_ACK)&(timer_done|
+		(one_ecat_frm_done & (ecat_frm_rslt == `ETHCAT_PRCS_CRC_FAIL))))begin
+			init_err   <=  'd1;
+		end
+	end	
+	
+	always @(posedge clk)begin
+        if(reset)begin
+            cnt_err   <=  'd0;
+		end else if(cnt_err_clr)begin
+			cnt_err   <=  'd0;
+		end else if(((wk_state == STM_INIT_WAIT_ACK)&(timer_done|(one_ecat_frm_done & (ecat_frm_rslt == `ETHCAT_PRCS_CRC_FAIL))))
+		|((wk_state == STM_WAIT_ACK)&(timer_done|(one_ecat_frm_done & (ecat_frm_rslt == `ETHCAT_PRCS_CRC_FAIL))))
+		|((wk_state == STM_HB_WAIT_ACK)&(timer_done|(one_ecat_frm_done & (ecat_frm_rslt == `ETHCAT_PRCS_CRC_FAIL)))))begin
+			cnt_err   <=  cnt_err + 'd1;
+		end
+	end	
     
     always @(posedge clk) begin
         if(reset)begin

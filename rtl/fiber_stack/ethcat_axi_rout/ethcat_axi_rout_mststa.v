@@ -17,13 +17,15 @@
 (* DowngradeIPIdentifiedWarnings="yes" *)
 module ethcat_axi_rout_mststa
 (
-     input              clk
-    ,input              rst
-    ,input              downstream_lane_up
-
+     input                  clk
+    ,input                  rst
+    ,input                  downstream_lane_up
+    ,input                  downstream_link
+    ,input	wire	[2:0]	stu
+    
     //from app
     ,input  wire            s_app_tx_tvalid
-    ,output wire             s_app_tx_tready
+    ,output reg             s_app_tx_tready
     ,input  wire    [3:0]   s_app_tx_tkeep
     ,input  wire            s_app_tx_tlast
     ,input  wire    [31:0]  s_app_tx_tdata
@@ -32,44 +34,261 @@ module ethcat_axi_rout_mststa
     ,output reg    [3:0]   m_app_rx_tkeep
     ,output reg            m_app_rx_tlast
     ,output reg    [31:0]  m_app_rx_tdata
-    //
-    ,output [0:31]      m_axi_tx_tdata_0
-    ,output [0:3]       m_axi_tx_tkeep_0
-    ,output             m_axi_tx_tvalid_0
-    ,output             m_axi_tx_tlast_0
-    ,input              m_axi_tx_tready_0
-        //AXI RX 0
-    ,input  [0:31]      s_axi_rx_tdata_0
-    ,input  [0:3]       s_axi_rx_tkeep_0
-    ,input              s_axi_rx_tvalid_0
-    ,input              s_axi_rx_tlast_0
 
-        //AXI RX 1
-    ,input  [0:31]     s_axi_rx_tdata_1
-    ,input  [0:3]      s_axi_rx_tkeep_1
-    ,input             s_axi_rx_tvalid_1
-    ,input             s_axi_rx_tlast_1
+    //AXI INTF  
+    ,output reg [0:31]      m_axi_tx_tdata_0
+    ,output reg [0:3]       m_axi_tx_tkeep_0
+    ,output reg            m_axi_tx_tvalid_0
+    ,output reg            m_axi_tx_tlast_0
+    ,input                  m_axi_tx_tready_0
+        //AXI RX
+    ,input  [0:31]          s_axi_rx_tdata_0
+    ,input  [0:3]           s_axi_rx_tkeep_0
+    ,input                  s_axi_rx_tvalid_0
+    ,input                  s_axi_rx_tlast_0
+
+    //AXI INTF 
+    ,output reg  [0:31]    m_axi_tx_tdata_1
+    ,output reg  [0:3]     m_axi_tx_tkeep_1
+    ,output reg            m_axi_tx_tvalid_1
+    ,output reg            m_axi_tx_tlast_1
+    ,input                  m_axi_tx_tready_1
+        //AXI RX
+    ,input  [0:31]          s_axi_rx_tdata_1
+    ,input  [0:3]           s_axi_rx_tkeep_1
+    ,input                  s_axi_rx_tvalid_1
+    ,input                  s_axi_rx_tlast_1
 
 );
+	
+	localparam  STM_IDLE     = 'd0;
+    localparam  STM_DX       = 'd1;
+    localparam  STM_KHG      = 'd2;
+	localparam  STM_PG       = 'd3;
+    localparam  STM_ED     	 = 'd4;
+	(* MARK_DEBUG="true" *)reg	[2:0]		wk_state;
+	
+	wire        m_cache_tvalid_0;
+    reg         m_cache_tready_0;
+    wire [3:0]  m_cache_tkeep_0;
+    wire        m_cache_tlast_0;
+    wire [31:0] m_cache_tdata_0;
+
+    reg         m_cache_tready_1;
+    wire [3:0]  m_cache_tkeep_1;
+    wire        m_cache_tlast_1;
+    wire [31:0] m_cache_tdata_1;
+	wire		m_cache_tvalid_1;
+	reg	[19:0]	cycle;
+	
+	always @(posedge clk) begin
+        if(rst)begin
+			wk_state  			<=  STM_IDLE;
+        end else begin
+            case(wk_state)
+			STM_IDLE:begin
+                if(downstream_link&downstream_lane_up)begin
+					wk_state  	<=  STM_KHG;//
+				end else if(downstream_link&downstream_lane_up&s_axi_rx_tvalid_1)begin
+					wk_state  	<=  STM_DX;//STM_DX-->STM_IDLE
+				end else if(~downstream_link&downstream_lane_up)begin
+					wk_state  	<=  STM_PG;
+				end else if(downstream_link&~downstream_lane_up)begin
+					wk_state  	<=  STM_ED;
+				end else begin				
+					wk_state  	<=  STM_IDLE;
+				end
+            end
+			STM_DX:begin
+				wk_state  		<= wk_state;
+			end		
+			STM_KHG:begin
+				if(stu==1)begin
+					wk_state  		<= wk_state;
+				end else if(((~downstream_link)|(~downstream_lane_up)))begin
+					wk_state  		<= STM_IDLE;
+				end else begin
+					wk_state  		<= wk_state;
+				end
+			end
+			STM_PG:begin
+				if(((downstream_link&downstream_lane_up))||((~downstream_link)&(~downstream_lane_up)))begin
+					wk_state  		<= STM_IDLE;
+				end else begin
+					wk_state  		<= wk_state;
+				end
+			end
+			STM_ED:begin
+				if(((downstream_link&downstream_lane_up))||((~downstream_link)&(~downstream_lane_up)))begin
+					wk_state  		<= STM_IDLE;
+				end else begin
+					wk_state  		<= wk_state;
+				end
+			end
+            default: begin
+                wk_state  		<=  STM_IDLE;
+            end
+            endcase
+        end
+	end
+	
+	always @(posedge clk) begin
+        if(rst)begin
+			cycle  	<=  'h0;
+        end else begin
+			if((~downstream_link)|(~downstream_lane_up))begin
+				cycle	<= cycle + 1;
+			end else begin
+				cycle  	<=  'h0;
+			end	
+		end
+	end	
 
     always @( * )begin
-        if(downstream_lane_up)begin
-            m_app_rx_tvalid <=  s_axi_rx_tvalid_0;
-            m_app_rx_tkeep  <=  s_axi_rx_tkeep_0;
-            m_app_rx_tlast  <=  s_axi_rx_tlast_0;
-            m_app_rx_tdata  <=  s_axi_rx_tdata_0;
-        end else begin
-            m_app_rx_tvalid <=  s_axi_rx_tvalid_1;
-            m_app_rx_tkeep  <=  s_axi_rx_tkeep_1;
-            m_app_rx_tlast  <=  s_axi_rx_tlast_1;
-            m_app_rx_tdata  <=  s_axi_rx_tdata_1;
+		case(wk_state)
+		STM_IDLE:begin
+			m_axi_tx_tdata_0	<= s_app_tx_tdata;
+			m_axi_tx_tkeep_0	<= s_app_tx_tkeep;
+			m_axi_tx_tvalid_0	<= s_app_tx_tvalid;
+			m_axi_tx_tlast_0	<= s_app_tx_tlast;
+			
+			m_axi_tx_tdata_1	<= m_cache_tdata_0;
+			m_axi_tx_tkeep_1	<= m_cache_tkeep_0;
+			m_axi_tx_tvalid_1	<= m_cache_tvalid_0;
+			m_axi_tx_tlast_1	<= m_cache_tlast_0;
+			
+			m_app_rx_tvalid 	<= m_cache_tvalid_1;
+			m_app_rx_tkeep		<= m_cache_tkeep_1;
+			m_app_rx_tlast		<= m_cache_tlast_1;
+			m_app_rx_tdata		<= m_cache_tdata_1;
+		end		
+		STM_KHG:begin
+			m_axi_tx_tdata_0	<= s_app_tx_tdata;
+			m_axi_tx_tkeep_0	<= s_app_tx_tkeep;
+			m_axi_tx_tvalid_0	<= s_app_tx_tvalid;
+			m_axi_tx_tlast_0	<= s_app_tx_tlast;
+			
+			m_axi_tx_tdata_1	<= m_cache_tdata_0;
+			m_axi_tx_tkeep_1	<= m_cache_tkeep_0;
+			m_axi_tx_tvalid_1	<= m_cache_tvalid_0;
+			m_axi_tx_tlast_1	<= m_cache_tlast_0;
+			
+			m_app_rx_tvalid 	<= m_cache_tvalid_1;
+			m_app_rx_tkeep		<= m_cache_tkeep_1;
+			m_app_rx_tlast		<= m_cache_tlast_1;
+			m_app_rx_tdata		<= m_cache_tdata_1;
+		end
+		STM_PG:begin
+			m_axi_tx_tdata_0	<= s_app_tx_tdata;
+			m_axi_tx_tkeep_0	<= s_app_tx_tkeep;
+			m_axi_tx_tvalid_0	<= s_app_tx_tvalid;
+			m_axi_tx_tlast_0	<= s_app_tx_tlast;
+			m_axi_tx_tdata_1	<= 'h0;
+			m_axi_tx_tkeep_1	<= 'h0;
+			m_axi_tx_tvalid_1	<= 'h0;
+			m_axi_tx_tlast_1	<= 'h0;
+			m_app_rx_tvalid 	<= m_cache_tvalid_0;
+			m_app_rx_tkeep		<= m_cache_tkeep_0;
+			m_app_rx_tlast		<= m_cache_tlast_0;
+			m_app_rx_tdata		<= m_cache_tdata_0;
+		end
+		STM_ED:begin
+			m_axi_tx_tdata_0	<= 'h0;
+			m_axi_tx_tkeep_0	<= 'h0;
+			m_axi_tx_tvalid_0	<= 'h0;
+			m_axi_tx_tlast_0	<= 'h0;
+			m_axi_tx_tdata_1	<= s_app_tx_tdata;
+			m_axi_tx_tkeep_1	<= s_app_tx_tkeep;
+			m_axi_tx_tvalid_1	<= s_app_tx_tvalid;
+			m_axi_tx_tlast_1	<= s_app_tx_tlast;
+			m_app_rx_tvalid 	<= m_cache_tvalid_1;
+			m_app_rx_tkeep		<= m_cache_tkeep_1;
+			m_app_rx_tlast		<= m_cache_tlast_1;
+			m_app_rx_tdata		<= m_cache_tdata_1;
+		end
+        default: begin 
+			m_axi_tx_tdata_0	<= 'h0;
+			m_axi_tx_tkeep_0	<= 'h0;
+			m_axi_tx_tvalid_0	<= 'h0;
+			m_axi_tx_tlast_0	<= 'h0;
+			m_axi_tx_tdata_1	<= 'h0;
+			m_axi_tx_tkeep_1	<= 'h0;
+			m_axi_tx_tvalid_1	<= 'h0;
+			m_axi_tx_tlast_1	<= 'h0;
+			m_app_rx_tvalid 	<= 'h0;
+			m_app_rx_tkeep		<= 'h0;
+			m_app_rx_tlast		<= 'h0;
+			m_app_rx_tdata		<= 'h0;
         end
+        endcase		
     end
 
-    assign  m_axi_tx_tvalid_0   =   s_app_tx_tvalid;
-    assign  s_app_tx_tready     =   m_axi_tx_tready_0;
-    assign  m_axi_tx_tkeep_0    =   s_app_tx_tkeep;
-    assign  m_axi_tx_tlast_0    =   s_app_tx_tlast;
-    assign  m_axi_tx_tdata_0    =   s_app_tx_tdata;
+    always @( * )begin        
+		case(wk_state)
+		STM_DX:begin
+			m_cache_tready_0	<= m_axi_tx_tready_1;			
+			s_app_tx_tready 	<= m_axi_tx_tready_0;
+			m_cache_tready_1	<= 1'b1;
+		end		
+		STM_KHG:begin
+			m_cache_tready_0	<= m_axi_tx_tready_1;			
+			s_app_tx_tready 	<= m_axi_tx_tready_0;
+			m_cache_tready_1	<= 1'b1;
+		end
+		STM_PG:begin
+			s_app_tx_tready 	<=  m_axi_tx_tready_0;
+			m_cache_tready_0	<= 1'b1;
+			m_cache_tready_1	<= 1'b0;
+		end
+		STM_ED:begin
+			s_app_tx_tready 	<=  m_axi_tx_tready_1;
+			m_cache_tready_0	<= 1'b0;
+			m_cache_tready_1	<= 1'b1;
+		end
+        default: begin 
+			s_app_tx_tready 	<= 1'b0;
+			m_cache_tready_0	<= 1'b0;
+			m_cache_tready_1	<= 1'b0;
+        end
+        endcase		
+    end
+
+	axi_cache
+        axi_cache_u0
+        (
+             .clk           (clk    			)
+            ,.reset         (rst    			)
+
+            ,.s_axi_tvalid  (s_axi_rx_tvalid_0  )
+            ,.s_axi_tready  ( 					)//s_axi_rx_tready_0
+            ,.s_axi_tkeep   (s_axi_rx_tkeep_0   )
+            ,.s_axi_tlast   (s_axi_rx_tlast_0   )
+            ,.s_axi_tdata   (s_axi_rx_tdata_0   )
+
+            ,.m_axi_tvalid  (m_cache_tvalid_0	)
+            ,.m_axi_tready  (m_cache_tready_0	)
+            ,.m_axi_tkeep   (m_cache_tkeep_0	)
+            ,.m_axi_tlast   (m_cache_tlast_0	)
+            ,.m_axi_tdata   (m_cache_tdata_0	)
+        );
+	
+	axi_cache
+        axi_cache_u1
+        (
+             .clk           (clk    			)
+            ,.reset         (rst    			)
+
+            ,.s_axi_tvalid  (s_axi_rx_tvalid_1	)
+            ,.s_axi_tready  ( 					)//s_axi_rx_tready_1
+            ,.s_axi_tkeep   (s_axi_rx_tkeep_1   )
+            ,.s_axi_tlast   (s_axi_rx_tlast_1   )
+            ,.s_axi_tdata   (s_axi_rx_tdata_1   )
+
+            ,.m_axi_tvalid  (m_cache_tvalid_1	)
+            ,.m_axi_tready  (m_cache_tready_1	)
+            ,.m_axi_tkeep   (m_cache_tkeep_1	)
+            ,.m_axi_tlast   (m_cache_tlast_1	)
+            ,.m_axi_tdata   (m_cache_tdata_1	)
+        );
 
 endmodule

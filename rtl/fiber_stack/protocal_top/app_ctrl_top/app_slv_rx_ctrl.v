@@ -617,7 +617,7 @@ module app_slv_rx_ctrl(
                     end
                 end
             end
-            STM_PRCS_WKC_L:begin
+            STM_DG_HD_PARSE,STM_PRCS_WKC_L:begin
                 cache_we    <=  4'hf;
             end
             default: begin
@@ -652,6 +652,9 @@ module app_slv_rx_ctrl(
                     cache_addr  <=  cache_addr_nxt_bias + rd_cache_cnt + (datagram_len[15:2] >> 1) - SLV_DEPOT2CACHE;
                 end
             end
+            STM_DG_HD_PARSE:begin
+                cache_addr  <=  cache_addr_nxt_bias;
+            end
             STM_PRCS_WKC_L:begin
                 cache_addr  <=  cache_addr_nxt_bias;
             end
@@ -684,6 +687,11 @@ module app_slv_rx_ctrl(
                 end else if (ethcat_type == `ETHCAT_TYPE_DATAGRAM)begin
                     cache_din   <=   depot_dout;
                 end
+            end
+            STM_DG_HD_PARSE:begin
+                cache_din   <=   {16'hedd8,//datagram_addr[15:0],  update slave station error flag
+                                     datagram_index[7:0],
+                                     datagram_cmd[7:0]};
             end
             STM_PRCS_WKC_L:begin
                 cache_din[31:8] <=  24'd0;
