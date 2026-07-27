@@ -27,8 +27,8 @@ module app_ctrl_top
     ,input                  mst_sta_restart //master station transfer restart,only active on rise edge
     ,input  wire    [15:0]  each_dg_length  //PS config each datagram length
     ,output wire            app_err_flag    //the error type of slave station is valid
-    ,output wire    [15:0]  app_err_type    //the error type of slave station
-    ,output wire    [15:0]  hb_err_slvsta       //indicate the index of the error station
+    ,output wire    [7:0]   app_err_type    //the error type of slave station
+    ,output wire    [7:0]   hb_err_slvsta       //indicate the index of the error station
     ,output wire            mst_prcs_hb_flag
     ,output reg             mst_sta_trsf_flag
     ,output wire    [7:0]   slv_sta_num         //this signals only update during first initial datagram.It indicate the number of slave station
@@ -40,6 +40,9 @@ module app_ctrl_top
 
     ,output wire            prot_send_req
     ,input  wire            prot_send_ack
+	
+	,input wire             init_error
+	,input wire             run_en
 
     //slave mode systerm signal
     ,output         [1:0]   slvsta_rcv_hb_flag  //indicate heartbeat type
@@ -48,7 +51,12 @@ module app_ctrl_top
     ,output wire    [7:0]   cfg_sta_addr        //the slave station address which is configed by master station
     ,output wire    [15:0]  cur_slv_dg_beat     //current slave station datagram beat number
 
-    
+    ,input  wire            init_err_clr
+	,output wire            init_err
+	,input  wire            cnt_err_clr
+	,output wire	[31:0]  cnt_err
+	,output wire			init_finish
+	
     //down layer config signals
     ,output                 pkg_trsf_start      //APP notice datagram layer could transfer datagram
     ,input  wire            rx_crc_vld          //ecat notice that one ethercat frame has been received and cac is pass
@@ -80,6 +88,7 @@ module app_ctrl_top
     ,output wire    [3:0]   slv_id_we
     ,output wire    [15:0]  slv_id_addr
     ,output wire    [31:0]  slv_id_din
+    ,output wire    [31:0]  slv_fpga_version
 
     //only used by slave mode,which are used to transfer complete package to ethcater tx buffer
     ,output wire            m_slvsta_tx_sof     //slave station tx port
@@ -102,14 +111,22 @@ module app_ctrl_top
 
                     ,.app_trsf_en       (app_trsf_en    )
                     ,.mst_sta_restart   (mst_sta_restart)
-                    ,.hb_err_slvsta     (hb_err_slvsta)
+                    ,.hb_err_slvsta     ()
                     ,.mst_prcs_hb_flag  (mst_prcs_hb_flag)
                     ,.loop_link_success (loop_link_success)
                     ,.ping_pong_flag    (ping_pong_flag     )
                     ,.pkg_trsf_start    (pkg_trsf_start )
                     ,.each_dg_length    (each_dg_length )
                     ,.app_err_flag      (app_err_flag)
-                    ,.app_err_type      (app_err_type)
+                    ,.app_err_type      ()
+					,.init_error		(init_error			)
+					,.run_en			(run_en				)
+					
+					,.init_err_clr		(init_err_clr)
+					,.init_err			(init_err)
+					,.cnt_err_clr		(cnt_err_clr)
+					,.cnt_err			(cnt_err)
+					,.init_finish		(init_finish)
                     
                     ,.one_ecat_frm_done (one_ecat_frm_done  )
                     ,.ecat_frm_rslt     (ecat_frm_rslt      )
@@ -136,6 +153,8 @@ module app_ctrl_top
                 ,.rx_eth_type       (rx_eth_type        )
                 ,.prot_rcv_req      (prot_rcv_req       )
                 ,.prot_rcv_ack      (prot_rcv_ack       )
+                ,.hb_err_slvsta     (hb_err_slvsta      )
+                ,.app_err_type      (app_err_type       )
 
                 ,.depot_we          (depot_we           )
                 ,.depot_addr        (depot_addr         )
@@ -144,6 +163,7 @@ module app_ctrl_top
                 ,.slv_id_we         (slv_id_we          )
                 ,.slv_id_addr       (slv_id_addr        )
                 ,.slv_id_din        (slv_id_din         )
+                ,.slv_fpga_version  (slv_fpga_version   )
 
                 ,.cache_we          (cache_we           )
                 ,.cache_addr        (cache_addr         )

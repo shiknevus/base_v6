@@ -6,7 +6,7 @@
 //  Only when write is inactive data corresponding to the address is 
 //  presented on the output port.
 //
-`include  "globe_includes.vh"
+`include  "./../../../include_files/globe_includes.vh"
 module xilinx_ultraram_true_dual_port #(
   parameter AWIDTH = 12,  // Address Width
   parameter DWIDTH = 72,  // Data Width

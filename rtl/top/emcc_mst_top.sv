@@ -529,53 +529,14 @@ localparam DO_BIT_WIDTH = 32;
         );
     assign  sfp0_disable = 1;
     assign  sfp1_disable = 1;
-    assign  s_axi_tx_tdata_1    = 0;
-    assign  s_axi_tx_tkeep_1    = 0;
-    assign  s_axi_tx_tvalid_1   = 0;
-    assign  s_axi_tx_tlast_1    = 0;
-
-    ethcat_axi_rout_mststa
-        axi_rout_u
-        (
-             .clk                   (prot_clk          )
-            ,.rst                   (prot_clk_rst      )
-            ,.downstream_lane_up    (mst_prcs_hb_flag   )//1:rx0 to tx;0:rx1 to tx
-
-            ,.m_app_rx_tvalid       (s_app_rx_tvalid    )
-            ,.m_app_rx_tkeep        (s_app_rx_tkeep     )
-            ,.m_app_rx_tlast        (s_app_rx_tlast     )
-            ,.m_app_rx_tdata        (s_app_rx_tdata     )
-
-            ,.s_app_tx_tvalid       (m_app_tx_tvalid    )
-            ,.s_app_tx_tready       (m_app_tx_tready    )
-            ,.s_app_tx_tkeep        (m_app_tx_tkeep     )
-            ,.s_app_tx_tlast        (m_app_tx_tlast     )
-            ,.s_app_tx_tdata        (m_app_tx_tdata     )
-
-            ,.m_axi_tx_tdata_0      (s_axi_tx_tdata_0   )
-            ,.m_axi_tx_tkeep_0      (s_axi_tx_tkeep_0   )
-            ,.m_axi_tx_tvalid_0     (s_axi_tx_tvalid_0  )
-            ,.m_axi_tx_tlast_0      (s_axi_tx_tlast_0   )
-            ,.m_axi_tx_tready_0     (s_axi_tx_tready_0  )
-
-            ,.s_axi_rx_tdata_0      (m_axi_rx_tdata_0   )
-            ,.s_axi_rx_tkeep_0      (m_axi_rx_tkeep_0   )
-            ,.s_axi_rx_tvalid_0     (m_axi_rx_tvalid_0  )
-            ,.s_axi_rx_tlast_0      (m_axi_rx_tlast_0   )
-
-            ,.s_axi_rx_tdata_1      (m_axi_rx_tdata_1   )
-            ,.s_axi_rx_tkeep_1      (m_axi_rx_tkeep_1   )
-            ,.s_axi_rx_tvalid_1     (m_axi_rx_tvalid_1  )
-            ,.s_axi_rx_tlast_1      (m_axi_rx_tlast_1   )
-        );
-/*		
-	ethcat_axi_rout ethcat_axi_rout_u
+    
+	ethcat_axi_rout_mststa ethcat_axi_rout_u
     (
          .clk                   (prot_clk       )
         ,.rst                   (prot_clk_rst   )
         ,.downstream_lane_up    (LANE_UP_0 &  CHANNEL_UP_0)//assert level base on heartbeat result downstream_lane_up-->LANE_UP_1 &  CHANNEL_UP_1
         ,.downstream_link       (LANE_UP_1 &  CHANNEL_UP_1)
-//        ,.stu			        (stu	        )
+        ,.stu			        (stu	        )
         //from app interface
         ,.s_app_tx_tvalid       (m_app_tx_tvalid)
         ,.s_app_tx_tready       (m_app_tx_tready)
@@ -608,7 +569,7 @@ localparam DO_BIT_WIDTH = 32;
         ,.s_axi_rx_tkeep_1      (m_axi_rx_tkeep_1   )
         ,.s_axi_rx_tvalid_1     (m_axi_rx_tvalid_1  )
         ,.s_axi_rx_tlast_1      (m_axi_rx_tlast_1   )
-    );	*/
+    );	
 
     `ifdef SIM_PLATFORM_MST
         always @(posedge prot_clk)begin
@@ -739,48 +700,48 @@ localparam DO_BIT_WIDTH = 32;
 //	.probe0({rs485_1_rx,rs485_1_tx,rs485_1_de,rs485_2_rx,rs485_2_tx,rs485_2_de})
 //);          
 
-    `ifdef SIM_PLATFORM_MST
-    emcc_mix_top
-    #(
-         .PS_REG_AWIDTH     (PS_REG_AWIDTH  )
-        ,.PS_REG_DWIDTH     (PS_REG_DWIDTH  )
-        ,.RAM_DEPTH         (RAM_DEPTH      )
-        ,.RAM_DWIDTH        (RAM_DWIDTH     )
-    )
-        emcc_mix_top_u
-        (
-             .clk                       (prot_clk        )
-            ,.reset                     (prot_clk_rst    )
-
-            ,.di_mst_msg                (main_board_inio )
-            ,.do_relay_mst_msg          (main_board_outio)
-
-       //component interface
-            ,.slv_cfg_msg_rden  (slv_cfg_msg_rden   )
-            ,.slv_cfg_msg_addr   (slv_cfg_msg_addr    )
-            ,.slv_cfg_msg_dat    (slv_cfg_msg_dat     )
-
-            //read back to master component
-            ,.slv_sta_msg_vld   (slv_sta_msg_vld    )  //slave station status message
-            ,.slv_sta_msg_addr  (slv_sta_msg_addr   )
-            ,.slv_sta_msg_dat   (slv_sta_msg_dat    )
-        //  ps interface
-            //reg cfg interface
-            ,.ps_reg_clk                (ps_reg_clk     )
-            ,.ps_reg_reset              (ps_reg_reset   )
-            ,.ps_reg_we                 (ps_reg_we     )
-            ,.ps_reg_addr               (ps_reg_addr   )
-            ,.ps_reg_wr_dat             (ps_reg_wr_dat )
-            ,.ps_reg_re                 (ps_reg_re     )
-            ,.ps_reg_rd_addr            (ps_reg_rd_addr)
-            ,.ps_comp_rd_vld            (comp_reg_rd_vld )
-            ,.ps_comp_rd_dat            (comp_reg_rd_dat )
-            ,.ps_flow_rd_vld            (flow_reg_rd_vld )
-            ,.ps_flow_rd_dat            (flow_reg_rd_dat )
-            ,.emcc_irq                  (emcc_irq        )
-            ,.flow_irq                  (flow_irq        )
-        );
-    `else
+   // `ifdef SIM_PLATFORM_MST
+    // 	emcc_mix_top
+    // 	#(
+    // 	     .PS_REG_AWIDTH     (PS_REG_AWIDTH  )
+    // 	    ,.PS_REG_DWIDTH     (PS_REG_DWIDTH  )
+    // 	    ,.RAM_DEPTH         (RAM_DEPTH      )
+    // 	    ,.RAM_DWIDTH        (RAM_DWIDTH     )
+    // 	)
+    // 	    emcc_mix_top_u
+    // 	    (
+    // 	         .clk                       (prot_clk        )
+    // 	        ,.reset                     (prot_clk_rst    )
+    // 	
+    // 	        ,.di_mst_msg                (main_board_inio )
+    // 	        ,.do_relay_mst_msg          (main_board_outio)
+    // 	
+    // 	   //component interface
+    // 	        ,.slv_cfg_msg_rden  (slv_cfg_msg_rden   )
+    // 	        ,.slv_cfg_msg_addr   (slv_cfg_msg_addr    )
+    // 	        ,.slv_cfg_msg_dat    (slv_cfg_msg_dat     )
+    // 	
+    // 	        //read back to master component
+    // 	        ,.slv_sta_msg_vld   (slv_sta_msg_vld    )  //slave station status message
+    // 	        ,.slv_sta_msg_addr  (slv_sta_msg_addr   )
+    // 	        ,.slv_sta_msg_dat   (slv_sta_msg_dat    )
+    // 	    //  ps interface
+    // 	        //reg cfg interface
+    // 	        ,.ps_reg_clk                (ps_reg_clk     )
+    // 	        ,.ps_reg_reset              (ps_reg_reset   )
+    // 	        ,.ps_reg_we                 (ps_reg_we     )
+    // 	        ,.ps_reg_addr               (ps_reg_addr   )
+    // 	        ,.ps_reg_wr_dat             (ps_reg_wr_dat )
+    // 	        ,.ps_reg_re                 (ps_reg_re     )
+    // 	        ,.ps_reg_rd_addr            (ps_reg_rd_addr)
+    // 	        ,.ps_comp_rd_vld            (comp_reg_rd_vld )
+    // 	        ,.ps_comp_rd_dat            (comp_reg_rd_dat )
+    // 	        ,.ps_flow_rd_vld            (flow_reg_rd_vld )
+    // 	        ,.ps_flow_rd_dat            (flow_reg_rd_dat )
+    // 	        ,.emcc_irq                  (emcc_irq        )
+    // 	        ,.flow_irq                  (flow_irq        )
+    // 	    );
+   // `else
         emcc_mix_top
         #(
              .PS_REG_AWIDTH     (PS_REG_AWIDTH  )
@@ -886,7 +847,7 @@ localparam DO_BIT_WIDTH = 32;
             ,.iv_do_debug          (   )
        
         );
-    `endif
+    //`endif
 
     /*always @(posedge prot_clk)begin
         if(jtag_irq_select)begin
@@ -915,17 +876,14 @@ localparam DO_BIT_WIDTH = 32;
         (
              .clk               (prot_clk     )
             ,.reset             (prot_clk_rst )
-
-            ,.link_success      (LANE_UP_0 &  CHANNEL_UP_0)
-            ,.loop_link_success (CHANNEL_UP_1 & LANE_UP_1   )
-/*    
+    
             ,.link_success      ((LANE_UP_0 &  CHANNEL_UP_0)|(CHANNEL_UP_1 & LANE_UP_1))
             ,.loop_link_success (1            )
 			,.downstream_lane_up(LANE_UP_0 &  CHANNEL_UP_0)
 			,.downstream_link   (LANE_UP_1 &  CHANNEL_UP_1)
-            ,.mst_prcs_hb_flag  (mst_prcs_hb_flag)
+/*            ,.mst_prcs_hb_flag  (mst_prcs_hb_flag)*/
             ,.stu				(stu	       )
-*/
+
        //component interface
             ,.slv_cfg_msg_rden  (slv_cfg_msg_rden   )
             ,.slv_cfg_msg_addr  (slv_cfg_msg_addr   )

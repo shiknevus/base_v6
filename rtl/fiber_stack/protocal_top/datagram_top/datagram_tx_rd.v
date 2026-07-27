@@ -237,6 +237,8 @@ module datagram_tx_rd(
                     m_app_tx_tdata[15:8]    <=  datagram_dst_addr[23:16];
                     m_app_tx_tdata[23:16]   <=  8'hff;
                     m_app_tx_tdata[31:24]   <=  8'hdd;//reserve
+                end else if (work_cnt_d2  ==  1) begin
+                    m_app_tx_tdata  <=  32'hfbea_7894;
                 end else begin
                     m_app_tx_tdata  <=  32'h5555_7777 + datagram_dst_addr[23:16];
                 end

@@ -23,6 +23,8 @@ module app_mst_rx_ctrl(
     ,output reg     [7:0]   slv_sta_num         //this signals only update during first initial datagram.It indicate the number of slave station
     ,output reg     [3:0]   rx_eth_type         //the type of package has been received by rx channel
 
+    ,output reg     [7:0]   app_err_type 
+    ,output reg     [7:0]   hb_err_slvsta      
     ,output reg             prot_rcv_req
     ,input                  prot_rcv_ack
     
@@ -45,6 +47,7 @@ module app_mst_rx_ctrl(
     ,output reg     [3:0]   slv_id_we        = 'd0
     ,output reg     [15:0]  slv_id_addr      = 'd0
     ,output reg     [31:0]  slv_id_din       = 'd0
+    ,output reg     [31:0]  slv_fpga_version = 'd0 //add by qsj 2022/10/06
     
     //heart beat check result
     ,output reg             ck_slv_hb_vld
@@ -329,6 +332,13 @@ module app_mst_rx_ctrl(
             STM_PRCS_WKC_L:begin
                 latency_cnt_done <= (latency_cnt == 5 - 1) ? 1'd1 : 1'd0;
             end
+            STM_RD_DATAGRAM:begin
+                if(ethcat_type == `ETHCAT_TYPE_INITIAL)begin
+                    latency_cnt_done <= (latency_cnt == CACHE_L_NUM ) ? 1'd1 : 1'd0;
+                end else begin
+                    latency_cnt_done <= (latency_cnt == CACHE_L_NUM - 1) ? 1'd1 : 1'd0;
+                end
+            end
             default: begin
                 latency_cnt_done <= (latency_cnt == CACHE_L_NUM - 1) ? 1'd1 : 1'd0;
             end
@@ -485,6 +495,30 @@ module app_mst_rx_ctrl(
             end
         endcase
     end
+	
+	reg	[15:0]	error_status;
+	always @(posedge clk) begin
+		if(reset)begin
+            app_err_type   	<=  'd0;
+            hb_err_slvsta  	<=  'd0;
+			error_status    <=	'd0;
+        end else begin
+			case(wk_state)
+            STM_DG_HD_L:begin
+				if(cache_addr==3&&latency_cnt_done==1)begin
+					error_status	<=  data_buf[2-0][31:16];
+				end else begin
+					error_status	<=  error_status;
+				end
+            end
+            default: begin
+                error_status	<=  error_status;
+            end
+			endcase
+			app_err_type[7:0]	<= error_status[15:8];
+			hb_err_slvsta[7:0]	<= error_status[7:0];
+		end
+    end
 
     always @(posedge clk)begin
         cache_rd_en_d1  <=  cache_rd_en;
@@ -546,29 +580,40 @@ module app_mst_rx_ctrl(
 
 //    always @( * ) begin
     always @(posedge clk) begin
-        case(wk_state)
-            STM_IDLE:begin
+        if(reset)begin
                 slv_id_we               <=  4'h0;
                 slv_id_addr             <=  'd0;
                 slv_id_din              <=  'd0;
+                slv_fpga_version        <=  'd0; //add by qsj 2022/10/06
+        end else begin
+        case(wk_state)
+            STM_IDLE:begin
+                slv_id_we               <=  4'h0;
+                slv_id_addr             <=  slv_id_addr;
+                slv_id_din              <=  slv_id_din;
+                slv_fpga_version        <=  slv_fpga_version; //add by qsj 2022/10/06
             end
             STM_RD_DATAGRAM_L:begin
                 if((ethcat_type == `ETHCAT_TYPE_INITIAL) & latency_cnt_done)begin
                     slv_id_we               <=  4'hf;
-                    slv_id_addr             <=  data_buf[2-1][23:16];//从站地址
-                    slv_id_din              <=  data_buf[2-2][31:0];//slave station id
+                    slv_id_addr             <=  data_buf[2-0][23:16];//从站地址
+                    slv_id_din              <=  data_buf[2-1][31:0];//slave station id
+                    slv_fpga_version        <=  data_buf[2-2][31:0];//slave fpga version  //add by qsj 2022/10/06
                 end else begin
                     slv_id_we               <=  4'h0;
-                    slv_id_addr             <=  'd0;
-                    slv_id_din              <=  'd0;
+                    slv_id_addr             <=  slv_id_addr;
+                    slv_id_din              <=  slv_id_din;
+                    slv_fpga_version        <=  slv_fpga_version; //add by qsj 2022/10/06
                 end
             end
             default: begin
                 slv_id_we               <=  4'h0;
                 slv_id_addr             <=  slv_id_addr;
                 slv_id_din              <=  slv_id_din;
+                slv_fpga_version        <=  slv_fpga_version; //add by qsj 2022/10/06
             end
         endcase
+        end
     end
 
 //    always @( * ) begin

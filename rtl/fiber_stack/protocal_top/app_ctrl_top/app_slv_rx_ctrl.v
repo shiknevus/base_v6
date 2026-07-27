@@ -35,19 +35,19 @@ module app_slv_rx_ctrl(
     ,input  wire            prot_send_ack
     
     //ll cache interface which is used between app layer and ethcat layer
-    ,(* MARK_DEBUG="true" *)output reg     [3:0]   cache_we
-    ,(* MARK_DEBUG="true" *)output reg     [15:0]  cache_addr
-    ,(* MARK_DEBUG="true" *)output reg     [31:0]  cache_din
-    ,(* MARK_DEBUG="true" *)input  wire    [31:0]  cache_dout
+    ,output reg     [3:0]   cache_we
+    ,output reg     [15:0]  cache_addr
+    ,output reg     [31:0]  cache_din
+    ,input  wire    [31:0]  cache_dout
     //ethercat crc result
     ,input  wire            rx_crc_vld
     ,input  wire            rx_crc_pass
     
     //app layer ll interface with application depot
     ,output reg             depot_rden
-    ,(* MARK_DEBUG="true" *)output reg     [3:0]   depot_we
-    ,(* MARK_DEBUG="true" *)output reg     [15:0]  depot_addr
-    ,(* MARK_DEBUG="true" *)output wire    [31:0]  depot_din
+    ,output reg     [3:0]   depot_we
+    ,output reg     [15:0]  depot_addr
+    ,output wire    [31:0]  depot_din
     ,input  wire    [31:0]  depot_dout
 
     //the interface which is used to stors all of slave station id,only used by master mode
@@ -98,10 +98,10 @@ module app_slv_rx_ctrl(
     localparam  STM_RX_DONE         = 'd26;//all child datagram has process done
     localparam  STM_TX_PKG          = 'd27;//only used by slave mode.this stage read complete package from ecat cache and send to them to aurora tx port
     localparam  STM_END             = 'd29;
-
+    localparam	FPGA_VERSION 	= 32'hF2504291;
     localparam  CACHE_L_NUM     = 'd3;  //cahce buffer read latency
     localparam  SLV_DEPOT2CACHE = 'd5;  //the latency from depot to cache
-    
+
     reg [7:0]   cfg_sta_mode    = 'd0;  //config address mode
     reg [5:0]   wk_state        = 'd0;
     reg [5:0]   wk_state_d1     = 'd0;
@@ -110,33 +110,33 @@ module app_slv_rx_ctrl(
     reg         latency_cnt_done;
     reg [15:0]  ethcat_len      = 'd0;
     reg [3:0]   ethcat_type     = 'd0;
-(* MARK_DEBUG="true" *)    reg [15:0]  rd_cache_cnt    = 'd0;
+    reg [15:0]  rd_cache_cnt    = 'd0;
     reg [15:0]  rd_cache_cnt_d1 = 'd0;
     reg [15:0]  rd_cache_cnt_d2 = 'd0;
     reg         rd_cache_done   = 'd0;
-(* MARK_DEBUG="true" *)    reg [31:0]  data_buf[3:0];
+    reg [31:0]  data_buf[3:0];
     reg         cache_rd_en;
     reg         cache_rd_en_d1;
     reg         cache_rd_en_d2;
-(* MARK_DEBUG="true" *)    reg [15:0]  cache_addr_nxt_bias;
+    reg [15:0]  cache_addr_nxt_bias;
     reg [7:0]   datagram_cmd    =   'd0;
     reg [7:0]   datagram_index  =   'd0;
     reg [31:0]  datagram_addr   =   'd0;
-(* MARK_DEBUG="true" *)    reg [15:0]  datagram_len    =   'd0;
+    reg [15:0]  datagram_len    =   'd0;
     reg         datagram_last   =   'D0;
-(* MARK_DEBUG="true" *)    reg [7:0]   datagram_wkc    =   'd0;
+    reg [7:0]   datagram_wkc    =   'd0;
     reg [14:0]  rsv_tag             =   'd0;
     reg [15:0]  ira_tag             =   'd0;
     reg [7:0]   rx_dg_cnt           =   'd0;
     reg [31:0]  timestamp           =   'd0;
     reg [15:0]  datagram_uuid       =   'd0;
     reg [15:0]  datagram_uuid_old   =   'd0;
-(* MARK_DEBUG="true" *)    reg [31:0]  rx_user_dg_id       =   'd0;
-(* MARK_DEBUG="true" *)    reg [31:0]  tx_user_dg_id       =   'd0;
-(* MARK_DEBUG="true" *)    reg         error_flag          =   'd0;
-                           reg         error_flag_d1          =   'd0;
-                           reg         error_flag_d2          =   'd0;
-(* MARK_DEBUG="true" *)    reg         error_flag_prcs        =   'd0;
+    reg [31:0]  rx_user_dg_id       =   'd0;
+    reg [31:0]  tx_user_dg_id       =   'd0;
+    reg         error_flag          =   'd0;
+    reg         error_flag_d1       =   'd0;
+    reg         error_flag_d2       =   'd0;
+    reg         error_flag_prcs     =   'd0;
     
     always @(posedge clk)begin
         wk_state_d1     <=  wk_state;
@@ -506,6 +506,13 @@ module app_slv_rx_ctrl(
             STM_PRCS_WKC_L:begin
                 latency_cnt_done <= (latency_cnt == 5 - 1) ? 1'd1 : 1'd0;
             end
+            STM_RD_DATAGRAM:begin
+                if(ethcat_type == `ETHCAT_TYPE_INITIAL)begin
+                    latency_cnt_done <= (latency_cnt == CACHE_L_NUM ) ? 1'd1 : 1'd0;// add FPGA Version to initial datagram
+                end else begin
+                    latency_cnt_done <= (latency_cnt == CACHE_L_NUM - 1) ? 1'd1 : 1'd0;
+                end
+            end
             default: begin
                 latency_cnt_done <= (latency_cnt == CACHE_L_NUM - 1) ? 1'd1 : 1'd0;
             end
@@ -610,7 +617,7 @@ module app_slv_rx_ctrl(
                     end
                 end
             end
-            STM_PRCS_WKC_L:begin
+            STM_DG_HD_PARSE,STM_PRCS_WKC_L:begin
                 cache_we    <=  4'hf;
             end
             default: begin
@@ -645,6 +652,9 @@ module app_slv_rx_ctrl(
                     cache_addr  <=  cache_addr_nxt_bias + rd_cache_cnt + (datagram_len[15:2] >> 1) - SLV_DEPOT2CACHE;
                 end
             end
+            STM_DG_HD_PARSE:begin
+                cache_addr  <=  cache_addr_nxt_bias;
+            end
             STM_PRCS_WKC_L:begin
                 cache_addr  <=  cache_addr_nxt_bias;
             end
@@ -665,6 +675,8 @@ module app_slv_rx_ctrl(
                         cache_din   <=   {8'h55,cfg_sta_addr[7:0],cfg_sta_addr[7:0],cfg_sta_mode[7:0]};
                     end else if(rd_cache_cnt == 'd1)begin
                         cache_din   <=   slvsta_id;
+                    end else if(rd_cache_cnt == 'd2)begin // add by qsj
+                        cache_din   <=   FPGA_VERSION + cfg_sta_addr << 2;
                     end
                 end else if (ethcat_type == `ETHCAT_TYPE_HEARTBEAT)begin
                     if(rd_cache_cnt == 'd0)begin
@@ -675,6 +687,11 @@ module app_slv_rx_ctrl(
                 end else if (ethcat_type == `ETHCAT_TYPE_DATAGRAM)begin
                     cache_din   <=   depot_dout;
                 end
+            end
+            STM_DG_HD_PARSE:begin
+                cache_din   <=   {16'hedd8,//datagram_addr[15:0],  update slave station error flag
+                                     datagram_index[7:0],
+                                     datagram_cmd[7:0]};
             end
             STM_PRCS_WKC_L:begin
                 cache_din[31:8] <=  24'd0;
@@ -759,8 +776,8 @@ module app_slv_rx_ctrl(
             cfg_sta_addr            <=  slvsta_id[7:0];
         end else if((wk_state == STM_RD_DATAGRAM_L) && 
                      (ethcat_type == `ETHCAT_TYPE_INITIAL))begin
-            cfg_sta_mode            <=  data_buf[2-1][7:0];
-            cfg_sta_addr            <=  data_buf[2-1][15:8];
+            cfg_sta_mode            <=  data_buf[2-0][7:0];
+            cfg_sta_addr            <=  data_buf[2-0][15:8];
         end else begin
             cfg_sta_mode            <=  cfg_sta_mode;
             cfg_sta_addr            <=  cfg_sta_addr;

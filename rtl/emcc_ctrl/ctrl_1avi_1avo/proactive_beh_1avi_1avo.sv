@@ -382,7 +382,7 @@ module proactive_beh_1avi_1avo#(
 			adc_dat_o <= adc_dat_o;
 	end
 	
-	dac_top(
+	dac_top dac_top_u0(
 		.i_sys_clk         (clk_i			)
 		,.i_rst_n          (~rst_i			)
 		,.i_time_1ms_vld   (i_time_1ms_vld	)

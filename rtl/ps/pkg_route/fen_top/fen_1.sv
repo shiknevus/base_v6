@@ -14,7 +14,7 @@
 //Description:
 //
 /////////////////////////////////////////////////////////////////
-`include  "depot_addr_map.vh"
+`include  "./../../../include_files/depot_addr_map.vh"
 module fen_1
 #(
      parameter  RAM_DEPTH   =   4096
