@@ -23,11 +23,7 @@
         "axi_intc_3": "",
         "axi_intc_2": "",
         "xlconcat_4": "",
-        "axi_crossbar_0": "",
-        "xlconcat_0": "",
-        "xlconcat_1": "",
-        "xlconcat_2": "",
-        "xlconcat_3": ""
+        "axi_crossbar_0": ""
       },
       "intc_subsys_1": {
         "axi_intc_2": "",
@@ -39,11 +35,7 @@
         "axi_intc_0": "",
         "xlslice_3": "",
         "xlconcat_5": "",
-        "axi_crossbar_0": "",
-        "xlconcat_0": "",
-        "xlconcat_1": "",
-        "xlconcat_2": "",
-        "xlconcat_3": ""
+        "axi_crossbar_0": ""
       },
       "intc_subsys_2": {
         "axi_intc_2": "",
@@ -55,11 +47,7 @@
         "axi_intc_0": "",
         "xlslice_3": "",
         "xlconcat_5": "",
-        "axi_crossbar_0": "",
-        "xlconcat_0": "",
-        "xlconcat_1": "",
-        "xlconcat_2": "",
-        "xlconcat_3": ""
+        "axi_crossbar_0": ""
       },
       "proc_prot_reset": "",
       "rst_ps8_0_99M": "",
@@ -85,11 +73,7 @@
           "m01_couplers": {},
           "m02_couplers": {},
           "m03_couplers": {}
-        },
-        "xlconcat_0": "",
-        "xlconcat_1": "",
-        "xlconcat_2": "",
-        "xlconcat_3": ""
+        }
       }
     },
     "interface_ports": {
@@ -656,54 +640,6 @@
                 "value": "1"
               }
             }
-          },
-          "xlconcat_0": {
-            "vlnv": "xilinx.com:ip:xlconcat:2.1",
-            "xci_name": "mststa_mpsoc_v2_xlconcat_0_0",
-            "parameters": {
-              "IN0_WIDTH": {
-                "value": "32"
-              },
-              "NUM_PORTS": {
-                "value": "1"
-              }
-            }
-          },
-          "xlconcat_1": {
-            "vlnv": "xilinx.com:ip:xlconcat:2.1",
-            "xci_name": "mststa_mpsoc_v2_xlconcat_1_0",
-            "parameters": {
-              "IN0_WIDTH": {
-                "value": "32"
-              },
-              "NUM_PORTS": {
-                "value": "1"
-              }
-            }
-          },
-          "xlconcat_2": {
-            "vlnv": "xilinx.com:ip:xlconcat:2.1",
-            "xci_name": "mststa_mpsoc_v2_xlconcat_2_0",
-            "parameters": {
-              "IN0_WIDTH": {
-                "value": "32"
-              },
-              "NUM_PORTS": {
-                "value": "1"
-              }
-            }
-          },
-          "xlconcat_3": {
-            "vlnv": "xilinx.com:ip:xlconcat:2.1",
-            "xci_name": "mststa_mpsoc_v2_xlconcat_3_0",
-            "parameters": {
-              "IN0_WIDTH": {
-                "value": "32"
-              },
-              "NUM_PORTS": {
-                "value": "1"
-              }
-            }
           }
         },
         "interface_nets": {
@@ -713,10 +649,10 @@
               "axi_crossbar_0/M02_AXI"
             ]
           },
-          "axi_crossbar_0_M03_AXI": {
+          "axi_crossbar_0_M01_AXI": {
             "interface_ports": [
-              "axi_intc_3/s_axi",
-              "axi_crossbar_0/M03_AXI"
+              "axi_intc_1/s_axi",
+              "axi_crossbar_0/M01_AXI"
             ]
           },
           "S00_AXI_1": {
@@ -725,10 +661,10 @@
               "axi_crossbar_0/S00_AXI"
             ]
           },
-          "axi_crossbar_0_M01_AXI": {
+          "axi_crossbar_0_M03_AXI": {
             "interface_ports": [
-              "axi_intc_1/s_axi",
-              "axi_crossbar_0/M01_AXI"
+              "axi_intc_3/s_axi",
+              "axi_crossbar_0/M03_AXI"
             ]
           },
           "axi_crossbar_0_M00_AXI": {
@@ -801,48 +737,24 @@
           "xlslice_0_Dout": {
             "ports": [
               "xlslice_0/Dout",
-              "xlconcat_0/In0"
+              "axi_intc_0/intr"
             ]
           },
           "xlslice_1_Dout": {
             "ports": [
               "xlslice_1/Dout",
-              "xlconcat_1/In0"
+              "axi_intc_1/intr"
             ]
           },
           "xlslice_2_Dout": {
             "ports": [
               "xlslice_2/Dout",
-              "xlconcat_2/In0"
+              "axi_intc_2/intr"
             ]
           },
           "xlslice_3_Dout": {
             "ports": [
               "xlslice_3/Dout",
-              "xlconcat_3/In0"
-            ]
-          },
-          "xlconcat_0_dout": {
-            "ports": [
-              "xlconcat_0/dout",
-              "axi_intc_0/intr"
-            ]
-          },
-          "xlconcat_1_dout": {
-            "ports": [
-              "xlconcat_1/dout",
-              "axi_intc_1/intr"
-            ]
-          },
-          "xlconcat_2_dout": {
-            "ports": [
-              "xlconcat_2/dout",
-              "axi_intc_2/intr"
-            ]
-          },
-          "xlconcat_3_dout": {
-            "ports": [
-              "xlconcat_3/dout",
               "axi_intc_3/intr"
             ]
           }
@@ -1059,67 +971,19 @@
                 "value": "1"
               }
             }
-          },
-          "xlconcat_0": {
-            "vlnv": "xilinx.com:ip:xlconcat:2.1",
-            "xci_name": "mststa_mpsoc_v2_xlconcat_0_1",
-            "parameters": {
-              "IN0_WIDTH": {
-                "value": "32"
-              },
-              "NUM_PORTS": {
-                "value": "1"
-              }
-            }
-          },
-          "xlconcat_1": {
-            "vlnv": "xilinx.com:ip:xlconcat:2.1",
-            "xci_name": "mststa_mpsoc_v2_xlconcat_1_1",
-            "parameters": {
-              "IN0_WIDTH": {
-                "value": "32"
-              },
-              "NUM_PORTS": {
-                "value": "1"
-              }
-            }
-          },
-          "xlconcat_2": {
-            "vlnv": "xilinx.com:ip:xlconcat:2.1",
-            "xci_name": "mststa_mpsoc_v2_xlconcat_2_1",
-            "parameters": {
-              "IN0_WIDTH": {
-                "value": "32"
-              },
-              "NUM_PORTS": {
-                "value": "1"
-              }
-            }
-          },
-          "xlconcat_3": {
-            "vlnv": "xilinx.com:ip:xlconcat:2.1",
-            "xci_name": "mststa_mpsoc_v2_xlconcat_3_1",
-            "parameters": {
-              "IN0_WIDTH": {
-                "value": "32"
-              },
-              "NUM_PORTS": {
-                "value": "1"
-              }
-            }
           }
         },
         "interface_nets": {
-          "axi_crossbar_0_M01_AXI": {
-            "interface_ports": [
-              "axi_crossbar_0/M01_AXI",
-              "axi_intc_1/s_axi"
-            ]
-          },
           "axi_crossbar_0_M02_AXI": {
             "interface_ports": [
               "axi_crossbar_0/M02_AXI",
               "axi_intc_2/s_axi"
+            ]
+          },
+          "S00_AXI_1": {
+            "interface_ports": [
+              "S00_AXI",
+              "axi_crossbar_0/S00_AXI"
             ]
           },
           "axi_crossbar_0_M03_AXI": {
@@ -1128,16 +992,16 @@
               "axi_intc_3/s_axi"
             ]
           },
+          "axi_crossbar_0_M01_AXI": {
+            "interface_ports": [
+              "axi_crossbar_0/M01_AXI",
+              "axi_intc_1/s_axi"
+            ]
+          },
           "axi_crossbar_0_M00_AXI": {
             "interface_ports": [
               "axi_crossbar_0/M00_AXI",
               "axi_intc_0/s_axi"
-            ]
-          },
-          "S00_AXI_1": {
-            "interface_ports": [
-              "S00_AXI",
-              "axi_crossbar_0/S00_AXI"
             ]
           }
         },
@@ -1204,48 +1068,24 @@
           "xlslice_0_Dout": {
             "ports": [
               "xlslice_0/Dout",
-              "xlconcat_0/In0"
+              "axi_intc_0/intr"
             ]
           },
           "xlslice_1_Dout": {
             "ports": [
               "xlslice_1/Dout",
-              "xlconcat_1/In0"
+              "axi_intc_1/intr"
             ]
           },
           "xlslice_2_Dout": {
             "ports": [
               "xlslice_2/Dout",
-              "xlconcat_2/In0"
+              "axi_intc_2/intr"
             ]
           },
           "xlslice_3_Dout": {
             "ports": [
               "xlslice_3/Dout",
-              "xlconcat_3/In0"
-            ]
-          },
-          "xlconcat_0_dout": {
-            "ports": [
-              "xlconcat_0/dout",
-              "axi_intc_0/intr"
-            ]
-          },
-          "xlconcat_1_dout": {
-            "ports": [
-              "xlconcat_1/dout",
-              "axi_intc_1/intr"
-            ]
-          },
-          "xlconcat_2_dout": {
-            "ports": [
-              "xlconcat_2/dout",
-              "axi_intc_2/intr"
-            ]
-          },
-          "xlconcat_3_dout": {
-            "ports": [
-              "xlconcat_3/dout",
               "axi_intc_3/intr"
             ]
           }
@@ -1462,73 +1302,19 @@
                 "value": "1"
               }
             }
-          },
-          "xlconcat_0": {
-            "vlnv": "xilinx.com:ip:xlconcat:2.1",
-            "xci_name": "mststa_mpsoc_v2_xlconcat_0_2",
-            "parameters": {
-              "IN0_WIDTH": {
-                "value": "32"
-              },
-              "NUM_PORTS": {
-                "value": "1"
-              }
-            }
-          },
-          "xlconcat_1": {
-            "vlnv": "xilinx.com:ip:xlconcat:2.1",
-            "xci_name": "mststa_mpsoc_v2_xlconcat_1_2",
-            "parameters": {
-              "IN0_WIDTH": {
-                "value": "32"
-              },
-              "NUM_PORTS": {
-                "value": "1"
-              }
-            }
-          },
-          "xlconcat_2": {
-            "vlnv": "xilinx.com:ip:xlconcat:2.1",
-            "xci_name": "mststa_mpsoc_v2_xlconcat_2_2",
-            "parameters": {
-              "IN0_WIDTH": {
-                "value": "32"
-              },
-              "NUM_PORTS": {
-                "value": "1"
-              }
-            }
-          },
-          "xlconcat_3": {
-            "vlnv": "xilinx.com:ip:xlconcat:2.1",
-            "xci_name": "mststa_mpsoc_v2_xlconcat_3_2",
-            "parameters": {
-              "IN0_WIDTH": {
-                "value": "32"
-              },
-              "NUM_PORTS": {
-                "value": "1"
-              }
-            }
           }
         },
         "interface_nets": {
-          "axi_crossbar_0_M00_AXI": {
-            "interface_ports": [
-              "axi_crossbar_0/M00_AXI",
-              "axi_intc_0/s_axi"
-            ]
-          },
           "axi_crossbar_0_M02_AXI": {
             "interface_ports": [
               "axi_crossbar_0/M02_AXI",
               "axi_intc_2/s_axi"
             ]
           },
-          "S00_AXI_1": {
+          "axi_crossbar_0_M00_AXI": {
             "interface_ports": [
-              "S00_AXI",
-              "axi_crossbar_0/S00_AXI"
+              "axi_crossbar_0/M00_AXI",
+              "axi_intc_0/s_axi"
             ]
           },
           "axi_crossbar_0_M03_AXI": {
@@ -1541,6 +1327,12 @@
             "interface_ports": [
               "axi_crossbar_0/M01_AXI",
               "axi_intc_1/s_axi"
+            ]
+          },
+          "S00_AXI_1": {
+            "interface_ports": [
+              "S00_AXI",
+              "axi_crossbar_0/S00_AXI"
             ]
           }
         },
@@ -1604,52 +1396,28 @@
               "xlconcat_5/In3"
             ]
           },
-          "xlslice_3_Dout": {
+          "xlslice_0_Dout": {
             "ports": [
-              "xlslice_3/Dout",
-              "xlconcat_3/In0"
-            ]
-          },
-          "xlslice_2_Dout": {
-            "ports": [
-              "xlslice_2/Dout",
-              "xlconcat_2/In0"
+              "xlslice_0/Dout",
+              "axi_intc_0/intr"
             ]
           },
           "xlslice_1_Dout": {
             "ports": [
               "xlslice_1/Dout",
-              "xlconcat_1/In0"
+              "axi_intc_1/intr"
             ]
           },
-          "xlslice_0_Dout": {
+          "xlslice_2_Dout": {
             "ports": [
-              "xlslice_0/Dout",
-              "xlconcat_0/In0"
-            ]
-          },
-          "xlconcat_0_dout": {
-            "ports": [
-              "xlconcat_0/dout",
-              "axi_intc_0/intr"
-            ]
-          },
-          "xlconcat_2_dout": {
-            "ports": [
-              "xlconcat_2/dout",
+              "xlslice_2/Dout",
               "axi_intc_2/intr"
             ]
           },
-          "xlconcat_3_dout": {
+          "xlslice_3_Dout": {
             "ports": [
-              "xlconcat_3/dout",
+              "xlslice_3/Dout",
               "axi_intc_3/intr"
-            ]
-          },
-          "xlconcat_1_dout": {
-            "ports": [
-              "xlconcat_1/dout",
-              "axi_intc_1/intr"
             ]
           }
         }
@@ -5251,18 +5019,6 @@
               }
             },
             "interface_nets": {
-              "m02_couplers_to_axi_interconnect_0": {
-                "interface_ports": [
-                  "M02_AXI",
-                  "m02_couplers/M_AXI"
-                ]
-              },
-              "xbar_to_m01_couplers": {
-                "interface_ports": [
-                  "xbar/M01_AXI",
-                  "m01_couplers/S_AXI"
-                ]
-              },
               "xbar_to_m02_couplers": {
                 "interface_ports": [
                   "xbar/M02_AXI",
@@ -5281,6 +5037,18 @@
                   "m03_couplers/S_AXI"
                 ]
               },
+              "s00_couplers_to_xbar": {
+                "interface_ports": [
+                  "s00_couplers/M_AXI",
+                  "xbar/S00_AXI"
+                ]
+              },
+              "m00_couplers_to_axi_interconnect_0": {
+                "interface_ports": [
+                  "M00_AXI",
+                  "m00_couplers/M_AXI"
+                ]
+              },
               "xbar_to_m00_couplers": {
                 "interface_ports": [
                   "xbar/M00_AXI",
@@ -5293,16 +5061,16 @@
                   "m01_couplers/M_AXI"
                 ]
               },
-              "m00_couplers_to_axi_interconnect_0": {
+              "xbar_to_m01_couplers": {
                 "interface_ports": [
-                  "M00_AXI",
-                  "m00_couplers/M_AXI"
+                  "xbar/M01_AXI",
+                  "m01_couplers/S_AXI"
                 ]
               },
-              "s00_couplers_to_xbar": {
+              "m02_couplers_to_axi_interconnect_0": {
                 "interface_ports": [
-                  "s00_couplers/M_AXI",
-                  "xbar/S00_AXI"
+                  "M02_AXI",
+                  "m02_couplers/M_AXI"
                 ]
               },
               "axi_interconnect_0_to_s00_couplers": {
@@ -5346,67 +5114,19 @@
                 ]
               }
             }
-          },
-          "xlconcat_0": {
-            "vlnv": "xilinx.com:ip:xlconcat:2.1",
-            "xci_name": "mststa_mpsoc_v2_xlconcat_0_3",
-            "parameters": {
-              "IN0_WIDTH": {
-                "value": "32"
-              },
-              "NUM_PORTS": {
-                "value": "1"
-              }
-            }
-          },
-          "xlconcat_1": {
-            "vlnv": "xilinx.com:ip:xlconcat:2.1",
-            "xci_name": "mststa_mpsoc_v2_xlconcat_1_3",
-            "parameters": {
-              "IN0_WIDTH": {
-                "value": "32"
-              },
-              "NUM_PORTS": {
-                "value": "1"
-              }
-            }
-          },
-          "xlconcat_2": {
-            "vlnv": "xilinx.com:ip:xlconcat:2.1",
-            "xci_name": "mststa_mpsoc_v2_xlconcat_2_3",
-            "parameters": {
-              "IN0_WIDTH": {
-                "value": "32"
-              },
-              "NUM_PORTS": {
-                "value": "1"
-              }
-            }
-          },
-          "xlconcat_3": {
-            "vlnv": "xilinx.com:ip:xlconcat:2.1",
-            "xci_name": "mststa_mpsoc_v2_xlconcat_3_3",
-            "parameters": {
-              "IN0_WIDTH": {
-                "value": "32"
-              },
-              "NUM_PORTS": {
-                "value": "1"
-              }
-            }
           }
         },
         "interface_nets": {
+          "axi_interconnect_0_M00_AXI": {
+            "interface_ports": [
+              "axi_intc_0/s_axi",
+              "axi_interconnect_0/M00_AXI"
+            ]
+          },
           "axi_interconnect_0_M01_AXI": {
             "interface_ports": [
               "axi_intc_1/s_axi",
               "axi_interconnect_0/M01_AXI"
-            ]
-          },
-          "S00_AXI_1": {
-            "interface_ports": [
-              "S00_AXI",
-              "axi_interconnect_0/S00_AXI"
             ]
           },
           "axi_interconnect_0_M03_AXI": {
@@ -5421,10 +5141,10 @@
               "axi_interconnect_0/M02_AXI"
             ]
           },
-          "axi_interconnect_0_M00_AXI": {
+          "S00_AXI_1": {
             "interface_ports": [
-              "axi_intc_0/s_axi",
-              "axi_interconnect_0/M00_AXI"
+              "S00_AXI",
+              "axi_interconnect_0/S00_AXI"
             ]
           }
         },
@@ -5501,55 +5221,49 @@
           "xlslice_1_Dout": {
             "ports": [
               "xlslice_1/Dout",
-              "xlconcat_1/In0"
+              "axi_intc_1/intr"
             ]
           },
           "xlslice_0_Dout": {
             "ports": [
               "xlslice_0/Dout",
-              "xlconcat_0/In0"
+              "axi_intc_0/intr"
             ]
           },
           "xlslice_3_Dout": {
             "ports": [
               "xlslice_3/Dout",
-              "xlconcat_3/In0"
+              "axi_intc_3/intr"
             ]
           },
           "xlslice_2_Dout": {
             "ports": [
               "xlslice_2/Dout",
-              "xlconcat_2/In0"
-            ]
-          },
-          "xlconcat_1_dout": {
-            "ports": [
-              "xlconcat_1/dout",
-              "axi_intc_1/intr"
-            ]
-          },
-          "xlconcat_3_dout": {
-            "ports": [
-              "xlconcat_3/dout",
-              "axi_intc_3/intr"
-            ]
-          },
-          "xlconcat_2_dout": {
-            "ports": [
-              "xlconcat_2/dout",
               "axi_intc_2/intr"
-            ]
-          },
-          "xlconcat_0_dout": {
-            "ports": [
-              "xlconcat_0/dout",
-              "axi_intc_0/intr"
             ]
           }
         }
       }
     },
     "interface_nets": {
+      "zynq_ultra_ps_e_0_GPIO_0": {
+        "interface_ports": [
+          "GPIO",
+          "zynq_ultra_ps_e_0/GPIO_0"
+        ]
+      },
+      "axi_bram_ctrl_0_BRAM_PORTA": {
+        "interface_ports": [
+          "blk_mem_gen_0/BRAM_PORTA",
+          "axi_bram_ctrl_0/BRAM_PORTA"
+        ]
+      },
+      "smartconnect_0_M02_AXI": {
+        "interface_ports": [
+          "smartconnect_0/M02_AXI",
+          "intc_subsys_2/S00_AXI"
+        ]
+      },
       "smartconnect_0_M00_AXI1": {
         "interface_ports": [
           "smartconnect_0/M00_AXI",
@@ -5562,10 +5276,10 @@
           "smartconnect_1/M02_AXI"
         ]
       },
-      "axi_bram_ctrl_0_BRAM_PORTA": {
+      "zynq_ultra_ps_e_0_M_AXI_HPM1_FPD": {
         "interface_ports": [
-          "blk_mem_gen_0/BRAM_PORTA",
-          "axi_bram_ctrl_0/BRAM_PORTA"
+          "smartconnect_1/S00_AXI",
+          "zynq_ultra_ps_e_0/M_AXI_HPM1_FPD"
         ]
       },
       "axi_bram_ctrl_1_BRAM_PORTA": {
@@ -5574,22 +5288,10 @@
           "blk_mem_gen_1/BRAM_PORTA"
         ]
       },
-      "smartconnect_0_M02_AXI": {
+      "smartconnect_0_M03_AXI": {
         "interface_ports": [
-          "smartconnect_0/M02_AXI",
-          "intc_subsys_2/S00_AXI"
-        ]
-      },
-      "zynq_ultra_ps_e_0_GPIO_0": {
-        "interface_ports": [
-          "GPIO",
-          "zynq_ultra_ps_e_0/GPIO_0"
-        ]
-      },
-      "zynq_ultra_ps_e_0_M_AXI_HPM1_FPD": {
-        "interface_ports": [
-          "smartconnect_1/S00_AXI",
-          "zynq_ultra_ps_e_0/M_AXI_HPM1_FPD"
+          "smartconnect_0/M03_AXI",
+          "intc_subsys_3/S00_AXI"
         ]
       },
       "zynq_ultra_ps_e_0_M_AXI_HPM0_FPD": {
@@ -5604,24 +5306,6 @@
           "smartconnect_1/M00_AXI"
         ]
       },
-      "BRAM_PORTB_0_1": {
-        "interface_ports": [
-          "TX_BRAM_PORTB",
-          "blk_mem_gen_0/BRAM_PORTB"
-        ]
-      },
-      "smartconnect_0_M03_AXI": {
-        "interface_ports": [
-          "smartconnect_0/M03_AXI",
-          "intc_subsys_3/S00_AXI"
-        ]
-      },
-      "BRAM_PORTB_1_1": {
-        "interface_ports": [
-          "RX_BRAM_PORTB",
-          "blk_mem_gen_1/BRAM_PORTB"
-        ]
-      },
       "smartconnect_1_M01_AXI": {
         "interface_ports": [
           "smartconnect_1/M01_AXI",
@@ -5632,6 +5316,18 @@
         "interface_ports": [
           "smartconnect_0/M01_AXI",
           "intc_subsys_1/S00_AXI"
+        ]
+      },
+      "BRAM_PORTB_1_1": {
+        "interface_ports": [
+          "RX_BRAM_PORTB",
+          "blk_mem_gen_1/BRAM_PORTB"
+        ]
+      },
+      "BRAM_PORTB_0_1": {
+        "interface_ports": [
+          "TX_BRAM_PORTB",
+          "blk_mem_gen_0/BRAM_PORTB"
         ]
       }
     },

@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module proactive_beh_3di_2do#(
+module proactive_beh_slv_pul_axis#(
     parameter                 	BHA_NUM 		= 2   //Number of active behaviors
 	,parameter					ARV_SIG_DET_TIM	= 5
 )(
@@ -43,10 +43,46 @@ module proactive_beh_3di_2do#(
     ,output		                ec_cha_st
     ,output reg [7:0]           a_tx_id
     ,output reg	[7:0]           a_alm_num
-
-    ,input      [2:0]           di_i
-	,output	reg [1:0]			do_o
-
+	//io port start
+    ,input						i_servo_notok       //servo not ok
+    ,input						i_servo_stop        //servo stop
+    ,input						i_axis_limf         //axis limit forward
+    ,input						i_axis_org          //axis origin
+    ,input						i_axis_limb         //axis limit backward
+    ,input						i_emerge_stop_signal//emergency stop signal
+    
+    ,input						cur_slv_board_id    //current slave board id
+    ,input						slv_board_id        //slave board id
+    ,input						pul_motor_r_flag    //pul motor ready flag
+    ,input						pul_motor_flag      //pul motor flag
+    ,output reg [31:0] 			m2s_pulm_msg        //message  master to slave
+    ,input 		[31:0] 			s2m_pulm_msg       	//message  slave to master
+	//io port end 
+	//register start
+	,input		[ 0:0]			rctrl_drive_on    	//enable servo
+	,input		[ 0:0]			rctrl_drive_reset 	//reset servo
+	,input		[ 0:0]			rctrl_resume      	//resume servo
+	,input		[ 0:0]			rctrl_pause       	//pause servo
+	,input		[ 0:0]			rctrl_quickstop   	//quick stop
+	,input		[ 0:0]			rcfg_pf_mode     	//position feedback mode
+	,input		[ 0:0]			rserv_dir         	//servo direction
+	,input		[31:0]			rserv_step_pulse 	//servo step pulse
+	,input		[31:0]			rserv_target_pulse	//servo target pulse
+	,input		[15:0]			rcfg_home_spd     	//home speed
+	,input		[15:0]			rcfg_home_acc     	//home acceleration
+	,input		[15:0]			rcfg_home_dec     	//home deceleration
+	,input		[15:0]			rcfg_jog_spd      	//jog speed
+	,input		[15:0]			rcfg_jog_acc      	//jog acceleration
+	,input		[15:0]			rcfg_jog_dec      	//jog deceleration
+	,input		[15:0]			rcfg_move_spd     	//move speed
+	,input		[15:0]			rcfg_move_acc     	//move acceleration
+	,input		[15:0]			rcfg_move_dec     	//move deceleration
+	,input		[15:0]			rcfg_spd_max      	//maximum speed
+	,input		[15:0]			rcfg_acc_max      	//maximum acceleration
+	,input		[15:0]			rcfg_dec_max      	//maximum deceleration
+	,input		[15:0]			rcfg_qs_dec       	//quick stop deceleration
+	,input		[31:0]			rcfg_timedly      	//timedly time
+	//register end
     ,output reg                 irq_o
     ,input                      irq_ack_i       //Interrupt response
 	,output reg [31:0]			state_monitor_o
@@ -169,7 +205,7 @@ module proactive_beh_3di_2do#(
 	reg [7:0] curr_state_m1;
 	reg [7:0] curr_state_m2;
 	reg [7:0] curr_state_m3;
-    always @(posedge clk_i)
+    always @(posedge clk_i) 
 	begin
         if (rst_i)begin
 			curr_state_m1 <= 8'b0;
@@ -177,20 +213,13 @@ module proactive_beh_3di_2do#(
 			curr_state_m3 <= 8'b0;
 			state_monitor_o <= 32'b0;
 			end
-        else begin
-			curr_state_m1 <= curr_state;
-			if (curr_state_m1 != curr_state) begin
-				curr_state_m2 <= curr_state_m1;
-				curr_state_m3 <= curr_state_m2;
-				state_monitor_o <= {curr_state_m3, curr_state_m2, curr_state_m1, curr_state};
-			end
-			else begin
-				curr_state_m2 <= curr_state_m2;
-				curr_state_m3 <= curr_state_m3;
-				state_monitor_o <= state_monitor_o;
-			end
+        else if (curr_state != curr_state_m1) begin
+            curr_state_m1 <= curr_state;
+            curr_state_m2 <= curr_state_m1;
+            curr_state_m3 <= curr_state_m2;
+			state_monitor_o <= {curr_state_m3,curr_state_m2,curr_state_m1, curr_state};
 		end
-	end
+    end
 
     always @(*) begin			
         case (curr_state)	
@@ -401,44 +430,216 @@ module proactive_beh_3di_2do#(
     	end
 	end
 	
-	
-	always@(posedge clk_i)
-	begin
-		if(rst_i || !a_en)
-			do_o <= 2'b00;
-		else if(curr_state == S_EXE && a_bhv_id_r == 8'd1)		//Drive to position 1
-			do_o <= 2'b01;
-		else if(curr_state == S_EXE && a_bhv_id_r == 8'd2)		//Drive to position 2
-			do_o <= 2'b10;
-		else if(curr_state == S_EXE && a_bhv_id_r == 8'd3)		//invalid behavior 
-			do_o <= 2'b00;
-		else if(curr_state == S_EXE && a_bhv_id_r == 8'd4)		//Sense position 1
-			do_o <= 2'b00;
-		else if(curr_state == S_EXE && a_bhv_id_r == 8'd5)		//Sense position 2
-			do_o <= 2'b00;
-		else if(curr_state == S_EXE && a_bhv_id_r == 8'd6)		//Drive to direction 1
-			do_o <= 2'b01;
-		else if(curr_state == S_EXE && a_bhv_id_r == 8'd7 )		//Drive to direction 2
-			do_o <= 2'b10; 
-		else if(curr_state == S_EXE && a_bhv_id_r == 8'd8 )		//Sense hook 1
-			do_o <= 2'b00; 
-		else if(curr_state == S_EXE && a_bhv_id_r == 8'd9 )		//Sense hook 0
-			do_o <= 2'b00; 
-		else if(curr_state == S_EXE && a_bhv_id_r == 8'd10)		//Drive to position 1 [safe]
-			do_o <= 2'b01;
-		else if(curr_state == S_EXE && a_bhv_id_r == 8'd11)		//Drive to position 2 [safe]
-			do_o <= 2'b10;
-		else if(curr_state == S_EXE && a_bhv_id_r == 8'd12)		//Drive to direction 1 [safe]
-			do_o <= 2'b01;
-		else if(curr_state == S_EXE && a_bhv_id_r == 8'd13)		//Drive to direction 2 [safe]
-			do_o <= 2'b10;
-		else
-			do_o <= do_o;
-	end
 
+// Internal motion control signals
+reg        action_son;
+reg        action_start;
+reg [7:0]  action_delay_cnt;
+reg        bh_disable;
+reg        action_alarm;
+reg [15:0] servo_delay_ms;
+reg        act_done_d1;
+reg        servo_stop_timeout;
+reg [15:0] servo_stop_timeout_cnt_ms;
 
-	//===============================================================================================================
-	//------------------------------------------------ user logic start ---------------------------------------------
-	//===============================================================================================================
+wire       action_busy;
+wire       action_done;
+wire       action_error;
+wire       dv_alarm;
+wire       o_dv_dir;
+wire       o_dv_son;
+wire       o_dv_reset;
+wire       servo_work_error;
 
+// m2s/s2m multi-cycle state machines
+reg [3:0]  m2s_state;
+reg [3:0]  s2m_state;
+reg [31:0] slv_beat_cnt;
+reg        action_beat;
+reg        pul_motor_flag_d1;
+reg        pul_motor_flag_d2;
+reg [31:0] s2m_0tmp;
+reg [31:0] s2m_10tmp;
+
+localparam P_EN_EFF  = 1'b0;  // servo enable active low
+localparam P_RST_EFF = 1'b0;  // servo reset active low
+
+assign o_dv_reset = rctrl_drive_reset;
+assign o_dv_son   = rctrl_drive_on ? (bh_disable ? 1'b0 : 1'b1) : 1'b0;
+
+assign {dv_alarm, action_error, action_done, action_busy} = s2m_10tmp[3:0];
+assign o_dv_dir = s2m_0tmp[0];
+
+always@(posedge clk_i) begin
+    if(rst_i) begin
+        slv_beat_cnt <= 32'd0;
+        action_beat  <= 1'b0;
+    end else begin
+        slv_beat_cnt <= slv_beat_cnt + 1'b1;
+        if(slv_beat_cnt >= 2000000) begin  // 20ms @ 100MHz
+            slv_beat_cnt <= 32'd0;
+            action_beat  <= ~action_beat;
+        end
+    end
+end
+
+always@(posedge clk_i) begin
+    if(rst_i) begin
+        m2s_pulm_msg <= 32'd0;
+        m2s_state    <= 4'd0;
+    end else begin
+        case(m2s_state)
+            0: begin  // control word: status + behavior ID
+                if(pul_motor_r_flag) begin
+                    m2s_pulm_msg <= {8'd0, a_bhv_id_r, 8'd0,
+                                     1'b0,              // i_axis_point (not available)
+                                     action_beat,
+                                     i_axis_org,
+                                     i_axis_limb,
+                                     i_axis_limf,
+                                     action_son,
+                                     action_start,
+                                     action_alarm};
+                    m2s_state <= 4'd1;
+                end
+            end
+            1: begin m2s_pulm_msg <= rserv_step_pulse;                    m2s_state <= 4'd2;  end
+            2: begin m2s_pulm_msg <= rserv_target_pulse;                  m2s_state <= 4'd3;  end
+            3: begin m2s_pulm_msg <= {rcfg_home_spd, rcfg_move_spd};      m2s_state <= 4'd4;  end
+            4: begin m2s_pulm_msg <= {12'd0, rctrl_drive_reset, o_dv_son,
+                                      rcfg_pf_mode, rserv_dir, rcfg_jog_spd};
+                                                                          m2s_state <= 4'd5;  end
+            5: begin m2s_pulm_msg <= {rcfg_home_acc, rcfg_home_dec};      m2s_state <= 4'd6;  end
+            6: begin m2s_pulm_msg <= {rcfg_jog_acc,  rcfg_jog_dec};       m2s_state <= 4'd7;  end
+            7: begin m2s_pulm_msg <= {rcfg_move_acc, rcfg_move_dec};      m2s_state <= 4'd8;  end
+            8: begin m2s_pulm_msg <= {rcfg_acc_max,  rcfg_dec_max};       m2s_state <= 4'd9;  end
+            9: begin m2s_pulm_msg <= {rcfg_spd_max,  rcfg_qs_dec};        m2s_state <= 4'd10; end
+            10: begin m2s_pulm_msg <= rcfg_timedly;                        m2s_state <= 4'd11; end
+            11: begin m2s_pulm_msg <= 32'd0;                               m2s_state <= 4'd12; end  // no wheel
+            12: begin m2s_pulm_msg <= 32'd0;                               m2s_state <= 4'd13; end
+            13: begin m2s_pulm_msg <= 32'd0;                               m2s_state <= 4'd14; end
+            14: begin m2s_pulm_msg <= 32'd0;                               m2s_state <= 4'd0;  end
+            default: begin m2s_pulm_msg <= 32'd0;                          m2s_state <= 4'd0;  end
+        endcase
+    end
+end
+
+always@(posedge clk_i) begin
+    pul_motor_flag_d1 <= pul_motor_flag & (cur_slv_board_id == slv_board_id);
+    pul_motor_flag_d2 <= pul_motor_flag_d1;
+
+    if(rst_i) begin
+        s2m_state <= 4'd0;
+        s2m_0tmp  <= 32'd0;
+        s2m_10tmp <= 32'd0;
+    end else begin
+        case(s2m_state)
+            0: begin
+                if(pul_motor_flag_d2) begin
+                    s2m_0tmp  <= s2m_pulm_msg;
+                    s2m_state <= 4'd1;
+                end
+            end
+            1,2,3,4,5,6,7,8,9: s2m_state <= s2m_state + 1'b1;   // pipeline delay
+            10: begin
+                s2m_10tmp <= s2m_pulm_msg;
+                s2m_state <= 4'd11;
+            end
+            11,12,13,14: s2m_state <= s2m_state + 1'b1;          // pipeline delay
+            default: s2m_state <= 4'd0;
+        endcase
+    end
+end
+
+always@(posedge clk_i) begin
+    if(rst_i || !a_en)
+        bh_disable <= 1'b0;
+    else if(curr_state == S_EXE) begin
+        if(a_bhv_id_r == 8'd9)       bh_disable <= 1'b0;
+        else if(a_bhv_id_r == 8'd10) bh_disable <= 1'b1;
+    end
+end
+
+always@(posedge clk_i) begin
+    if(rst_i || !a_en) begin
+        action_son       <= 1'b0;
+        action_start     <= 1'b0;
+        action_delay_cnt <= 8'd0;
+    end
+    else if(curr_state == S_EXE) begin
+        action_son <= rctrl_drive_on;
+        if(action_son) begin
+            if(action_busy) begin
+                action_start     <= 1'b0;
+                action_delay_cnt <= action_delay_cnt;
+            end else if(action_delay_cnt == 10) begin
+                action_start     <= 1'b1;
+                action_delay_cnt <= action_delay_cnt;
+            end else begin
+                action_start     <= action_start;
+                action_delay_cnt <= action_delay_cnt + i_time_1ms_vld;
+            end
+        end else begin
+            action_delay_cnt <= 8'd0;
+            action_start     <= 1'b0;
+        end
+    end
+    else begin
+        action_son       <= 1'b0;
+        action_start     <= 1'b0;
+        action_delay_cnt <= 8'd0;
+    end
+end
+
+always@(posedge clk_i) begin
+    act_done_d1 <= action_done;
+    if(rst_i || !a_en) begin
+        servo_delay_ms <= 16'd0;
+    end else begin
+        if(action_son) begin
+            if(action_busy) begin
+                if(i_servo_stop)
+                    servo_delay_ms <= servo_delay_ms + i_time_1ms_vld;
+                else
+                    servo_delay_ms <= 16'd0;
+            end
+        end else begin
+            servo_delay_ms <= 16'd0;
+        end
+    end
+end
+
+always@(posedge clk_i) begin
+    if(rst_i || !a_en) begin
+        servo_stop_timeout        <= 1'd0;
+        servo_stop_timeout_cnt_ms <= 16'd0;
+    end else begin
+        if(action_son & act_done_d1) begin
+            if(servo_stop_timeout_cnt_ms < 5000) begin
+                servo_stop_timeout_cnt_ms <= servo_stop_timeout_cnt_ms + i_time_1ms_vld;
+                servo_stop_timeout        <= 1'b0;
+            end else begin
+                servo_stop_timeout_cnt_ms <= servo_stop_timeout_cnt_ms;
+                servo_stop_timeout        <= 1'b1;
+            end
+        end else begin
+            servo_stop_timeout        <= 1'b0;
+            servo_stop_timeout_cnt_ms <= 16'd0;
+        end
+    end
+end
+
+assign servo_work_error = (((a_bhv_id_r == 8'd1) & (servo_delay_ms >= 5000)) |
+                           ((a_bhv_id_r >= 8'd2 && a_bhv_id_r <= 8'd3) & (servo_delay_ms >= 1000))) ? 1'b1 : 1'b0;
+
+always@(posedge clk_i) begin
+    if(rst_i || !a_en)
+        action_alarm <= 1'b0;
+    else if(curr_state == S_EXE)
+        action_alarm <= 1'b0;
+    else if(curr_state_1d == S_EXE && curr_state == S_ALERT_40)
+        action_alarm <= 1'b1;
+    else if(curr_state == S_IDLE)
+        action_alarm <= 1'b0;
+end
 endmodule

@@ -9,7 +9,7 @@
 // Project Name: 
 // Target Devices: 
 // Tool Versions: 
-// Description: ASS00630
+// Description: ASS00628
 // 
 // Dependencies: 
 // 
@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module ec_5di#(
+module ec_slv_pul_axis#(
 		parameter  				REG_SPACE_BIAS 		= 	2000	,
 		parameter  				REG_SPACE_SIZE 		= 	512	
 )(
@@ -39,14 +39,26 @@ module ec_5di#(
 		output 		 [31:0]     o_st_rd_data    ,
 		output 		            o_st_rd_vld     ,
 
-		input		 [4:0]		di_i			,	//In - position sensor signal
-		output		 			do_o			,	//invaild
+    	input						i_servo_notok       //servo not ok
+    	,input						i_servo_stop        //servo stop
+    	,input						i_axis_limf         //axis limit forward
+    	,input						i_axis_org          //axis origin
+    	,input						i_axis_limb         //axis limit backward
+    	,input						i_emerge_stop_signal//emergency stop signal
+	
+    	,input						cur_slv_board_id    //current slave board id
+    	,input						slv_board_id        //slave board id
+    	,input						pul_motor_r_flag    //pul motor ready flag
+    	,input						pul_motor_flag      //pul motor flag
+    	,output 	[31:0] 			m2s_pulm_msg        //message  master to slave
+    	,input 		[31:0] 			s2m_pulm_msg       	//message  slave to master
+
 		
-		output 	            	o_intr_irq	
+		,output 	            	o_intr_irq	
     );
 	
 	
-	localparam		A_BHA_NUM		=	2;	
+	localparam		A_BHA_NUM		=	15;	
 	localparam		B_BHA_NUM		=	1;	
 	localparam		ARV_SIG_DET_TIM	=	5;
 	
@@ -302,10 +314,10 @@ module ec_5di#(
 	,.param70               (param70		)
 	);
 
-	proactive_beh_5di#(	
+	proactive_beh_slv_pul_axis#(	
 	.BHA_NUM 				(A_BHA_NUM  	 	),	//Number of active behaviors
 	.ARV_SIG_DET_TIM		(ARV_SIG_DET_TIM	)		//In - place signal detection time
-)proactive_beh_5di_u0(
+)proactive_beh_slv_pul_axis_u0(
     .clk_i                 	(clk_i				)
     ,.rst_i                	(rst_i				)
     ,.i_time_1ms_vld       	(i_time_1ms_vld 	)
@@ -321,17 +333,51 @@ module ec_5di#(
     ,.ec_cha_st            	(ec_cha_st			)
     ,.a_tx_id              	(a_tx_id        	)
     ,.a_alm_num            	(a_alm_num      	)
-    ,.di_i                  (di_i				)
-	,.do_o					(do_o				)
+    ,.ec_id					(ec_id				)
+    ,.i_servo_notok			(i_servo_notok		)
+    ,.i_servo_stop			(i_servo_stop		)
+    ,.i_axis_limf			(i_axis_limf		)
+    ,.i_axis_org			(i_axis_org			)
+    ,.i_axis_limb			(i_axis_limb		)	
+    ,.i_emerge_stop_signal	(1'b0				)
+    ,.cur_slv_board_id		(1'b0				)
+    ,.slv_board_id			(1'b0				)
+    ,.pul_motor_r_flag		(1'b1				)
+    ,.pul_motor_flag		(1'b0				)
+    ,.m2s_pulm_msg			(m2s_pulm_msg		)
+    ,.s2m_pulm_msg			(s2m_pulm_msg		)
+    ,.rctrl_drive_on		(param26			)
+    ,.rctrl_drive_reset		(param27			)
+    ,.rctrl_resume			(param28			)
+    ,.rctrl_pause			(param29			)
+    ,.rctrl_quickstop		(param30			)
+    ,.rcfg_pf_mode			(param16[0]			)
+    ,.rserv_dir				(param17[0]			)
+    ,.rserv_step_pulse		(param1				)
+    ,.rserv_target_pulse	(param2				)
+    ,.rcfg_home_spd			(param6				)
+    ,.rcfg_home_acc			(param7				)
+    ,.rcfg_home_dec			(param8				)
+    ,.rcfg_jog_spd			(param9				)
+    ,.rcfg_jog_acc			(param10			)
+    ,.rcfg_jog_dec			(param11			)
+    ,.rcfg_move_spd			(param12			)
+    ,.rcfg_move_acc			(param13			)
+    ,.rcfg_move_dec			(param14			)
+    ,.rcfg_spd_max			(param15			)
+    ,.rcfg_acc_max			(param18[15:0]		)
+    ,.rcfg_dec_max			(param19[15:0]		)
+    ,.rcfg_qs_dec			(param20[15:0]		)
+    ,.rcfg_timedly			(param3				)
     ,.irq_o                	(irq_a				)
     ,.irq_ack_i       		(irq_a_grant		)
 	,.state_monitor_o		(param51			)
     );
 
 	 
-	status_beh_5di#(
+	status_beh_slv_pul_axis#(
 		.BHA_NUM(B_BHA_NUM	)
-)status_beh_5di_u0(
+)status_beh_slv_pul_axis_u0(
 	.clk_i			        (clk_i				)
 	,.rst_i			        (rst_i				)
 	,.i_time_1ms_vld		(i_time_1ms_vld 	)
@@ -351,7 +397,7 @@ module ec_5di#(
 	,.irq_ack_i	            (irq_b_grant		)	
     );
 	 
-	tim_beh_5di tim_beh_5di_u0(
+	tim_beh_slv_pul_axis tim_beh_slv_pul_axis_u0(
     .clk_i                      (clk_i          	)
 	,.rst_i              	    (rst_i         		)
 	,.i_time_1ms_vld   	        (i_time_1ms_vld 	)
@@ -372,10 +418,10 @@ module ec_5di#(
 	,.irq_ack_i                 (irq_c_grant		)
    );
 	
-		pre_post_sta_check_5di#(
+		pre_post_sta_check_slv_pul_axis#(
 			.A_BHA_NUM			(A_BHA_NUM	 		)    ,	
 			.B_BHA_NUM			(B_BHA_NUM	 		)  
-	)pre_post_sta_check_5di_u0(
+	)pre_post_sta_check_slv_pul_axis_u0(
 			.clk_i				(clk_i			),
 			.rst_i				(rst_i			),
 			.i_time_1ms_vld		(i_time_1ms_vld	),
@@ -391,8 +437,6 @@ module ec_5di#(
 			.link_m_saf_st   	(link_m_saf_st  ),
 			.sc_id				(sc_id			),
 			.ec_id           	(ec_id          ),
-			.di_i				(di_i			),
-			.do_i				(do_o			),
 			.a_en				(a_en			),
 			.b_en				(b_en			),	
 			.c_en				(c_en			),	
@@ -410,7 +454,14 @@ module ec_5di#(
 			.b_post_sta_allow	(b_post_sta_allow),	
 			.c_pre_sta_allow	(c_pre_sta_allow),	
 			.c_post_sta_allow	(c_post_sta_allow)	
-		);
+			
+		,.i_servo_notok			(i_servo_notok		)
+		,.i_servo_stop			(i_servo_stop		)
+		,.i_axis_limf			(i_axis_limf		)
+		,.i_axis_org			(i_axis_org		)
+		,.i_axis_limb			(i_axis_limb		)
+		,.i_emerge_stop_signal	(i_emerge_stop_signal)
+    );
 		
 	irq_3i1o_arbitrator irq_3i1o_arbitrator_u0(
 		.clk_i              (clk_i            	)

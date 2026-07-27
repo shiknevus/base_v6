@@ -9,7 +9,7 @@
 // Project Name: 
 // Target Devices: 
 // Tool Versions: 
-// Description: ASS00630
+// Description: 
 // 
 // Dependencies: 
 // 
@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module ec_5di#(
+module ec_pul_axis#(
 		parameter  				REG_SPACE_BIAS 		= 	2000	,
 		parameter  				REG_SPACE_SIZE 		= 	512	
 )(
@@ -39,14 +39,14 @@ module ec_5di#(
 		output 		 [31:0]     o_st_rd_data    ,
 		output 		            o_st_rd_vld     ,
 
-		input		 [4:0]		di_i			,	//In - position sensor signal
-		output		 			do_o			,	//invaild
+		input		 [3:0]		di_i			,	//In - position sensor signal
+		output		 [1:0]		do_o			,	//switch
 		
 		output 	            	o_intr_irq	
     );
 	
 	
-	localparam		A_BHA_NUM		=	2;	
+	localparam		A_BHA_NUM		=	13;	
 	localparam		B_BHA_NUM		=	1;	
 	localparam		ARV_SIG_DET_TIM	=	5;
 	
@@ -302,10 +302,10 @@ module ec_5di#(
 	,.param70               (param70		)
 	);
 
-	proactive_beh_5di#(	
+	proactive_beh_pul_axis#(	
 	.BHA_NUM 				(A_BHA_NUM  	 	),	//Number of active behaviors
 	.ARV_SIG_DET_TIM		(ARV_SIG_DET_TIM	)		//In - place signal detection time
-)proactive_beh_5di_u0(
+)proactive_beh_pul_axis_u0(
     .clk_i                 	(clk_i				)
     ,.rst_i                	(rst_i				)
     ,.i_time_1ms_vld       	(i_time_1ms_vld 	)
@@ -329,9 +329,9 @@ module ec_5di#(
     );
 
 	 
-	status_beh_5di#(
+	status_beh_pul_axis#(
 		.BHA_NUM(B_BHA_NUM	)
-)status_beh_5di_u0(
+)status_beh_pul_axis_u0(
 	.clk_i			        (clk_i				)
 	,.rst_i			        (rst_i				)
 	,.i_time_1ms_vld		(i_time_1ms_vld 	)
@@ -351,7 +351,7 @@ module ec_5di#(
 	,.irq_ack_i	            (irq_b_grant		)	
     );
 	 
-	tim_beh_5di tim_beh_5di_u0(
+	tim_beh_pul_axis tim_beh_pul_axis_u0(
     .clk_i                      (clk_i          	)
 	,.rst_i              	    (rst_i         		)
 	,.i_time_1ms_vld   	        (i_time_1ms_vld 	)
@@ -372,10 +372,10 @@ module ec_5di#(
 	,.irq_ack_i                 (irq_c_grant		)
    );
 	
-		pre_post_sta_check_5di#(
+		pre_post_sta_check_pul_axis#(
 			.A_BHA_NUM			(A_BHA_NUM	 		)    ,	
 			.B_BHA_NUM			(B_BHA_NUM	 		)  
-	)pre_post_sta_check_5di_u0(
+	)pre_post_sta_check_pul_axis_u0(
 			.clk_i				(clk_i			),
 			.rst_i				(rst_i			),
 			.i_time_1ms_vld		(i_time_1ms_vld	),

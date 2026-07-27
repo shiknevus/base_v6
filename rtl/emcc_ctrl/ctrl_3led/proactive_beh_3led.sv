@@ -183,11 +183,11 @@ module proactive_beh_3led#(
 			curr_state_m3 <= 8'b0;
 			state_monitor_o <= 32'b0;
 			end
-        else if (curr_state != curr_state_m1) begin
-            curr_state_m1 <= curr_state;
-            curr_state_m2 <= curr_state_m1;
+        else if (next_state != curr_state) begin
             curr_state_m3 <= curr_state_m2;
-			state_monitor_o <= {curr_state_m3,curr_state_m2,curr_state_m1, curr_state};
+            curr_state_m2 <= curr_state_m1;
+            curr_state_m1 <= curr_state;
+            state_monitor_o <= {curr_state_m3, curr_state_m2, curr_state_m1, curr_state};
 		end
     end
 

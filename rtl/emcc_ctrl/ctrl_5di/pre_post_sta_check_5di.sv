@@ -43,7 +43,7 @@ module pre_post_sta_check_5di#(
 		,input 		[7:0]				ec_id        
 		
 		,input		[4:0]				di_i
-		,input							do_o
+		,input							do_i
 		
 		,input							valid_sig_1
 		,input							valid_sig_2
@@ -87,8 +87,8 @@ module pre_post_sta_check_5di#(
 
 	wire [A_BHA_NUM-1:0]	post_sta	;
 
-	assign	post_sta[0 ] = (a_bhv_id == 1 )&&(di_i ==2'b01);
-	assign	post_sta[1 ] = (a_bhv_id == 2 )&&(di_i ==2'b10);
+	assign	post_sta[0 ] = (a_bhv_id == 1 )&&(di_i ==5'b01);
+	assign	post_sta[1 ] = (a_bhv_id == 2 )&&(di_i ==5'b10);
 
 
 	always@(posedge clk_i) 
