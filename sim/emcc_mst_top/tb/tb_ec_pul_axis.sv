@@ -94,8 +94,6 @@ localparam EC_BIAS_ADDR = `PL_CFG_BASE_ADDR + {20'h1a00};
 
 reg tb_ACLK;
 reg tb_ARESETn;
-wire temp_clk;
-wire temp_rstn;
 reg [31:0] read_data;
 reg resp;
 genvar i;
@@ -156,33 +154,21 @@ initial begin
     ps_write_word(EC_BIAS_ADDR + `PARAM28,      32'h0000_0000, resp1);  // rctrl_resume = 0
     ps_write_word(EC_BIAS_ADDR + `PARAM29,      32'h0000_0000, resp1);  // rctrl_drive_reset = 0
     ps_write_word(EC_BIAS_ADDR + `PARAM30,      32'h0000_0001, resp1);  // rctrl_drive_on = 1
-
+    
+    //============================================  behavior 15: reset servo  ==================================
+    #500;
+    do_behavior(8'd15);
     //============================================  behavior 14: Son servo  ==================================
-    #600;
-    ps_write_word(EC_BIAS_ADDR + `A_BHV_ID,     32'h0000_000E, resp1);  // beh=14 Son
-    //10
-    @`EC_COMP_INST_PATH.o_intr_irq;
-    ps_read_word(EC_BIAS_ADDR + `IRQ_REG2, read_data);
-    if(read_data == 32'd0) begin
-        ps_read_word(EC_BIAS_ADDR + `IRQ_REG1, read_data);
-        if(read_data == {8'h88,8'h66,8'd14,8'd10})
-            ps_write_word(EC_BIAS_ADDR + `A_TX_RSULT_RPT, 32'h0E0a_5100, resp1);
-        else $stop;
-    end else $stop;
-    //30/40
-    @`EC_COMP_INST_PATH.o_intr_irq;
-    ps_read_word(EC_BIAS_ADDR + `IRQ_REG2, read_data);
-    if(read_data == 32'd0) begin
-        ps_read_word(EC_BIAS_ADDR + `IRQ_REG1, read_data);
-        if(read_data == {8'h88,8'h66,8'd14,8'd30})
-            ps_write_word(EC_BIAS_ADDR + `A_TX_RSULT_RPT, 32'h0E1E_5100, resp1);
-        else if(read_data == {8'h88,8'h66,8'd14,8'd40})
-            ps_write_word(EC_BIAS_ADDR + `A_TX_RSULT_RPT, 32'h0E28_5101, resp1);
-        else $stop;
-    end else $stop;
-
-    //============================================  behavior 1: HOME  ==================================
-    #600;
+    #500;
+    do_behavior(8'd14);
+    //============================================  behavior 14: off servo  ==================================
+    #500;
+    do_behavior(8'd14);
+    //============================================  behavior 14: son servo  ==================================
+    #500;
+    do_behavior(8'd14);
+    //============================================     behavior 1: HOME    ==================================
+    #1000;
     //simulate axis_org pulse during homing
     fork
         begin
@@ -193,106 +179,50 @@ initial begin
         end
     join_none
 
-    ps_write_word(EC_BIAS_ADDR + `A_BHV_ID,     32'h0000_0001, resp1);  // beh=1 Home
-    //10
-    @`EC_COMP_INST_PATH.o_intr_irq;
-    ps_read_word(EC_BIAS_ADDR + `IRQ_REG2, read_data);
-    if(read_data == 32'd0) begin
-        ps_read_word(EC_BIAS_ADDR + `IRQ_REG1, read_data);
-        if(read_data == {8'h88,8'h66,8'd1,8'd10})
-            ps_write_word(EC_BIAS_ADDR + `A_TX_RSULT_RPT, 32'h010a_5100, resp1);
-        else $stop;
-    end else $stop;
-    //30/40
-    @`EC_COMP_INST_PATH.o_intr_irq;
-    ps_read_word(EC_BIAS_ADDR + `IRQ_REG2, read_data);
-    if(read_data == 32'd0) begin
-        ps_read_word(EC_BIAS_ADDR + `IRQ_REG1, read_data);
-        if(read_data == {8'h88,8'h66,8'd1,8'd30})
-            ps_write_word(EC_BIAS_ADDR + `A_TX_RSULT_RPT, 32'h011E_5100, resp1);
-        else if(read_data == {8'h88,8'h66,8'd1,8'd40})
-            ps_write_word(EC_BIAS_ADDR + `A_TX_RSULT_RPT, 32'h0128_5101, resp1);
-        else $stop;
-    end else $stop;
+    do_behavior(8'd1);
 
     //============================================  behavior 2: JOG  ==================================
-    #600;
-    ps_write_word(EC_BIAS_ADDR + `A_BHV_ID,     32'h0000_0002, resp1);  // beh=2 Jog
-    //10
-    @`EC_COMP_INST_PATH.o_intr_irq;
-    ps_read_word(EC_BIAS_ADDR + `IRQ_REG2, read_data);
-    if(read_data == 32'd0) begin
-        ps_read_word(EC_BIAS_ADDR + `IRQ_REG1, read_data);
-        if(read_data == {8'h88,8'h66,8'd2,8'd10})
-            ps_write_word(EC_BIAS_ADDR + `A_TX_RSULT_RPT, 32'h020a_5100, resp1);
-        else $stop;
-    end else $stop;
-    //30/40
-    @`EC_COMP_INST_PATH.o_intr_irq;
-    ps_read_word(EC_BIAS_ADDR + `IRQ_REG2, read_data);
-    if(read_data == 32'd0) begin
-        ps_read_word(EC_BIAS_ADDR + `IRQ_REG1, read_data);
-        if(read_data == {8'h88,8'h66,8'd2,8'd30})
-            ps_write_word(EC_BIAS_ADDR + `A_TX_RSULT_RPT, 32'h021E_5100, resp1);
-        else if(read_data == {8'h88,8'h66,8'd2,8'd40})
-            ps_write_word(EC_BIAS_ADDR + `A_TX_RSULT_RPT, 32'h0228_5101, resp1);
-        else $stop;
-    end else $stop;
-
+    #1000;
+    do_behavior(8'd2);
     //============================================  behavior 3: MOVE  ==================================
-    #600;
-    ps_write_word(EC_BIAS_ADDR + `A_BHV_ID,     32'h0000_0003, resp1);  // beh=3 Move
-    //10
-    @`EC_COMP_INST_PATH.o_intr_irq;
-    ps_read_word(EC_BIAS_ADDR + `IRQ_REG2, read_data);
-    if(read_data == 32'd0) begin
-        ps_read_word(EC_BIAS_ADDR + `IRQ_REG1, read_data);
-        if(read_data == {8'h88,8'h66,8'd3,8'd10})
-            ps_write_word(EC_BIAS_ADDR + `A_TX_RSULT_RPT, 32'h030a_5100, resp1);
-        else $stop;
-    end else $stop;
-    //30/40
-    @`EC_COMP_INST_PATH.o_intr_irq;
-    ps_read_word(EC_BIAS_ADDR + `IRQ_REG2, read_data);
-    if(read_data == 32'd0) begin
-        ps_read_word(EC_BIAS_ADDR + `IRQ_REG1, read_data);
-        if(read_data == {8'h88,8'h66,8'd3,8'd30})
-            ps_write_word(EC_BIAS_ADDR + `A_TX_RSULT_RPT, 32'h031E_5100, resp1);
-        else if(read_data == {8'h88,8'h66,8'd3,8'd40})
-            ps_write_word(EC_BIAS_ADDR + `A_TX_RSULT_RPT, 32'h0328_5101, resp1);
-        else $stop;
-    end else $stop;
-
+    #1000;
+    do_behavior(8'd3);
     //============================================  behavior 15: Reset servo  ==================================
-    #600;
-    ps_write_word(EC_BIAS_ADDR + `A_BHV_ID,     32'h0000_000F, resp1);  // beh=15 Reset
-    //10
-    @`EC_COMP_INST_PATH.o_intr_irq;
-    ps_read_word(EC_BIAS_ADDR + `IRQ_REG2, read_data);
-    if(read_data == 32'd0) begin
-        ps_read_word(EC_BIAS_ADDR + `IRQ_REG1, read_data);
-        if(read_data == {8'h88,8'h66,8'd15,8'd10})
-            ps_write_word(EC_BIAS_ADDR + `A_TX_RSULT_RPT, 32'h0F0a_5100, resp1);
-        else $stop;
-    end else $stop;
-    //30/40
-    @`EC_COMP_INST_PATH.o_intr_irq;
-    ps_read_word(EC_BIAS_ADDR + `IRQ_REG2, read_data);
-    if(read_data == 32'd0) begin
-        ps_read_word(EC_BIAS_ADDR + `IRQ_REG1, read_data);
-        if(read_data == {8'h88,8'h66,8'd15,8'd30})
-            ps_write_word(EC_BIAS_ADDR + `A_TX_RSULT_RPT, 32'h0F1E_5100, resp1);
-        else if(read_data == {8'h88,8'h66,8'd15,8'd40})
-            ps_write_word(EC_BIAS_ADDR + `A_TX_RSULT_RPT, 32'h0F28_5101, resp1);
-        else $stop;
-    end else $stop;
+    #1000;
+    do_behavior(8'd15);
 
     #2000;
     $stop;
 end
 
-assign temp_clk = tb_ACLK;
-assign temp_rstn = tb_ARESETn;
+
+task automatic do_behavior;
+    input [7:0] beh_id;
+    reg [31:0] irq1, irq2;
+    begin
+        ps_write_word(EC_BIAS_ADDR + `A_BHV_ID, {24'd0, beh_id}, resp1);
+        // 10
+        @`EC_COMP_INST_PATH.o_intr_irq;
+        ps_read_word(EC_BIAS_ADDR + `IRQ_REG2, irq2);
+        if(irq2 == 32'd0) begin
+            ps_read_word(EC_BIAS_ADDR + `IRQ_REG1, irq1);
+            if(irq1 == {8'h88, 8'h66, beh_id, 8'd10})
+                ps_write_word(EC_BIAS_ADDR + `A_TX_RSULT_RPT, {beh_id, 8'h0a, 16'h5100}, resp1);
+            else $stop;
+        end else $stop;
+        // 30/40
+        @`EC_COMP_INST_PATH.o_intr_irq;
+        ps_read_word(EC_BIAS_ADDR + `IRQ_REG2, irq2);
+        if(irq2 == 32'd0) begin
+            ps_read_word(EC_BIAS_ADDR + `IRQ_REG1, irq1);
+            if(irq1 == {8'h88, 8'h66, beh_id, 8'd30})
+                ps_write_word(EC_BIAS_ADDR + `A_TX_RSULT_RPT, {beh_id, 8'h1e, 16'h5100}, resp1);
+            else if(irq1 == {8'h88, 8'h66, beh_id, 8'd40})
+                ps_write_word(EC_BIAS_ADDR + `A_TX_RSULT_RPT, {beh_id, 8'h28, 16'h5101}, resp1);
+            else $stop;
+        end else $stop;
+    end
+endtask
 
 task automatic ps_write_word;
     input   [31:0]  addr;
