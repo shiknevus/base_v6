@@ -100,40 +100,24 @@ module pre_post_sta_check_pul_axis#(
 	assign	post_sta[10] = (a_bhv_id == 11);
 	assign	post_sta[11] = (a_bhv_id == 12);
 	assign	post_sta[12] = (a_bhv_id == 13);
+	assign	post_sta[13] = (a_bhv_id == 14);
+	assign	post_sta[14] = (a_bhv_id == 15);
+	assign	post_sta[15] = (a_bhv_id == 16);
+	assign	post_sta[16] = (a_bhv_id == 17);
 
 
-	always@(posedge clk_i) 
+	always@(posedge clk_i)
 	begin
+		integer i;
 		if(rst_i || !a_en)
 			a_post_sta_allow <= {A_BHA_NUM{1'b0}};
-		else if(post_sta[0] && A_BHA_NUM > 0)
-			a_post_sta_allow[0] <= 1;
-		else if(post_sta[1] && A_BHA_NUM > 1)
-			a_post_sta_allow[1] <= 1;
-		else if(post_sta[2] && A_BHA_NUM > 2)
-			a_post_sta_allow[2] <= 1;
-		else if(post_sta[3] && A_BHA_NUM > 3)
-			a_post_sta_allow[3] <= 1;
-		else if(post_sta[4] && A_BHA_NUM > 4)
-			a_post_sta_allow[4] <= 1;
-		else if(post_sta[5] && A_BHA_NUM > 5)
-			a_post_sta_allow[5] <= 1;
-		else if(post_sta[6] && A_BHA_NUM > 6)
-			a_post_sta_allow[6] <= 1;
-		else if(post_sta[7] && A_BHA_NUM > 7)
-			a_post_sta_allow[7] <= 1;
-		else if(post_sta[8] && A_BHA_NUM > 8)
-			a_post_sta_allow[8] <= 1;
-		else if(post_sta[9] && A_BHA_NUM > 9)
-			a_post_sta_allow[9] <= 1;
-		else if(post_sta[10] && A_BHA_NUM > 10)
-			a_post_sta_allow[10] <= 1;
-		else if(post_sta[11] && A_BHA_NUM > 11)
-			a_post_sta_allow[11] <= 1;
-		else if(post_sta[12] && A_BHA_NUM > 12)
-			a_post_sta_allow[12] <= 1;
-		else
+		else begin
 			a_post_sta_allow <= {A_BHA_NUM{1'b0}};
+			for(i = 0; i < A_BHA_NUM; i = i + 1) begin
+				if(post_sta[i])
+					a_post_sta_allow[i] <= 1;
+			end
+		end
 	end
 	
 	//========================================================================================//

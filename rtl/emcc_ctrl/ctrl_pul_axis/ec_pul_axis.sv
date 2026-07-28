@@ -60,7 +60,7 @@ module ec_pul_axis#(
     );
 	
 	
-	localparam		A_BHA_NUM		=	13;	
+	localparam		A_BHA_NUM		=	17;	
 	localparam		B_BHA_NUM		=	1;	
 	localparam		ARV_SIG_DET_TIM	=	5;
 	

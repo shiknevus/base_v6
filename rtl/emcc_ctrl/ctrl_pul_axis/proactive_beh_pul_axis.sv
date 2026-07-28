@@ -216,11 +216,18 @@ module proactive_beh_pul_axis#(
 			curr_state_m3 <= 8'b0;
 			state_monitor_o <= 32'b0;
 			end
-        else if (curr_state != curr_state_m1) begin
+        else begin
             curr_state_m1 <= curr_state;
+			if (curr_state_m1 != curr_state) begin
             curr_state_m2 <= curr_state_m1;
             curr_state_m3 <= curr_state_m2;
-			state_monitor_o <= {curr_state_m3,curr_state_m2,curr_state_m1, curr_state};
+				state_monitor_o <= {curr_state_m3, curr_state_m2, curr_state_m1, curr_state};
+			end
+			else begin
+				curr_state_m2 <= curr_state_m2;
+				curr_state_m3 <= curr_state_m3;
+				state_monitor_o <= state_monitor_o;
+			end
 		end
     end
 
@@ -426,9 +433,13 @@ module proactive_beh_pul_axis#(
     	        detect_flag <= 1'b1;  
     	    end
     	    else begin
-    	        //detect_tim  <= detect_tim + i_time_1s_vld;	//actual
-				detect_tim  <= detect_tim + 1;	//sim
-    	        detect_flag <= 1'b0;	
+                `ifdef ENB_SIM_MODE
+				    detect_tim  <= detect_tim + 1;	
+    	            detect_flag <= 1'b0;	
+                `else
+    	            detect_tim  <= detect_tim + i_time_1s_vld;	//actual
+    	            detect_flag <= 1'b0;
+                `endif 
     	    end
     	end
 	end

@@ -186,10 +186,10 @@ initial begin
     //simulate axis_org pulse during homing
     fork
         begin
-            #50000;  // wait 50us
+            #500;  // wait 50us
             force `EC_COMP_INST_PATH.i_axis_org = 1'b1;
-            #10000;
-            force `EC_COMP_INST_PATH.i_axis_org = 1'b0;
+            #100;
+            release `EC_COMP_INST_PATH.i_axis_org;
         end
     join_none
 
