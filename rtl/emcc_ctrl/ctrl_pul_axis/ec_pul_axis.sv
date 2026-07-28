@@ -39,10 +39,24 @@ module ec_pul_axis#(
 		output 		 [31:0]     o_st_rd_data    ,
 		output 		            o_st_rd_vld     ,
 
-		input		 [3:0]		di_i			,	//In - position sensor signal
-		output		 [1:0]		do_o			,	//switch
+    	input					i_servo_notok       //servo not ok
+    	,input					i_servo_stop        //servo stop
+    	,input					i_axis_limf         //axis limit forward
+    	,input					i_axis_org          //axis origin
+    	,input					i_axis_limb         //axis limit backward
+    	,input					i_emerge_stop_signal//emergency stop signal
+
+   		,input  	            i_safe_status 		//safe status
+   		,input  	            i_axis_point		//axis point
+   		,input  	            i_axis_reset		//axis reset
+   		,input  	            i_dv_alarm			//drive alarm
+   		,output 	            o_dv_pulse			//axi pulse
+   		,output 	            o_dv_dir			//axis dir
+   		,output 	            o_dv_reset			//servo reset
+   		,output 	            o_dv_son			//servo en
+
 		
-		output 	            	o_intr_irq	
+		,output 	            o_intr_irq	
     );
 	
 	
@@ -321,8 +335,44 @@ module ec_pul_axis#(
     ,.ec_cha_st            	(ec_cha_st			)
     ,.a_tx_id              	(a_tx_id        	)
     ,.a_alm_num            	(a_alm_num      	)
-    ,.di_i                  (di_i				)
-	,.do_o					(do_o				)
+    ,.ec_id					(					)
+    ,.i_servo_notok			(					)
+    ,.i_servo_stop			(					)
+    ,.i_axis_limf			(					)
+    ,.i_axis_org			(					)
+    ,.i_axis_limb			(					)
+    ,.i_emerge_stop_signal	(					)
+    ,.i_safe_status			(					)
+    ,.i_axis_point			(					)
+    ,.i_axis_reset			(					)
+    ,.i_dv_alarm			(					)
+    ,.o_dv_pulse			(					)
+    ,.o_dv_dir				(					)
+    ,.o_dv_reset			(					)
+    ,.o_dv_son				(					)
+    ,.rctrl_drive_on		(					)
+    ,.rctrl_drive_reset		(					)
+    ,.rctrl_resume			(					)
+    ,.rctrl_pause			(					)
+    ,.rctrl_quickstop		(					)
+    ,.rcfg_pf_mode			(					)
+    ,.rserv_dir				(					)
+    ,.rserv_step_pulse		(					)
+    ,.rserv_target_pulse	(					)
+    ,.rcfg_home_spd			(					)
+    ,.rcfg_home_acc			(					)
+    ,.rcfg_home_dec			(					)
+    ,.rcfg_jog_spd			(					)
+    ,.rcfg_jog_acc			(					)
+    ,.rcfg_jog_dec			(					)
+    ,.rcfg_move_spd			(					)
+    ,.rcfg_move_acc			(					)
+    ,.rcfg_move_dec			(					)
+    ,.rcfg_spd_max			(					)
+    ,.rcfg_acc_max			(					)
+    ,.rcfg_dec_max			(					)
+    ,.rcfg_qs_dec			(					)
+    ,.rcfg_timedly			(					)
     ,.irq_o                	(irq_a				)
     ,.irq_ack_i       		(irq_a_grant		)
 	,.state_monitor_o		(param51			)
@@ -372,7 +422,7 @@ module ec_pul_axis#(
 	,.irq_ack_i                 (irq_c_grant		)
    );
 	
-		pre_post_sta_check_pul_axis#(
+	pre_post_sta_check_pul_axis#(
 			.A_BHA_NUM			(A_BHA_NUM	 		)    ,	
 			.B_BHA_NUM			(B_BHA_NUM	 		)  
 	)pre_post_sta_check_pul_axis_u0(
@@ -391,7 +441,6 @@ module ec_pul_axis#(
 			.link_m_saf_st   	(link_m_saf_st  ),
 			.sc_id				(sc_id			),
 			.ec_id           	(ec_id          ),
-			.di_i				(di_i			),
 			.do_i				(do_o			),
 			.a_en				(a_en			),
 			.b_en				(b_en			),	

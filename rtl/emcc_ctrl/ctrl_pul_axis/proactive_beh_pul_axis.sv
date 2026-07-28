@@ -43,25 +43,48 @@ module proactive_beh_pul_axis#(
     ,output		                ec_cha_st
     ,output reg [7:0]           a_tx_id
     ,output reg	[7:0]           a_alm_num
+    //io port start
+    ,input					    i_servo_notok       //servo not ok
+    ,input					    i_servo_stop        //servo stop
+    ,input					    i_axis_limf         //axis limit forward
+    ,input					    i_axis_org          //axis origin
+    ,input					    i_axis_limb         //axis limit backward
+    ,input					    i_emerge_stop_signal//emergency stop signal
 
-    ,input  	                i_safe_status 
-    ,input  	                i_axis_limf     
-    ,input  	                i_axis_limb     
-    ,input  	                i_axis_org
-    ,input  	                i_axis_point
-    ,input  	                i_axis_reset
-    ,input  	                i_servo_notok
-    ,input  	                i_servo_stop
-    ,input  	                i_dv_alarm
-    ,output reg                 o_dv_pulse
-    ,output reg                 o_dv_dir
-    ,output reg                 o_dv_reset
-    ,output reg                 o_dv_son
-    ,input  	 [7:0]          set_wheel_gear
-    ,input  	 [3:0]          i_wheel_prog
-    ,input  	                i_wheel_run
-    ,input  	                i_wheel_dir
-    ,input  	 [15:0]         i_wheel_speed
+   	,input  	                i_safe_status 		//safe status
+   	,input  	                i_axis_point		//axis point
+   	,input  	                i_axis_reset		//axis reset
+   	,input  	                i_dv_alarm			//drive alarm
+   	,output wire                o_dv_pulse			//axi pulse
+   	,output wire                o_dv_dir			//axis dir
+   	,output wire                o_dv_reset			//servo reset
+   	,output wire                o_dv_son			//servo en
+    //io port end
+	//register start
+	,input		[ 0:0]			rctrl_drive_on    	//enable servo
+	,input		[ 0:0]			rctrl_drive_reset 	//reset servo
+	,input		[ 0:0]			rctrl_resume      	//resume servo
+	,input		[ 0:0]			rctrl_pause       	//pause servo
+	,input		[ 0:0]			rctrl_quickstop   	//quick stop
+	,input		[ 0:0]			rcfg_pf_mode     	//position feedback mode
+	,input		[ 0:0]			rserv_dir         	//servo direction
+	,input		[31:0]			rserv_step_pulse 	//servo step pulse
+	,input		[31:0]			rserv_target_pulse	//servo target pulse
+	,input		[15:0]			rcfg_home_spd     	//home speed
+	,input		[15:0]			rcfg_home_acc     	//home acceleration
+	,input		[15:0]			rcfg_home_dec     	//home deceleration
+	,input		[15:0]			rcfg_jog_spd      	//jog speed
+	,input		[15:0]			rcfg_jog_acc      	//jog acceleration
+	,input		[15:0]			rcfg_jog_dec      	//jog deceleration
+	,input		[15:0]			rcfg_move_spd     	//move speed
+	,input		[15:0]			rcfg_move_acc     	//move acceleration
+	,input		[15:0]			rcfg_move_dec     	//move deceleration
+	,input		[15:0]			rcfg_spd_max      	//maximum speed
+	,input		[15:0]			rcfg_acc_max      	//maximum acceleration
+	,input		[15:0]			rcfg_dec_max      	//maximum deceleration
+	,input		[15:0]			rcfg_qs_dec       	//quick stop deceleration
+	,input		[31:0]			rcfg_timedly      	//timedly time
+	//register end
 
     ,output reg                 irq_o
     ,input                      irq_ack_i       //Interrupt response
@@ -409,345 +432,438 @@ module proactive_beh_pul_axis#(
     	    end
     	end
 	end
-	
-	
-	always@(posedge clk_i)
-	begin
-		if(rst_i || !a_en)
-			do_o <= 2'b00;
-		else if(curr_state == S_EXE && a_bhv_id_r == 8'd1)		//Drive to position 1
-			do_o <= 2'b01;
-		else if(curr_state == S_EXE && a_bhv_id_r == 8'd2)		//Drive to position 2
-			do_o <= 2'b10;
-		else if(curr_state == S_EXE && a_bhv_id_r == 8'd3)		//invalid behavior 
-			do_o <= 2'b00;
-		else if(curr_state == S_EXE && a_bhv_id_r == 8'd4)		//Sense position 1
-			do_o <= 2'b00;
-		else if(curr_state == S_EXE && a_bhv_id_r == 8'd5)		//Sense position 2
-			do_o <= 2'b00;
-		else if(curr_state == S_EXE && a_bhv_id_r == 8'd6)		//Drive to direction 1
-			do_o <= 2'b01;
-		else if(curr_state == S_EXE && a_bhv_id_r == 8'd7 )		//Drive to direction 2
-			do_o <= 2'b10; 
-		else if(curr_state == S_EXE && a_bhv_id_r == 8'd8 )		//Sense hook 1
-			do_o <= 2'b00; 
-		else if(curr_state == S_EXE && a_bhv_id_r == 8'd9 )		//Sense hook 0
-			do_o <= 2'b00; 
-		else if(curr_state == S_EXE && a_bhv_id_r == 8'd10)		//Drive to position 1 [safe]
-			do_o <= 2'b01;
-		else if(curr_state == S_EXE && a_bhv_id_r == 8'd11)		//Drive to position 2 [safe]
-			do_o <= 2'b10;
-		else if(curr_state == S_EXE && a_bhv_id_r == 8'd12)		//Drive to direction 1 [safe]
-			do_o <= 2'b01;
-		else if(curr_state == S_EXE && a_bhv_id_r == 8'd13)		//Drive to direction 2 [safe]
-			do_o <= 2'b10;
-		else
-			do_o <= do_o;
-	end
 
 
-	//===============================================================================================================
-	//------------------------------------------------ user logic start ---------------------------------------------
-	//===============================================================================================================
-	localparam P_EN_EFF     	  = 1'b0;
-   	localparam P_RST_EFF      = 1'b0;
-   	assign o_dv_son   =  i_auto_manual_singal ? ~P_EN_EFF : rctrl_drive_on ? (bh_disable ? ~P_EN_EFF : P_EN_EFF) : ~P_EN_EFF;
-   	assign o_dv_reset = (rctrl_drive_reset | i_axis_reset) ? P_RST_EFF : ~P_RST_EFF;
-   
+// motion control signals
+reg        action_start;
+reg        get_point_flag;
+reg        alarm_flag;
+reg        son_bhv_flag;
+reg        reset_bhv_flag;
+reg        action_alarm;
+reg [7:0]  action_delay_cnt;
+reg [15:0] servo_delay_ms;
+reg        act_done_d1;
+reg        servo_stop_timeout;
+reg [15:0] servo_stop_timeout_cnt_ms;
 
-   	reg              i_wheel_enable;
-   	wire             i_wheel_work;
-   	assign   i_wheel_work = i_wheel_run & i_wheel_enable;
-   	assign   i_switch_man = (i_wheel_prog==0) ? 1'b0 : 1'b1;
-   	always@(posedge clk) begin
-   	    if((i_wheel_prog==0) | (i_wheel_prog==15)) begin
-   	        i_wheel_enable <= 1'b0;
-   	    end else if(set_wheel_gear[i_wheel_prog-1]) begin
-   	        i_wheel_enable <= 1'b1;
-   	    end else begin
-   	        i_wheel_enable <= 1'b0;
-   	    end
-   	end
+wire       action_son;
+reg        action_busy;
+reg        action_done;
+reg        action_error;
+wire       servo_work_error;
 
-   	wire wheel_son = ((curr_beh_number == 1) & i_switch_man) ? 1'b1 : 1'b0;
+assign action_son = rctrl_drive_on;
 
+// behavior flags in S_EXE
+always@(posedge clk_i) begin
+    if(rst_i || !a_en) begin
+        action_start    <= 1'b0;
+        get_point_flag  <= 1'b0;
+        alarm_flag      <= 1'b0;
+        son_bhv_flag    <= 1'b0;
+        reset_bhv_flag  <= 1'b0;
+    end
+    else if(curr_state == S_EXE) begin
+        if(a_bhv_id_r == 8'd1)       action_start   <= 1'b1;   // Home
+        else if(a_bhv_id_r == 8'd2)  action_start   <= 1'b1;   // JOG
+        else if(a_bhv_id_r == 8'd3)  action_start   <= 1'b1;   // Move
+        else if(a_bhv_id_r == 8'd10) get_point_flag <= 1'b1;   // Get point data
+        else if(a_bhv_id_r == 8'd11) alarm_flag     <= 1'b1;
+        else if(a_bhv_id_r == 8'd12) alarm_flag     <= 1'b1;
+        else if(a_bhv_id_r == 8'd13) alarm_flag     <= 1'b1;
+        else if(a_bhv_id_r == 8'd14) son_bhv_flag   <= 1'b1;   // Son servo
+        else if(a_bhv_id_r == 8'd15) reset_bhv_flag <= 1'b1;   // Reset servo
+    end
+    else begin
+        action_start    <= 1'b0;
+        get_point_flag  <= 1'b0;
+        alarm_flag      <= 1'b0;
+        son_bhv_flag    <= 1'b0;
+        reset_bhv_flag  <= 1'b0;
+    end
+end
 
-  	wire         o_rc_pulse_start;
-  	wire [31:0]  o_rc_pulse_period;
-  	wire [31:0]  o_rc_pulse_number;
-  	wire         o_rc_pulse_dir;
-  	wire         i_rc_pulse_done;
-  	wire         i_rc_dbestop;
-  
-  Pulmot_fd Pulmot_fd00
-   (
-      .clk              ( clk                    ),
-      .reset            ( reset                  ),
-      
-      .i_bv_pulse_start ( o_rc_pulse_start       ),
-      .i_bv_pulse_period( o_rc_pulse_period      ),
-      .i_bv_pulse_number( o_rc_pulse_number      ),
-      .i_bv_pulse_dir   ( o_rc_pulse_dir         ),
-      .o_bv_pulse_done  ( i_rc_pulse_done        ),
+// servo outputs
+assign o_dv_son   = (son_bhv_flag  ) ? rctrl_drive_on : ~rctrl_drive_on;
+assign o_dv_reset = (reset_bhv_flag) ? rctrl_drive_reset : ~rctrl_drive_reset;
 
-      .i_dv_ready       ( 1'b0                   ),
-      .i_dv_inp         ( 1'b0                   ),
-      .i_dv_phase_a     ( 1'b0                   ),
-      .i_dv_phase_b     ( 1'b0                   ),
-      .i_dv_phase_z     ( 1'b0                   ),
-      .o_dv_pulse_p     ( o_dv_pulse         ),
-      .o_dv_pulse_n     ( o_dv_dir           )
-   );
-  
-  ////////////////// Positioner
-   reg  [31:0]  pos_pf_spd;
-   reg  [31:0]  pos_pf_acc;
-   reg  [31:0]  pos_pf_dec;
-   wire [31:0]  pos_quickstop_dec = rcfg_qs_dec;
-   reg          pos_quickstop;
-   reg  [31:0]  pos_pf_mode;
-   reg          pos_pf_start;
-   reg          pos_pf_stop;
-   reg          pos_pf_dir;
-   reg  [31:0]  pos_pf_pulse;
-   wire         pos_pf_busy;
-   wire         pos_pf_done;
-   wire         pos_pf_error;
+// motion start triggers
+wire home_start;
+wire jog_start;
+wire move_start;
+assign home_start = (a_bhv_id_r == 8'd1) ? action_start : 1'b0;
+assign jog_start  = (a_bhv_id_r == 8'd2) ? action_start : 1'b0;
+assign move_start = (a_bhv_id_r == 8'd3) ? action_start : 1'b0;
 
-   Positioner_std	pos_u
-   (
-      .clk            ( clk               ),
-      .reset          ( reset             ),
-      .i_pf_spd       ( pos_pf_spd        ),
-      .i_pf_acc       ( pos_pf_acc        ),
-      .i_pf_dec       ( pos_pf_dec        ),
-      .i_pf_mode      ( pos_pf_mode       ),
-      .i_pf_start     ( pos_pf_start      ),
-      .i_pf_stop      ( pos_pf_stop       ),
-      .i_pf_dir       ( pos_pf_dir        ),
-      .i_pf_pulse     ( pos_pf_pulse      ),
-      .i_quickstop    ( pos_quickstop     ),
-      .i_quickstop_dec( pos_quickstop_dec ),
-      .o_pf_done      ( pos_pf_done       ),
-      .o_pf_error     ( pos_pf_error      ),
-      .o_pf_busy      ( pos_pf_busy       ),
-      .o_pulse_start  ( o_rc_pulse_start  ),
-      .o_pulse_period ( o_rc_pulse_period ),
-      .o_pulse_number ( o_rc_pulse_number ),
-      .o_pulse_dir    ( o_rc_pulse_dir    ),
-      .i_pulse_done   ( i_rc_pulse_done   )
-   );
-   
-    /// -------------------------------------------------------------------------
-   /// -------------------------------------------------------------------------
-   /// -------------------------------------------------------------------------
-   wire         home_start;
-   reg axis_org;
-   `ifdef ENB_SIM_MODULE
-       reg sim_start_n;
-       wire sim_start = (sim_start_n ==0) && (home_start==1);
-       reg [3:0]sim_state;
-       reg [15:0]sim_org_cnt;
-       always @ (posedge clk)
-       begin
-          if(reset)begin
-            sim_start_n <= 'b0;
-            sim_org_cnt <= 'b0;
-            sim_state <= 'b0;
-            axis_org <= 'b0;
-          end else begin
-            sim_start_n <= home_start;
-            case(sim_state)
-                0:begin
-                    if(sim_start)sim_state<=1;
-                    else sim_state <= 0;
-                    sim_org_cnt <= 0;
-                    axis_org <= 0;
-                end
-                1:begin
-                    if(sim_org_cnt < 1000)begin
-                        sim_org_cnt <= sim_org_cnt + i_time_1ms_vld;
-                        sim_state <= sim_state;
-                    end else begin
-                        sim_state <= sim_state + 1;
-                        sim_org_cnt <= 0;
-                    end
-                    axis_org <= 0;
-                end
-                2:begin
-                    if(sim_org_cnt < 1000)begin
-                        sim_org_cnt <= sim_org_cnt + i_time_1ms_vld;
-                        sim_state <= sim_state;
-                    end else begin
-                        sim_state <= sim_state + 1;
-                        sim_org_cnt <= 0;
-                    end
-                    axis_org <= 1;
-                end
-                3:begin
-                    sim_org_cnt <= 'b0;
-                    sim_state <= 'b0;
-                    axis_org <= 'b0;
-                end
-                default:begin
-                    sim_org_cnt <= 'b0;
-                    sim_state <= 'b0;
-                    axis_org <= 'b0;
-                end
-            endcase
-          end
-       end
-   `else
-       always @(posedge clk) begin
-           axis_org <= i_axis_org;
-       end
-   `endif
-   /// -------------------------------------------------------------------------
-   /// -------------------------------------------------------------------------
-   /// -------------------------------------------------------------------------
-   
-   ////////////////// HOME
-//   wire         home_start;
-   reg          home_stop;
-   wire         home_busy;
-   wire         home_done;
-   wire         home_error;
-   wire [31:0]  home_pf_spd;
-   wire [31:0]  home_pf_acc;
-   wire [31:0]  home_pf_dec;
-   wire [31:0]  home_pf_pulse;
-   wire         home_pf_dir;
-   wire         home_pf_start;
-   wire         home_pf_stop;
-   wire         home_pf_quickstop;
+// axis_org register
+reg axis_org;
+always@(posedge clk_i) begin
+    if(rst_i)
+        axis_org <= 1'b0;
+    else
+        axis_org <= i_axis_org;
+end
 
-    localparam DIR_POS  	      = 1'b1;
-    localparam DIR_NEG    	      = 1'b0;
-    localparam P_SPD_MIN    	  = 32'd5000;      // pulse/s
-   Home_fa_std #(P_SPD_MIN/1000)
-   home_u
-   (
-      .clk            ( clk               ),
-      .reset          ( reset             ),
-      
-      .i_drv_son      ( action_son           ),
-      .i_lim_f        ( i_axis_limf       ),
-      .i_lim_b        ( i_axis_limb       ),
-      .i_org          ( axis_org          ),
-      .i_pf_spd       ( rcfg_home_spd     ),
-      .i_pf_acc       ( rcfg_home_acc     ),
-      .i_pf_dec       ( rcfg_home_dec     ),
-      .i_pf_dir       ( DIR_NEG           ),
-      .i_start        ( home_start    	  ),
-      .i_stop         ( home_stop         ),
-      .o_busy         ( home_busy         ),
-      .o_done         ( home_done         ),
-      .o_error        ( home_error        ),
-      .o_pf_spd       ( home_pf_spd       ),
-      .o_pf_acc       ( home_pf_acc       ),
-      .o_pf_dec       ( home_pf_dec       ),
-      .o_pf_pulse     ( home_pf_pulse     ),
-      .o_pf_dir       ( home_pf_dir       ),
-      .o_pf_start     ( home_pf_start     ),
-      .o_pf_stop      ( home_pf_stop      ),
-      .o_pf_quickstop ( home_pf_quickstop ),
-      .i_pf_busy      ( pos_pf_busy       ),
-      .i_pf_done      ( pos_pf_done       )
-   );
-   
-   ////////////////// JOG
-   wire         jog_start;
-   reg          jog_stop;
-   wire         jog_busy;
-   wire         jog_done;
-   wire         jog_error;
-   wire [31:0]  jog_pf_spd;
-   wire [31:0]  jog_pf_acc;
-   wire [31:0]  jog_pf_dec;   
-   wire [31:0]  jog_pf_pulse;  
-   wire         jog_pf_dir;
-   wire         jog_pf_start;
-   wire         jog_pf_stop;
-   wire         jog_pf_quickstop;
-   
-   Jog_fa_std	jog_u
-   (
-      .clk            ( clk              ),
-      .reset          ( reset            ),
-      
-      .i_drv_son      ( action_son          ),
-      .i_lim_f        ( i_axis_limf      ),
-      .i_lim_b        ( i_axis_limb      ),
-      .i_org          ( axis_org         ),
-      .i_pf_spd       ( rcfg_jog_spd     ),
-      .i_pf_acc       ( rcfg_jog_acc     ),
-      .i_pf_dec       ( rcfg_jog_dec     ),
-      .i_pf_pulse     ( rserv_step_pulse ),
-      .i_pf_dir       ( rserv_dir        ),
-      .i_start        ( jog_start   	 ),
-      .i_stop         ( jog_stop         ),
-      .o_busy         ( jog_busy         ),
-      .o_done         ( jog_done         ),
-      .o_error        ( jog_error        ),
-      .o_pf_spd       ( jog_pf_spd       ),
-      .o_pf_acc       ( jog_pf_acc       ),
-      .o_pf_dec       ( jog_pf_dec       ),
-      .o_pf_pulse     ( jog_pf_pulse     ),
-      .o_pf_dir       ( jog_pf_dir       ),
-      .o_pf_start     ( jog_pf_start     ),
-      .o_pf_stop      ( jog_pf_stop      ),
-      .o_pf_quickstop ( jog_pf_quickstop ),
-      .i_pf_busy      ( pos_pf_busy      ),
-      .i_pf_done      ( pos_pf_done      )
-   );
-   
-   ////////////////// MOVE
-   wire         move_start;
-   reg          move_stop;
-   wire         move_busy;
-   wire         move_done;
-   wire         move_error;
-   wire [31:0]  move_pf_spd;
-   wire [31:0]  move_pf_acc;
-   wire [31:0]  move_pf_dec;  
-   wire [31:0]  move_pf_pulse;   
-   wire         move_pf_dir;
-   wire         move_pf_start;
-   wire         move_pf_stop;
-   wire         move_pf_quickstop;
+// common params
+localparam DIR_POS = 1'b1;
+localparam DIR_NEG = 1'b0;
+localparam P_SPD_MIN = 32'd5000;  // pulse/s
 
-   
-   reg signed [31:0]  r_pf_abspos;
-   Move_fa_std	move_u
-   (
-      .clk            ( clk                ),
-      .reset          ( reset              ),
-      
-      .i_drv_son      ( action_son            ),
-      .i_lim_f        ( i_axis_limf        ),
-      .i_lim_b        ( i_axis_limb        ),
-      .i_org          ( axis_org           ),
-      .i_abspos       ( r_pf_abspos        ),
-      .i_pf_spd       ( rcfg_move_spd      ),
-      .i_pf_acc       ( rcfg_move_acc      ),
-      .i_pf_dec       ( rcfg_move_dec      ),
-      .i_pf_pulse     ( rserv_target_pulse ),
-      .i_start        ( move_start     	   ),
-      .i_stop         ( move_stop          ),
-      .o_busy         ( move_busy          ),
-      .o_done         ( move_done          ),
-      .o_error        ( move_error         ),
-      .o_pf_spd       ( move_pf_spd        ),
-      .o_pf_acc       ( move_pf_acc        ),
-      .o_pf_dec       ( move_pf_dec        ),
-      .o_pf_pulse     ( move_pf_pulse      ),
-      .o_pf_dir       ( move_pf_dir        ),
-      .o_pf_start     ( move_pf_start      ),
-      .o_pf_stop      ( move_pf_stop       ),
-      .o_pf_quickstop ( move_pf_quickstop  ),
-      .i_pf_busy      ( pos_pf_busy        ),
-      .i_pf_done      ( pos_pf_done        )
-   );
+// HOME (beh=1)
+reg          home_stop;
+wire         home_busy;
+wire         home_done;
+wire         home_error;
+wire [31:0]  home_pf_spd;
+wire [31:0]  home_pf_acc;
+wire [31:0]  home_pf_dec;
+wire [31:0]  home_pf_pulse;
+wire         home_pf_dir;
+wire         home_pf_start;
+wire         home_pf_stop;
+wire         home_pf_quickstop;
+wire         pos_pf_busy;
+wire         pos_pf_done;
+wire         pos_pf_error;
 
+Home_fa_std #(P_SPD_MIN/1000)
+home_u
+(
+  .clk            ( clk_i              ),
+  .reset          ( rst_i              ),
+
+  .i_drv_son      ( action_son         ),
+  .i_lim_f        ( i_axis_limf        ),
+  .i_lim_b        ( i_axis_limb        ),
+  .i_org          ( axis_org           ),
+  .i_pf_spd       ( rcfg_home_spd      ),
+  .i_pf_acc       ( rcfg_home_acc      ),
+  .i_pf_dec       ( rcfg_home_dec      ),
+  .i_pf_dir       ( DIR_NEG            ),
+  .i_start        ( home_start         ),
+  .i_stop         ( home_stop          ),
+  .o_busy         ( home_busy          ),
+  .o_done         ( home_done          ),
+  .o_error        ( home_error         ),
+  .o_pf_spd       ( home_pf_spd        ),
+  .o_pf_acc       ( home_pf_acc        ),
+  .o_pf_dec       ( home_pf_dec        ),
+  .o_pf_pulse     ( home_pf_pulse      ),
+  .o_pf_dir       ( home_pf_dir        ),
+  .o_pf_start     ( home_pf_start      ),
+  .o_pf_stop      ( home_pf_stop       ),
+  .o_pf_quickstop ( home_pf_quickstop  ),
+  .i_pf_busy      ( pos_pf_busy        ),
+  .i_pf_done      ( pos_pf_done        )
+);
+
+// JOG (beh=2)
+reg          jog_stop;
+wire         jog_busy;
+wire         jog_done;
+wire         jog_error;
+wire [31:0]  jog_pf_spd;
+wire [31:0]  jog_pf_acc;
+wire [31:0]  jog_pf_dec;
+wire [31:0]  jog_pf_pulse;
+wire         jog_pf_dir;
+wire         jog_pf_start;
+wire         jog_pf_stop;
+wire         jog_pf_quickstop;
+
+Jog_fa_std jog_u
+(
+  .clk            ( clk_i              ),
+  .reset          ( rst_i              ),
+
+  .i_drv_son      ( action_son         ),
+  .i_lim_f        ( i_axis_limf        ),
+  .i_lim_b        ( i_axis_limb        ),
+  .i_org          ( axis_org           ),
+  .i_pf_spd       ( rcfg_jog_spd       ),
+  .i_pf_acc       ( rcfg_jog_acc       ),
+  .i_pf_dec       ( rcfg_jog_dec       ),
+  .i_pf_pulse     ( rserv_step_pulse   ),
+  .i_pf_dir       ( rserv_dir          ),
+  .i_start        ( jog_start          ),
+  .i_stop         ( jog_stop           ),
+  .o_busy         ( jog_busy           ),
+  .o_done         ( jog_done           ),
+  .o_error        ( jog_error          ),
+  .o_pf_spd       ( jog_pf_spd         ),
+  .o_pf_acc       ( jog_pf_acc         ),
+  .o_pf_dec       ( jog_pf_dec         ),
+  .o_pf_pulse     ( jog_pf_pulse       ),
+  .o_pf_dir       ( jog_pf_dir         ),
+  .o_pf_start     ( jog_pf_start       ),
+  .o_pf_stop      ( jog_pf_stop        ),
+  .o_pf_quickstop ( jog_pf_quickstop   ),
+  .i_pf_busy      ( pos_pf_busy        ),
+  .i_pf_done      ( pos_pf_done        )
+);
+
+// MOVE (beh=3)
+reg          move_stop;
+wire         move_busy;
+wire         move_done;
+wire         move_error;
+wire [31:0]  move_pf_spd;
+wire [31:0]  move_pf_acc;
+wire [31:0]  move_pf_dec;
+wire [31:0]  move_pf_pulse;
+wire         move_pf_dir;
+wire         move_pf_start;
+wire         move_pf_stop;
+wire         move_pf_quickstop;
+
+reg signed [31:0] r_pf_abspos;
+
+Move_fa_std move_u
+(
+  .clk            ( clk_i              ),
+  .reset          ( rst_i              ),
+
+  .i_drv_son      ( action_son         ),
+  .i_lim_f        ( i_axis_limf        ),
+  .i_lim_b        ( i_axis_limb        ),
+  .i_org          ( axis_org           ),
+  .i_abspos       ( r_pf_abspos        ),
+  .i_pf_spd       ( rcfg_move_spd      ),
+  .i_pf_acc       ( rcfg_move_acc      ),
+  .i_pf_dec       ( rcfg_move_dec      ),
+  .i_pf_pulse     ( rserv_target_pulse ),
+  .i_start        ( move_start         ),
+  .i_stop         ( move_stop          ),
+  .o_busy         ( move_busy          ),
+  .o_done         ( move_done          ),
+  .o_error        ( move_error         ),
+  .o_pf_spd       ( move_pf_spd        ),
+  .o_pf_acc       ( move_pf_acc        ),
+  .o_pf_dec       ( move_pf_dec        ),
+  .o_pf_pulse     ( move_pf_pulse      ),
+  .o_pf_dir       ( move_pf_dir        ),
+  .o_pf_start     ( move_pf_start      ),
+  .o_pf_stop      ( move_pf_stop       ),
+  .o_pf_quickstop ( move_pf_quickstop  ),
+  .i_pf_busy      ( pos_pf_busy        ),
+  .i_pf_done      ( pos_pf_done        )
+);
+
+// Positioner
+reg  [31:0]  pos_pf_spd;
+reg  [31:0]  pos_pf_acc;
+reg  [31:0]  pos_pf_dec;
+wire [31:0]  pos_quickstop_dec = rcfg_qs_dec;
+reg          pos_quickstop;
+reg  [31:0]  pos_pf_mode;
+reg          pos_pf_start;
+reg          pos_pf_stop;
+reg          pos_pf_dir;
+reg  [31:0]  pos_pf_pulse;
+
+wire         o_rc_pulse_start;
+wire [31:0]  o_rc_pulse_period;
+wire [31:0]  o_rc_pulse_number;
+wire         o_rc_pulse_dir;
+wire         i_rc_pulse_done;
+
+Positioner_std pos_u
+(
+  .clk            ( clk_i              ),
+  .reset          ( rst_i              ),
+  .i_pf_spd       ( pos_pf_spd         ),
+  .i_pf_acc       ( pos_pf_acc         ),
+  .i_pf_dec       ( pos_pf_dec         ),
+  .i_pf_mode      ( pos_pf_mode        ),
+  .i_pf_start     ( pos_pf_start       ),
+  .i_pf_stop      ( pos_pf_stop        ),
+  .i_pf_dir       ( pos_pf_dir         ),
+  .i_pf_pulse     ( pos_pf_pulse       ),
+  .i_quickstop    ( pos_quickstop      ),
+  .i_quickstop_dec( pos_quickstop_dec  ),
+  .o_pf_done      ( pos_pf_done        ),
+  .o_pf_error     ( pos_pf_error       ),
+  .o_pf_busy      ( pos_pf_busy        ),
+  .o_pulse_start  ( o_rc_pulse_start   ),
+  .o_pulse_period ( o_rc_pulse_period  ),
+  .o_pulse_number ( o_rc_pulse_number  ),
+  .o_pulse_dir    ( o_rc_pulse_dir     ),
+  .i_pulse_done   ( i_rc_pulse_done    )
+);
+
+// Pulmot_fd pulse generator
+Pulmot_fd Pulmot_fd00
+(
+  .clk              ( clk_i              ),
+  .reset            ( rst_i              ),
+
+  .i_bv_pulse_start ( o_rc_pulse_start   ),
+  .i_bv_pulse_period( o_rc_pulse_period  ),
+  .i_bv_pulse_number( o_rc_pulse_number  ),
+  .i_bv_pulse_dir   ( o_rc_pulse_dir     ),
+  .o_bv_pulse_done  ( i_rc_pulse_done    ),
+
+  .i_dv_ready       ( 1'b0               ),
+  .i_dv_inp         ( 1'b0               ),
+  .i_dv_phase_a     ( 1'b0               ),
+  .i_dv_phase_b     ( 1'b0               ),
+  .i_dv_phase_z     ( 1'b0               ),
+  .o_dv_pulse_p     ( o_dv_pulse         ),
+  .o_dv_pulse_n     ( o_dv_dir           )
+);
+
+// action status mux: busy|done|error from active module
+always@(posedge clk_i) begin
+    if(rst_i) begin
+        action_busy  <= 1'b0;
+        action_done  <= 1'b0;
+        action_error <= 1'b0;
+    end else begin
+        case(a_bhv_id_r)
+            8'd1: begin
+                action_busy  <= home_busy;
+                action_done  <= home_done;
+                action_error <= home_error;
+                home_stop    <= action_alarm;
+            end
+            8'd2: begin
+                action_busy  <= jog_busy;
+                action_done  <= jog_done;
+                action_error <= jog_error;
+                jog_stop     <= action_alarm;
+            end
+            8'd3: begin
+                action_busy  <= move_busy;
+                action_done  <= move_done;
+                action_error <= move_error;
+                move_stop    <= action_alarm;
+            end
+            default: begin
+                action_busy  <= 1'b0;
+                action_done  <= 1'b0;
+                action_error <= 1'b0;
+            end
+        endcase
+    end
+end
+
+// Positioner
+always@(*) begin
+    case(a_bhv_id_r)
+        8'd1: begin
+            pos_pf_spd    = home_pf_spd   > rcfg_spd_max ? rcfg_spd_max : home_pf_spd;
+            pos_pf_acc    = home_pf_acc   > rcfg_acc_max ? rcfg_acc_max : home_pf_acc;
+            pos_pf_dec    = home_pf_dec   > rcfg_dec_max ? rcfg_dec_max : home_pf_dec;
+            pos_pf_mode   = rcfg_pf_mode ? 32'h10 : 32'h00;   // home: absolute mode
+            pos_pf_pulse  = home_pf_pulse;
+            pos_pf_start  = home_pf_start;
+            pos_pf_stop   = home_pf_stop;
+            pos_pf_dir    = home_pf_dir;
+            pos_quickstop = home_pf_quickstop;
+        end
+        8'd2: begin
+            pos_pf_spd    = jog_pf_spd    > rcfg_spd_max ? rcfg_spd_max : jog_pf_spd;
+            pos_pf_acc    = jog_pf_acc    > rcfg_acc_max ? rcfg_acc_max : jog_pf_acc;
+            pos_pf_dec    = jog_pf_dec    > rcfg_dec_max ? rcfg_dec_max : jog_pf_dec;
+            pos_pf_mode   = rcfg_pf_mode ? 32'h11 : 32'h01;   // jog: incremental mode
+            pos_pf_pulse  = jog_pf_pulse;
+            pos_pf_start  = jog_pf_start;
+            pos_pf_stop   = jog_pf_stop;
+            pos_pf_dir    = jog_pf_dir;
+            pos_quickstop = jog_pf_quickstop;
+        end
+        8'd3: begin
+            pos_pf_spd    = move_pf_spd   > rcfg_spd_max ? rcfg_spd_max : move_pf_spd;
+            pos_pf_acc    = move_pf_acc   > rcfg_acc_max ? rcfg_acc_max : move_pf_acc;
+            pos_pf_dec    = move_pf_dec   > rcfg_dec_max ? rcfg_dec_max : move_pf_dec;
+            pos_pf_mode   = rcfg_pf_mode ? 32'h11 : 32'h01;   // move: incremental mode
+            pos_pf_pulse  = move_pf_pulse;
+            pos_pf_start  = move_pf_start;
+            pos_pf_stop   = move_pf_stop;
+            pos_pf_dir    = move_pf_dir;
+            pos_quickstop = move_pf_quickstop;
+        end
+        default: begin
+            pos_pf_spd    = 32'd0;
+            pos_pf_acc    = 32'd0;
+            pos_pf_dec    = 32'd0;
+            pos_pf_mode   = 32'd0;
+            pos_pf_pulse  = 32'd0;
+            pos_pf_start  = 1'b0;
+            pos_pf_stop   = 1'b0;
+            pos_pf_dir    = 1'b0;
+            pos_quickstop = 1'b0;
+        end
+    endcase
+end
+
+// absolute position tracking
+always@(posedge clk_i) begin
+    if(rst_i)
+        r_pf_abspos <= 32'd0;
+    else if(action_son) begin
+        if(home_done & ~home_busy & ~home_error)
+            r_pf_abspos <= 32'd0;
+        else if(i_rc_pulse_done)
+            r_pf_abspos <= (o_rc_pulse_dir == DIR_POS) ? r_pf_abspos + 1'b1 : r_pf_abspos - 1'b1;
+    end
+end
+
+// servo delay monitor
+always@(posedge clk_i) begin
+    act_done_d1 <= action_done;
+    if(rst_i || !a_en) begin
+        servo_delay_ms <= 16'd0;
+    end else begin
+        if(action_son) begin
+            if(action_busy) begin
+                if(i_servo_stop)
+                    servo_delay_ms <= servo_delay_ms + i_time_1ms_vld;
+                else
+                    servo_delay_ms <= 16'd0;
+            end
+        end else begin
+            servo_delay_ms <= 16'd0;
+        end
+    end
+end
+
+// servo stop timeout (5s)
+always@(posedge clk_i) begin
+    if(rst_i || !a_en) begin
+        servo_stop_timeout        <= 1'd0;
+        servo_stop_timeout_cnt_ms <= 16'd0;
+    end else begin
+        if(action_son & act_done_d1) begin
+            if(servo_stop_timeout_cnt_ms < 5000) begin
+                servo_stop_timeout_cnt_ms <= servo_stop_timeout_cnt_ms + i_time_1ms_vld;
+                servo_stop_timeout        <= 1'b0;
+            end else begin
+                servo_stop_timeout_cnt_ms <= servo_stop_timeout_cnt_ms;
+                servo_stop_timeout        <= 1'b1;
+            end
+        end else begin
+            servo_stop_timeout        <= 1'b0;
+            servo_stop_timeout_cnt_ms <= 16'd0;
+        end
+    end
+end
+
+// servo work error: home=5s, jog-move=1s
+assign servo_work_error = (((a_bhv_id_r == 8'd1) & (servo_delay_ms >= 5000)) |
+                           ((a_bhv_id_r >= 8'd2 && a_bhv_id_r <= 8'd3) & (servo_delay_ms >= 1000))) ? 1'b1 : 1'b0;
+
+// action alarm
+always@(posedge clk_i) begin
+    if(rst_i || !a_en)
+        action_alarm <= 1'b0;
+    else if(curr_state == S_EXE)
+        action_alarm <= 1'b0;
+    else if(curr_state_1d == S_EXE && curr_state == S_ALERT_40)
+        action_alarm <= 1'b1;
+    else if(curr_state == S_IDLE)
+        action_alarm <= 1'b0;
+end
 
 endmodule
