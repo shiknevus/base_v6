@@ -60,6 +60,11 @@ module proactive_beh_pul_axis#(
    	,output wire                o_dv_reset			//servo reset
    	,output wire                o_dv_son			//servo en
     //io port end
+    //for post check start
+    ,output reg                 action_busy
+    ,output reg                 action_done
+    ,output reg                 action_error
+    //for post check start end
 	//register start
 	,input		[ 0:0]			rctrl_drive_on    	//enable servo
 	,input		[ 0:0]			rctrl_drive_reset 	//reset servo
@@ -458,13 +463,8 @@ reg        act_done_d1;
 reg        servo_stop_timeout;
 reg [15:0] servo_stop_timeout_cnt_ms;
 
-wire       action_son;
-reg        action_busy;
-reg        action_done;
-reg        action_error;
 wire       servo_work_error;
 
-assign action_son = rctrl_drive_on;
 
 // behavior flags in S_EXE
 always@(posedge clk_i) begin
@@ -479,10 +479,6 @@ always@(posedge clk_i) begin
         if(a_bhv_id_r == 8'd1)       action_start   <= 1'b1;   // Home
         else if(a_bhv_id_r == 8'd2)  action_start   <= 1'b1;   // JOG
         else if(a_bhv_id_r == 8'd3)  action_start   <= 1'b1;   // Move
-        else if(a_bhv_id_r == 8'd10) get_point_flag <= 1'b1;   // Get point data
-        else if(a_bhv_id_r == 8'd11) alarm_flag     <= 1'b1;
-        else if(a_bhv_id_r == 8'd12) alarm_flag     <= 1'b1;
-        else if(a_bhv_id_r == 8'd13) alarm_flag     <= 1'b1;
         else if(a_bhv_id_r == 8'd14) son_bhv_flag   <= 1'b1;   // Son servo
         else if(a_bhv_id_r == 8'd15) reset_bhv_flag <= 1'b1;   // Reset servo
     end
@@ -496,8 +492,17 @@ always@(posedge clk_i) begin
 end
 
 // servo outputs
-assign o_dv_son   = (son_bhv_flag  ) ? rctrl_drive_on : ~rctrl_drive_on;
-assign o_dv_reset = (reset_bhv_flag) ? rctrl_drive_reset : ~rctrl_drive_reset;
+reg son_bhv_flag_d1;
+reg r_dv_son;
+always@(posedge clk_i) begin
+    son_bhv_flag_d1 <= son_bhv_flag;
+    if(rst_i)
+        r_dv_son <= 1'b0;
+    else if(son_bhv_flag & ~son_bhv_flag_d1)
+        r_dv_son <= ~r_dv_son;
+end
+assign o_dv_son   = r_dv_son;
+assign o_dv_reset = (reset_bhv_flag) ? 1'b1 : 1'b0;
 
 // motion start triggers
 wire home_start;
@@ -544,7 +549,7 @@ home_u
   .clk            ( clk_i              ),
   .reset          ( rst_i              ),
 
-  .i_drv_son      ( action_son         ),
+  .i_drv_son      ( r_dv_son         ),
   .i_lim_f        ( i_axis_limf        ),
   .i_lim_b        ( i_axis_limb        ),
   .i_org          ( axis_org           ),
@@ -588,7 +593,7 @@ Jog_fa_std jog_u
   .clk            ( clk_i              ),
   .reset          ( rst_i              ),
 
-  .i_drv_son      ( action_son         ),
+  .i_drv_son      ( r_dv_son         ),
   .i_lim_f        ( i_axis_limf        ),
   .i_lim_b        ( i_axis_limb        ),
   .i_org          ( axis_org           ),
@@ -635,7 +640,7 @@ Move_fa_std move_u
   .clk            ( clk_i              ),
   .reset          ( rst_i              ),
 
-  .i_drv_son      ( action_son         ),
+  .i_drv_son      ( r_dv_son         ),
   .i_lim_f        ( i_axis_limf        ),
   .i_lim_b        ( i_axis_limb        ),
   .i_org          ( axis_org           ),
@@ -724,7 +729,7 @@ Pulmot_fd Pulmot_fd00
   .o_dv_pulse_n     ( o_dv_dir           )
 );
 
-// action status mux: busy|done|error from active module
+// action status 
 always@(posedge clk_i) begin
     if(rst_i) begin
         action_busy  <= 1'b0;
@@ -813,7 +818,7 @@ end
 always@(posedge clk_i) begin
     if(rst_i)
         r_pf_abspos <= 32'd0;
-    else if(action_son) begin
+    else if(r_dv_son) begin
         if(home_done & ~home_busy & ~home_error)
             r_pf_abspos <= 32'd0;
         else if(i_rc_pulse_done)
@@ -827,7 +832,7 @@ always@(posedge clk_i) begin
     if(rst_i || !a_en) begin
         servo_delay_ms <= 16'd0;
     end else begin
-        if(action_son) begin
+        if(r_dv_son) begin
             if(action_busy) begin
                 if(i_servo_stop)
                     servo_delay_ms <= servo_delay_ms + i_time_1ms_vld;
@@ -846,7 +851,7 @@ always@(posedge clk_i) begin
         servo_stop_timeout        <= 1'd0;
         servo_stop_timeout_cnt_ms <= 16'd0;
     end else begin
-        if(action_son & act_done_d1) begin
+        if(r_dv_son & act_done_d1) begin
             if(servo_stop_timeout_cnt_ms < 5000) begin
                 servo_stop_timeout_cnt_ms <= servo_stop_timeout_cnt_ms + i_time_1ms_vld;
                 servo_stop_timeout        <= 1'b0;

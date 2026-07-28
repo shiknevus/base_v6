@@ -69,6 +69,10 @@ module pre_post_sta_check_pul_axis#(
 		,output	reg	[B_BHA_NUM-1:0]		b_post_sta_allow
 		,output	reg						c_pre_sta_allow	
 		,output	reg						c_post_sta_allow
+
+		,input							action_busy
+		,input							action_done
+		,input							action_error
     );
 	
 	//========================================================================================//

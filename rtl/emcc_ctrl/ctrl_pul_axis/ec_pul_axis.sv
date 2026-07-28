@@ -350,6 +350,11 @@ module ec_pul_axis#(
     ,.o_dv_dir				(o_dv_dir			)
     ,.o_dv_reset			(o_dv_reset			)
     ,.o_dv_son				(o_dv_son			)
+	
+	,.action_busy			(action_busy)
+	,.action_done			(action_done)
+	,.action_error			(action_error)
+
     ,.rctrl_drive_on		(param30			)
     ,.rctrl_drive_reset		(param29			)
     ,.rctrl_resume			(param28			)
@@ -458,6 +463,11 @@ module ec_pul_axis#(
 			.b_post_sta_allow	(b_post_sta_allow),	
 			.c_pre_sta_allow	(c_pre_sta_allow),	
 			.c_post_sta_allow	(c_post_sta_allow)	
+
+			,.action_busy		(action_busy	)
+			,.action_done		(action_done	)
+			,.action_error		(action_error	)
+
 		);
 		
 	irq_3i1o_arbitrator irq_3i1o_arbitrator_u0(
