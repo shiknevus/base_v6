@@ -1,5 +1,5 @@
 `timescale 1 ns / 1 ps
-`include "./../../include_files/depot_addr_map.vh"
+`include "depot_addr_map.vh"
 module pkg_route
 #(
      parameter  RAM_DEPTH   =   32768

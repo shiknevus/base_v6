@@ -14,7 +14,7 @@
 //Description:
 //
 /////////////////////////////////////////////////////////////////
-`include  "./../../../include_files/depot_addr_map.vh"
+`include  "depot_addr_map.vh"
 module shou_1
 #(
      parameter  RAM_DEPTH   =   32768

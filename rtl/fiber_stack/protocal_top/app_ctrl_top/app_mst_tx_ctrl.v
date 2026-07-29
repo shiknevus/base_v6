@@ -166,7 +166,7 @@ module app_mst_tx_ctrl(
                     if(timer_done)begin
                         wk_state <= STM_END;
                     end else if (one_ecat_frm_done & (ecat_frm_rslt == `ETHCAT_PRCS_CRC_FAIL))begin
-                        wk_state <= STM_CK_SLV_HB;
+                        wk_state <= STM_END;//STM_CK_SLV_HB;
                     end else if (one_ecat_frm_done & (ecat_frm_rslt == `ETHCAT_PRCS_SUCCESS) & 
                                  (rx_eth_type == `ETHCAT_TYPE_INITIAL))begin
                         wk_state <= STM_POST_PRCS_INIT;
@@ -186,9 +186,9 @@ module app_mst_tx_ctrl(
                 end
                 STM_WAIT_ACK:begin
                     if(timer_done)begin
-                        wk_state <= STM_CK_SLV_HB;
+                        wk_state <= STM_POST_PRCS_DG;
                     end else if (one_ecat_frm_done & (ecat_frm_rslt == `ETHCAT_PRCS_CRC_FAIL))begin
-                        wk_state <= STM_CK_SLV_HB;
+                        wk_state <= STM_POST_PRCS_DG;
                     end else if (one_ecat_frm_done & (ecat_frm_rslt == `ETHCAT_PRCS_SUCCESS) & 
                                  (rx_eth_type == `ETHCAT_TYPE_DATAGRAM))begin
                         wk_state <= STM_POST_PRCS_DG;
@@ -225,8 +225,12 @@ module app_mst_tx_ctrl(
                 STM_POST_PRCS_INIT:begin
                     if(~app_trsf_en)begin
                         wk_state <= STM_END;
+					end else if(init_error)begin
+						wk_state <= STM_END;
+					end else if(run_en)begin
+						wk_state <= STM_TX_HS;
                     end else begin
-                        wk_state <= STM_TX_HS;
+                        wk_state <= wk_state;
                     end
                 end
                 STM_POST_PRCS_DG:begin
