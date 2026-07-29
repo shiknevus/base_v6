@@ -91,9 +91,9 @@ module pre_post_sta_check_pul_axis#(
 
 	wire [A_BHA_NUM-1:0]	post_sta	;
 
-	assign	post_sta[0 ] = (a_bhv_id == 1 );
-	assign	post_sta[1 ] = (a_bhv_id == 2 );
-	assign	post_sta[2 ] = (a_bhv_id == 3 );
+	assign	post_sta[0 ] = (a_bhv_id == 1 )&&action_done;
+	assign	post_sta[1 ] = (a_bhv_id == 2 )&&action_done;
+	assign	post_sta[2 ] = (a_bhv_id == 3 )&&action_done;
 	assign	post_sta[3 ] = (a_bhv_id == 4 );
 	assign	post_sta[4 ] = (a_bhv_id == 5 );
 	assign	post_sta[5 ] = (a_bhv_id == 6 );

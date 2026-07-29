@@ -285,8 +285,12 @@ module proactive_beh_pul_axis#(
 				if(detect_flag) begin
                 	if ((a_bhv_id_r >= 8'd1) && (a_bhv_id_r <= BHA_NUM ) && post_sta_allow[a_bhv_id_r - 1])
                     	next_state = S_SUCC_30;
-                	else
-                    	next_state = S_ALERT_40;
+                	else begin
+                        if (timout) 
+                            next_state = S_ALERT_40;
+                        else
+                            next_state = S_BHA_POST_DET;
+                    end
 				end
 				else
 					next_state = S_BHA_POST_DET;
@@ -553,9 +557,9 @@ home_u
   .i_lim_f        ( i_axis_limf        ),
   .i_lim_b        ( i_axis_limb        ),
   .i_org          ( axis_org           ),
-  .i_pf_spd       ( rcfg_home_spd      ),
-  .i_pf_acc       ( rcfg_home_acc      ),
-  .i_pf_dec       ( rcfg_home_dec      ),
+  .i_pf_spd       ( {16'd0,rcfg_home_spd} ),
+  .i_pf_acc       ( {16'd0,rcfg_home_acc} ),
+  .i_pf_dec       ( {16'd0,rcfg_home_dec} ),
   .i_pf_dir       ( DIR_NEG            ),
   .i_start        ( home_start         ),
   .i_stop         ( home_stop          ),
@@ -597,9 +601,9 @@ Jog_fa_std jog_u
   .i_lim_f        ( i_axis_limf        ),
   .i_lim_b        ( i_axis_limb        ),
   .i_org          ( axis_org           ),
-  .i_pf_spd       ( rcfg_jog_spd       ),
-  .i_pf_acc       ( rcfg_jog_acc       ),
-  .i_pf_dec       ( rcfg_jog_dec       ),
+  .i_pf_spd       ( {16'd0,rcfg_jog_spd}  ),
+  .i_pf_acc       ( {16'd0,rcfg_jog_acc}  ),
+  .i_pf_dec       ( {16'd0,rcfg_jog_dec}  ),
   .i_pf_pulse     ( rserv_step_pulse   ),
   .i_pf_dir       ( rserv_dir          ),
   .i_start        ( jog_start          ),
@@ -645,9 +649,9 @@ Move_fa_std move_u
   .i_lim_b        ( i_axis_limb        ),
   .i_org          ( axis_org           ),
   .i_abspos       ( r_pf_abspos        ),
-  .i_pf_spd       ( rcfg_move_spd      ),
-  .i_pf_acc       ( rcfg_move_acc      ),
-  .i_pf_dec       ( rcfg_move_dec      ),
+  .i_pf_spd       ( {16'd0,rcfg_move_spd} ),
+  .i_pf_acc       ( {16'd0,rcfg_move_acc} ),
+  .i_pf_dec       ( {16'd0,rcfg_move_dec} ),
   .i_pf_pulse     ( rserv_target_pulse ),
   .i_start        ( move_start         ),
   .i_stop         ( move_stop          ),
