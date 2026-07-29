@@ -154,7 +154,7 @@ initial begin
     ps_write_word(EC_BIAS_ADDR + `PARAM28,      32'h0000_0000, resp1);  // rctrl_resume = 0
     ps_write_word(EC_BIAS_ADDR + `PARAM29,      32'h0000_0000, resp1);  // rctrl_drive_reset = 0
     ps_write_word(EC_BIAS_ADDR + `PARAM30,      32'h0000_0001, resp1);  // rctrl_drive_on = 1
-    
+
     //============================================  behavior 15: reset servo  ==================================
     #500;
     do_behavior(8'd15);
@@ -168,13 +168,13 @@ initial begin
     #500;
     do_behavior(8'd14);
     //============================================     behavior 1: HOME    ==================================
-    #1000;
+    #5000;
     //simulate axis_org pulse during homing
     fork
         begin
-            #500;  // wait 50us
+            #2000;  // wait 50us
             force `EC_COMP_INST_PATH.i_axis_org = 1'b1;
-            #100;
+            #1000;
             release `EC_COMP_INST_PATH.i_axis_org;
         end
     join_none
