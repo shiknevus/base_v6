@@ -67,8 +67,8 @@ module ethcat_axi_rout #
     localparam  STM_DX       = 'd2;
 	localparam  STM_PG       = 'd3;
     localparam  STM_ED     	 = 'd4;
-	
-	localparam  STM_IDLE_F      = 'd0;
+
+    localparam  STM_IDLE_F      = 'd0;
     localparam  STM_INIT        = 'd1;
     localparam  STM_JUDGE    	= 'd2;
     localparam  STM_END     	= 'd3;
@@ -88,7 +88,7 @@ module ethcat_axi_rout #
 	wire		m_cache_tvalid_1;
 	reg	 [2:0]	stu;
 	reg	 [23:0]	cycle;
-	
+
 	(* MARK_DEBUG="true" *)reg		[1:0]				f_wk_state;
 	(* MARK_DEBUG="true" *)reg		[1:0]				f_nstate;
 	
@@ -229,10 +229,10 @@ module ethcat_axi_rout #
     always @( * )begin        
 		case(wk_state)
         STM_KHG:begin
-			s_app_tx_tready 	<=  m_axi_tx_tready_0;
-			m_cache_tready_0	<= m_axi_tx_tready_1;
+                        s_app_tx_tready         <= m_axi_tx_tready_0;
+                        m_cache_tready_0        <= m_axi_tx_tready_1;
 			m_cache_tready_1	<= 1'b1;
-		end		
+		end
 		STM_DX:begin
 			m_cache_tready_1	<= m_axi_tx_tready_0;
 			s_app_tx_tready 	<=  m_axi_tx_tready_1;
@@ -255,7 +255,7 @@ module ethcat_axi_rout #
         end
         endcase		
     end
-	
+
 	always @(posedge clk)begin
         if(rst)begin
 			stu	<=  'd0; 
@@ -328,7 +328,7 @@ module ethcat_axi_rout #
 		default:f_nstate <= STM_IDLE_F;
 		endcase
 	end	
-	
+
 	always @(posedge clk) begin
         if(rst)begin
 			cycle  	<=  'h0;

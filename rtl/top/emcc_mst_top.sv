@@ -209,7 +209,6 @@ module emcc_mst_top #
     wire                        rcv_intf_tst_dg_done;//interrupt
     reg                         axi_clk_rst_0_d1;
     reg                         aurora_ip_rst_release;
-    wire    [2:0]               stu;
     wire                        clk_10m;
 
      ///////////////////////////////////////////////////////////////////////
@@ -541,7 +540,6 @@ localparam DO_BIT_WIDTH = 32;
         ,.rst                   (prot_clk_rst   )
         ,.downstream_lane_up    (LANE_UP_0 &  CHANNEL_UP_0)//assert level base on heartbeat result downstream_lane_up-->LANE_UP_1 &  CHANNEL_UP_1
         ,.downstream_link       (LANE_UP_1 &  CHANNEL_UP_1)
-        ,.stu			        (stu	        )
         //from app interface
         ,.s_app_tx_tvalid       (m_app_tx_tvalid)
         ,.s_app_tx_tready       (m_app_tx_tready)
@@ -887,7 +885,6 @@ localparam DO_BIT_WIDTH = 32;
 			,.downstream_lane_up(LANE_UP_0 &  CHANNEL_UP_0)
 			,.downstream_link   (LANE_UP_1 &  CHANNEL_UP_1)
 /*            ,.mst_prcs_hb_flag  (mst_prcs_hb_flag)*/
-            ,.stu				(stu	       )
 
        //component interface
             ,.slv_cfg_msg_rden  (slv_cfg_msg_rden   )

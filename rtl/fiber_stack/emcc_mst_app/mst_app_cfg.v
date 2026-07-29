@@ -42,7 +42,6 @@ module mst_app_cfg
 	
 	,output reg             			init_error
 	,output reg             			run_en
-	,(* MARK_DEBUG="true" *)output	reg		[2:0]				stu	
 	,output reg             			init_err_clr
 	,input wire            				init_err
 	,output reg             			cnt_err_clr
@@ -81,10 +80,6 @@ module mst_app_cfg
     localparam  STM_INI_DONE    = 'd2;
     localparam  STM_RUN     	= 'd3;
 	
-    localparam  STM_IDLE_F      = 'd0;
-    localparam  STM_INIT        = 'd1;
-    localparam  STM_JUDGE    	= 'd2;
-    localparam  STM_END     	= 'd3;
 	
     reg     ps_reg_re_d1;
     reg     ps_reg_re_d2;
@@ -108,8 +103,6 @@ module mst_app_cfg
 	reg		[7:0]				data_reg1;
 	reg		[7:0]				data_reg2;
 	reg		[2:0]				err_code;
-	(* MARK_DEBUG="true" *)reg		[1:0]				f_wk_state;
-	(* MARK_DEBUG="true" *)reg		[1:0]				f_nstate;
 
     assign  wr_space_select =   ((ps_reg_addr >= REG_SPACE_BIAS) & (ps_reg_addr < (REG_SPACE_BIAS + REG_SPACE_SIZE))) ? 1'd1 : 1'd0;
     assign  rd_space_select =   ((ps_reg_rd_addr >= REG_SPACE_BIAS) & (ps_reg_rd_addr < (REG_SPACE_BIAS + REG_SPACE_SIZE))) ? 1'd1 : 1'd0;
@@ -350,104 +343,6 @@ module mst_app_cfg
 		end
 	end
 	
-	always @(posedge ps_reg_clk) begin
-        if(ps_reg_reset)begin
-			cycle  	<=  'h0;
-        end else begin
-			if((~downstream_link)|(~downstream_lane_up))begin
-				cycle	<= cycle + 1;
-			end else begin
-				cycle  	<=  'h0;
-			end	
-		end
-	end	
-	
-	/*always @(posedge ps_reg_clk) begin
-        if(ps_reg_reset)begin
-			stu  	<=  'h0;
-        end else begin
-			if(((~downstream_link)|(~downstream_lane_up))&&(cycle=='hffffff))begin
-				stu <= 'h0;
-			end else if((wk_state==STM_RUN)&(data_reg1-data_reg2==1))begin
-				stu	<= 'h1;
-			end else begin
-				stu <= 'h0;
-			end	
-		end
-	end*/	
-	
-	always @(posedge ps_reg_clk)begin
-        if(ps_reg_reset)begin
-			stu	<=  'd0; 
-		end else begin
-			case(f_wk_state)
-			STM_IDLE_F:begin
-				if(downstream_link&downstream_lane_up)begin
-					stu <= 'd1;
-				end	else begin
-					stu <= stu;
-				end
-			end	
-			STM_INIT:begin
-				if(downstream_link&downstream_lane_up)begin
-					stu <= 'd1;
-				end else if(((~downstream_link)|(~downstream_lane_up))&&(cycle=='hffffff))begin
-					stu <= 'h0;
-				end else begin
-					stu <= stu;
-				end	
-			end
-			STM_JUDGE:begin
-				stu <= stu;
-			end
-			STM_END:begin
-				stu <= stu;
-			end
-			default:stu	<=  'd0;
-		endcase
-		end
-	end	
-	
-	always @(posedge ps_reg_clk)begin
-        if(ps_reg_reset)begin
-            f_wk_state	<=  STM_IDLE_F; 
-		end else begin
-			f_wk_state	<=	f_nstate;
-		end
-	end
-	
-	always @ (*)begin
-		f_nstate <= STM_IDLE_F;
-		case(f_wk_state)
-		STM_IDLE_F:begin
-			if((~downstream_link)|(~downstream_lane_up))begin
-				f_nstate <= STM_INIT;
-			end	else begin
-				f_nstate <= STM_IDLE_F;
-			end
-		end 
-		STM_INIT:begin
-			if(downstream_link&downstream_lane_up)begin
-				f_nstate <= STM_END;
-			end else if(((~downstream_link)|(~downstream_lane_up))&&(cycle=='hffffff))begin
-				f_nstate <= STM_JUDGE;
-			end	else begin
-				f_nstate <= STM_INIT;
-			end
-		end
-		STM_JUDGE:begin
-			if(downstream_link&downstream_lane_up)begin
-				f_nstate <= STM_END;
-			end else begin
-				f_nstate <= STM_JUDGE;
-			end
-		end
-		STM_END:begin
-			f_nstate <= STM_IDLE_F;
-		end			
-		default:f_nstate <= STM_IDLE_F;
-		endcase
-	end	
 	
 	always @(posedge ps_reg_clk) begin
         if(ps_reg_reset)begin

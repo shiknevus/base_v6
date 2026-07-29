@@ -32,7 +32,6 @@ module emcc_mst_app
     ,input                              downstream_link
             //  ps  config  port    //
     ,output reg                         rcv_intf_tst_dg_done
-    ,output wire    [2:0]              stu
     
     //component interface
     ,output wire                        slv_cfg_msg_rden
@@ -225,7 +224,6 @@ module emcc_mst_app
 		
 		,.init_error		(init_error			)
 		,.run_en			(run_en				)
-		,.stu				(stu				)		
 		,.init_err_clr		(init_err_clr		)
 		,.init_err			(init_err			)
 		,.cnt_err_clr		(cnt_err_clr		)

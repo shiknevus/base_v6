@@ -66,6 +66,11 @@ module ethcat_axi_rout_mststa
     localparam  STM_KHG      = 'd2;
 	localparam  STM_PG       = 'd3;
     localparam  STM_ED     	 = 'd4;
+
+    localparam  STM_IDLE_F      = 'd0;
+    localparam  STM_INIT        = 'd1;
+    localparam  STM_JUDGE    	= 'd2;
+    localparam  STM_END     	= 'd3;
 	(* MARK_DEBUG="true" *)reg	[2:0]		wk_state;
 	
 	wire        m_cache_tvalid_0;
@@ -79,7 +84,11 @@ module ethcat_axi_rout_mststa
     wire        m_cache_tlast_1;
     wire [31:0] m_cache_tdata_1;
 	wire		m_cache_tvalid_1;
+	reg	[2:0]	stu;
 	reg	[19:0]	cycle;
+
+	(* MARK_DEBUG="true" *)reg		[1:0]				f_wk_state;
+	(* MARK_DEBUG="true" *)reg		[1:0]				f_nstate;
 	
 	always @(posedge clk) begin
         if(rst)begin
@@ -105,7 +114,7 @@ module ethcat_axi_rout_mststa
 			STM_KHG:begin
 				if(stu==1)begin
 					wk_state  		<= wk_state;
-				end else if(((~downstream_link)|(~downstream_lane_up)))begin
+				end else if((~downstream_link)|(~downstream_lane_up))begin
 					wk_state  		<= STM_IDLE;
 				end else begin
 					wk_state  		<= wk_state;
@@ -131,38 +140,10 @@ module ethcat_axi_rout_mststa
             endcase
         end
 	end
-	
-	always @(posedge clk) begin
-        if(rst)begin
-			cycle  	<=  'h0;
-        end else begin
-			if((~downstream_link)|(~downstream_lane_up))begin
-				cycle	<= cycle + 1;
-			end else begin
-				cycle  	<=  'h0;
-			end	
-		end
-	end	
 
     always @( * )begin
 		case(wk_state)
-		STM_IDLE:begin
-			m_axi_tx_tdata_0	<= s_app_tx_tdata;
-			m_axi_tx_tkeep_0	<= s_app_tx_tkeep;
-			m_axi_tx_tvalid_0	<= s_app_tx_tvalid;
-			m_axi_tx_tlast_0	<= s_app_tx_tlast;
-			
-			m_axi_tx_tdata_1	<= m_cache_tdata_0;
-			m_axi_tx_tkeep_1	<= m_cache_tkeep_0;
-			m_axi_tx_tvalid_1	<= m_cache_tvalid_0;
-			m_axi_tx_tlast_1	<= m_cache_tlast_0;
-			
-			m_app_rx_tvalid 	<= m_cache_tvalid_1;
-			m_app_rx_tkeep		<= m_cache_tkeep_1;
-			m_app_rx_tlast		<= m_cache_tlast_1;
-			m_app_rx_tdata		<= m_cache_tdata_1;
-		end		
-		STM_KHG:begin
+		STM_IDLE,STM_KHG:begin
 			m_axi_tx_tdata_0	<= s_app_tx_tdata;
 			m_axi_tx_tkeep_0	<= s_app_tx_tkeep;
 			m_axi_tx_tvalid_0	<= s_app_tx_tvalid;
@@ -178,6 +159,22 @@ module ethcat_axi_rout_mststa
 			m_app_rx_tlast		<= m_cache_tlast_1;
 			m_app_rx_tdata		<= m_cache_tdata_1;
 		end
+/*		STM_IDLE:begin
+			m_axi_tx_tdata_0	<= s_app_tx_tdata;
+			m_axi_tx_tkeep_0	<= s_app_tx_tkeep;
+			m_axi_tx_tvalid_0	<= s_app_tx_tvalid;
+			m_axi_tx_tlast_0	<= s_app_tx_tlast;
+			
+			m_axi_tx_tdata_1	<= m_cache_tdata_0;
+			m_axi_tx_tkeep_1	<= m_cache_tkeep_0;
+			m_axi_tx_tvalid_1	<= m_cache_tvalid_0;
+			m_axi_tx_tlast_1	<= m_cache_tlast_0;
+			
+			m_app_rx_tvalid 	<= m_cache_tvalid_1;
+			m_app_rx_tkeep		<= m_cache_tkeep_1;
+			m_app_rx_tlast		<= m_cache_tlast_1;
+			m_app_rx_tdata		<= m_cache_tdata_1;
+		end	*/	
 		STM_PG:begin
 			m_axi_tx_tdata_0	<= s_app_tx_tdata;
 			m_axi_tx_tkeep_0	<= s_app_tx_tkeep;
@@ -225,15 +222,15 @@ module ethcat_axi_rout_mststa
 
     always @( * )begin        
 		case(wk_state)
+        STM_KHG:begin
+                        s_app_tx_tready         <= m_axi_tx_tready_0;
+                        m_cache_tready_0        <= m_axi_tx_tready_1;
+			m_cache_tready_1	<= 1'b1;
+		end
 		STM_DX:begin
-			m_cache_tready_0	<= m_axi_tx_tready_1;			
-			s_app_tx_tready 	<= m_axi_tx_tready_0;
 			m_cache_tready_1	<= 1'b1;
-		end		
-		STM_KHG:begin
-			m_cache_tready_0	<= m_axi_tx_tready_1;			
 			s_app_tx_tready 	<= m_axi_tx_tready_0;
-			m_cache_tready_1	<= 1'b1;
+			m_cache_tready_0	<= m_axi_tx_tready_1;			
 		end
 		STM_PG:begin
 			s_app_tx_tready 	<=  m_axi_tx_tready_0;
@@ -252,6 +249,91 @@ module ethcat_axi_rout_mststa
         end
         endcase		
     end
+
+	always @(posedge clk)begin
+        if(rst)begin
+			stu	<=  'd0; 
+		end else begin
+			case(f_wk_state)
+			STM_IDLE_F:begin
+				if(downstream_link&downstream_lane_up)begin
+					stu <= 'd1;
+				end	else begin
+					stu <= stu;
+				end
+			end	
+			STM_INIT:begin
+				if(downstream_link&downstream_lane_up)begin
+					stu <= 'd1;
+				end else if(((~downstream_link)|(~downstream_lane_up))&&(cycle=='hffffff))begin
+					stu <= 'h0;
+				end else begin
+					stu <= stu;
+				end	
+			end
+			STM_JUDGE:begin
+				stu <= stu;
+			end
+			STM_END:begin
+				stu <= stu;
+			end
+			default:stu	<=  'd0;
+		endcase
+		end
+	end	
+	
+	always @(posedge clk)begin
+        if(rst)begin
+            f_wk_state	<=  STM_IDLE_F; 
+		end else begin
+			f_wk_state	<=	f_nstate;
+		end
+	end
+	
+	always @ (*)begin
+		f_nstate <= STM_IDLE_F;
+		case(f_wk_state)
+		STM_IDLE_F:begin
+			if((~downstream_link)|(~downstream_lane_up))begin
+				f_nstate <= STM_INIT;
+			end	else begin
+				f_nstate <= STM_IDLE_F;
+			end
+		end 
+		STM_INIT:begin
+			if(downstream_link&downstream_lane_up)begin
+				f_nstate <= STM_END;
+			end else if(((~downstream_link)|(~downstream_lane_up))&&(cycle=='hffffff))begin
+				f_nstate <= STM_JUDGE;
+			end	else begin
+				f_nstate <= STM_INIT;
+			end
+		end
+		STM_JUDGE:begin
+			if(downstream_link&downstream_lane_up)begin
+				f_nstate <= STM_END;
+			end else begin
+				f_nstate <= STM_JUDGE;
+			end
+		end
+		STM_END:begin
+			f_nstate <= STM_IDLE_F;
+		end			
+		default:f_nstate <= STM_IDLE_F;
+		endcase
+	end	
+
+	always @(posedge clk) begin
+        if(rst)begin
+			cycle  	<=  'h0;
+        end else begin
+			if((~downstream_link)|(~downstream_lane_up))begin
+				cycle	<= cycle + 1;
+			end else begin
+				cycle  	<=  'h0;
+			end	
+		end
+	end
 
 	axi_cache
         axi_cache_u0
