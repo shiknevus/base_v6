@@ -21,8 +21,6 @@ module ethcat_axi_rout_mststa
     ,input                  rst
     ,input                  downstream_lane_up
     ,input                  downstream_link
-    ,input	wire	[2:0]	stu
-    
     //from app
     ,input  wire            s_app_tx_tvalid
     ,output reg             s_app_tx_tready

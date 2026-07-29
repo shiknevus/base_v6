@@ -25,7 +25,8 @@ module app_protocal_top
     ,input  wire            prot_rcv_ack
 	
 	,input wire             init_error
-	,input wire             run_en
+    ,input              downstream_lane_up
+    ,input              downstream_link
     //slave mode systerm signal
     ,output         [1:0]   slvsta_rcv_hb_flag  //slave station receive heartbeat flag[1:0]
                                                     //[1bit]: receive hb fram; [0]:check slave station address is match
@@ -176,7 +177,8 @@ module app_protocal_top
                 //what is dst_addr message in heartbeat datagram layer.
             ,.dg_hb_dst_addr        (dg_hb_dst_addr     )
 			,.init_error		(init_error			)
-			,.run_en			(run_en				)
+                    ,.downstream_lane_up(downstream_lane_up)
+                    ,.downstream_link   (downstream_link   )
             
                 //app layer ll interface with application depot
             ,.depot_rden        (depot_rden_slv)

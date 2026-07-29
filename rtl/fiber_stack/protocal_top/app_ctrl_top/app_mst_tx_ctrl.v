@@ -26,7 +26,9 @@ module app_mst_tx_ctrl(
     ,output reg [15:0]  app_err_type    //the error type of slave station
 	,output reg			init_finish
 	,input wire         init_error
-	,input wire         run_en
+
+    ,input              downstream_lane_up
+    ,input              downstream_link
 
     ,output reg [15:0]  hb_err_slvsta   //indicate the index of the error station
     ,output reg         mst_prcs_hb_flag
@@ -94,6 +96,24 @@ module app_mst_tx_ctrl(
     reg             mst_sta_restart_d1  =   'd0;//master station restart transfer
     reg             mst_sta_restart_r   =   'd0;
     reg             latch_sta_rs_flag;
+    reg              run_en;
+
+    always @(posedge clk)begin
+        if(reset)begin
+            run_en		<=  1'b0; 
+	end else if (wk_state == STM_IDLE) begin
+            run_en		<=  1'b0; 
+	end else if (wk_state == STM_POST_PRCS_INIT) begin
+            if((app_err_type==0)&(hb_err_slvsta==0)&
+	       (downstream_lane_up | downstream_link))begin
+                   run_en <= 'h1;
+            end else begin
+                   run_en		<= 'h0;
+            end	
+	end else if (wk_state > STM_TX_HS) begin
+            run_en <= 'h1;
+	end
+    end
 
     always @(posedge clk)begin
         mst_sta_restart_d1  <=  mst_sta_restart;

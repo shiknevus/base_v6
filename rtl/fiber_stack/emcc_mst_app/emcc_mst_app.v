@@ -158,7 +158,6 @@ module emcc_mst_app
 	wire	[31:0]  cnt_err;
 	wire			init_finish;
 	wire			init_error;
-	wire			run_en;
 
     always @(posedge clk)begin
         if(reset)begin
@@ -223,7 +222,6 @@ module emcc_mst_app
 		,.o_wr_cfg_data_done    (o_wr_cfg_data_done     )
 		
 		,.init_error		(init_error			)
-		,.run_en			(run_en				)
 		,.init_err_clr		(init_err_clr		)
 		,.init_err			(init_err			)
 		,.cnt_err_clr		(cnt_err_clr		)
@@ -411,7 +409,8 @@ module emcc_mst_app
             ,.slv_fpga_version  (slv_fpga_version   )
 			
 			,.init_error		(init_error			)
-			,.run_en			(run_en				)
+                    ,.downstream_lane_up(downstream_lane_up)
+                    ,.downstream_link   (downstream_link   )
 			,.init_err_clr		(init_err_clr)
 			,.init_err			(init_err)
 			,.cnt_err_clr		(cnt_err_clr)

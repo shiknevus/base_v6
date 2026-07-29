@@ -42,7 +42,8 @@ module app_ctrl_top
     ,input  wire            prot_send_ack
 	
 	,input wire             init_error
-	,input wire             run_en
+    ,input              downstream_lane_up
+    ,input              downstream_link
 
     //slave mode systerm signal
     ,output         [1:0]   slvsta_rcv_hb_flag  //indicate heartbeat type
@@ -120,7 +121,8 @@ module app_ctrl_top
                     ,.app_err_flag      (app_err_flag)
                     ,.app_err_type      ()
 					,.init_error		(init_error			)
-					,.run_en			(run_en				)
+                    ,.downstream_lane_up(downstream_lane_up)
+                    ,.downstream_link   (downstream_link   )
 					
 					,.init_err_clr		(init_err_clr)
 					,.init_err			(init_err)

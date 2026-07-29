@@ -41,7 +41,6 @@ module mst_app_cfg
 	,output reg  [31:0] debug_data
 	
 	,output reg             			init_error
-	,output reg             			run_en
 	,output reg             			init_err_clr
 	,input wire            				init_err
 	,output reg             			cnt_err_clr
@@ -360,25 +359,6 @@ module mst_app_cfg
 		end
 	end	
 	
-	always @(posedge ps_reg_clk)begin
-        if(ps_reg_reset)begin
-            run_en		<=  1'b0; 
-		end else begin
-			case(wk_state)
-			STM_INI_DONE:begin
-				if((app_err_type==0)&(hb_err_slvsta==0)&downstream_lane_up&downstream_link)begin
-					run_en		<= 'h1;
-				end else begin
-					run_en		<= 'h0;
-				end	
-			end
-			STM_RUN:begin
-				run_en			<= 'h1;
-			end	
-			default:run_en		<=  1'b0;
-		endcase
-		end
-	end
 `ifndef AIDEN_FIX	
 	always @(posedge ps_reg_clk)begin
         if(ps_reg_reset)begin
