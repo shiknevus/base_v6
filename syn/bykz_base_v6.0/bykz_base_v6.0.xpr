@@ -3,7 +3,7 @@
 <!--                                                         -->
 <!-- Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.   -->
 
-<Project Version="7" Minor="39" Path="E:/workspace/0722/bykz_v6.0/syn/bykz_base_v6.0/bykz_base_v6.0.xpr">
+<Project Version="7" Minor="39" Path="E:/Git_repo/origin/check/bykz_v6.0/syn/bykz_base_v6.0/bykz_base_v6.0.xpr">
   <DefaultLaunch Dir="$PRUNDIR"/>
   <Configuration>
     <Option Name="Id" Val="f50145e241df45a782da3972e666a56e"/>
@@ -33,19 +33,19 @@
     <Option Name="DSAVendor" Val="xilinx"/>
     <Option Name="DSANumComputeUnits" Val="60"/>
     <Option Name="WTXSimLaunchSim" Val="1"/>
-    <Option Name="WTModelSimLaunchSim" Val="83"/>
+    <Option Name="WTModelSimLaunchSim" Val="86"/>
     <Option Name="WTQuestaLaunchSim" Val="0"/>
     <Option Name="WTIesLaunchSim" Val="0"/>
     <Option Name="WTVcsLaunchSim" Val="0"/>
     <Option Name="WTRivieraLaunchSim" Val="0"/>
     <Option Name="WTActivehdlLaunchSim" Val="0"/>
-    <Option Name="WTXSimExportSim" Val="115"/>
-    <Option Name="WTModelSimExportSim" Val="115"/>
-    <Option Name="WTQuestaExportSim" Val="115"/>
-    <Option Name="WTIesExportSim" Val="115"/>
-    <Option Name="WTVcsExportSim" Val="115"/>
-    <Option Name="WTRivieraExportSim" Val="115"/>
-    <Option Name="WTActivehdlExportSim" Val="115"/>
+    <Option Name="WTXSimExportSim" Val="128"/>
+    <Option Name="WTModelSimExportSim" Val="128"/>
+    <Option Name="WTQuestaExportSim" Val="128"/>
+    <Option Name="WTIesExportSim" Val="128"/>
+    <Option Name="WTVcsExportSim" Val="128"/>
+    <Option Name="WTRivieraExportSim" Val="128"/>
+    <Option Name="WTActivehdlExportSim" Val="128"/>
     <Option Name="GenerateIPUpgradeLog" Val="TRUE"/>
     <Option Name="XSimRadix" Val="hex"/>
     <Option Name="XSimTimeUnit" Val="ns"/>
@@ -631,7 +631,7 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/sim/slv_depot_init.coe">
+      <File Path="$PPRDIR/../../../../../../workspace/0722/bykz_v6.0/syn/src/sim/slv_depot_init.coe">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -744,11 +744,9 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../0719/bykz_v6.0/rtl/fiber_stack/ethcat_axi_rout/ethcat_axi_rout_mststa.v">
+      <File Path="$PPRDIR/../src/sim/emcc_slv_top/tb/ram_init/slv_depot_init.coe">
         <FileInfo>
-          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>

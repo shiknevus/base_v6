@@ -484,7 +484,7 @@ module mst_app_cfg
 		endcase
 		end
 	end
-	
+`ifndef AIDEN_FIX	
 	always @(posedge ps_reg_clk)begin
         if(ps_reg_reset)begin
             init_error		<=  1'b0; 
@@ -511,7 +511,11 @@ module mst_app_cfg
 		endcase
 		end
 	end
-	
+`else
+    always @(posedge ps_reg_clk)begin
+        init_error  <=   1'b0;
+    end
+`endif
 	always @(posedge ps_reg_clk)begin
         init_finish_d1    <=  init_finish;
         init_finish_d2    <=  init_finish_d1;

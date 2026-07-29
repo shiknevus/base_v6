@@ -44,4 +44,4 @@
 `define DEFAULT_SUPPORT_SLV_NUM 32  //the number ofdefault support slave station is 30
 
 `define ETHCAT_HB_DG_LEN      8   //ethcat initial datagram package length  unit:1BYTE
-
+`define AIDEN_FIX
