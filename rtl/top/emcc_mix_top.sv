@@ -187,7 +187,7 @@ module emcc_mix_top
     wire    [31:0]              do_mst_msg_force      ;
     assign ov_dbg_enable = 0;
     
-	assign do_relay_mst_msg = di_mst_msg[0]?do_mst_msg_force:do_mst_msg;
+	assign do_relay_mst_msg = ~di_mst_msg[0]?do_mst_msg_force:do_mst_msg;
 	
     vio_0 vio (
       .clk(clk),                // input wire clk
