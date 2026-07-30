@@ -210,10 +210,13 @@ module Positioner_std
                end else begin
                   if(spd_div_ready) begin
                      r_pf_spd_next <= spd_div_quo*r_pf_acc;
-                     
+
                      if((r_pf_mode&MODE_S) == MODE_S) // S Wave Mode
                         if(r_pf_acc_act[P_DIV_WIDTH+31:P_DIV_WIDTH] < r_pf_acc_target)
                            r_pf_spd_next <= (spd_div_quo*r_pf_acc)<<1;
+`ifdef PF_SIM
+                     r_pf_spd_next <= r_pf_spd_next << 8;  // add by szzhang 20260729
+`endif
                   end
 
                   if(r_div_ready) begin
@@ -260,6 +263,9 @@ module Positioner_std
                   if((r_pf_mode&MODE_S) == MODE_S) // S Wave Mode
                      if(r_pf_dec_act[P_DIV_WIDTH+31:P_DIV_WIDTH] < r_pf_dec_target)
                         r_pf_spd_next <= (spd_div_quo*r_pf_dec)<<1;
+`ifdef PF_SIM
+                  r_pf_spd_next <= r_pf_spd_next << 8;  // add by szzhang 20260729 
+`endif
                end
 
                if(r_div_ready) begin
