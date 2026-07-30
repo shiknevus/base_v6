@@ -60,7 +60,7 @@ module ec_pul_axis#(
     );
 	
 	
-	localparam		A_BHA_NUM		=	17;	
+	localparam		A_BHA_NUM		=	8;	
 	localparam		B_BHA_NUM		=	1;	
 	localparam		ARV_SIG_DET_TIM	=	5;
 	
@@ -196,6 +196,7 @@ module ec_pul_axis#(
 	
 	reg		[7:0]	a_bhv_id_r;
 	
+	wire           action_busy,action_done	,action_error;	
 	always@(posedge clk_i)
 	begin
 		if(rst_i)
@@ -315,7 +316,7 @@ module ec_pul_axis#(
 	,.param69               (param69		)
 	,.param70               (param70		)
 	);
-
+    
 	proactive_beh_pul_axis#(	
 	.BHA_NUM 				(A_BHA_NUM  	 	),	//Number of active behaviors
 	.ARV_SIG_DET_TIM		(ARV_SIG_DET_TIM	)		//In - place signal detection time
@@ -378,6 +379,7 @@ module ec_pul_axis#(
     ,.rcfg_dec_max			(param3[15:0]			)
     ,.rcfg_qs_dec			(param7[15:0]			)
     ,.rcfg_timedly			(					)
+    
     ,.irq_o                	(irq_a				)
     ,.irq_ack_i       		(irq_a_grant		)
 	,.state_monitor_o		(param51			)

@@ -459,6 +459,7 @@ reg        action_start;
 reg        get_point_flag;
 reg        alarm_flag;
 reg        son_bhv_flag;
+reg        soff_bhv_flag;
 reg        reset_bhv_flag;
 reg        action_alarm;
 reg [7:0]  action_delay_cnt;
@@ -477,35 +478,40 @@ always@(posedge clk_i) begin
         get_point_flag  <= 1'b0;
         alarm_flag      <= 1'b0;
         son_bhv_flag    <= 1'b0;
+        soff_bhv_flag   <= 1'b0;
         reset_bhv_flag  <= 1'b0;
     end
     else if(curr_state == S_EXE) begin
-        if(a_bhv_id_r == 8'd1)       action_start   <= 1'b1;   // Home
-        else if(a_bhv_id_r == 8'd2)  action_start   <= 1'b1;   // JOG
-        else if(a_bhv_id_r == 8'd3)  action_start   <= 1'b1;   // Move
-        else if(a_bhv_id_r == 8'd14) son_bhv_flag   <= 1'b1;   // Son servo
-        else if(a_bhv_id_r == 8'd15) reset_bhv_flag <= 1'b1;   // Reset servo
+        if (a_bhv_id_r == 8'd1)      action_start   <= 1'b1;   // Home serch
+        else if(a_bhv_id_r == 8'd2)  action_start   <= 1'b1;   // Home move
+        else if(a_bhv_id_r == 8'd3)  action_start   <= 1'b1;   // JOG
+        else if(a_bhv_id_r == 8'd4)  action_start   <= 1'b1;   // Move
+        else if(a_bhv_id_r == 8'd5)  get_point_flag <= 1'b1;   // Get point
+        else if(a_bhv_id_r == 8'd6)  son_bhv_flag   <= 1'b1;   // S-on servo
+        else if(a_bhv_id_r == 8'd7)  soff_bhv_flag  <= 1'b1;   // S-off servo
+        else if(a_bhv_id_r == 8'd8)  reset_bhv_flag <= 1'b1;   // Reset servo
     end
     else begin
         action_start    <= 1'b0;
         get_point_flag  <= 1'b0;
         alarm_flag      <= 1'b0;
         son_bhv_flag    <= 1'b0;
+        soff_bhv_flag   <= 1'b0;
         reset_bhv_flag  <= 1'b0;
     end
 end
 
 // servo outputs
-reg son_bhv_flag_d1;
 reg r_dv_son;
 always@(posedge clk_i) begin
-    son_bhv_flag_d1 <= son_bhv_flag;
     if(rst_i)
         r_dv_son <= 1'b0;
-    else if(son_bhv_flag & ~son_bhv_flag_d1)
-        r_dv_son <= ~r_dv_son;
+    else if(soff_bhv_flag)          
+        r_dv_son <= 1'b0;
+    else if(son_bhv_flag)           
+        r_dv_son <= 1'b1;
 end
-assign o_dv_son   = r_dv_son;
+assign o_dv_son = r_dv_son;
 assign o_dv_reset = (reset_bhv_flag) ? 1'b1 : 1'b0;
 
 // motion start triggers
@@ -513,8 +519,8 @@ wire home_start;
 wire jog_start;
 wire move_start;
 assign home_start = (a_bhv_id_r == 8'd1) ? action_start : 1'b0;
-assign jog_start  = (a_bhv_id_r == 8'd2) ? action_start : 1'b0;
-assign move_start = (a_bhv_id_r == 8'd3) ? action_start : 1'b0;
+assign jog_start  = (a_bhv_id_r == 8'd3) ? action_start : 1'b0;
+assign move_start = (a_bhv_id_r == 8'd4) ? action_start : 1'b0;
 
 // axis_org register
 reg axis_org;
@@ -578,7 +584,7 @@ home_u
   .i_pf_done      ( pos_pf_done        )
 );
 
-// JOG (beh=2)
+// JOG (beh=3)
 reg          jog_stop;
 wire         jog_busy;
 wire         jog_done;
