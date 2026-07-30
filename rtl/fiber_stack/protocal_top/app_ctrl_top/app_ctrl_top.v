@@ -42,8 +42,14 @@ module app_ctrl_top
     ,input  wire            prot_send_ack
 	
 	,input wire             init_error
-    ,input              downstream_lane_up
-    ,input              downstream_link
+	,output wire    [2:0]   err_code      // Error code from master TX control
+
+    // Physical layer status signals
+    ,input                  downstream_lane_up
+    ,input                  downstream_link
+    
+    // PS manual heartbeat scan trigger
+    ,input                  hb_scan_req
 
     //slave mode systerm signal
     ,output         [1:0]   slvsta_rcv_hb_flag  //indicate heartbeat type
@@ -121,8 +127,12 @@ module app_ctrl_top
                     ,.app_err_flag      (app_err_flag)
                     ,.app_err_type      ()
 					,.init_error		(init_error			)
-                    ,.downstream_lane_up(downstream_lane_up)
-                    ,.downstream_link   (downstream_link   )
+					,.err_code          (err_code          )
+					
+					,.downstream_lane_up  (downstream_lane_up)
+					,.downstream_link     (downstream_link)
+					
+					,.hb_scan_req         (hb_scan_req)
 					
 					,.init_err_clr		(init_err_clr)
 					,.init_err			(init_err)

@@ -100,6 +100,7 @@ module emcc_mst_app
     wire            ps_tx_req;
     wire            ps_tx_ack;
     wire            opt_intf_init_en;
+    wire            hb_scan_req_int;  // Internal heartbeat scan trigger
     wire    [31:0]  cur_tx_trsf_pkg_id;
     wire            tx_dg_done;
     wire            rx_dg_done;
@@ -158,6 +159,7 @@ module emcc_mst_app
 	wire	[31:0]  cnt_err;
 	wire			init_finish;
 	wire			init_error;
+	wire    [2:0]   err_code;
 
     always @(posedge clk)begin
         if(reset)begin
@@ -227,8 +229,7 @@ module emcc_mst_app
 		,.cnt_err_clr		(cnt_err_clr		)
 		,.cnt_err			(cnt_err			)
 		,.init_finish		(init_finish		)
-		,.downstream_lane_up(downstream_lane_up	)
-		,.downstream_link   (downstream_link	)
+		,.err_code          (err_code        )
 
         ,.link_success      (link_success       )
         ,.loop_link_success (loop_link_success  )
@@ -243,6 +244,7 @@ module emcc_mst_app
         ,.ps_tx_req         (ps_tx_req          )
         ,.ps_rd_depot_flag  (ps_rd_depot_flag   )
         ,.opt_intf_init_en  (opt_intf_init_en   )
+        ,.hb_scan_req       (hb_scan_req_int    )
     );
 
     mst_app_send
@@ -391,6 +393,13 @@ module emcc_mst_app
             ,.loop_link_success (loop_link_success   )
             ,.ping_pong_flag    (ping_pong_flag             )
 
+            // Physical layer status signals
+            ,.downstream_lane_up(downstream_lane_up  )
+            ,.downstream_link   (downstream_link    )
+            
+            // PS manual heartbeat scan trigger
+            ,.hb_scan_req       (hb_scan_req_int    )
+
             ,.prot_send_req     (prot_send_req  )
             ,.prot_send_ack     (prot_send_ack  )
             ,.prot_rcv_req      (prot_rcv_req   )
@@ -409,8 +418,7 @@ module emcc_mst_app
             ,.slv_fpga_version  (slv_fpga_version   )
 			
 			,.init_error		(init_error			)
-                    ,.downstream_lane_up(downstream_lane_up)
-                    ,.downstream_link   (downstream_link   )
+			,.err_code          (err_code           )
 			,.init_err_clr		(init_err_clr)
 			,.init_err			(init_err)
 			,.cnt_err_clr		(cnt_err_clr)
