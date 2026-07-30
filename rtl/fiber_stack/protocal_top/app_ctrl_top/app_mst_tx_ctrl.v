@@ -76,16 +76,16 @@ module app_mst_tx_ctrl(
     localparam  STM_INIT_WAIT_ACK   = 'd2;//wait initial package ack
     localparam  STM_CK_SLV_HB       = 'd3;//check slave station heartbeat
     localparam  STM_HB_WAIT_ACK     = 'd4;//wait heartbeat ack
-    localparam  STM_CK_HB_SUCCES    = 'd5;//one heartbeat of slave stiation has rx successful
+    localparam  STM_CK_HB_SUCCES    = 'd5;//one heartbeat of slave station has rx successful
     localparam  STM_TX_HS           = 'd7;//handshake with depot
-    localparam  STM_TX_PKG          = 'd10;//normal package  been transfer
+    localparam  STM_TX_PKG          = 'd10;//normal package been transfer
     localparam  STM_WAIT_ACK        = 'd11;//wait datagram ack
     localparam  STM_RD_DAT          = 'd12;//no use
     localparam  STM_POST_PRCS_INIT  = 'd13;//initial package post process
     localparam  STM_POST_PRCS_HB    = 'd14;//heart beat package post process
     localparam  STM_POST_PRCS_DG    = 'd15;//datagram package post process
     localparam  STM_SLV_ERROR       = 'd16;//no use
-    localparam  STM_ALL_LINK_PASS   = 'd17;
+    localparam  STM_ALL_LINK_PASS   = 'd17;//all link pass after heartbeat scan
     localparam  STM_END             = 'd18;
     
     reg     [31:0]  timer_cnt;
@@ -97,22 +97,83 @@ module app_mst_tx_ctrl(
     reg             mst_sta_restart_r   =   'd0;
     reg             latch_sta_rs_flag;
     reg              run_en;
-
-    always @(posedge clk)begin
+/*
+	// init_error generation: set when initialization completes with errors
+	always @(posedge clk) begin
         if(reset)begin
-            run_en		<=  1'b0; 
-	end else if (wk_state == STM_IDLE) begin
-            run_en		<=  1'b0; 
-	end else if (wk_state == STM_POST_PRCS_INIT) begin
-            if((app_err_type==0)&(hb_err_slvsta==0)&
-	       (downstream_lane_up | downstream_link))begin
-                   run_en <= 'h1;
+            init_error <= 1'b0;
+        end else if((wk_state == STM_POST_PRCS_INIT) & (~app_trsf_en)) begin
+            // Init done with no transfer enable - this is an error
+            init_error <= 1'b1;
+        end else if((wk_state == STM_POST_PRCS_INIT) & 
+                   (app_err_type != 8'd0)) begin
+            // Init failed due to slave station error
+            init_error <= 1'b1;
+        end else if((wk_state == STM_POST_PRCS_INIT) & 
+                   (hb_err_slvsta != 8'd0)) begin
+            // Init failed due to heartbeat error
+            init_error <= 1'b1;
+        end else if(wk_state >= STM_TX_HS) begin
+            // Successfully entered running state - clear error
+            init_error <= 1'b0;
+        end
+    end
+
+	// err_code generation: error code for PS status monitoring
+	// 0: No error
+	// 1: Initialization error
+	// 2: Data transfer error
+	// 3: Both optical links down
+	always @(posedge clk) begin
+        if(reset)begin
+            err_code <= 3'd0;
+        end else if(wk_state < STM_TX_HS) begin
+            // Initialization phase
+            if(init_error)begin
+                err_code <= 3'd1;
             end else begin
-                   run_en		<= 'h0;
-            end	
-	end else if (wk_state > STM_TX_HS) begin
-            run_en <= 'h1;
-	end
+                err_code <= 3'd0;
+            end
+        end else begin
+            // Running phase
+            if((downstream_lane_up == 1'b0) && (downstream_link == 1'b0)) begin
+                // Both optical links down
+                err_code <= 3'd3;
+            end else if((app_err_type == 8'd0) && (hb_err_slvsta == 8'd0)) begin
+                // No errors
+                err_code <= 3'd0;
+            end else if(downstream_link && !downstream_lane_up && 
+                       (app_err_type == 8'd0) && (hb_err_slvsta == 8'd1)) begin
+                // Degraded mode: link ok, lane up failed, but minimal error
+                err_code <= 3'd0;
+            end else if(downstream_lane_up && !downstream_link && 
+                       (app_err_type == slv_sta_num) && (hb_err_slvsta == 8'd0)) begin
+                // Degraded mode: lane up ok, link failed, but expected error
+                err_code <= 3'd0;
+            end else begin
+                // Data transfer error
+                err_code <= 3'd2;
+            end
+        end
+    end
+*/
+	// run_en generation: allow running when init finished, no errors, and at least one link is up
+	always @(posedge clk) begin
+        if(reset)begin
+            run_en <= 1'b0;
+        end else if(wk_state == STM_IDLE) begin
+            run_en <= 1'b0;
+        end else if(wk_state == STM_POST_PRCS_INIT) begin
+            // Allow running if no errors and at least one optical link is up
+            if((app_err_type == 8'd0) & (hb_err_slvsta == 8'd0) & 
+               (downstream_lane_up | downstream_link)) begin
+                run_en <= 1'b1;
+            end else begin
+                run_en <= 1'b0;
+            end
+        end else if(wk_state >= STM_TX_HS) begin
+            run_en <= 1'b1;  // Keep running once started
+        end
     end
 
     always @(posedge clk)begin
