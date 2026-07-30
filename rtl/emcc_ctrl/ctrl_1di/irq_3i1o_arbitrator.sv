@@ -349,9 +349,6 @@ begin
 	end else if(irq_c_grant_o)begin
         irq_reg1_o <= {ec_id,sc_id,c_bhv_id,c_tx_id};
         irq_reg2_o <= {c_alm_num,24'd0};
-	end else if(curr_state == S_END_DELAY)begin
-		irq_reg1_o <= 'b0;
-        irq_reg2_o <= 'b0;
 	end else begin
 		irq_reg1_o <= irq_reg1_o;
         irq_reg2_o <= irq_reg2_o;
