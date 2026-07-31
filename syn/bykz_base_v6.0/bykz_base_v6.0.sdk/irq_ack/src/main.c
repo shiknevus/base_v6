@@ -1,4 +1,3 @@
-
 // @file main.c
 
 #include <stdio.h>
@@ -72,6 +71,7 @@
 #define PARAM29              0x148U
 #define PARAM30              0x14CU
 #define PARAM51              0x150U
+#define PARAM52              0x154U
 
 // INTC instance descriptor
 typedef struct {
@@ -107,6 +107,7 @@ typedef struct {
 #define NUM_IRQ_SLOTS 11
 static IrqSlot irq_table[NUM_IRQ_SLOTS] = {
 	{ "ec_1di",          0,  0, PL_CFG_BASE + REG_BIAS_EC_1DI         },
+	{ "ec_1do",          0,  1, PL_CFG_BASE + REG_BIAS_EC_1DO         },
 	{ "ec_2di_2do",      0,  2, PL_CFG_BASE + REG_BIAS_EC_2DI_2DO     },
 	{ "ec_3di_2do",      0,  3, PL_CFG_BASE + REG_BIAS_EC_3DI_2DO     },
 	{ "ec_3di_1do",      0,  4, PL_CFG_BASE + REG_BIAS_EC_3DI_1DO     },
@@ -118,27 +119,38 @@ static IrqSlot irq_table[NUM_IRQ_SLOTS] = {
 	{ "ec_slv_pul_axis", 0, 10, PL_CFG_BASE + REG_BIAS_EC_SLV_PUL_AXIS },
 };
 
-#define TEST_INTC_IDX  0
-#define TEST_BASE      (PL_CFG_BASE + REG_BIAS_EC_3DI_2DO)
-#define TEST_INTC_BIT  3
-
 static XScuGic Gic;
 static XIntc   Intc;
 volatile static u32 IrqCount   = 0;
 volatile static int IrqPending = FALSE;
 static IrqSlot *irq_lut[32];
 
+// Multi-component support
+static int  cur_component = 0;          // currently selected component index [0..NUM_IRQ_SLOTS-1]
+static int  bhv_pending[NUM_IRQ_SLOTS]; // 1 = fire-and-forget behavior running on this component
+static u32  bhv_intc_bit[NUM_IRQ_SLOTS]; // INTC bit for each component
+
+// Input mode state machine
+typedef enum {
+	MODE_BEHAVIOR,       // 0~f triggers behavior on current component
+	MODE_SELECT_COMP,    // waiting for digits to select component
+} InputMode;
+static InputMode input_mode = MODE_BEHAVIOR;
+static int  comp_select_buf = -1;    // accumulated digit buffer, -1 = empty
+
+
 // Function declarations
 static int  SetupInterruptSystem(void);
 static void PlIrqHandler(void *CallbackRef);
 static void PlRegWrite(u32 base_addr);
 static void PlRegWritePulAxis(u32 base_addr);
-static void PlRegRead(u32 base_addr);
+static void PlRegRead(u32 base_addr, const char *name);
 static void PsIrqAck(u32 base_addr, const char *name);
 static void DispatchIntc(int intc_idx);
 static void DispatchAll(void);
 static int  WaitForIrq(u32 expected_bit, u32 timeout_ms);
-static int  DoBehavior(u32 base_addr, u8 bhv_id, u32 intc_bit);
+static int  DoBehavior(u32 base_addr, u8 bhv_id, u32 intc_bit, const char *comp_name);
+static void PrintMenu(void);
 
 // ISR
 static void PlIrqHandler(void *CallbackRef)
@@ -151,6 +163,7 @@ static void PlIrqHandler(void *CallbackRef)
 // Common initialization
 static void PlRegWrite(u32 base_addr)
 {
+	Xil_Out32(base_addr + RST_EN,  0x00000000U);
 	Xil_Out32(base_addr + RST_EN,  0x00000001U);
 	Xil_Out32(base_addr + SC_ID,   0x00000066U);
 	Xil_Out32(base_addr + EC_ID,   0x00000088U);
@@ -158,47 +171,42 @@ static void PlRegWrite(u32 base_addr)
 	Xil_Out32(base_addr + B_EN,    0x00000000U);
 	Xil_Out32(base_addr + C_EN,    0x00000000U);
 	Xil_Out32(base_addr + A_TX_OT, 0xFFFF0000U);
-	xil_printf("PL regs init @0x%08x\r\n", (unsigned)base_addr);
 }
 
 // ec_pul_axis specific initialization
 static void PlRegWritePulAxis(u32 base_addr)
 {
-	Xil_Out32(base_addr + RST_EN,  0x00000001U);
-	Xil_Out32(base_addr + SC_ID,   0x00000066U);
-	Xil_Out32(base_addr + EC_ID,   0x00000088U);
-	Xil_Out32(base_addr + A_EN,    0x00000001U);
-	Xil_Out32(base_addr + B_EN,    0x00000000U);
-	Xil_Out32(base_addr + C_EN,    0x00000000U);
-	Xil_Out32(base_addr + A_TX_OT, 0xFFFF0000U);
+	PlRegWrite(base_addr);  // common init first
 
-	Xil_Out32(base_addr + PARAM1,  0x00002710U);
-	Xil_Out32(base_addr + PARAM2,  0x00002710U);
-	Xil_Out32(base_addr + PARAM3,  0x00002710U);
-	Xil_Out32(base_addr + PARAM4,  0x00001388U);
-	Xil_Out32(base_addr + PARAM5,  0x00002710U);
-	Xil_Out32(base_addr + PARAM6,  0x00002710U);
-	Xil_Out32(base_addr + PARAM7,  0x00004E20U);
-	Xil_Out32(base_addr + PARAM8,  0x00004E20U);
-	Xil_Out32(base_addr + PARAM9,  0x000003E8U);
-	Xil_Out32(base_addr + PARAM16, 0x00000000U);
-	Xil_Out32(base_addr + PARAM27, 0x00000000U);
-	Xil_Out32(base_addr + PARAM30, 0x00000001U);
-	xil_printf("PL pul_axis init @0x%08x\r\n", (unsigned)base_addr);
+	Xil_Out32(base_addr + PARAM1,  0x00002710U); // max_spd
+	Xil_Out32(base_addr + PARAM2,  0x00002710U); // max_acc
+	Xil_Out32(base_addr + PARAM3,  0x00002710U); // max_dec
+	Xil_Out32(base_addr + PARAM4,  0x00000064U); // home/jog/move_spd
+	Xil_Out32(base_addr + PARAM5,  0x00000064U); // home/jog/move_acc
+	Xil_Out32(base_addr + PARAM6,  0x00000064U); // home/jog/move_dec
+	Xil_Out32(base_addr + PARAM7,  0x00004E20U); // qs_dec
+	Xil_Out32(base_addr + PARAM8,  0x00004E20U); // target_pulse
+	Xil_Out32(base_addr + PARAM9,  0x000003E8U); // step_pulse
+	Xil_Out32(base_addr + PARAM16, 0x00000000U); // pf_mode
+	Xil_Out32(base_addr + PARAM27, 0x00000000U); // serv_dir
+	Xil_Out32(base_addr + PARAM30, 0x00000001U); // drive_on
 }
 
-static void PlRegRead(u32 base_addr)
+static void PlRegRead(u32 base_addr, const char *name)
 {
+	xil_printf("[%s]\r\n", name);
 	xil_printf("  RST_EN=0x%08x SC_ID=0x%08x EC_ID=0x%08x A_EN=0x%08x\r\n",
 		(unsigned)Xil_In32(base_addr + RST_EN),
 		(unsigned)Xil_In32(base_addr + SC_ID),
 		(unsigned)Xil_In32(base_addr + EC_ID),
 		(unsigned)Xil_In32(base_addr + A_EN));
-	xil_printf("  PARAM1=0x%08x PARAM2=0x%08x PARAM3=0x%08x PARAM51=0x%08x\r\n",
+	xil_printf("  PARAM1=0x%08x PARAM2=0x%08x PARAM3=0x%08x PARAM51=0x%08x PARAM52=0x%08x\r\n",
 		(unsigned)Xil_In32(base_addr + PARAM1),
 		(unsigned)Xil_In32(base_addr + PARAM2),
 		(unsigned)Xil_In32(base_addr + PARAM3),
-		(unsigned)Xil_In32(base_addr + PARAM51));
+		(unsigned)Xil_In32(base_addr + PARAM51),
+		(unsigned)Xil_In32(base_addr + PARAM52)
+	);
 }
 
 // Interrupt acknowledge
@@ -209,13 +217,11 @@ static void PsIrqAck(u32 base_addr, const char *name)
 	irq_reg2 = Xil_In32(base_addr + IRQ_REG2);
 	irq_reg1 = Xil_In32(base_addr + IRQ_REG1);
 
+	if (irq_reg1 == 0U)
+		return;
+
 	xil_printf(" [%s] IRQ_REG2=0x%08x IRQ_REG1=0x%08x\r\n",
 		   name, (unsigned)irq_reg2, (unsigned)irq_reg1);
-
-	if (irq_reg1 == 0U) {
-		xil_printf(" [%s] IRQ_REG1=0, skip ack\r\n", name);
-		return;
-	}
 
 	if (irq_reg2 != 0U)
 		xil_printf(" [%s] ALARM num=0x%02x\r\n", name,
@@ -248,39 +254,43 @@ static int SetupInterruptSystem(void)
 	Status = XScuGic_CfgInitialize(&Gic, GicCfg, GicCfg->CpuBaseAddress);
 	if (Status != XST_SUCCESS) return XST_FAILURE;
 
-	Status = XIntc_Initialize(&Intc, intc_desc[TEST_INTC_IDX].dev_id);
+	// Initialize all INTCs used by irq_table
+	Status = XIntc_Initialize(&Intc, intc_desc[0].dev_id);
 	if (Status != XST_SUCCESS) return XST_FAILURE;
 
+	// Connect all components' interrupts to the handler
 	for (i = 0; i < NUM_IRQ_SLOTS; i++) {
 		if (!irq_table[i].name) continue;
-		if (irq_table[i].intc_idx != TEST_INTC_IDX) continue;
 		XIntc_Connect(&Intc, irq_table[i].intc_bit,
 			      (XInterruptHandler)PlIrqHandler, &Intc);
 	}
 
 	XIntc_Start(&Intc, XIN_REAL_MODE);
 
+	// Enable all components' interrupts
 	for (i = 0; i < NUM_IRQ_SLOTS; i++) {
 		if (!irq_table[i].name) continue;
-		if (irq_table[i].intc_idx != TEST_INTC_IDX) continue;
 		XIntc_Enable(&Intc, irq_table[i].intc_bit);
 	}
 
-	Status = XScuGic_Connect(&Gic, intc_desc[TEST_INTC_IDX].gic_spi,
+	// Connect INTC#0 to GIC
+	Status = XScuGic_Connect(&Gic, intc_desc[0].gic_spi,
 				 (Xil_ExceptionHandler)XIntc_InterruptHandler, &Intc);
 	if (Status != XST_SUCCESS) return XST_FAILURE;
-	XScuGic_Enable(&Gic, intc_desc[TEST_INTC_IDX].gic_spi);
+	XScuGic_Enable(&Gic, intc_desc[0].gic_spi);
 
 	Xil_ExceptionInit();
 	Xil_ExceptionRegisterHandler(XIL_EXCEPTION_ID_INT,
 				     (Xil_ExceptionHandler)XScuGic_InterruptHandler, &Gic);
 	Xil_ExceptionEnable();
 
+	// Build LUT for quick INTC bit -> IrqSlot lookup
 	for (i = 0; i < 32; i++) irq_lut[i] = NULL;
 	for (i = 0; i < NUM_IRQ_SLOTS; i++) {
 		if (!irq_table[i].name) continue;
-		if (irq_table[i].intc_idx != TEST_INTC_IDX) continue;
 		irq_lut[irq_table[i].intc_bit] = &irq_table[i];
+		bhv_intc_bit[i] = irq_table[i].intc_bit;
+		bhv_pending[i]  = 0;
 	}
 
 	return XST_SUCCESS;
@@ -294,27 +304,11 @@ static void DispatchIntc(int intc_idx)
 	u32 pending = isr & ier;
 	if (!pending) return;
 
-	if (intc_idx == TEST_INTC_IDX) {
-		for (u32 bit = 0; bit < 32 && pending; bit++) {
-			u32 mask = 1U << bit;
-			if ((pending & mask) && irq_lut[bit]) {
-				xil_printf("\r\n[Dispatch] %s (INTC#%d bit%u)\r\n",
-					   irq_lut[bit]->name, intc_idx, bit);
-				PsIrqAck(irq_lut[bit]->base_addr, irq_lut[bit]->name);
-				pending &= ~mask;
-			}
-		}
-	} else {
-		for (u32 i = 0; i < NUM_IRQ_SLOTS && pending; i++) {
-			if (!irq_table[i].name) continue;
-			if (irq_table[i].intc_idx != intc_idx) continue;
-			u32 mask = 1U << irq_table[i].intc_bit;
-			if (pending & mask) {
-				xil_printf("\r\n[Dispatch] %s (INTC#%d bit%u)\r\n",
-					   irq_table[i].name, intc_idx, irq_table[i].intc_bit);
-				PsIrqAck(irq_table[i].base_addr, irq_table[i].name);
-				pending &= ~mask;
-			}
+	for (u32 bit = 0; bit < 32 && pending; bit++) {
+		u32 mask = 1U << bit;
+		if ((pending & mask) && irq_lut[bit]) {
+			PsIrqAck(irq_lut[bit]->base_addr, irq_lut[bit]->name);
+			pending &= ~mask;
 		}
 	}
 }
@@ -330,10 +324,7 @@ static int WaitForIrq(u32 expected_bit, u32 timeout_ms)
 {
 	u32 elapsed_ms = 0;
 	u32 mask = 1U << expected_bit;
-	u32 base = intc_desc[TEST_INTC_IDX].baseaddr;
-
-	xil_printf("  [WaitIrq] waiting bit%u (timeout=%ums)...\r\n",
-		   expected_bit, (unsigned)timeout_ms);
+	u32 base = intc_desc[0].baseaddr;
 
 	while (1) {
 		u32 isr = Xil_In32(base + INTC_ISR);
@@ -353,7 +344,6 @@ static int WaitForIrq(u32 expected_bit, u32 timeout_ms)
 				}
 			}
 			if (pending & mask) {
-				xil_printf("  [WaitIrq] got bit%u!\r\n", expected_bit);
 				return 1;
 			}
 		}
@@ -361,7 +351,7 @@ static int WaitForIrq(u32 expected_bit, u32 timeout_ms)
 		usleep(1000);
 		if (timeout_ms) {
 			elapsed_ms++;
-			if ((elapsed_ms % 1000) == 0)
+			if ((elapsed_ms % 5000) == 0)
 				xil_printf("  [WaitIrq] %us ISR=0x%08x\r\n",
 					   (unsigned)(elapsed_ms / 1000), (unsigned)isr);
 			if (elapsed_ms >= timeout_ms) return 0;
@@ -369,7 +359,7 @@ static int WaitForIrq(u32 expected_bit, u32 timeout_ms)
 	}
 }
 
-// Read IRQ_REG1
+// Read IRQ_REG1 with retry
 static u32 ReadIrqReg1(u32 base_addr)
 {
 	u32 v;
@@ -382,68 +372,114 @@ static u32 ReadIrqReg1(u32 base_addr)
 }
 
 // Behavior transaction
-static int DoBehavior(u32 base_addr, u8 bhv_id, u32 intc_bit)
+static int DoBehavior(u32 base_addr, u8 bhv_id, u32 intc_bit, const char *comp_name)
 {
 	u32 irq_reg1, irq_num;
 
-	xil_printf("\r\n[BHV %u] trigger @0x%08x...\r\n",
-		   (unsigned)bhv_id, (unsigned)base_addr);
+	xil_printf("\r\n[BHV %u] %s @0x%08x...\r\n",
+		   (unsigned)bhv_id, comp_name, (unsigned)base_addr);
 	Xil_Out32(base_addr + A_BHV_ID, (u32)bhv_id);
 
 	// ① Wait for 10(0x0A) interrupt
 	if (!WaitForIrq(intc_bit, 5000)) {
-		xil_printf("[BHV %u] TIMEOUT req(10)\r\n", (unsigned)bhv_id);
+		xil_printf("[BHV %u] %s TIMEOUT req(10)\r\n",
+			   (unsigned)bhv_id, comp_name);
 		return 0;
 	}
 	irq_reg1 = ReadIrqReg1(base_addr);
 	irq_num  = irq_reg1 & 0xFFU;
-	xil_printf("[BHV %u] irq_num=0x%02x ack...\r\n",
-		   (unsigned)bhv_id, (unsigned)irq_num);
-	IrqCount++;
-	PsIrqAck(base_addr, "bhv");
+	xil_printf("[BHV %u] %s irq_num=0x%02x ack...\r\n",
+		   (unsigned)bhv_id, comp_name, (unsigned)irq_num);
+	PsIrqAck(base_addr, comp_name);
 	usleep(1000);
 
 	// ② Wait for 30(0x1E)/40(0x28) interrupt
 	if (!WaitForIrq(intc_bit, 30000)) {
-		xil_printf("[BHV %u] TIMEOUT result\r\n", (unsigned)bhv_id);
+		xil_printf("[BHV %u] %s TIMEOUT result\r\n",
+			   (unsigned)bhv_id, comp_name);
 		return 0;
 	}
 	irq_reg1 = ReadIrqReg1(base_addr);
 	irq_num  = irq_reg1 & 0xFFU;
-	IrqCount++;
 
 	if (irq_num == 0x1EU) {
-		xil_printf("[BHV %u] SUCCESS(30) ack...\r\n", (unsigned)bhv_id);
-		PsIrqAck(base_addr, "bhv");
-		xil_printf("[BHV %u] COMPLETE!\r\n", (unsigned)bhv_id);
+		xil_printf("[BHV %u] %s SUCCESS(30) ack...\r\n",
+			   (unsigned)bhv_id, comp_name);
+		PsIrqAck(base_addr, comp_name);
+		xil_printf("[BHV %u] %s COMPLETE!\r\n",
+			   (unsigned)bhv_id, comp_name);
 		return 1;
 	} else if (irq_num == 0x28U) {
-		xil_printf("[BHV %u] FAIL(40) ack...\r\n", (unsigned)bhv_id);
-		PsIrqAck(base_addr, "bhv");
-		xil_printf("[BHV %u] FAILED.\r\n", (unsigned)bhv_id);
+		xil_printf("[BHV %u] %s FAIL(40) ack...\r\n",
+			   (unsigned)bhv_id, comp_name);
+		PsIrqAck(base_addr, comp_name);
+		xil_printf("[BHV %u] %s FAILED.\r\n",
+			   (unsigned)bhv_id, comp_name);
 		return 0;
 	} else {
-		xil_printf("[BHV %u] irq_num=0x%02x (unexpected)\r\n",
-			   (unsigned)bhv_id, (unsigned)irq_num);
-		if (irq_num != 0U) PsIrqAck(base_addr, "bhv");
+		xil_printf("[BHV %u] %s irq_num=0x%02x (unexpected)\r\n",
+			   (unsigned)bhv_id, comp_name, (unsigned)irq_num);
+		if (irq_num != 0U) PsIrqAck(base_addr, comp_name);
 		return 0;
 	}
+}
+
+static void PrintMenu(void)
+{
+	xil_printf("\r\n");
+	xil_printf("===========================================\r\n");
+	xil_printf(" Multi-Component IRQ ACK\r\n");
+	xil_printf(" Current component: [%d] %s\r\n",
+		   cur_component, irq_table[cur_component].name);
+	xil_printf("===========================================\r\n");
+	xil_printf(" Keys:\r\n");
+	xil_printf("  0~f      - Send behavior 0~15 to CURRENT component\r\n");
+	xil_printf("  c        - Enter component-select mode \r\n");
+	xil_printf("  p        - Read PARAM of current component\r\n");
+	xil_printf("  r        - Read all registers of current component\r\n");
+	xil_printf("  m        - Show this menu\r\n");
+	xil_printf("  i        - Init/re-init current component\r\n");
+	xil_printf("  I        - Init ALL components\r\n");
+	xil_printf("  s        - Scan: read PARAM51 of all components\r\n");
+	xil_printf("===========================================\r\n");
+	xil_printf(" Component list:\r\n");
+	for (int i = 0; i < NUM_IRQ_SLOTS; i++) {
+		xil_printf("  [%d] %s%s (bit%u @0x%08x)\r\n",
+			   i, irq_table[i].name,
+			   (i == cur_component) ? " <--" : "",
+			   irq_table[i].intc_bit, (unsigned)irq_table[i].base_addr);
+	}
+	xil_printf("===========================================\r\n");
 }
 
 int main(void)
 {
 	int Status;
+	char key_index;
 
 	init_platform();
 
 	xil_printf("\r\n==============================================\r\n");
-	xil_printf(" PL IRQ: 16-INTC dispatch architecture\r\n");
-	xil_printf(" INTC#0 @0x%08x -> GIC SPI %u\r\n",
-		   (unsigned)intc_desc[0].baseaddr, (unsigned)intc_desc[0].gic_spi);
+	xil_printf(" PL IRQ: Multi-Component BM\r\n");
+	xil_printf(" 16-INTC dispatch architecture\r\n");
+	xil_printf(" %d components registered on INTC#0\r\n", NUM_IRQ_SLOTS);
 	xil_printf("==============================================\r\n");
 
-	PlRegWrite(TEST_BASE);
-	PlRegRead(TEST_BASE);
+	// Initialize ALL components
+	xil_printf("\r\nInitializing all components...\r\n");
+	for (int i = 0; i < NUM_IRQ_SLOTS; i++) {
+		if (irq_table[i].base_addr == (PL_CFG_BASE + REG_BIAS_EC_PUL_AXIS) ||
+		    irq_table[i].base_addr == (PL_CFG_BASE + REG_BIAS_EC_SLV_PUL_AXIS)) {
+			PlRegWritePulAxis(irq_table[i].base_addr);
+			xil_printf("  [%d] pul_axis init @0x%08x\r\n",
+				   i, (unsigned)irq_table[i].base_addr);
+		} else {
+			PlRegWrite(irq_table[i].base_addr);
+			xil_printf("  [%d] %s init @0x%08x\r\n",
+				   i, irq_table[i].name,
+				   (unsigned)irq_table[i].base_addr);
+		}
+	}
 
 	Status = SetupInterruptSystem();
 	if (Status != XST_SUCCESS) {
@@ -451,28 +487,140 @@ int main(void)
 		cleanup_platform();
 		return XST_FAILURE;
 	}
-	xil_printf("Ready. p=PARAM51 0~f=bhv 0~15\r\n");
+
+	xil_printf("\r\nAll components ready! Interrupts enabled.\r\n");
+
+	PrintMenu();
 
 	while (1) {
 		DispatchAll();
 
-		char c = XUartPs_RecvByte(STDIN_BASEADDRESS);
-		if (c == 'p' || c == 'P') {
-			xil_printf("\r\n[PARAM51] = 0x%08x\r\n",
-				   (unsigned)Xil_In32(TEST_BASE + PARAM51));
-		} else if ((c >= '0' && c <= '9') ||
-			   (c >= 'a' && c <= 'f') ||
-			   (c >= 'A' && c <= 'F')) {
-			u8 bhv = (c <= '9') ? (u8)(c - '0') :
-				 (c <= 'F') ? (u8)(c - 'A' + 10) :
-				              (u8)(c - 'a' + 10);
-			DoBehavior(TEST_BASE, bhv, TEST_INTC_BIT);
-		} else if (c != 0) {
-			xil_printf("\r\n[ERROR!] '%c'\r\n", c);
+		key_index = XUartPs_RecvByte(STDIN_BASEADDRESS);
+
+		if (key_index == 0 || key_index == 0xFF) {
+			usleep(10000);
+			continue;
+		}
+
+		if (input_mode == MODE_SELECT_COMP) {
+			// Accumulate digits, Enter to confirm, Esc to cancel
+			if (key_index >= '0' && key_index <= '9') {
+				int d = (int)(key_index - '0');
+				if (comp_select_buf < 0)
+					comp_select_buf = d;
+				else
+					comp_select_buf = comp_select_buf * 10 + d;
+				xil_printf("%c", key_index);
+				if (comp_select_buf > NUM_IRQ_SLOTS - 1) {
+					xil_printf("\r\nInvalid index %d (max %d)\r\n",
+						   comp_select_buf, NUM_IRQ_SLOTS - 1);
+					comp_select_buf = -1;
+					input_mode = MODE_BEHAVIOR;
+				}
+				// else: stay in MODE_SELECT_COMP for more digits
+			} else if (key_index == '\r' || key_index == '\n') {
+				// Enter confirms selection
+				if (comp_select_buf >= 0) {
+					cur_component = comp_select_buf;
+					xil_printf("\r\n>>> Switched to [%d] %s <<<\r\n",
+						   cur_component,
+						   irq_table[cur_component].name);
+				} else {
+					xil_printf("\r\nNo digit, cancelled.\r\n");
+				}
+				comp_select_buf = -1;
+				input_mode = MODE_BEHAVIOR;
+			} else if (key_index == 0x1B || key_index == 0x7F || key_index == 0x08) {
+				// Esc / Backspace / Del → cancel
+				xil_printf("\r\nCancelled.\r\n");
+				comp_select_buf = -1;
+				input_mode = MODE_BEHAVIOR;
+			}
+			/* else: ignore other chars, stay in MODE_SELECT_COMP */
+		}
+		// Component select: enter selection mode
+		else if (key_index == 'c' || key_index == 'C') {
+			input_mode = MODE_SELECT_COMP;
+			xil_printf("\r\nSelect component (0-%d): ", NUM_IRQ_SLOTS - 1);
+		}
+		// Behavior hex digits (0-9, a-f, A-F)
+		else if ((key_index >= '0' && key_index <= '9') ||
+			 (key_index >= 'a' && key_index <= 'f') ||
+			 (key_index >= 'A' && key_index <= 'F')) {
+			u8 bhv = (key_index <= '9') ? (u8)(key_index - '0') :
+				 (key_index <= 'F') ? (u8)(key_index - 'A' + 10) :
+				              (u8)(key_index - 'a' + 10);
+			IrqSlot *comp = &irq_table[cur_component];
+			xil_printf("\r\n>>> [BHV=%u] on [%d] %s <<<\r\n",
+				   (unsigned)bhv, cur_component, comp->name);
+			DoBehavior(comp->base_addr, bhv, comp->intc_bit, comp->name);
+		}
+		// Read PARAM51 of current component
+		else if (key_index == 'p' || key_index == 'P') {
+			IrqSlot *comp = &irq_table[cur_component];
+			xil_printf("\r\n[%d:%s] PARAM51=0x%08x PARAM52=0x%08x\r\n",
+				   cur_component, comp->name,
+				   (unsigned)Xil_In32(comp->base_addr + PARAM51),
+				   (unsigned)Xil_In32(comp->base_addr + PARAM52));
+		}
+		// Read all registers of current component
+		else if (key_index == 'r' || key_index == 'R') {
+			IrqSlot *comp = &irq_table[cur_component];
+			xil_printf("\r\n");
+			PlRegRead(comp->base_addr, comp->name);
+		}
+		// Re-init current component
+		else if (key_index == 'i') {
+			IrqSlot *comp = &irq_table[cur_component];
+			xil_printf("\r\nRe-init [%d] %s...\r\n",
+				   cur_component, comp->name);
+			if (comp->base_addr == (PL_CFG_BASE + REG_BIAS_EC_PUL_AXIS) ||
+			    comp->base_addr == (PL_CFG_BASE + REG_BIAS_EC_SLV_PUL_AXIS))
+				PlRegWritePulAxis(comp->base_addr);
+			else
+				PlRegWrite(comp->base_addr);
+			PlRegRead(comp->base_addr, comp->name);
+		}
+		// Init ALL components
+		else if (key_index == 'I') {
+			xil_printf("\r\nRe-initializing ALL components...\r\n");
+			for (int i = 0; i < NUM_IRQ_SLOTS; i++) {
+				if (irq_table[i].base_addr == (PL_CFG_BASE + REG_BIAS_EC_PUL_AXIS) ||
+				    irq_table[i].base_addr == (PL_CFG_BASE + REG_BIAS_EC_SLV_PUL_AXIS))
+					PlRegWritePulAxis(irq_table[i].base_addr);
+				else
+					PlRegWrite(irq_table[i].base_addr);
+			}
+			xil_printf("All components re-initialized.\r\n");
+		}
+		// Scan all components PARAM51
+		else if (key_index == 's' || key_index == 'S') {
+			xil_printf("\r\n=== Scanning all components ===\r\n");
+			for (int i = 0; i < NUM_IRQ_SLOTS; i++) {
+				u32 p51 = Xil_In32(irq_table[i].base_addr + PARAM51);
+				u32 irq1 = Xil_In32(irq_table[i].base_addr + IRQ_REG1);
+				xil_printf("  [%d] %-20s PARAM51=0x%08x IRQ_REG1=0x%08x\r\n",
+					   i, irq_table[i].name,
+					   (unsigned)p51, (unsigned)irq1);
+			}
+			xil_printf("=== Scan complete ===\r\n");
+		}
+		// Show menu
+		else if (key_index == 'm' || key_index == 'M') {
+			PrintMenu();
+		}
+		else if (key_index == 'q' || key_index == 'Q') {
+			xil_printf("\r\nExiting...\r\n");
+			break;
+		}
+		else if (key_index >= 32 && key_index < 127) {
+			xil_printf("\r\n[?] '%c' (0x%02x) - press 'm' for menu\r\n",
+				   key_index, (unsigned)key_index);
 		}
 
 		usleep(10000);
 	}
 
+	cleanup_platform();
 	return 0;
 }
