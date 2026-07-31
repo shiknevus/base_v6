@@ -12,6 +12,23 @@
 #include "xintc.h"
 #include "sleep.h"
 
+// ARM generic timer helpers (Cortex-A53)
+static inline u64 get_cntpct(void) {
+	u64 cnt;
+	__asm__ volatile("mrs %0, cntpct_el0" : "=r"(cnt));
+	return cnt;
+}
+static inline u32 get_cntfrq(void) {
+	u32 freq;
+	__asm__ volatile("mrs %0, cntfrq_el0" : "=r"(freq));
+	return freq;
+}
+static u32 ts_ms(void) {
+	static u32 freq;
+	if (!freq) freq = get_cntfrq();
+	return (u32)(get_cntpct() / (freq / 1000));
+}
+
 #define PL_CFG_BASE          XPAR_PLCFG_M_AXI_BASEADDR    // 0xB0100000
 
 // Component register offset base address
@@ -185,8 +202,8 @@ static void PlRegWritePulAxis(u32 base_addr)
 	Xil_Out32(base_addr + PARAM5,  0x00000064U); // home/jog/move_acc
 	Xil_Out32(base_addr + PARAM6,  0x00000064U); // home/jog/move_dec
 	Xil_Out32(base_addr + PARAM7,  0x00004E20U); // qs_dec
-	Xil_Out32(base_addr + PARAM8,  0x00004E20U); // target_pulse
-	Xil_Out32(base_addr + PARAM9,  0x000003E8U); // step_pulse
+	Xil_Out32(base_addr + PARAM8,  0x0007A120U); // target_pulse
+	Xil_Out32(base_addr + PARAM9,  0x0000C350U); // step_pulse
 	Xil_Out32(base_addr + PARAM16, 0x00000000U); // pf_mode
 	Xil_Out32(base_addr + PARAM27, 0x00000000U); // serv_dir
 	Xil_Out32(base_addr + PARAM30, 0x00000001U); // drive_on
@@ -195,18 +212,33 @@ static void PlRegWritePulAxis(u32 base_addr)
 static void PlRegRead(u32 base_addr, const char *name)
 {
 	xil_printf("[%s]\r\n", name);
-	xil_printf("  RST_EN=0x%08x SC_ID=0x%08x EC_ID=0x%08x A_EN=0x%08x\r\n",
+	xil_printf("  RST_EN=0x%08x SC_ID=0x%08x EC_ID=0x%08x A_EN=0x%08x B_EN=0x%08x C_EN=0x%08x A_TX_OT=0x%08x\r\n",
 		(unsigned)Xil_In32(base_addr + RST_EN),
 		(unsigned)Xil_In32(base_addr + SC_ID),
 		(unsigned)Xil_In32(base_addr + EC_ID),
-		(unsigned)Xil_In32(base_addr + A_EN));
-	xil_printf("  PARAM1=0x%08x PARAM2=0x%08x PARAM3=0x%08x PARAM51=0x%08x PARAM52=0x%08x\r\n",
+		(unsigned)Xil_In32(base_addr + A_EN),
+		(unsigned)Xil_In32(base_addr + B_EN),
+		(unsigned)Xil_In32(base_addr + C_EN),
+		(unsigned)Xil_In32(base_addr + A_TX_OT));
+	xil_printf("  PARAM1 =0x%08x PARAM2 =0x%08x PARAM3 =0x%08x\r\n",
 		(unsigned)Xil_In32(base_addr + PARAM1),
 		(unsigned)Xil_In32(base_addr + PARAM2),
-		(unsigned)Xil_In32(base_addr + PARAM3),
+		(unsigned)Xil_In32(base_addr + PARAM3));
+	xil_printf("  PARAM4 =0x%08x PARAM5 =0x%08x PARAM6 =0x%08x\r\n",
+		(unsigned)Xil_In32(base_addr + PARAM4),
+		(unsigned)Xil_In32(base_addr + PARAM5),
+		(unsigned)Xil_In32(base_addr + PARAM6));
+	xil_printf("  PARAM7 =0x%08x PARAM8 =0x%08x PARAM9 =0x%08x\r\n",
+		(unsigned)Xil_In32(base_addr + PARAM7),
+		(unsigned)Xil_In32(base_addr + PARAM8),
+		(unsigned)Xil_In32(base_addr + PARAM9));
+	xil_printf("  PARAM16=0x%08x PARAM27=0x%08x PARAM30=0x%08x\r\n",
+		(unsigned)Xil_In32(base_addr + PARAM16),
+		(unsigned)Xil_In32(base_addr + PARAM27),
+		(unsigned)Xil_In32(base_addr + PARAM30));
+	xil_printf("  PARAM51=0x%08x PARAM52=0x%08x\r\n",
 		(unsigned)Xil_In32(base_addr + PARAM51),
-		(unsigned)Xil_In32(base_addr + PARAM52)
-	);
+		(unsigned)Xil_In32(base_addr + PARAM52));
 }
 
 // Interrupt acknowledge
@@ -220,11 +252,12 @@ static void PsIrqAck(u32 base_addr, const char *name)
 	if (irq_reg1 == 0U)
 		return;
 
-	xil_printf(" [%s] IRQ_REG2=0x%08x IRQ_REG1=0x%08x\r\n",
-		   name, (unsigned)irq_reg2, (unsigned)irq_reg1);
+	xil_printf("[%08u]  [%s] IRQ_REG2=0x%08x IRQ_REG1=0x%08x\r\n",
+		   (unsigned)ts_ms(), name, (unsigned)irq_reg2, (unsigned)irq_reg1);
 
 	if (irq_reg2 != 0U)
-		xil_printf(" [%s] ALARM num=0x%02x\r\n", name,
+		xil_printf("[%08u]  [%s] ALARM num=0x%02x\r\n",
+			   (unsigned)ts_ms(), name,
 			   (unsigned)((irq_reg2 >> 24) & 0xFFU));
 
 	bhv_id  = (irq_reg1 >> 8) & 0xFFU;
@@ -237,8 +270,8 @@ static void PsIrqAck(u32 base_addr, const char *name)
 
 	resp = (bhv_id << 24) | (irq_num << 16) | status;
 	Xil_Out32(base_addr + A_TX_RSULT_RPT, resp);
-	xil_printf(" [%s] -> A_TX_RSULT_RPT=0x%08x (bhv=%u irq_num=%u %s)\r\n",
-		   name, (unsigned)resp, (unsigned)bhv_id, (unsigned)irq_num,
+	xil_printf("[%08u]  [%s] -> A_TX_RSULT_RPT=0x%08x (bhv=%u irq_num=%u %s)\r\n",
+		   (unsigned)ts_ms(), name, (unsigned)resp, (unsigned)bhv_id, (unsigned)irq_num,
 		   (irq_num == 0x28U) ? "FAIL" : "SUCCESS");
 }
 
@@ -376,49 +409,49 @@ static int DoBehavior(u32 base_addr, u8 bhv_id, u32 intc_bit, const char *comp_n
 {
 	u32 irq_reg1, irq_num;
 
-	xil_printf("\r\n[BHV %u] %s @0x%08x...\r\n",
-		   (unsigned)bhv_id, comp_name, (unsigned)base_addr);
+	xil_printf("[%08u] \r\n[BHV %u] %s @0x%08x...\r\n",
+		   (unsigned)ts_ms(), (unsigned)bhv_id, comp_name, (unsigned)base_addr);
 	Xil_Out32(base_addr + A_BHV_ID, (u32)bhv_id);
 
-	// ① Wait for 10(0x0A) interrupt
+	//  Wait for 10(0x0A) interrupt
 	if (!WaitForIrq(intc_bit, 5000)) {
-		xil_printf("[BHV %u] %s TIMEOUT req(10)\r\n",
-			   (unsigned)bhv_id, comp_name);
+		xil_printf("[%08u] [BHV %u] %s TIMEOUT req(10)\r\n",
+			   (unsigned)ts_ms(), (unsigned)bhv_id, comp_name);
 		return 0;
 	}
 	irq_reg1 = ReadIrqReg1(base_addr);
 	irq_num  = irq_reg1 & 0xFFU;
-	xil_printf("[BHV %u] %s irq_num=0x%02x ack...\r\n",
-		   (unsigned)bhv_id, comp_name, (unsigned)irq_num);
+	xil_printf("[%08u] [BHV %u] %s irq_num=0x%02x ack...\r\n",
+		   (unsigned)ts_ms(), (unsigned)bhv_id, comp_name, (unsigned)irq_num);
 	PsIrqAck(base_addr, comp_name);
 	usleep(1000);
 
-	// ② Wait for 30(0x1E)/40(0x28) interrupt
+	//  Wait for 30(0x1E)/40(0x28) interrupt
 	if (!WaitForIrq(intc_bit, 30000)) {
-		xil_printf("[BHV %u] %s TIMEOUT result\r\n",
-			   (unsigned)bhv_id, comp_name);
+		xil_printf("[%08u] [BHV %u] %s TIMEOUT result\r\n",
+			   (unsigned)ts_ms(), (unsigned)bhv_id, comp_name);
 		return 0;
 	}
 	irq_reg1 = ReadIrqReg1(base_addr);
 	irq_num  = irq_reg1 & 0xFFU;
 
 	if (irq_num == 0x1EU) {
-		xil_printf("[BHV %u] %s SUCCESS(30) ack...\r\n",
-			   (unsigned)bhv_id, comp_name);
+		xil_printf("[%08u] [BHV %u] %s SUCCESS(30) ack...\r\n",
+			   (unsigned)ts_ms(), (unsigned)bhv_id, comp_name);
 		PsIrqAck(base_addr, comp_name);
-		xil_printf("[BHV %u] %s COMPLETE!\r\n",
-			   (unsigned)bhv_id, comp_name);
+		xil_printf("[%08u] [BHV %u] %s COMPLETE!\r\n",
+			   (unsigned)ts_ms(), (unsigned)bhv_id, comp_name);
 		return 1;
 	} else if (irq_num == 0x28U) {
-		xil_printf("[BHV %u] %s FAIL(40) ack...\r\n",
-			   (unsigned)bhv_id, comp_name);
+		xil_printf("[%08u] [BHV %u] %s FAIL(40) ack...\r\n",
+			   (unsigned)ts_ms(), (unsigned)bhv_id, comp_name);
 		PsIrqAck(base_addr, comp_name);
-		xil_printf("[BHV %u] %s FAILED.\r\n",
-			   (unsigned)bhv_id, comp_name);
+		xil_printf("[%08u] [BHV %u] %s FAILED.\r\n",
+			   (unsigned)ts_ms(), (unsigned)bhv_id, comp_name);
 		return 0;
 	} else {
-		xil_printf("[BHV %u] %s irq_num=0x%02x (unexpected)\r\n",
-			   (unsigned)bhv_id, comp_name, (unsigned)irq_num);
+		xil_printf("[%08u] [BHV %u] %s irq_num=0x%02x (unexpected)\r\n",
+			   (unsigned)ts_ms(), (unsigned)bhv_id, comp_name, (unsigned)irq_num);
 		if (irq_num != 0U) PsIrqAck(base_addr, comp_name);
 		return 0;
 	}
