@@ -95,7 +95,7 @@ module proactive_beh_pul_axis#(
     ,input                      irq_ack_i       //Interrupt response
     //face to output register
 	,output reg [31:0]			state_monitor_o
-	,output     [31:0]			r_pf_abspos
+	,output reg signed [31:0]			r_pf_abspos
     //face to output register end
     );
 
@@ -479,16 +479,15 @@ always@(posedge clk_i) begin
     if(rst_i || !a_en) begin
         action_start    <= 1'b0;
         get_point_flag  <= 1'b0;
-        alarm_flag      <= 1'b0;
         son_bhv_flag    <= 1'b0;
         soff_bhv_flag   <= 1'b0;
         reset_bhv_flag  <= 1'b0;
     end
     else if(curr_state == S_EXE) begin
         if (a_bhv_id_r == 8'd1)      action_start   <= 1'b1;   // Home serch
-        else if(a_bhv_id_r == 8'd2)  action_start   <= 1'b1;   // Home move
+        else if(a_bhv_id_r == 8'd2)  action_start   <= 1'b1;   // Move 0
         else if(a_bhv_id_r == 8'd3)  action_start   <= 1'b1;   // JOG
-        else if(a_bhv_id_r == 8'd4)  action_start   <= 1'b1;   // Move
+        else if(a_bhv_id_r == 8'd4)  action_start   <= 1'b1;   // Move absul
         else if(a_bhv_id_r == 8'd5)  get_point_flag <= 1'b1;   // Get point
         else if(a_bhv_id_r == 8'd6)  son_bhv_flag   <= 1'b1;   // S-on servo
         else if(a_bhv_id_r == 8'd7)  soff_bhv_flag  <= 1'b1;   // S-off servo
@@ -497,7 +496,6 @@ always@(posedge clk_i) begin
     else begin
         action_start    <= 1'b0;
         get_point_flag  <= 1'b0;
-        alarm_flag      <= 1'b0;
         son_bhv_flag    <= 1'b0;
         soff_bhv_flag   <= 1'b0;
         reset_bhv_flag  <= 1'b0;
@@ -523,7 +521,7 @@ wire jog_start;
 wire move_start;
 assign home_start = (a_bhv_id_r == 8'd1) ? action_start : 1'b0;
 assign jog_start  = (a_bhv_id_r == 8'd3) ? action_start : 1'b0;
-assign move_start = (a_bhv_id_r == 8'd4) ? action_start : 1'b0;
+assign move_start = ((a_bhv_id_r == 8'd2)||(a_bhv_id_r == 8'd4)) ? action_start : 1'b0;
 
 // axis_org register
 reg axis_org;
@@ -646,7 +644,7 @@ wire         move_pf_start;
 wire         move_pf_stop;
 wire         move_pf_quickstop;
 
-reg signed [31:0] r_pf_abspos;
+// reg signed [31:0] r_pf_abspos;
 
 Move_fa_std move_u
 (
@@ -661,7 +659,7 @@ Move_fa_std move_u
   .i_pf_spd       ( {16'd0,rcfg_move_spd} ),
   .i_pf_acc       ( {16'd0,rcfg_move_acc} ),
   .i_pf_dec       ( {16'd0,rcfg_move_dec} ),
-  .i_pf_pulse     ( rserv_target_pulse ),
+  .i_pf_pulse     ( (a_bhv_id_r == 8'd2) ? 32'd0 : rserv_target_pulse ),
   .i_start        ( move_start         ),
   .i_stop         ( move_stop          ),
   .o_busy         ( move_busy          ),
@@ -757,12 +755,18 @@ always@(posedge clk_i) begin
                 home_stop    <= action_alarm;
             end
             8'd2: begin
+                action_busy  <= move_busy;
+                action_done  <= move_done;
+                action_error <= move_error;
+                move_stop    <= action_alarm;
+            end
+            8'd3: begin
                 action_busy  <= jog_busy;
                 action_done  <= jog_done;
                 action_error <= jog_error;
                 jog_stop     <= action_alarm;
             end
-            8'd3: begin
+            8'd4: begin
                 action_busy  <= move_busy;
                 action_done  <= move_done;
                 action_error <= move_error;
@@ -792,6 +796,17 @@ always@(*) begin
             pos_quickstop = home_pf_quickstop;
         end
         8'd2: begin
+            pos_pf_spd    = move_pf_spd   > rcfg_spd_max ? rcfg_spd_max : move_pf_spd;
+            pos_pf_acc    = move_pf_acc   > rcfg_acc_max ? rcfg_acc_max : move_pf_acc;
+            pos_pf_dec    = move_pf_dec   > rcfg_dec_max ? rcfg_dec_max : move_pf_dec;
+            pos_pf_mode   = rcfg_pf_mode ? 32'h11 : 32'h01;   // move: incremental mode
+            pos_pf_pulse  = move_pf_pulse;
+            pos_pf_start  = move_pf_start;
+            pos_pf_stop   = move_pf_stop;
+            pos_pf_dir    = move_pf_dir;
+            pos_quickstop = move_pf_quickstop;
+        end
+        8'd3: begin
             pos_pf_spd    = jog_pf_spd    > rcfg_spd_max ? rcfg_spd_max : jog_pf_spd;
             pos_pf_acc    = jog_pf_acc    > rcfg_acc_max ? rcfg_acc_max : jog_pf_acc;
             pos_pf_dec    = jog_pf_dec    > rcfg_dec_max ? rcfg_dec_max : jog_pf_dec;
@@ -802,7 +817,7 @@ always@(*) begin
             pos_pf_dir    = jog_pf_dir;
             pos_quickstop = jog_pf_quickstop;
         end
-        8'd3: begin
+        8'd4: begin
             pos_pf_spd    = move_pf_spd   > rcfg_spd_max ? rcfg_spd_max : move_pf_spd;
             pos_pf_acc    = move_pf_acc   > rcfg_acc_max ? rcfg_acc_max : move_pf_acc;
             pos_pf_dec    = move_pf_dec   > rcfg_dec_max ? rcfg_dec_max : move_pf_dec;
@@ -881,7 +896,7 @@ end
 
 // servo work error: home=5s, jog-move=1s
 assign servo_work_error = (((a_bhv_id_r == 8'd1) & (servo_delay_ms >= 5000)) |
-                           ((a_bhv_id_r >= 8'd2 && a_bhv_id_r <= 8'd3) & (servo_delay_ms >= 1000))) ? 1'b1 : 1'b0;
+                           ((a_bhv_id_r >= 8'd2 && a_bhv_id_r <= 8'd4) & (servo_delay_ms >= 1000))) ? 1'b1 : 1'b0;
 
 // action alarm
 always@(posedge clk_i) begin
