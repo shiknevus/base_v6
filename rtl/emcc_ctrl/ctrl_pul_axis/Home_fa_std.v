@@ -224,9 +224,7 @@ module Home_fa_std
                    fsm_st <= ST_HOME_END;
                end
                ST_HOME_END: begin
-                   if(~i_drv_son) begin
-                       fsm_st <= ST_HOME_IDLE;
-                   end
+                   fsm_st <= ST_HOME_IDLE;
                end
            endcase
        end

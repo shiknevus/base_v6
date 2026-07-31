@@ -239,9 +239,9 @@ module proactive_beh_pul_axis#(
 		end
     end
 
-    always @(*) begin			
-        case (curr_state)	
-            S_IDLE: 
+    always @(*) begin
+        case (curr_state)
+            S_IDLE:
 			begin	//0
                 if (a_en && a_bhv_id != 8'd0 && a_bhv_vld)    //ps behavior execution instruction
                     next_state = S_BHA_PRE_DET;
@@ -249,7 +249,7 @@ module proactive_beh_pul_axis#(
                     next_state = S_IDLE;
             end
 
-            S_BHA_PRE_DET: 
+            S_BHA_PRE_DET:
 			begin	//1
                 if ((a_bhv_id_r >= 8'd1) && (a_bhv_id_r <= BHA_NUM ) && pre_sta_allow[a_bhv_id_r - 1])
                     next_state = S_READY_10;
@@ -843,11 +843,19 @@ always@(*) begin
 end
 
 // absolute position tracking
+reg home_pos_reset;
+always@(posedge clk_i) begin
+    if(rst_i || home_busy)
+        home_pos_reset <= 1'b0;
+    else if(home_done & ~home_busy & ~home_error)
+        home_pos_reset <= 1'b1;
+end
+
 always@(posedge clk_i) begin
     if(rst_i)
         r_pf_abspos <= 32'd0;
     else if(r_dv_son) begin
-        if(home_done & ~home_busy & ~home_error)
+        if(home_done & ~home_busy & ~home_error & ~home_pos_reset)
             r_pf_abspos <= 32'd0;
         else if(i_rc_pulse_done)
             r_pf_abspos <= (o_rc_pulse_dir == DIR_POS) ? r_pf_abspos + 1'b1 : r_pf_abspos - 1'b1;

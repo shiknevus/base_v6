@@ -128,9 +128,7 @@ module Move_fa_std
                    fsm_st <= ST_MOVE_END;
                end
                ST_MOVE_END: begin
-                   if(~i_drv_son) begin
-                       fsm_st <= ST_MOVE_IDLE;
-                   end
+                   fsm_st <= ST_MOVE_IDLE;
                end
            endcase
        end

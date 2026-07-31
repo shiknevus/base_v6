@@ -121,9 +121,7 @@ module Jog_fa_std
                    fsm_st <= ST_JOG_END;
                end
                ST_JOG_END: begin
-                   if(~i_drv_son) begin
-                       fsm_st <= ST_JOG_IDLE;
-                   end
+                   fsm_st <= ST_JOG_IDLE;
                end
            endcase
        end
