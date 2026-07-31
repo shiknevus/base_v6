@@ -413,7 +413,7 @@ static int DoBehavior(u32 base_addr, u8 bhv_id, u32 intc_bit, const char *comp_n
 		   (unsigned)ts_ms(), (unsigned)bhv_id, comp_name, (unsigned)base_addr);
 	Xil_Out32(base_addr + A_BHV_ID, (u32)bhv_id);
 
-	//  Wait for 10(0x0A) interrupt
+	// Wait for 10(0x0A) interrupt
 	if (!WaitForIrq(intc_bit, 5000)) {
 		xil_printf("[%08u] [BHV %u] %s TIMEOUT req(10)\r\n",
 			   (unsigned)ts_ms(), (unsigned)bhv_id, comp_name);
@@ -426,14 +426,22 @@ static int DoBehavior(u32 base_addr, u8 bhv_id, u32 intc_bit, const char *comp_n
 	PsIrqAck(base_addr, comp_name);
 	usleep(1000);
 
-	//  Wait for 30(0x1E)/40(0x28) interrupt
-	if (!WaitForIrq(intc_bit, 30000)) {
-		xil_printf("[%08u] [BHV %u] %s TIMEOUT result\r\n",
-			   (unsigned)ts_ms(), (unsigned)bhv_id, comp_name);
-		return 0;
+	// Poll IRQ_REG1 directly for result (0x1E=success, 0x28=fail)
+	{
+		int poll_ms = 0;
+		while (poll_ms < 30000) {
+			irq_reg1 = Xil_In32(base_addr + IRQ_REG1);
+			irq_num  = irq_reg1 & 0xFFU;
+			if (irq_num == 0x1EU || irq_num == 0x28U) break;
+			usleep(1000);
+			poll_ms++;
+		}
+		if (poll_ms >= 30000) {
+			xil_printf("[%08u] [BHV %u] %s TIMEOUT result\r\n",
+				   (unsigned)ts_ms(), (unsigned)bhv_id, comp_name);
+			return 0;
+		}
 	}
-	irq_reg1 = ReadIrqReg1(base_addr);
-	irq_num  = irq_reg1 & 0xFFU;
 
 	if (irq_num == 0x1EU) {
 		xil_printf("[%08u] [BHV %u] %s SUCCESS(30) ack...\r\n",
