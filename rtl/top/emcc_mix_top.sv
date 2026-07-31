@@ -450,6 +450,7 @@ module emcc_mix_top
 				,.do_o					(m_2di_2do_do			)
 				,.o_intr_irq			(map_irq[2]				)
 			);
+            assign   do_mst_msg[2:1] = ~m_2di_2do_do;
 
             wire [1:0] m_3di_2do_do;
 			ec_3di_2do#(

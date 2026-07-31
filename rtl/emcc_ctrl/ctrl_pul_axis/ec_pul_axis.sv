@@ -383,6 +383,7 @@ module ec_pul_axis#(
     ,.irq_o                	(irq_a				)
     ,.irq_ack_i       		(irq_a_grant		)
 	,.state_monitor_o		(param51			)
+	,.r_pf_abspos			(param52			)
     );
 
 	 

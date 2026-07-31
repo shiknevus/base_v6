@@ -93,7 +93,10 @@ module proactive_beh_pul_axis#(
 
     ,output reg                 irq_o
     ,input                      irq_ack_i       //Interrupt response
+    //face to output register
 	,output reg [31:0]			state_monitor_o
+	,output     [31:0]			r_pf_abspos
+    //face to output register end
     );
 
     reg  [7:0]      a_bhv_id_r;
@@ -437,16 +440,16 @@ module proactive_beh_pul_axis#(
     	    detect_flag <= 1'b0;
     	end
     	else begin
-    	    if(detect_tim >= ARV_SIG_DET_TIM - 1'b1) begin
+    	    if((ARV_SIG_DET_TIM == 0) || (detect_tim > ARV_SIG_DET_TIM - 1'b1)) begin
     	        detect_tim  <= detect_tim; 
     	        detect_flag <= 1'b1;  
     	    end
     	    else begin
                 `ifdef ENB_SIM_MODE
-				    detect_tim  <= detect_tim + 1;	
+				    detect_tim  <= detect_tim + 1;	//sim
     	            detect_flag <= 1'b0;	
                 `else
-    	            detect_tim  <= detect_tim + i_time_1s_vld;	//actual
+    	            detect_tim  <= detect_tim + 1;	//actual
     	            detect_flag <= 1'b0;
                 `endif 
     	    end
