@@ -147,13 +147,24 @@ static int  cur_component = 0;          // currently selected component index [0
 static int  bhv_pending[NUM_IRQ_SLOTS]; // 1 = fire-and-forget behavior running on this component
 static u32  bhv_intc_bit[NUM_IRQ_SLOTS]; // INTC bit for each component
 
+static u32 param_spd       = 0x00000064U; // PARAM4:  home/jog/move_spd
+static u32 param_acc       = 0x00000064U; // PARAM5:  home/jog/move_acc
+static u32 param_dec       = 0x00000064U; // PARAM6:  home/jog/move_dec
+static u32 param_target    = 0x0007A120U; // PARAM8:  target_pulse
+static u32 param_step      = 0x0000C350U; // PARAM9:  step_pulse
+static u32 param_serv_dir  = 0x00000000U; // PARAM27: serv_dir
+
 // Input mode state machine
 typedef enum {
 	MODE_BEHAVIOR,       // 0~f triggers behavior on current component
 	MODE_SELECT_COMP,    // waiting for digits to select component
+	MODE_SET_PARAM,      // waiting for param selection (1~6)
+	MODE_PARAM_VAL,      // waiting for hex value input
 } InputMode;
 static InputMode input_mode = MODE_BEHAVIOR;
 static int  comp_select_buf = -1;    // accumulated digit buffer, -1 = empty
+static int  param_sel        = 0;    // which param is being edited (1..6)
+static u32  param_val_buf    = 0;    // hex value accumulator
 
 
 // Function declarations
@@ -198,14 +209,14 @@ static void PlRegWritePulAxis(u32 base_addr)
 	Xil_Out32(base_addr + PARAM1,  0x00002710U); // max_spd
 	Xil_Out32(base_addr + PARAM2,  0x00002710U); // max_acc
 	Xil_Out32(base_addr + PARAM3,  0x00002710U); // max_dec
-	Xil_Out32(base_addr + PARAM4,  0x00000064U); // home/jog/move_spd
-	Xil_Out32(base_addr + PARAM5,  0x00000064U); // home/jog/move_acc
-	Xil_Out32(base_addr + PARAM6,  0x00000064U); // home/jog/move_dec
-	Xil_Out32(base_addr + PARAM7,  0x00004E20U); // qs_dec
-	Xil_Out32(base_addr + PARAM8,  0x0007A120U); // target_pulse
-	Xil_Out32(base_addr + PARAM9,  0x0000C350U); // step_pulse
-	Xil_Out32(base_addr + PARAM16, 0x00000000U); // pf_mode
-	Xil_Out32(base_addr + PARAM27, 0x00000000U); // serv_dir
+	Xil_Out32(base_addr + PARAM4,  param_spd);      // home/jog/move_spd
+	Xil_Out32(base_addr + PARAM5,  param_acc);      // home/jog/move_acc
+	Xil_Out32(base_addr + PARAM6,  param_dec);      // home/jog/move_dec
+	Xil_Out32(base_addr + PARAM7,  0x00004E20U);    // qs_dec
+	Xil_Out32(base_addr + PARAM8,  param_target);   // target_pulse
+	Xil_Out32(base_addr + PARAM9,  param_step);     // step_pulse
+	Xil_Out32(base_addr + PARAM16, 0x00000000U);    // pf_mode
+	Xil_Out32(base_addr + PARAM27, param_serv_dir); // serv_dir
 	Xil_Out32(base_addr + PARAM30, 0x00000001U); // drive_on
 }
 
@@ -465,6 +476,76 @@ static int DoBehavior(u32 base_addr, u8 bhv_id, u32 intc_bit, const char *comp_n
 	}
 }
 
+// Map param index -> register offset
+static u32 ParamRegOffset(int sel)
+{
+	switch (sel) {
+		case 1: return PARAM4;
+		case 2: return PARAM5;
+		case 3: return PARAM6;
+		case 4: return PARAM8;
+		case 5: return PARAM9;
+		case 6: return PARAM27;
+		default: return 0;
+	}
+}
+
+// Get pointer to the global param variable by index
+static u32* ParamVarPtr(int sel)
+{
+	switch (sel) {
+		case 1: return &param_spd;
+		case 2: return &param_acc;
+		case 3: return &param_dec;
+		case 4: return &param_target;
+		case 5: return &param_step;
+		case 6: return &param_serv_dir;
+		default: return NULL;
+	}
+}
+
+static const char* ParamName(int sel)
+{
+	switch (sel) {
+		case 1: return "spd       ";
+		case 2: return "acc       ";
+		case 3: return "dec       ";
+		case 4: return "target    ";
+		case 5: return "step      ";
+		case 6: return "serv_dir  ";
+		default: return "?         ";
+	}
+}
+
+// Write one param to current component's register
+static void ParamWriteCur(int sel, u32 val)
+{
+	u32 off = ParamRegOffset(sel);
+	if (off == 0) return;
+	IrqSlot *comp = &irq_table[cur_component];
+	Xil_Out32(comp->base_addr + off, val);
+	u32 *pvar = ParamVarPtr(sel);
+	if (pvar) *pvar = val;
+	xil_printf("  [%d:%s] PARAM%u(%-9s) <= 0x%08x (%u)\r\n",
+		   cur_component, comp->name,
+		   (unsigned)(sel <= 3 ? sel + 3 : sel == 4 ? 8 : sel == 5 ? 9 : 27),
+		   ParamName(sel), (unsigned)val, (unsigned)val);
+}
+
+static void PrintParamMenu(void)
+{
+	IrqSlot *comp = &irq_table[cur_component];
+	xil_printf("\r\n--- Set Param on [%d] %s ---\r\n", cur_component, comp->name);
+	xil_printf("  1: spd       (PARAM4)  = %u (0x%08x)\r\n", (unsigned)param_spd, (unsigned)param_spd);
+	xil_printf("  2: acc       (PARAM5)  = %u (0x%08x)\r\n", (unsigned)param_acc, (unsigned)param_acc);
+	xil_printf("  3: dec       (PARAM6)  = %u (0x%08x)\r\n", (unsigned)param_dec, (unsigned)param_dec);
+	xil_printf("  4: target    (PARAM8)  = %u (0x%08x)\r\n", (unsigned)param_target, (unsigned)param_target);
+	xil_printf("  5: step      (PARAM9)  = %u (0x%08x)\r\n", (unsigned)param_step, (unsigned)param_step);
+	xil_printf("  6: serv_dir  (PARAM27) = %u (0x%08x)\r\n", (unsigned)param_serv_dir, (unsigned)param_serv_dir);
+	xil_printf("  Esc / q: cancel\r\n");
+	xil_printf("Select param (1~6): ");
+}
+
 static void PrintMenu(void)
 {
 	xil_printf("\r\n");
@@ -476,6 +557,7 @@ static void PrintMenu(void)
 	xil_printf(" Keys:\r\n");
 	xil_printf("  0~f      - Send behavior 0~15 to CURRENT component\r\n");
 	xil_printf("  c        - Enter component-select mode \r\n");
+	xil_printf("  w        - Set motion params (spd/acc/dec/target/step/dir)\r\n");
 	xil_printf("  p        - Read PARAM of current component\r\n");
 	xil_printf("  r        - Read all registers of current component\r\n");
 	xil_printf("  m        - Show this menu\r\n");
@@ -579,10 +661,41 @@ int main(void)
 			}
 			/* else: ignore other chars, stay in MODE_SELECT_COMP */
 		}
+		// Param config: select which parameter
+		else if (input_mode == MODE_SET_PARAM) {
+			if (key_index >= '1' && key_index <= '6') {
+				param_sel = (int)(key_index - '0');
+				param_val_buf = 0;
+				input_mode = MODE_PARAM_VAL;
+				xil_printf("%c\r\nEnter decimal value for %s: ", key_index, ParamName(param_sel));
+			} else if (key_index == 0x1B || key_index == 'q' || key_index == 'Q') {
+				xil_printf("\r\nCancelled.\r\n");
+				input_mode = MODE_BEHAVIOR;
+			}
+		}
+		// Param config: enter decimal value
+		else if (input_mode == MODE_PARAM_VAL) {
+			if (key_index >= '0' && key_index <= '9') {
+				param_val_buf = param_val_buf * 10 + (u32)(key_index - '0');
+				xil_printf("%c", key_index);
+			} else if (key_index == '\r' || key_index == '\n') {
+				xil_printf("\r\n");
+				ParamWriteCur(param_sel, param_val_buf);
+				input_mode = MODE_BEHAVIOR;
+			} else if (key_index == 0x1B || key_index == 0x7F || key_index == 0x08) {
+				xil_printf("\r\nCancelled.\r\n");
+				input_mode = MODE_BEHAVIOR;
+			}
+		}
 		// Component select: enter selection mode
 		else if (key_index == 'c' || key_index == 'C') {
 			input_mode = MODE_SELECT_COMP;
 			xil_printf("\r\nSelect component (0-%d): ", NUM_IRQ_SLOTS - 1);
+		}
+		// Set motion params
+		else if (key_index == 'w' || key_index == 'W') {
+			input_mode = MODE_SET_PARAM;
+			PrintParamMenu();
 		}
 		// Behavior hex digits (0-9, a-f, A-F)
 		else if ((key_index >= '0' && key_index <= '9') ||
