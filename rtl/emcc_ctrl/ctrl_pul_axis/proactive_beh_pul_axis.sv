@@ -859,6 +859,10 @@ always@(posedge clk_i) begin
             r_pf_abspos <= 32'd0;
         else if(i_rc_pulse_done)
             r_pf_abspos <= (o_rc_pulse_dir == DIR_POS) ? r_pf_abspos + 1'b1 : r_pf_abspos - 1'b1;
+`ifdef PF_SIM
+        else if(pos_pf_done)
+            r_pf_abspos <= (o_rc_pulse_dir == DIR_POS) ? r_pf_abspos + 1'b1 : r_pf_abspos - 1'b1;
+`endif
     end
 end
 
