@@ -279,9 +279,11 @@ end
 			S_WAIT_IRQ_ACK2: begin	//irq_
 				if(irq_receive_ack)// Interrupt acknowledge received successfully
 					next_state = S_END_DELAY;
+				else if(irq_cnt >= 8'd200)	//escape: PS ack lost (CDC), re-arbitrate instead of hang
+					next_state = S_IDLE;
 				else
 					next_state = S_WAIT_IRQ_ACK2;
-			end		
+			end
 						
 			S_END_DELAY: begin
 				if(irq_cnt >= 8)
@@ -301,7 +303,12 @@ end
 	else if(curr_state != curr_state_1d)
 		irq_cnt <= 8'd0;
 	else if(curr_state == S_WAIT_IRQ_ACK1) begin
-		if(irq_cnt > 8'd31) 
+		if(irq_cnt > 8'd31)
+			irq_cnt <= irq_cnt;
+		else
+			irq_cnt <= irq_cnt +1;
+	end else if(curr_state == S_WAIT_IRQ_ACK2) begin
+		if(irq_cnt > 8'd200)
 			irq_cnt <= irq_cnt;
 		else
 			irq_cnt <= irq_cnt +1;
