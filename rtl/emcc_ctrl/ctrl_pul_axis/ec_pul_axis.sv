@@ -165,6 +165,14 @@ module ec_pul_axis#(
 	wire			a_tx_result_vld;
 	wire			b_tx_result_vld;
 	wire			c_tx_result_vld;
+	reg			a_bhv_vld_r1, a_bhv_vld_r2;
+	reg			a_tx_result_vld_r1, a_tx_result_vld_r2;
+	reg			b_tx_result_vld_r1, b_tx_result_vld_r2;
+	reg			c_tx_result_vld_r1, c_tx_result_vld_r2;
+	wire		a_bhv_vld_sync		= a_bhv_vld_r2 & ~a_bhv_vld_r1;
+	wire		a_tx_result_vld_sync	= a_tx_result_vld_r2 & ~a_tx_result_vld_r1;
+	wire		b_tx_result_vld_sync	= b_tx_result_vld_r2 & ~b_tx_result_vld_r1;
+	wire		c_tx_result_vld_sync	= c_tx_result_vld_r2 & ~c_tx_result_vld_r1;
 	
 	wire 	[A_BHA_NUM-1:0]	a_pre_sta_allow   ;
 	wire 	[A_BHA_NUM-1:0]	a_post_sta_allow  ;
@@ -201,7 +209,7 @@ module ec_pul_axis#(
 	begin
 		if(rst_i)
 			a_bhv_id_r <= 8'd0;
-		else if(a_bhv_vld)
+		else if(a_bhv_vld_sync)
 			a_bhv_id_r <= a_bhv_id;
 		else
 			a_bhv_id_r <= a_bhv_id_r;
@@ -316,8 +324,19 @@ module ec_pul_axis#(
 	,.param69               (param69		)
 	,.param70               (param70		)
 	);
-    
-	proactive_beh_pul_axis#(	
+
+	always @(posedge clk_i) begin
+		a_bhv_vld_r1			<= a_bhv_vld;
+		a_bhv_vld_r2			<= a_bhv_vld_r1;
+		a_tx_result_vld_r1		<= a_tx_result_vld;
+		a_tx_result_vld_r2		<= a_tx_result_vld_r1;
+		b_tx_result_vld_r1		<= b_tx_result_vld;
+		b_tx_result_vld_r2		<= b_tx_result_vld_r1;
+		c_tx_result_vld_r1		<= c_tx_result_vld;
+		c_tx_result_vld_r2		<= c_tx_result_vld_r1;
+	end
+
+	proactive_beh_pul_axis#(
 	.BHA_NUM 				(A_BHA_NUM  	 	),	//Number of active behaviors
 	.ARV_SIG_DET_TIM		(ARV_SIG_DET_TIM	)		//In - place signal detection time
 )proactive_beh_pul_axis_u0(
@@ -329,10 +348,10 @@ module ec_pul_axis#(
     ,.post_sta_allow       	(a_post_sta_allow	)
 	,.a_en			       	(a_en				)
     ,.a_bhv_id             	(a_bhv_id       	)
-    ,.a_bhv_vld            	(a_bhv_vld      	)
+    ,.a_bhv_vld            	(a_bhv_vld_sync 	)
     ,.a_tx_ot              	(a_tx_ot        	)
     ,.a_tx_result_rpt	   	(a_tx_result_rpt	)
-	,.a_tx_result_vld      	(a_tx_result_vld	)
+	,.a_tx_result_vld      	(a_tx_result_vld_sync	)
     ,.ec_cha_st            	(ec_cha_st			)
     ,.a_tx_id              	(a_tx_id        	)
     ,.a_alm_num            	(a_alm_num      	)
@@ -400,7 +419,7 @@ module ec_pul_axis#(
 	,.b_bhv_id              (b_bhv_id			)
 	,.b_tx_ot               (b_tx_ot			)
 	,.b_tx_result_rpt       (b_tx_result_rpt	)
-	,.b_tx_result_vld       (b_tx_result_vld	)
+	,.b_tx_result_vld       (b_tx_result_vld_sync	)
 	,.ec_chb_st             (ec_chb_st			)
 	,.b_tx_id               (b_tx_id			)
 	,.b_alm_num             (b_alm_num			)
@@ -421,7 +440,7 @@ module ec_pul_axis#(
 	,.c_bhv_id                  (c_bhv_id			)
 	,.c_tx_ot          	        (c_tx_ot			)
 	,.c_tx_result_rpt  	        (c_tx_result_rpt	)
-	,.c_tx_result_vld           (c_tx_result_vld	)
+	,.c_tx_result_vld           (c_tx_result_vld_sync	)
 	,.ec_chc_st	                (ec_chc_st			)
 	,.c_tx_id         	        (c_tx_id			)
 	,.c_alm_num                 (c_alm_num			)
@@ -498,7 +517,7 @@ module ec_pul_axis#(
 		,.irq_reg2_o		(irq_reg2			)
 		,.irq_o				(o_intr_irq			)
 		,.irq_busy_o		(irq_busy_o			)
-		,.irq_receive_ack_i (a_tx_result_vld || b_tx_result_vld || c_tx_result_vld)	
+		,.irq_receive_ack_i (a_tx_result_vld_sync || b_tx_result_vld_sync || c_tx_result_vld_sync)
     );
 	
 	
