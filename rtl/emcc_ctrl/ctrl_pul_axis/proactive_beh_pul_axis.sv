@@ -508,9 +508,9 @@ always@(posedge clk_i) begin
     if(rst_i)
         r_dv_son <= 1'b0;
     else if(soff_bhv_flag)          
-        r_dv_son <= 1'b0;
+        r_dv_son <= 1'b0;//
     else if(son_bhv_flag)           
-        r_dv_son <= 1'b1;
+        r_dv_son <= 1'b1;//
 end
 assign o_dv_son = r_dv_son;
 assign o_dv_reset = (reset_bhv_flag) ? 1'b1 : 1'b0;

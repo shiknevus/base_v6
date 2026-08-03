@@ -87,6 +87,8 @@ module pre_post_sta_check_pul_axis#(
 			home_completed <= 1'b0;
 		else if(a_bhv_id == 8'd1 && action_done && ~action_error)
 			home_completed <= 1'b1;
+		else if(a_bhv_id == 8'd7)
+			home_completed <= 1'b0;
 	end
 
 	always@(posedge clk_i)begin
