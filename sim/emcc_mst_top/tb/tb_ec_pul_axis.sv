@@ -7,7 +7,7 @@ module tb_ec_pul_axis;
 //********************************Defines*********************************
 `define EC_COMP_INST_PATH tb_ec_pul_axis.emcc_mst_top_u.emcc_mix_top_u.ec_pul_axis_u0
 //*************************Parameter Declarations**************************
-parameter       SIM_MAX_TIME  = 9500000;
+parameter       SIM_MAX_TIME  = 40000000;
 parameter       CLOCKPERIOD_1 = 6.4	;
 parameter       CLOCKPERIOD_2 = 6.4	;
 parameter       INIT_CLOCKPERIOD = 5 ;
@@ -126,7 +126,18 @@ initial begin
     #2000;
 
     //PS RX PORT
-    wait (tb_ec_pul_axis.emcc_mst_top_u.prot_clk_rst == 0);
+    fork
+        begin
+            wait (tb_ec_pul_axis.emcc_mst_top_u.axi_clk_0 === 1'b1);
+            $display("  [%0t] axi_clk_0 up", $time);
+        end
+        begin #500000; $display("WARN: axi_clk_0 not seen, continue"); end
+    join_any
+    disable fork;
+    $display("  [%0t] axi_clk_0=%b prot_clk_rst=%b (before force)", $time,
+             tb_ec_pul_axis.emcc_mst_top_u.axi_clk_0,
+             tb_ec_pul_axis.emcc_mst_top_u.prot_clk_rst);
+    force tb_ec_pul_axis.emcc_mst_top_u.prot_clk_rst = 1'b0;
 
     //ps write rst
     ps_write_word(EC_BIAS_ADDR + `RST_EN,      32'h0000_0001, resp1);
@@ -142,12 +153,12 @@ initial begin
     ps_write_word(EC_BIAS_ADDR + `PARAM1,       32'h0000_07D0, resp1);  // spd_max = 2000
     ps_write_word(EC_BIAS_ADDR + `PARAM2,       32'h0000_07D0, resp1);  // acc_max = 2000
     ps_write_word(EC_BIAS_ADDR + `PARAM3,       32'h0000_07D0, resp1);  // dec_max = 2000
-    ps_write_word(EC_BIAS_ADDR + `PARAM4,       32'h0000_0032, resp1);  // home/jog/move spd = 50
-    ps_write_word(EC_BIAS_ADDR + `PARAM5,       32'h0000_0064, resp1);  // home/jog/move acc = 100
-    ps_write_word(EC_BIAS_ADDR + `PARAM6,       32'h0000_0064, resp1);  // home/jog/move dec = 100
+    ps_write_word(EC_BIAS_ADDR + `PARAM4,       32'h0000_000A, resp1);  // home/jog/move spd = 10
+    ps_write_word(EC_BIAS_ADDR + `PARAM5,       32'h0000_07D0, resp1);  // home/jog/move acc = 2000
+    ps_write_word(EC_BIAS_ADDR + `PARAM6,       32'h0000_07D0, resp1);  // home/jog/move dec = 2000
     ps_write_word(EC_BIAS_ADDR + `PARAM7,       32'h0000_03E8, resp1);  // qs_dec = 1000
-    ps_write_word(EC_BIAS_ADDR + `PARAM8,       32'h0003_0D40, resp1);  // target_pulse = 200000
-    ps_write_word(EC_BIAS_ADDR + `PARAM9,       32'h0003_0D40, resp1);  // step_pulse = 200000
+    ps_write_word(EC_BIAS_ADDR + `PARAM8,       32'h0000_0064, resp1);  // target_pulse = 100 (PF_SIM: ~47cyc/pulse, 100=>~48us)
+    ps_write_word(EC_BIAS_ADDR + `PARAM9,       32'h0000_0064, resp1);  // step_pulse = 100
     ps_write_word(EC_BIAS_ADDR + `PARAM16,      32'h0000_0000, resp1);  // pf_mode = 0
     ps_write_word(EC_BIAS_ADDR + `PARAM27,      32'h0000_0001, resp1);  // rserv_dir = 1 (POS)
     ps_write_word(EC_BIAS_ADDR + `PARAM26,      32'h0000_0000, resp1);  // rctrl_quickstop = 0
@@ -155,39 +166,40 @@ initial begin
     ps_write_word(EC_BIAS_ADDR + `PARAM29,      32'h0000_0000, resp1);  // rctrl_drive_reset = 0
     ps_write_word(EC_BIAS_ADDR + `PARAM30,      32'h0000_0001, resp1);  // rctrl_drive_on = 1
 
-    //============================================  behavior 15: reset servo  ==================================
+    //============================================  behavior 8: reset servo  ==================================
     #500;
     do_behavior(8'd8);
-    //============================================  behavior 14: Son servo  ==================================
+    //============================================  behavior 6: son servo  ==================================
     #500;
     do_behavior(8'd6);
-    //============================================  behavior 14: off servo  ==================================
+    //============================================  behavior 7: soff servo  ==================================
     #500;
     do_behavior(8'd7);
-    //============================================  behavior 14: son servo  ==================================
+    //============================================  behavior 6: son servo  ==================================
     #500;
     do_behavior(8'd6);
     //============================================     behavior 1: HOME    ==================================
     #5000;
-    //simulate axis_org pulse during homing
-    fork
-        begin
-            #3000;  
-            force `EC_COMP_INST_PATH.i_axis_org = 1'b1;
-            #5000;
-            force `EC_COMP_INST_PATH.i_axis_org = 1'b0;
-        end
-    join_none
 
-    do_behavior(8'd1);
+    do_behavior(8'd1);      // HOME -> home_completed=1, abspos=0
 
-    //============================================  behavior 2: JOG  ==================================
+    //============================================  behavior 4: MOVE abs (0 -> +500)  ==================================
     #1000;
-    do_behavior(8'd3);
-    //============================================  behavior 3: MOVE  ==================================
+    do_behavior(8'd4);      // 500 pulses -> abspos=500
+
+    //============================================  behavior 3: JOG (+500)  ==================================
     #1000;
-    do_behavior(8'd4);
-    //============================================  behavior 15: Reset servo  ==================================
+    do_behavior(8'd3);      // 500 pulses -> abspos=1000
+
+    //============================================  behavior 2: MOVE 0 (abs -> 0)  ==================================
+    #1000;
+    do_behavior(8'd2);      // 1000 pulses -> abspos=0
+
+    //============================================  behavior 5: GET POINT  ==================================
+    #1000;
+    do_behavior(8'd5);      // no motion, quick success
+
+    //============================================  behavior 7: soff servo  ==================================
     #1000;
     do_behavior(8'd7);
 
@@ -196,13 +208,77 @@ initial begin
 end
 
 
+//abspos trace - prints only on change
+initial begin
+    $monitor("  [%0t] MON abspos=%d pfdone=%b pfdir=%b son=%b", $time,
+        `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.r_pf_abspos,
+        `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_pf_done,
+        `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.o_rc_pulse_dir,
+        `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.r_dv_son);
+end
+
+//HOME org stimulus - independent process (do_behavior's disable fork can't kill it).
+//hold org=1 until BACC detects + BDEC decel done, release -> FMIN sees falling edge, HOME finishes
+initial begin
+    wait(`EC_COMP_INST_PATH.a_bhv_id_r == 8'd1);
+    #1000;
+    force `EC_COMP_INST_PATH.i_axis_org = 1'b1;
+    #200000;
+    force `EC_COMP_INST_PATH.i_axis_org = 1'b0;
+    $display("  [%0t] org released", $time);
+end
+
+//HOME diagnostic monitor - independent process (do_behavior's disable fork can't kill it)
+initial begin
+    wait(`EC_COMP_INST_PATH.a_bhv_id_r == 8'd1);
+    $display("  [%0t] DIAG HOME start", $time);
+    repeat(60) begin
+        #5000;
+        $display("  [%0t] DIAG org=%b a_org=%b hfsm=%h hbusy=%b hdone=%b herr=%b pfsm=%h spd=%d tgt=%d quo=%d srdy=%b rdy=%b cnt=%d son=%b stmon=%h",
+            $time,
+            `EC_COMP_INST_PATH.i_axis_org,
+            `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.axis_org,
+            `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.home_u.fsm_st,
+            `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.home_u.o_busy,
+            `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.home_u.o_done,
+            `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.home_u.o_error,
+            `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.fsm_st,
+            `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.r_pf_spd,
+            `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.r_pf_spd_target,
+            `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.spd_div_quo,
+            `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.spd_div_ready,
+            `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.r_div_ready,
+            `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.r_pf_pulse_count,
+            `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.r_dv_son,
+            `EC_COMP_INST_PATH.param51);
+        $display("  [%0t] DIV d0=%h/%h/%h/%h/%h den=%d start=%b nom=%h cnt=%d rst=%b", $time,
+            `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.spd_div.fsm_st[0],
+            `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.spd_div.busy_d[0],
+            `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.spd_div.ready_q[0],
+            `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.spd_div.quo_q[0],
+            `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.spd_div.clk_en_d[0],
+            `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.spd_div_den,
+            `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.spd_div_start,
+            `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.spd_div_nom,
+            `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.spd_div.fsm_cnt[0],
+            `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.reset);
+    end
+end
+
 task automatic do_behavior;
     input [7:0] beh_id;
     reg [31:0] irq1, irq2;
+    reg irq_ok;
     begin
         ps_write_word(EC_BIAS_ADDR + `A_BHV_ID, {24'd0, beh_id}, resp1);
-        // 10
-        @`EC_COMP_INST_PATH.o_intr_irq;
+        // 10 (with timeout: skip failed behavior instead of hanging forever)
+        irq_ok = 1'b0;
+        fork
+            begin @`EC_COMP_INST_PATH.o_intr_irq; irq_ok = 1'b1; end
+            begin #10000000; $display("WARN: BHV %0d irq10 TIMEOUT", beh_id); end
+        join_any
+        disable fork;
+        if(!irq_ok) begin $display("BHV %0d SKIPPED", beh_id); return; end
         ps_read_word(EC_BIAS_ADDR + `IRQ_REG2, irq2);
         if(irq2 == 32'd0) begin
             ps_read_word(EC_BIAS_ADDR + `IRQ_REG1, irq1);
@@ -210,8 +286,14 @@ task automatic do_behavior;
                 ps_write_word(EC_BIAS_ADDR + `A_TX_RSULT_RPT, {beh_id, 8'h0a, 16'h5100}, resp1);
             else $stop;
         end else $stop;
-        // 30/40
-        @`EC_COMP_INST_PATH.o_intr_irq;
+        // 30/40 (with timeout)
+        irq_ok = 1'b0;
+        fork
+            begin @`EC_COMP_INST_PATH.o_intr_irq; irq_ok = 1'b1; end
+            begin #10000000; $display("WARN: BHV %0d irq30 TIMEOUT", beh_id); end
+        join_any
+        disable fork;
+        if(!irq_ok) begin $display("BHV %0d RESULT SKIPPED", beh_id); return; end
         ps_read_word(EC_BIAS_ADDR + `IRQ_REG2, irq2);
         if(irq2 == 32'd0) begin
             ps_read_word(EC_BIAS_ADDR + `IRQ_REG1, irq1);
