@@ -206,7 +206,14 @@ module Positioner_std
             ST_POS_ACC: begin
                // speed
                if(r_pf_pulse_first) begin
+`ifdef PF_SIM
+                  if(r_pf_spd_act < {r_pf_spd_target,{P_DIV_WIDTH{1'b0}}})
+                     r_pf_spd_act <= r_pf_spd_act + r_pf_acc*UNIT_DT*256;
+                  else
+                     r_pf_spd_act <= {r_pf_spd_target,{P_DIV_WIDTH{1'b0}}};
+`else
                   r_pf_spd_act <= r_pf_spd_act + r_pf_acc*UNIT_DT;
+`endif
                end else begin
                   if(spd_div_ready) begin
                      r_pf_spd_next <= spd_div_quo*r_pf_acc;
@@ -268,12 +275,19 @@ module Positioner_std
 `endif
                end
 
+`ifdef PF_SIM
+               if(r_pf_spd > P_SPD_MIN + 1)
+                  r_pf_spd_act <= r_pf_spd_act - r_pf_acc*UNIT_DT*256;
+               else
+                  r_pf_spd_act <= {P_SPD_MIN,{P_DIV_WIDTH{1'b0}}};
+`else
                if(r_div_ready) begin
                   if(r_pf_spd > r_pf_spd_next[P_DIV_WIDTH+P_SPD_WIDTH-1:P_DIV_WIDTH] + P_SPD_MIN)
                      r_pf_spd_act <= r_pf_spd_act - r_pf_spd_next;
                   else
                      r_pf_spd_act <= {P_SPD_MIN,{P_DIV_WIDTH{1'b0}}};
                end
+`endif
 
                // deceleration             
                if((r_pf_mode&MODE_S) == MODE_S) begin // S Wave Mode
@@ -548,12 +562,21 @@ module Positioner_std
 `ifndef PF_SIM
                   if(r_pf_pulse_done) begin
                      if(r_pf_pulse_cal>=r_pf_pulse-1'b1 | r_pf_quickstop)
-`else
-                  if(r_div_ready) begin
-                     if(r_pf_spd==r_pf_spd_target | r_pf_quickstop)
-`endif               
                         fsm_st <= ST_POS_DEC;
                   end
+`else
+`ifdef PF_SIM
+                  if(r_pf_spd==r_pf_spd_target | r_pf_quickstop) begin
+                     fsm_st <= ST_POS_DEC;
+                  end
+`else
+                  if(r_div_ready) begin
+                     if(r_pf_spd==r_pf_spd_target | r_pf_quickstop) begin
+                        fsm_st <= ST_POS_DEC;
+                     end
+                  end
+`endif
+`endif
                end
 
                if(i_pf_stop) begin
@@ -581,15 +604,23 @@ module Positioner_std
                         end
                      end
                   endcase
+               end
+`else
+`ifdef PF_SIM
+               if(r_pf_spd<=P_SPD_MIN) begin
+                  fsm_st <= ST_POS_IDLE;
+                  r_pf_done <= 1'b1;
+               end
 `else
                if(r_div_ready) begin
                   if(r_pf_spd<=P_SPD_MIN) begin
                      fsm_st <= ST_POS_IDLE;
                      r_pf_done <= 1'b1;
                   end
-`endif
                end
-               
+`endif
+`endif
+
                if(i_pf_stop) begin
                   fsm_st <= ST_POS_IDLE;
                   r_pf_done <= 1'b1;
