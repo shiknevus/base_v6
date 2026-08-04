@@ -162,7 +162,8 @@ module proactive_beh_pul_axis#(
 		curr_state_1d <= curr_state;
 	end
 	
-    //Current behavior number
+    //Current behavior number 
+    reg         a_bhv_vld_r;
     always@(posedge clk_i)begin
         if(rst_i)begin
             a_bhv_id_r <= 8'd0;
