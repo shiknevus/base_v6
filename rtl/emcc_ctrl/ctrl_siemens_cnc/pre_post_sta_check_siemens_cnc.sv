@@ -37,7 +37,6 @@ module pre_post_sta_check_siemens_cnc#(
 		,input 							m_saf_st
 		,input 							link_m_saf_st
 
-		,input							link_lock
 
 		,input 		[7:0]				a_bhv_id
 		,input 		[7:0]				b_bhv_id
@@ -70,7 +69,7 @@ module pre_post_sta_check_siemens_cnc#(
 	// reject immediately (hard alarm) when manual mode (204) or link locked (203),
 	// like the old-framework riddle check; slow path waits for a_tx_ot timeout.
 	wire auto_manual = (m_wk_mod == 4'd3);		//set_work_mode == 3: manual
-	wire pre_ok = !auto_manual && !link_lock && !unit_st && !m_st && !m_saf_st && !link_m_saf_st;
+	wire pre_ok = !auto_manual  && !unit_st && !m_st && !m_saf_st && !link_m_saf_st;
 
 	always@(posedge clk_i)
 	begin

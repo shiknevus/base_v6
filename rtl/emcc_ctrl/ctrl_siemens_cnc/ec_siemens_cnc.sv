@@ -405,7 +405,6 @@ module ec_siemens_cnc#(
 			.m_wk_mod        	(m_wk_mod       ),
 			.m_saf_st        	(m_saf_st       ),
 			.link_m_saf_st   	(link_m_saf_st  ),
-			.link_lock			(param26		),
 			.a_bhv_id			(a_bhv_id_r		),
 			.b_bhv_id			(b_bhv_id		),
 			.c_bhv_id			(c_bhv_id		),
