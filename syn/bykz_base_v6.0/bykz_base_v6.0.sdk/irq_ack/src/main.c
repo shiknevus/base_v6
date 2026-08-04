@@ -10,6 +10,7 @@
 #include "xil_cache.h"
 #include "xscugic.h"
 #include "xintc.h"
+#include "xuartps_hw.h"
 #include "sleep.h"
 
 // ARM generic timer helpers (Cortex-A53)
@@ -90,7 +91,7 @@ static u32 ts_ms(void) {
 #define PARAM51              0x150U
 #define PARAM52              0x154U
 
-// INTC instance descriptor
+// INTC instance descriptor (16-INTC dispatch architecture)
 typedef struct {
 	u32 dev_id;
 	u32 baseaddr;
@@ -98,6 +99,10 @@ typedef struct {
 } IntcDesc;
 
 #define NUM_INTC 16
+
+#define INTC_ISR 0x00U
+#define INTC_IER 0x08U
+#define INTC_IAR 0x0CU
 static const IntcDesc intc_desc[NUM_INTC] = {
 	{  0, 0xA0000000U, 121 }, {  1, 0xA0001000U, 122 },
 	{  2, 0xA0002000U, 123 }, {  3, 0xA0003000U, 124 },
@@ -108,10 +113,6 @@ static const IntcDesc intc_desc[NUM_INTC] = {
 	{ 12, 0xA000C000U, 140 }, { 13, 0xA000D000U, 141 },
 	{ 14, 0xA000E000U, 142 }, { 15, 0xA000F000U, 143 },
 };
-
-#define INTC_ISR 0x00U
-#define INTC_IER 0x08U
-#define INTC_MER 0x1CU
 
 // Interrupt routing slot
 typedef struct {
@@ -138,14 +139,9 @@ static IrqSlot irq_table[NUM_IRQ_SLOTS] = {
 
 static XScuGic Gic;
 static XIntc   Intc;
-volatile static u32 IrqCount   = 0;
-volatile static int IrqPending = FALSE;
-static IrqSlot *irq_lut[32];
 
 // Multi-component support
 static int  cur_component = 0;          // currently selected component index [0..NUM_IRQ_SLOTS-1]
-static int  bhv_pending[NUM_IRQ_SLOTS]; // 1 = fire-and-forget behavior running on this component
-static u32  bhv_intc_bit[NUM_IRQ_SLOTS]; // INTC bit for each component
 
 static u32 param_spd       = 0x00000064U; // PARAM4:  home/jog/move_spd
 static u32 param_acc       = 0x00000064U; // PARAM5:  home/jog/move_acc
@@ -166,29 +162,298 @@ static int  comp_select_buf = -1;    // accumulated digit buffer, -1 = empty
 static int  param_sel        = 0;    // which param is being edited (1..6)
 static u32  param_val_buf    = 0;    // hex value accumulator
 
+//---------------------------------------------------------------------------
+// Event queue (ISR -> main loop)
+//---------------------------------------------------------------------------
+typedef struct {
+	IrqSlot *slot;
+	u32      irq_reg1;
+	u32      irq_reg2;
+	u32      tick;
+} IrqEvent;
 
-// Function declarations
-static int  SetupInterruptSystem(void);
-static void PlIrqHandler(void *CallbackRef);
-static void PlRegWrite(u32 base_addr);
-static void PlRegWritePulAxis(u32 base_addr);
-static void PlRegRead(u32 base_addr, const char *name);
-static void PsIrqAck(u32 base_addr, const char *name);
-static void DispatchIntc(int intc_idx);
-static void DispatchAll(void);
-static int  WaitForIrq(u32 expected_bit, u32 timeout_ms);
-static int  DoBehavior(u32 base_addr, u8 bhv_id, u32 intc_bit, const char *comp_name);
-static void PrintMenu(void);
+#define EVQ_SIZE 64
+static IrqEvent evq[EVQ_SIZE];
+static volatile int  evq_head, evq_tail;
+static volatile u32  EvDropCount;
+static volatile u32  IsrCount;   // diag: how many times the ISR ran
 
-// ISR
-static void PlIrqHandler(void *CallbackRef)
+// Called from ISR context only. Non-blocking; drops and counts on overflow.
+static int EvPush(const IrqEvent *ev)
 {
-	(void)CallbackRef;
-	IrqCount++;
-	IrqPending = TRUE;
+	int next = (evq_head + 1) % EVQ_SIZE;
+	if (next == evq_tail)
+		return 0;
+	evq[evq_head] = *ev;
+	evq_head = next;
+	return 1;
 }
 
-// Common initialization
+// Called from main loop only.
+static int EvPop(IrqEvent *ev)
+{
+	if (evq_head == evq_tail)
+		return 0;
+	*ev = evq[evq_tail];
+	evq_tail = (evq_tail + 1) % EVQ_SIZE;
+	return 1;
+}
+
+// Per-bit ISR: capture registers, push event. No ack, no print, no wait.
+static void ComponentIsr(void *ref)
+{
+	IrqSlot *slot = (IrqSlot *)ref;
+	IrqEvent ev;
+	int i;
+
+	IsrCount++;
+
+	ev.slot     = slot;
+	ev.irq_reg2 = Xil_In32(slot->base_addr + IRQ_REG2);
+	ev.irq_reg1 = 0;
+	// IRQ_REG1 may lag the INTC edge by a few AXI cycles; retry briefly.
+	// Dropping this event loses the edge forever (level source + edge INTC),
+	// because the bit is cleared by IAR right after this handler returns.
+	for (i = 0; i < 8; i++) {
+		ev.irq_reg1 = Xil_In32(slot->base_addr + IRQ_REG1);
+		if (ev.irq_reg1 != 0U) break;
+	}
+	ev.tick     = ts_ms();
+
+	if (!EvPush(&ev))
+		EvDropCount++;
+}
+
+//---------------------------------------------------------------------------
+// Behavior transaction state machine (main-loop context)
+//---------------------------------------------------------------------------
+typedef enum {
+	BHV_IDLE,
+	BHV_WAIT_REQ,      // wrote A_BHV_ID, waiting for 0x0A interrupt
+	BHV_WAIT_RESULT,   // acked 0x0A, waiting for 0x1E (ok) / 0x28 (fail)
+} BhvState;
+
+static BhvState       bhv_state = BHV_IDLE;
+static IrqSlot       *bhv_slot  = NULL;
+static u8             bhv_id    = 0;
+static u32            bhv_deadline = 0;
+
+// last acked IRQ_REG1 per component, for stale-duplicate suppression
+// (HW keeps IRQ asserted until A_TX_RSULT_RPT is written, so the ISR can
+//  fire several times before the ACK lands; only the first event matters)
+static u32 last_acked_reg1[NUM_IRQ_SLOTS];
+
+// ACK with the values captured in the event (main-loop context only)
+static void PsIrqAck(IrqSlot *slot, u32 irq_reg1, u32 irq_reg2)
+{
+	u32 bhv_id, irq_num, status, resp;
+	int idx;
+
+	if (irq_reg1 == 0U)
+		return;
+
+	xil_printf("[%08u]  [%s] IRQ_REG2=0x%08x IRQ_REG1=0x%08x\r\n",
+		   (unsigned)ts_ms(), slot->name, (unsigned)irq_reg2, (unsigned)irq_reg1);
+
+	if (irq_reg2 != 0U)
+		xil_printf("[%08u]  [%s] ALARM num=0x%02x\r\n",
+			   (unsigned)ts_ms(), slot->name,
+			   (unsigned)((irq_reg2 >> 24) & 0xFFU));
+
+	bhv_id  = (irq_reg1 >> 8) & 0xFFU;
+	irq_num = irq_reg1 & 0xFFU;
+
+	if (bhv_id == 1U || bhv_id == 2U)
+		status = (irq_num == 0x28U) ? 0x5101U : 0x5100U;
+	else
+		status = (irq_num == 0x28U) ? 0x5199U : 0x5167U;
+
+	resp = (bhv_id << 24) | (irq_num << 16) | status;
+	Xil_Out32(slot->base_addr + A_TX_RSULT_RPT, resp);
+	xil_printf("[%08u]  [%s] -> A_TX_RSULT_RPT=0x%08x (bhv=%u irq_num=%u %s)\r\n",
+		   (unsigned)ts_ms(), slot->name, (unsigned)resp, (unsigned)bhv_id, (unsigned)irq_num,
+		   (irq_num == 0x28U) ? "FAIL" : "SUCCESS");
+
+	for (idx = 0; idx < NUM_IRQ_SLOTS; idx++)
+		if (&irq_table[idx] == slot) {
+			last_acked_reg1[idx] = irq_reg1;
+			break;
+		}
+}
+
+// Trigger a behavior on the given component (async, returns immediately)
+static void BhvStart(IrqSlot *slot, u8 id)
+{
+	xil_printf("[%08u] \r\n[BHV %u] %s @0x%08x...\r\n",
+		   (unsigned)ts_ms(), (unsigned)id, slot->name, (unsigned)slot->base_addr);
+	Xil_Out32(slot->base_addr + A_BHV_ID, (u32)id);
+
+	bhv_slot  = slot;
+	bhv_id    = id;
+	bhv_state = BHV_WAIT_REQ;
+	bhv_deadline = ts_ms() + 5000U;   // req(0x0A) wait, 5s
+}
+
+// Called from main loop: deadline expired
+static void BhvTimeout(void)
+{
+	xil_printf("[%08u] [BHV %u] %s TIMEOUT (state=%s, isr=%u drop=%u)\r\n",
+		   (unsigned)ts_ms(), (unsigned)bhv_id, bhv_slot->name,
+		   (bhv_state == BHV_WAIT_REQ) ? "req" : "result",
+		   (unsigned)IsrCount, (unsigned)EvDropCount);
+	bhv_state = BHV_IDLE;
+	bhv_slot  = NULL;
+}
+
+// Consume one queued event, advance the behavior state machine.
+static void ProcessEvent(const IrqEvent *ev)
+{
+	u32 num = ev->irq_reg1 & 0xFFU;
+	IrqSlot *slot = ev->slot;
+	int idx;
+
+	if (ev->irq_reg1 == 0U)
+		return;
+
+	// stale duplicate of an already-acked interrupt -> drop
+	for (idx = 0; idx < NUM_IRQ_SLOTS; idx++)
+		if (&irq_table[idx] == slot)
+			break;
+	if (idx < NUM_IRQ_SLOTS && ev->irq_reg1 == last_acked_reg1[idx])
+		return;   // duplicate of last acked event (IRQ_REG1 holds last value)
+
+	// expected "request" interrupt
+	if (bhv_state == BHV_WAIT_REQ && slot == bhv_slot && num == 0x0AU) {
+		xil_printf("[%08u] [BHV %u] %s irq_num=0x%02x ack...\r\n",
+			   (unsigned)ts_ms(), (unsigned)bhv_id, slot->name, (unsigned)num);
+		PsIrqAck(slot, ev->irq_reg1, ev->irq_reg2);
+		bhv_state   = BHV_WAIT_RESULT;
+		bhv_deadline = ts_ms() + 5000U;   // result wait, 5s
+		return;
+	}
+
+	// expected "result" interrupt
+	if (bhv_state == BHV_WAIT_RESULT && slot == bhv_slot &&
+	    (num == 0x1EU || num == 0x28U)) {
+		xil_printf("[%08u] [BHV %u] %s %s(0x%02x) ack...\r\n",
+			   (unsigned)ts_ms(), (unsigned)bhv_id, slot->name,
+			   (num == 0x1EU) ? "SUCCESS" : "FAIL", (unsigned)num);
+		PsIrqAck(slot, ev->irq_reg1, ev->irq_reg2);
+		xil_printf("[%08u] [BHV %u] %s COMPLETE!\r\n",
+			   (unsigned)ts_ms(), (unsigned)bhv_id, slot->name);
+		bhv_state = BHV_IDLE;
+		bhv_slot  = NULL;
+		return;
+	}
+
+	// background / non-matching interrupt: ack immediately so HW deasserts.
+	// (stale duplicates of the in-flight target event are already filtered
+	//  by last_acked_reg1, and events of the target slot which do not match
+	//  the current transition are not re-acked while a behavior is running)
+	if (bhv_state != BHV_IDLE && slot == bhv_slot) {
+		xil_printf("[%08u]  [%s] unexpected irq_num=0x%02x while BHV active, dropped\r\n",
+			   (unsigned)ts_ms(), slot->name, (unsigned)num);
+		return;
+	}
+	if (ev->irq_reg1 != 0U) {
+		xil_printf("[%08u]  [%s] bg irq_num=0x%02x ack...\r\n",
+			   (unsigned)ts_ms(), slot->name, (unsigned)num);
+		PsIrqAck(slot, ev->irq_reg1, ev->irq_reg2);
+	}
+}
+
+// Fallback: poll INTC ISR directly and feed the same state machine.
+// The ISR path (GIC) may be unreliable; polling the INTC level is
+// what the original BM did, so keep it as a safety net.
+static void PollIntcFallback(void)
+{
+	u32 base = intc_desc[0].baseaddr;
+	u32 pending = Xil_In32(base + INTC_ISR) & Xil_In32(base + INTC_IER);
+
+	for (int i = 0; i < NUM_IRQ_SLOTS && pending; i++) {
+		if (!irq_table[i].name) continue;
+		if (irq_table[i].intc_idx != 0) continue;
+		u32 m = 1U << irq_table[i].intc_bit;
+		if (!(pending & m)) continue;
+
+		IrqEvent ev;
+		ev.slot     = &irq_table[i];
+		ev.irq_reg2 = Xil_In32(irq_table[i].base_addr + IRQ_REG2);
+		ev.irq_reg1 = Xil_In32(irq_table[i].base_addr + IRQ_REG1);
+		ev.tick     = ts_ms();
+
+		// IRQ_REG1 may lag the INTC edge by a few AXI cycles.
+		// If it reads 0, do NOT clear the bit yet -- the component
+		// irq line is level, so clearing the edge loses the event forever.
+		if (ev.irq_reg1 == 0U) {
+			xil_printf("[%08u]  [%s] poll: bit%u set, IRQ_REG1=0, retry\r\n",
+				   (unsigned)ts_ms(), irq_table[i].name,
+				   (unsigned)irq_table[i].intc_bit);
+			continue;
+		}
+
+		ProcessEvent(&ev);
+		// Do NOT write IAR here. The INTC bit is edge-latched while the
+		// component irq line is level; the component re-asserts within
+		// microseconds of the ack (S_SUCC_30), so clearing the bit races
+		// with the next edge and loses it forever. Keeping the bit set
+		// is harmless: events are de-duplicated by last_acked_reg1.
+		pending &= ~m;
+	}
+}
+
+//---------------------------------------------------------------------------
+// Interrupt system setup
+//---------------------------------------------------------------------------
+static int SetupInterruptSystem(void)
+{
+	XScuGic_Config *GicCfg;
+	int Status;
+	u32 i;
+
+	GicCfg = XScuGic_LookupConfig(XPAR_SCUGIC_0_DEVICE_ID);
+	if (!GicCfg) return XST_FAILURE;
+	Status = XScuGic_CfgInitialize(&Gic, GicCfg, GicCfg->CpuBaseAddress);
+	if (Status != XST_SUCCESS) return XST_FAILURE;
+
+	// Initialize all INTCs used by irq_table
+	Status = XIntc_Initialize(&Intc, intc_desc[0].dev_id);
+	if (Status != XST_SUCCESS) return XST_FAILURE;
+
+	// Per-bit handler: hardware dispatches, no software polling
+	for (i = 0; i < NUM_IRQ_SLOTS; i++) {
+		if (!irq_table[i].name) continue;
+		XIntc_Connect(&Intc, irq_table[i].intc_bit,
+			      (XInterruptHandler)ComponentIsr, &irq_table[i]);
+	}
+
+	XIntc_Start(&Intc, XIN_REAL_MODE);
+
+	for (i = 0; i < NUM_IRQ_SLOTS; i++) {
+		if (!irq_table[i].name) continue;
+		XIntc_Enable(&Intc, irq_table[i].intc_bit);
+	}
+
+	// Connect INTC#0 to GIC
+	Status = XScuGic_Connect(&Gic, intc_desc[0].gic_spi,
+				 (Xil_ExceptionHandler)XIntc_InterruptHandler, &Intc);
+	if (Status != XST_SUCCESS) return XST_FAILURE;
+	XScuGic_Enable(&Gic, intc_desc[0].gic_spi);
+
+	Xil_ExceptionInit();
+	Xil_ExceptionRegisterHandler(XIL_EXCEPTION_ID_INT,
+				     (Xil_ExceptionHandler)XScuGic_InterruptHandler, &Gic);
+	Xil_ExceptionEnable();
+
+	for (i = 0; i < NUM_IRQ_SLOTS; i++)
+		last_acked_reg1[i] = 0;
+
+	return XST_SUCCESS;
+}
+
+//---------------------------------------------------------------------------
+// Component register access (main-loop context)
+//---------------------------------------------------------------------------
 static void PlRegWrite(u32 base_addr)
 {
 	Xil_Out32(base_addr + RST_EN,  0x00000000U);
@@ -250,230 +515,6 @@ static void PlRegRead(u32 base_addr, const char *name)
 	xil_printf("  PARAM51=0x%08x PARAM52=0x%08x\r\n",
 		(unsigned)Xil_In32(base_addr + PARAM51),
 		(unsigned)Xil_In32(base_addr + PARAM52));
-}
-
-// Interrupt acknowledge
-static void PsIrqAck(u32 base_addr, const char *name)
-{
-	u32 irq_reg1, irq_reg2, irq_num, bhv_id, status, resp;
-
-	irq_reg2 = Xil_In32(base_addr + IRQ_REG2);
-	irq_reg1 = Xil_In32(base_addr + IRQ_REG1);
-
-	if (irq_reg1 == 0U)
-		return;
-
-	xil_printf("[%08u]  [%s] IRQ_REG2=0x%08x IRQ_REG1=0x%08x\r\n",
-		   (unsigned)ts_ms(), name, (unsigned)irq_reg2, (unsigned)irq_reg1);
-
-	if (irq_reg2 != 0U)
-		xil_printf("[%08u]  [%s] ALARM num=0x%02x\r\n",
-			   (unsigned)ts_ms(), name,
-			   (unsigned)((irq_reg2 >> 24) & 0xFFU));
-
-	bhv_id  = (irq_reg1 >> 8) & 0xFFU;
-	irq_num = irq_reg1 & 0xFFU;
-
-	if (bhv_id == 1U || bhv_id == 2U)
-		status = (irq_num == 0x28U) ? 0x5101U : 0x5100U;
-	else
-		status = (irq_num == 0x28U) ? 0x5199U : 0x5167U;
-
-	resp = (bhv_id << 24) | (irq_num << 16) | status;
-	Xil_Out32(base_addr + A_TX_RSULT_RPT, resp);
-	xil_printf("[%08u]  [%s] -> A_TX_RSULT_RPT=0x%08x (bhv=%u irq_num=%u %s)\r\n",
-		   (unsigned)ts_ms(), name, (unsigned)resp, (unsigned)bhv_id, (unsigned)irq_num,
-		   (irq_num == 0x28U) ? "FAIL" : "SUCCESS");
-}
-
-// Interrupt system initialization
-static int SetupInterruptSystem(void)
-{
-	XScuGic_Config *GicCfg;
-	int Status;
-	u32 i;
-
-	GicCfg = XScuGic_LookupConfig(XPAR_SCUGIC_0_DEVICE_ID);
-	if (!GicCfg) return XST_FAILURE;
-	Status = XScuGic_CfgInitialize(&Gic, GicCfg, GicCfg->CpuBaseAddress);
-	if (Status != XST_SUCCESS) return XST_FAILURE;
-
-	// Initialize all INTCs used by irq_table
-	Status = XIntc_Initialize(&Intc, intc_desc[0].dev_id);
-	if (Status != XST_SUCCESS) return XST_FAILURE;
-
-	// Connect all components' interrupts to the handler
-	for (i = 0; i < NUM_IRQ_SLOTS; i++) {
-		if (!irq_table[i].name) continue;
-		XIntc_Connect(&Intc, irq_table[i].intc_bit,
-			      (XInterruptHandler)PlIrqHandler, &Intc);
-	}
-
-	XIntc_Start(&Intc, XIN_REAL_MODE);
-
-	// Enable all components' interrupts
-	for (i = 0; i < NUM_IRQ_SLOTS; i++) {
-		if (!irq_table[i].name) continue;
-		XIntc_Enable(&Intc, irq_table[i].intc_bit);
-	}
-
-	// Connect INTC#0 to GIC
-	Status = XScuGic_Connect(&Gic, intc_desc[0].gic_spi,
-				 (Xil_ExceptionHandler)XIntc_InterruptHandler, &Intc);
-	if (Status != XST_SUCCESS) return XST_FAILURE;
-	XScuGic_Enable(&Gic, intc_desc[0].gic_spi);
-
-	Xil_ExceptionInit();
-	Xil_ExceptionRegisterHandler(XIL_EXCEPTION_ID_INT,
-				     (Xil_ExceptionHandler)XScuGic_InterruptHandler, &Gic);
-	Xil_ExceptionEnable();
-
-	// Build LUT for quick INTC bit -> IrqSlot lookup
-	for (i = 0; i < 32; i++) irq_lut[i] = NULL;
-	for (i = 0; i < NUM_IRQ_SLOTS; i++) {
-		if (!irq_table[i].name) continue;
-		irq_lut[irq_table[i].intc_bit] = &irq_table[i];
-		bhv_intc_bit[i] = irq_table[i].intc_bit;
-		bhv_pending[i]  = 0;
-	}
-
-	return XST_SUCCESS;
-}
-
-static void DispatchIntc(int intc_idx)
-{
-	u32 base = intc_desc[intc_idx].baseaddr;
-	u32 isr = Xil_In32(base + INTC_ISR);
-	u32 ier = Xil_In32(base + INTC_IER);
-	u32 pending = isr & ier;
-	if (!pending) return;
-
-	for (u32 bit = 0; bit < 32 && pending; bit++) {
-		u32 mask = 1U << bit;
-		if ((pending & mask) && irq_lut[bit]) {
-			PsIrqAck(irq_lut[bit]->base_addr, irq_lut[bit]->name);
-			pending &= ~mask;
-		}
-	}
-}
-
-static void DispatchAll(void)
-{
-	for (int i = 0; i < NUM_INTC; i++)
-		DispatchIntc(i);
-}
-
-// Wait for specific INTC bit interrupt
-static int WaitForIrq(u32 expected_bit, u32 timeout_ms)
-{
-	u32 elapsed_ms = 0;
-	u32 mask = 1U << expected_bit;
-	u32 base = intc_desc[0].baseaddr;
-
-	while (1) {
-		u32 isr = Xil_In32(base + INTC_ISR);
-		u32 ier = Xil_In32(base + INTC_IER);
-		u32 pending = isr & ier;
-
-		if (pending) {
-			// Background processing for non-target interrupts
-			u32 bg = pending & ~mask;
-			for (u32 bit = 0; bit < 32 && bg; bit++) {
-				u32 m = 1U << bit;
-				if ((bg & m) && irq_lut[bit]) {
-					xil_printf("  [WaitIrq] bg: %s (bit%u)\r\n",
-						   irq_lut[bit]->name, bit);
-					PsIrqAck(irq_lut[bit]->base_addr, irq_lut[bit]->name);
-					bg &= ~m;
-				}
-			}
-			if (pending & mask) {
-				return 1;
-			}
-		}
-
-		usleep(1000);
-		if (timeout_ms) {
-			elapsed_ms++;
-			if ((elapsed_ms % 5000) == 0)
-				xil_printf("  [WaitIrq] %us ISR=0x%08x\r\n",
-					   (unsigned)(elapsed_ms / 1000), (unsigned)isr);
-			if (elapsed_ms >= timeout_ms) return 0;
-		}
-	}
-}
-
-// Read IRQ_REG1 with retry
-static u32 ReadIrqReg1(u32 base_addr)
-{
-	u32 v;
-	for (int r = 0; r < 5; r++) {
-		v = Xil_In32(base_addr + IRQ_REG1);
-		if (v != 0U) return v;
-		usleep(1000);
-	}
-	return v;
-}
-
-// Behavior transaction
-static int DoBehavior(u32 base_addr, u8 bhv_id, u32 intc_bit, const char *comp_name)
-{
-	u32 irq_reg1, irq_num;
-
-	xil_printf("[%08u] \r\n[BHV %u] %s @0x%08x...\r\n",
-		   (unsigned)ts_ms(), (unsigned)bhv_id, comp_name, (unsigned)base_addr);
-	Xil_Out32(base_addr + A_BHV_ID, (u32)bhv_id);
-
-	// Wait for 10(0x0A) interrupt
-	if (!WaitForIrq(intc_bit, 5000)) {
-		xil_printf("[%08u] [BHV %u] %s TIMEOUT req(10)\r\n",
-			   (unsigned)ts_ms(), (unsigned)bhv_id, comp_name);
-		return 0;
-	}
-	irq_reg1 = ReadIrqReg1(base_addr);
-	irq_num  = irq_reg1 & 0xFFU;
-	xil_printf("[%08u] [BHV %u] %s irq_num=0x%02x ack...\r\n",
-		   (unsigned)ts_ms(), (unsigned)bhv_id, comp_name, (unsigned)irq_num);
-	PsIrqAck(base_addr, comp_name);
-	usleep(1000);
-
-	// Poll IRQ_REG1 directly for result (0x1E=success, 0x28=fail)
-	{
-		int poll_ms = 0;
-		while (poll_ms < 30000) {
-			irq_reg1 = Xil_In32(base_addr + IRQ_REG1);
-			irq_num  = irq_reg1 & 0xFFU;
-			if (irq_num == 0x1EU || irq_num == 0x28U) break;
-			usleep(1000);
-			poll_ms++;
-		}
-		if (poll_ms >= 30000) {
-			xil_printf("[%08u] [BHV %u] %s TIMEOUT result\r\n",
-				   (unsigned)ts_ms(), (unsigned)bhv_id, comp_name);
-			return 0;
-		}
-	}
-
-	if (irq_num == 0x1EU) {
-		xil_printf("[%08u] [BHV %u] %s SUCCESS(30) ack...\r\n",
-			   (unsigned)ts_ms(), (unsigned)bhv_id, comp_name);
-		PsIrqAck(base_addr, comp_name);
-		xil_printf("[%08u] [BHV %u] %s COMPLETE!\r\n",
-			   (unsigned)ts_ms(), (unsigned)bhv_id, comp_name);
-		return 1;
-	} else if (irq_num == 0x28U) {
-		xil_printf("[%08u] [BHV %u] %s FAIL(40) ack...\r\n",
-			   (unsigned)ts_ms(), (unsigned)bhv_id, comp_name);
-		PsIrqAck(base_addr, comp_name);
-		xil_printf("[%08u] [BHV %u] %s FAILED.\r\n",
-			   (unsigned)ts_ms(), (unsigned)bhv_id, comp_name);
-		return 0;
-	} else {
-		xil_printf("[%08u] [BHV %u] %s irq_num=0x%02x (unexpected)\r\n",
-			   (unsigned)ts_ms(), (unsigned)bhv_id, comp_name, (unsigned)irq_num);
-		if (irq_num != 0U) PsIrqAck(base_addr, comp_name);
-		return 0;
-	}
 }
 
 // Map param index -> register offset
@@ -550,7 +591,7 @@ static void PrintMenu(void)
 {
 	xil_printf("\r\n");
 	xil_printf("===========================================\r\n");
-	xil_printf(" Multi-Component IRQ ACK\r\n");
+	xil_printf(" Multi-Component IRQ ACK (event-driven)\r\n");
 	xil_printf(" Current component: [%d] %s\r\n",
 		   cur_component, irq_table[cur_component].name);
 	xil_printf("===========================================\r\n");
@@ -583,7 +624,7 @@ int main(void)
 	init_platform();
 
 	xil_printf("\r\n==============================================\r\n");
-	xil_printf(" PL IRQ: Multi-Component BM\r\n");
+	xil_printf(" PL IRQ: Multi-Component BM (pure event-driven)\r\n");
 	xil_printf(" 16-INTC dispatch architecture\r\n");
 	xil_printf(" %d components registered on INTC#0\r\n", NUM_IRQ_SLOTS);
 	xil_printf("==============================================\r\n");
@@ -616,9 +657,31 @@ int main(void)
 	PrintMenu();
 
 	while (1) {
-		DispatchAll();
+		IrqEvent ev;
 
-		key_index = XUartPs_RecvByte(STDIN_BASEADDRESS);
+		// 1. drain event queue (ISR feeds, main-loop consumes)
+		while (EvPop(&ev))
+			ProcessEvent(&ev);
+
+		// 1b. INTC polling fallback (GIC ISR path may not deliver)
+		PollIntcFallback();
+
+		if (EvDropCount) {
+			xil_printf("[%08u] EVQ overflow: %u dropped\r\n",
+				   (unsigned)ts_ms(), (unsigned)EvDropCount);
+			EvDropCount = 0;
+		}
+
+		// 2. behavior timeout (timestamp deadline, non-blocking)
+		if (bhv_state != BHV_IDLE &&
+		    (s32)(ts_ms() - bhv_deadline) > 0)
+			BhvTimeout();
+
+		// 3. UART menu (non-blocking, so events/timeouts run while idle)
+		if (XUartPs_IsReceiveData(STDIN_BASEADDRESS))
+			key_index = XUartPs_RecvByte(STDIN_BASEADDRESS);
+		else
+			key_index = 0;
 
 		if (key_index == 0 || key_index == 0xFF) {
 			usleep(10000);
@@ -705,9 +768,14 @@ int main(void)
 				 (key_index <= 'F') ? (u8)(key_index - 'A' + 10) :
 				              (u8)(key_index - 'a' + 10);
 			IrqSlot *comp = &irq_table[cur_component];
-			xil_printf("\r\n>>> [BHV=%u] on [%d] %s <<<\r\n",
-				   (unsigned)bhv, cur_component, comp->name);
-			DoBehavior(comp->base_addr, bhv, comp->intc_bit, comp->name);
+			if (bhv_state != BHV_IDLE) {
+				xil_printf("\r\n[BHV %u] still running on %s, ignore\r\n",
+					   (unsigned)bhv_id, bhv_slot->name);
+			} else {
+				xil_printf("\r\n>>> [BHV=%u] on [%d] %s <<<\r\n",
+					   (unsigned)bhv, cur_component, comp->name);
+				BhvStart(comp, bhv);
+			}
 		}
 		// Read PARAM51 of current component
 		else if (key_index == 'p' || key_index == 'P') {
