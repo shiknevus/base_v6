@@ -171,15 +171,13 @@ initial begin
     #500;
     do_behavior(8'd5);      // ok again
 
-    //============================================  timer0 (beh 129)  ==================================
+    //============================================  timer (beh 1, gap=1s)  ==================================
     #500;
-    ps_write_word(EC_BIAS_ADDR + `PARAM8, 32'h0000_000A, resp1);     // timer0 period 10ms
-    // first expiry: irq30 with c_bhv_id=129
-    #100000;    // wait until timer expires (10ms) and irq rises
-    do_timer_ack(8'd129);
-    // second expiry: restart verified
-    #100000;
-    do_timer_ack(8'd129);
+    ps_write_word(EC_BIAS_ADDR + `PARAM8, 32'h0000_0001, resp1);     // timer period 1s (task_time_cnt counts i_time_1s_vld)
+    // first cycle: irq10 -> irq20 -> irq30
+    do_timer_cycle();
+    // second cycle: restart verified (c_en || gap!=0 auto-restarts)
+    do_timer_cycle();
 
     #2000;
     $finish;
@@ -237,25 +235,55 @@ task automatic do_behavior;
     end
 endtask
 
-//wait for a channel-C timer irq30 (beh_id 129/130/131) and ack it
-task automatic do_timer_ack;
-    input [7:0] beh_id;
+//wait for one full channel-C timer cycle (irq10 -> irq20 -> irq30, beh_id fixed 1 by template) and ack each
+task automatic do_timer_cycle;
     reg [31:0] irq1, irq2;
     reg irq_ok;
     begin
+        // 10
         irq_ok = 1'b0;
         fork
             begin @`EC_COMP_INST_PATH.o_intr_irq; irq_ok = 1'b1; end
-            begin #10000000; $display("WARN: timer beh %0d irq TIMEOUT", beh_id); end
+            begin #10000000; $display("WARN: timer irq10 TIMEOUT"); end
         join_any
         disable fork;
-        if(!irq_ok) begin $display("timer beh %0d SKIPPED", beh_id); return; end
+        if(!irq_ok) begin $display("timer cycle SKIPPED"); return; end
         ps_read_word(EC_BIAS_ADDR + `IRQ_REG2, irq2);
         if(irq2 == 32'd0) begin
             ps_read_word(EC_BIAS_ADDR + `IRQ_REG1, irq1);
-            if(irq1 == {8'h88, 8'h66, beh_id, 8'd30}) begin
-                $display("  [%0t] timer beh %0d irq30", $time, beh_id);
-                ps_write_word(EC_BIAS_ADDR + `C_TX_RSULT_RPT, {beh_id, 8'h1e, 16'h5100}, resp1);
+            if(irq1 == {8'h88, 8'h66, 8'd1, 8'd10})
+                ps_write_word(EC_BIAS_ADDR + `C_TX_RSULT_RPT, {8'd1, 8'h0a, 16'h5100}, resp1);
+            else $stop;
+        end else $stop;
+        // 20
+        irq_ok = 1'b0;
+        fork
+            begin @`EC_COMP_INST_PATH.o_intr_irq; irq_ok = 1'b1; end
+            begin #10000000; $display("WARN: timer irq20 TIMEOUT"); end
+        join_any
+        disable fork;
+        if(!irq_ok) begin $display("timer cycle SKIPPED at 20"); return; end
+        ps_read_word(EC_BIAS_ADDR + `IRQ_REG2, irq2);
+        if(irq2 == 32'd0) begin
+            ps_read_word(EC_BIAS_ADDR + `IRQ_REG1, irq1);
+            if(irq1 == {8'h88, 8'h66, 8'd1, 8'd20})
+                ps_write_word(EC_BIAS_ADDR + `C_TX_RSULT_RPT, {8'd1, 8'h14, 16'h5100}, resp1);
+            else $stop;
+        end else $stop;
+        // 30
+        irq_ok = 1'b0;
+        fork
+            begin @`EC_COMP_INST_PATH.o_intr_irq; irq_ok = 1'b1; end
+            begin #10000000; $display("WARN: timer irq30 TIMEOUT"); end
+        join_any
+        disable fork;
+        if(!irq_ok) begin $display("timer cycle SKIPPED at 30"); return; end
+        ps_read_word(EC_BIAS_ADDR + `IRQ_REG2, irq2);
+        if(irq2 == 32'd0) begin
+            ps_read_word(EC_BIAS_ADDR + `IRQ_REG1, irq1);
+            if(irq1 == {8'h88, 8'h66, 8'd1, 8'd30}) begin
+                $display("  [%0t] timer cycle done (10/20/30)", $time);
+                ps_write_word(EC_BIAS_ADDR + `C_TX_RSULT_RPT, {8'd1, 8'h1e, 16'h5100}, resp1);
             end
             else $stop;
         end else $stop;
