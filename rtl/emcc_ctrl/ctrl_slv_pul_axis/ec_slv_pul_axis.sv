@@ -9,7 +9,7 @@
 // Project Name: 
 // Target Devices: 
 // Tool Versions: 
-// Description: ASS00628
+// Description: ASS00645 Linear/3DI/Pulse Servo Panel Control V6.0
 // 
 // Dependencies: 
 // 
@@ -45,7 +45,10 @@ module ec_slv_pul_axis#(
     	,input						i_axis_org          //axis origin
     	,input						i_axis_limb         //axis limit backward
     	,input						i_emerge_stop_signal//emergency stop signal
-	
+    	,input						i_safe_status       //safe status
+    	,input						i_axis_point        //axis in position
+    	,input						i_axis_reset        //axis reset
+
     	,input						cur_slv_board_id    //current slave board id
     	,input						slv_board_id        //slave board id
     	,input						pul_motor_r_flag    //pul motor ready flag
@@ -53,14 +56,13 @@ module ec_slv_pul_axis#(
     	,output 	[31:0] 			m2s_pulm_msg        //message  master to slave
     	,input 		[31:0] 			s2m_pulm_msg       	//message  slave to master
 
-		
-		,output 	            	o_intr_irq	
+
+		,output 	            	o_intr_irq
     );
 	
 	
-	localparam		A_BHA_NUM		=	15;	
-	localparam		B_BHA_NUM		=	1;	
-	localparam		ARV_SIG_DET_TIM	=	5;
+	localparam		A_BHA_NUM		=	8;	// 1home 2move0 3jog 4move 5getpoint 6son 7soff 8reset
+	localparam		B_BHA_NUM		=	1;
 	
 	//PS-PL    
 	wire 	[7:0]	unit_id         ;     	
@@ -163,13 +165,36 @@ module ec_slv_pul_axis#(
 	wire			a_tx_result_vld;
 	wire			b_tx_result_vld;
 	wire			c_tx_result_vld;
-	
+
+	//CDC sync (ps_reg_clk -> clk_i): 2-stage sync + edge detect.
+	reg			a_bhv_vld_r1, a_bhv_vld_r2;
+	reg			a_tx_result_vld_r1, a_tx_result_vld_r2;
+	reg			b_tx_result_vld_r1, b_tx_result_vld_r2;
+	reg			c_tx_result_vld_r1, c_tx_result_vld_r2;
+
+	wire		a_bhv_vld_sync		= a_bhv_vld_r2 & ~a_bhv_vld_r1;
+	wire		a_tx_result_vld_sync	= a_tx_result_vld_r2 & ~a_tx_result_vld_r1;
+	wire		b_tx_result_vld_sync	= b_tx_result_vld_r2 & ~b_tx_result_vld_r1;
+	wire		c_tx_result_vld_sync	= c_tx_result_vld_r2 & ~c_tx_result_vld_r1;
+
+	always @(posedge clk_i) begin
+		a_bhv_vld_r1			<= a_bhv_vld;
+		a_bhv_vld_r2			<= a_bhv_vld_r1;
+		a_tx_result_vld_r1		<= a_tx_result_vld;
+		a_tx_result_vld_r2		<= a_tx_result_vld_r1;
+		b_tx_result_vld_r1		<= b_tx_result_vld;
+		b_tx_result_vld_r2		<= b_tx_result_vld_r1;
+		c_tx_result_vld_r1		<= c_tx_result_vld;
+		c_tx_result_vld_r2		<= c_tx_result_vld_r1;
+	end
+
 	wire 	[A_BHA_NUM-1:0]	a_pre_sta_allow   ;
 	wire 	[A_BHA_NUM-1:0]	a_post_sta_allow  ;
 	wire 	[B_BHA_NUM-1:0]	b_pre_sta_allow   ;
 	wire 	[B_BHA_NUM-1:0]	b_post_sta_allow  ;
 	wire 					c_pre_sta_allow   ;
 	wire 					c_post_sta_allow  ;
+	wire					pre_sta_fail      ;
 	
 	wire	irq_a  ;
 	wire	irq_b  ;
@@ -198,7 +223,7 @@ module ec_slv_pul_axis#(
 	begin
 		if(rst_i)
 			a_bhv_id_r <= 8'd0;
-		else if(a_bhv_vld)
+		else if(a_bhv_vld_sync)
 			a_bhv_id_r <= a_bhv_id;
 		else
 			a_bhv_id_r <= a_bhv_id_r;
@@ -314,9 +339,8 @@ module ec_slv_pul_axis#(
 	,.param70               (param70		)
 	);
 
-	proactive_beh_slv_pul_axis#(	
-	.BHA_NUM 				(A_BHA_NUM  	 	),	//Number of active behaviors
-	.ARV_SIG_DET_TIM		(ARV_SIG_DET_TIM	)		//In - place signal detection time
+	proactive_beh_slv_pul_axis#(
+	.BHA_NUM 				(A_BHA_NUM  	 	)	//Number of active behaviors
 )proactive_beh_slv_pul_axis_u0(
     .clk_i                 	(clk_i				)
     ,.rst_i                	(rst_i				)
@@ -326,10 +350,10 @@ module ec_slv_pul_axis#(
     ,.post_sta_allow       	(a_post_sta_allow	)
 	,.a_en			       	(a_en				)
     ,.a_bhv_id             	(a_bhv_id       	)
-    ,.a_bhv_vld            	(a_bhv_vld      	)
+    ,.a_bhv_vld            	(a_bhv_vld_sync 	)
     ,.a_tx_ot              	(a_tx_ot        	)
     ,.a_tx_result_rpt	   	(a_tx_result_rpt	)
-	,.a_tx_result_vld      	(a_tx_result_vld	)
+	,.a_tx_result_vld      	(a_tx_result_vld_sync)
     ,.ec_cha_st            	(ec_cha_st			)
     ,.a_tx_id              	(a_tx_id        	)
     ,.a_alm_num            	(a_alm_num      	)
@@ -339,11 +363,15 @@ module ec_slv_pul_axis#(
     ,.i_axis_limf			(i_axis_limf		)
     ,.i_axis_org			(i_axis_org			)
     ,.i_axis_limb			(i_axis_limb		)	
-    ,.i_emerge_stop_signal	(1'b0				)
-    ,.cur_slv_board_id		(1'b0				)
-    ,.slv_board_id			(1'b0				)
-    ,.pul_motor_r_flag		(1'b1				)
-    ,.pul_motor_flag		(1'b0				)
+    ,.i_emerge_stop_signal	(i_emerge_stop_signal)
+    ,.i_safe_status			(i_safe_status		)
+    ,.i_axis_point			(i_axis_point		)
+    ,.i_axis_reset			(i_axis_reset		)
+    ,.i_pre_sta_fail		(pre_sta_fail		)
+    ,.cur_slv_board_id		(cur_slv_board_id	)
+    ,.slv_board_id			(slv_board_id		)
+    ,.pul_motor_r_flag		(pul_motor_r_flag	)
+    ,.pul_motor_flag		(pul_motor_flag		)
     ,.m2s_pulm_msg			(m2s_pulm_msg		)
     ,.s2m_pulm_msg			(s2m_pulm_msg		)
 
@@ -463,6 +491,11 @@ module ec_slv_pul_axis#(
 		,.i_axis_org			(i_axis_org		)
 		,.i_axis_limb			(i_axis_limb		)
 		,.i_emerge_stop_signal	(i_emerge_stop_signal)
+		,.i_safe_status			(i_safe_status		)
+		,.i_axis_point			(i_axis_point		)
+		,.i_axis_reset			(i_axis_reset		)
+		,.a_bhv_vld				(a_bhv_vld_sync		)
+		,.o_pre_sta_fail		(pre_sta_fail		)
     );
 		
 	irq_3i1o_arbitrator irq_3i1o_arbitrator_u0(
@@ -490,7 +523,7 @@ module ec_slv_pul_axis#(
 		,.irq_reg2_o		(irq_reg2			)
 		,.irq_o				(o_intr_irq			)
 		,.irq_busy_o		(irq_busy_o			)
-		,.irq_receive_ack_i (a_tx_result_vld || b_tx_result_vld || c_tx_result_vld)	
+		,.irq_receive_ack_i (a_tx_result_vld_sync || b_tx_result_vld_sync || c_tx_result_vld_sync)
     );
 	
 	

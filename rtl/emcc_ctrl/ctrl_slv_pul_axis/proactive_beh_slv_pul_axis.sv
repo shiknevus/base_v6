@@ -22,7 +22,6 @@
 
 module proactive_beh_slv_pul_axis#(
     parameter                 	BHA_NUM 		= 2   //Number of active behaviors
-	,parameter					ARV_SIG_DET_TIM	= 5
 )(
     input                       clk_i
     ,input                      rst_i
@@ -50,7 +49,11 @@ module proactive_beh_slv_pul_axis#(
     ,input						i_axis_org          //axis origin
     ,input						i_axis_limb         //axis limit backward
     ,input						i_emerge_stop_signal//emergency stop signal
-    
+    ,input						i_safe_status       //safe status
+    ,input						i_axis_point        //axis in position
+    ,input						i_axis_reset        //axis reset
+    ,input						i_pre_sta_fail      //hard alarm from pre-check (limit etc): reject immediately
+
     ,input						cur_slv_board_id    //current slave board id
     ,input						slv_board_id        //slave board id
     ,input						pul_motor_r_flag    //pul motor ready flag
@@ -102,11 +105,9 @@ module proactive_beh_slv_pul_axis#(
 	reg [7:0]		ack_tx_result;
 	reg	[7:0]		ack_ps_alart_num;
 	
-	reg	[7:0]	detect_tim;	//s
-	reg			detect_flag;
-	
-	
-	localparam  S_IDLE          = 8'h00; 
+
+
+	localparam  S_IDLE          = 8'h00;
     localparam  S_BHA_PRE_DET	= 8'h01; 
 	localparam	S_READY_10		= 8'h02;
     localparam  S_READY_10_ACK  = 8'h03; 
@@ -147,22 +148,26 @@ module proactive_beh_slv_pul_axis#(
 		end
 	end
 	
-	always@(posedge clk_i)begin
-	if(rst_i)
-		curr_state_1d <= 8'd0;
-	else
-		curr_state_1d <= curr_state;
-	end
+    reg			a_bhv_vld_r;
 	
     //Current behavior number
     always@(posedge clk_i)begin
-        if(rst_i)
+        if(rst_i)begin
             a_bhv_id_r <= 8'd0;
-        else if(a_bhv_vld)
+			a_bhv_vld_r <= 1'b0;
+        end else if(a_en && ((a_bhv_id >= 8'd1) && (a_bhv_id <= BHA_NUM)) && a_bhv_vld)begin
             a_bhv_id_r <= a_bhv_id;
-        else
+			a_bhv_vld_r <= a_bhv_vld;
+        end else if(curr_state == S_IDLE && curr_state_1d != curr_state)begin
+            a_bhv_id_r <= 8'd0;
+			a_bhv_vld_r <= 1'b0;
+        end else begin
             a_bhv_id_r <= a_bhv_id_r;
+			a_bhv_vld_r <= 1'b0;
+        end
     end
+	
+//------------------------------------------- FSM begin => Control 10/20/30/40 interrupt -----------------------------------------------//
 
 	reg match_10;
 	//reg match_20;
@@ -193,6 +198,12 @@ module proactive_beh_slv_pul_axis#(
 		end
 	end
     
+	always@(posedge clk_i)begin
+	if(rst_i)
+		curr_state_1d <= 8'd0;
+	else
+		curr_state_1d <= curr_state;
+	end
 
     always @(posedge clk_i) begin
         if (rst_i)
@@ -223,18 +234,19 @@ module proactive_beh_slv_pul_axis#(
 
     always @(*) begin			
         case (curr_state)	
-            S_IDLE: 
-			begin	//0
-                if (a_en && a_bhv_id != 8'd0 && a_bhv_vld)    //ps behavior execution instruction
+            S_IDLE: begin			//curr_state = 0
+                if (a_en && ((a_bhv_id_r >= 8'd1) && (a_bhv_id_r <= BHA_NUM)) && a_bhv_vld_r)	//behavior start
                     next_state = S_BHA_PRE_DET;
                 else
                     next_state = S_IDLE;
             end
 
-            S_BHA_PRE_DET: 
+            S_BHA_PRE_DET:
 			begin	//1
-                if ((a_bhv_id_r >= 8'd1) && (a_bhv_id_r <= BHA_NUM ) && pre_sta_allow[a_bhv_id_r - 1])
+                if(pre_sta_allow[a_bhv_id_r - 1'b1])
                     next_state = S_READY_10;
+                else if(i_pre_sta_fail)
+                    next_state = S_ALERT_40;		//hard alarm: reject immediately (no timout wait)
                 else if(timout)
                     next_state = S_ALERT_40;
                 else
@@ -267,14 +279,12 @@ module proactive_beh_slv_pul_axis#(
 			
             S_BHA_POST_DET:
 			begin	//7
-				if(detect_flag) begin
-                	if ((a_bhv_id_r >= 8'd1) && (a_bhv_id_r <= BHA_NUM ) && post_sta_allow[a_bhv_id_r - 1])
-                    	next_state = S_SUCC_30;
-                	else
-                    	next_state = S_ALERT_40;
-				end
-				else
-					next_state = S_BHA_POST_DET;
+				if(post_sta_allow[a_bhv_id_r - 1'b1])
+                	next_state = S_SUCC_30;
+                else if(timout)
+                    next_state = S_ALERT_40;
+                else
+                    next_state = S_BHA_POST_DET;
             end
 
             S_SUCC_30: begin		//8						//Send Interrupt 30
@@ -307,15 +317,15 @@ module proactive_beh_slv_pul_axis#(
 
         endcase
     end
+	
+//----------------------------------------------------------- FSM end ------------------------------------------------------//
 
     //Channel A busy signal
 	assign ec_cha_st = (curr_state != S_IDLE)?1'b1:1'b0;
 
     //Channel A transaction ID: 10 20 30 40
     always@(posedge clk_i)begin
-        if(rst_i)
-            a_tx_id <= 8'd0;
-		else if(!a_en)
+        if(rst_i || !a_en)
 			a_tx_id <= 8'd0;
         else if(curr_state == S_READY_10)
             a_tx_id <= 8'd10;
@@ -325,16 +335,14 @@ module proactive_beh_slv_pul_axis#(
             a_tx_id <= 8'd30;
         else if(curr_state == S_ALERT_40)
             a_tx_id <= 8'd40;
-		else if(match_40)
+		else if(curr_state == S_IDLE || curr_state == S_BHA_PRE_DET)
 			a_tx_id <= 8'd0;
         else
             a_tx_id <= a_tx_id;
     end
 
     always@(posedge clk_i)begin
-        if(rst_i)
-            irq_o <= 1'b0;
-		else if(!a_en)
+        if(rst_i || !a_en)
 			irq_o <= 1'b0;
 		else if(irq_ack_i)    		//interrupt arbiter receives the interrupt.
             irq_o <= 1'b0;
@@ -351,12 +359,18 @@ module proactive_beh_slv_pul_axis#(
     end
 
     always@(posedge clk_i)begin
-        if(rst_i)
+        if(rst_i || !a_en)
             a_alm_num <= 8'd0;
-		else if(!a_en)
-			a_alm_num <= 8'd0;
-        else if(curr_state == S_BHA_PRE_DET && timout)						//The pre - full inspection is not met.
-			a_alm_num <= 8'd101;    
+        else if(curr_state == S_BHA_PRE_DET && i_pre_sta_fail && !pre_sta_allow[a_bhv_id_r - 1'b1])	//hard alarm: limit
+            a_alm_num <= i_axis_limf ? 8'd101 : 8'd102;
+        else if(curr_state == S_BHA_PRE_DET && timout) begin				//The pre - full inspection is not met.
+			case(a_bhv_id_r)
+				8'd1:    a_alm_num <= 8'd102;	// home alarm
+				8'd3:    a_alm_num <= 8'd103;	// jog alarm
+				8'd2, 8'd4: a_alm_num <= 8'd104;	// move alarm
+				default: a_alm_num <= 8'd101;
+			endcase
+		end
         else if(curr_state == S_READY_10_ACK && ack_tx_result == IRQ_NO_OK)	//Transaction 10 ps response error
             a_alm_num <= ack_ps_alart_num;    
         else if(curr_state == S_READY_10_ACK && timout)						//For Transaction 10, waiting for the ps response timed out.
@@ -373,11 +387,12 @@ module proactive_beh_slv_pul_axis#(
 			a_alm_num <= ack_ps_alart_num;
 		else if(curr_state == S_SUCC_30_ACK && timout)						//For Transaction 30, waiting for the ps response timed out.
             a_alm_num <= 8'd123;
-		else if(match_40)
+		else if(curr_state == S_IDLE)
 			a_alm_num <= 8'd0;
         else
             a_alm_num <= a_alm_num;
     end
+	
 
     //Timeout count
     always@(posedge clk_i)begin
@@ -391,6 +406,8 @@ module proactive_beh_slv_pul_axis#(
             timout_cnt <= 20'd0;
         else if(i_time_1s_vld)
             timout_cnt <= timout_cnt+1;
+		else
+			timout_cnt <= timout_cnt;
     end
 
     always@(posedge clk_i)begin
@@ -406,30 +423,6 @@ module proactive_beh_slv_pul_axis#(
 	//===============================================================================================================
 	//------------------------------------------------ user logic start ---------------------------------------------
 	//===============================================================================================================
-
-	always@(posedge clk_i)
-	begin
-    	if(rst_i) begin
-    	    detect_tim  <= 8'd0;
-    	    detect_flag <= 1'b0;
-    	end
-    	else if(curr_state != S_BHA_POST_DET) begin
-    	    detect_tim  <= 8'd0;
-    	    detect_flag <= 1'b0;
-    	end
-    	else begin
-    	    if(detect_tim >= ARV_SIG_DET_TIM - 1'b1) begin
-    	        detect_tim  <= detect_tim; 
-    	        detect_flag <= 1'b1;  
-    	    end
-    	    else begin
-    	        //detect_tim  <= detect_tim + i_time_1s_vld;	//actual
-				detect_tim  <= detect_tim + 1;	//sim
-    	        detect_flag <= 1'b0;	
-    	    end
-    	end
-	end
-	
 
 // Internal motion control signals
 reg        action_son;
@@ -503,19 +496,19 @@ always@(posedge clk_i) begin
                     m2s_state <= 4'd1;
                 end
             end
-            1: begin m2s_pulm_msg <= rserv_step_pulse;                    m2s_state <= 4'd2;  end
-            2: begin m2s_pulm_msg <= rserv_target_pulse;                  m2s_state <= 4'd3;  end
-            3: begin m2s_pulm_msg <= {rcfg_home_spd, rcfg_move_spd};      m2s_state <= 4'd4;  end
-            4: begin m2s_pulm_msg <= {12'd0, rctrl_drive_reset, o_dv_son,
-                                      rcfg_pf_mode, rserv_dir, rcfg_jog_spd};
-                                                                          m2s_state <= 4'd5;  end
-            5: begin m2s_pulm_msg <= {rcfg_home_acc, rcfg_home_dec};      m2s_state <= 4'd6;  end
-            6: begin m2s_pulm_msg <= {rcfg_jog_acc,  rcfg_jog_dec};       m2s_state <= 4'd7;  end
-            7: begin m2s_pulm_msg <= {rcfg_move_acc, rcfg_move_dec};      m2s_state <= 4'd8;  end
-            8: begin m2s_pulm_msg <= {rcfg_acc_max,  rcfg_dec_max};       m2s_state <= 4'd9;  end
-            9: begin m2s_pulm_msg <= {rcfg_spd_max,  rcfg_qs_dec};        m2s_state <= 4'd10; end
+            1 : begin m2s_pulm_msg <= rserv_step_pulse;                    m2s_state <= 4'd2;  end
+            2 : begin m2s_pulm_msg <= rserv_target_pulse;                  m2s_state <= 4'd3;  end
+            3 : begin m2s_pulm_msg <= {rcfg_home_spd, rcfg_move_spd};      m2s_state <= 4'd4;  end
+            4 : begin m2s_pulm_msg <= {12'd0, rctrl_drive_reset, o_dv_son,
+                                       rcfg_pf_mode, rserv_dir, rcfg_jog_spd};
+                                                                           m2s_state <= 4'd5;  end
+            5 : begin m2s_pulm_msg <= {rcfg_home_acc, rcfg_home_dec};      m2s_state <= 4'd6;  end
+            6 : begin m2s_pulm_msg <= {rcfg_jog_acc,  rcfg_jog_dec};       m2s_state <= 4'd7;  end
+            7 : begin m2s_pulm_msg <= {rcfg_move_acc, rcfg_move_dec};      m2s_state <= 4'd8;  end
+            8 : begin m2s_pulm_msg <= {rcfg_acc_max,  rcfg_dec_max};       m2s_state <= 4'd9;  end
+            9 : begin m2s_pulm_msg <= {rcfg_spd_max,  rcfg_qs_dec};        m2s_state <= 4'd10; end
             10: begin m2s_pulm_msg <= rcfg_timedly;                        m2s_state <= 4'd11; end
-            11: begin m2s_pulm_msg <= 32'd0;                               m2s_state <= 4'd12; end  // no wheel
+            11: begin m2s_pulm_msg <= 32'd0;                               m2s_state <= 4'd12; end
             12: begin m2s_pulm_msg <= 32'd0;                               m2s_state <= 4'd13; end
             13: begin m2s_pulm_msg <= 32'd0;                               m2s_state <= 4'd14; end
             14: begin m2s_pulm_msg <= 32'd0;                               m2s_state <= 4'd0;  end
@@ -555,8 +548,8 @@ always@(posedge clk_i) begin
     if(rst_i || !a_en)
         bh_disable <= 1'b0;
     else if(curr_state == S_EXE) begin
-        if(a_bhv_id_r == 8'd9)       bh_disable <= 1'b0;
-        else if(a_bhv_id_r == 8'd10) bh_disable <= 1'b1;
+        if(a_bhv_id_r == 8'd6)       bh_disable <= 1'b0;   // son
+        else if(a_bhv_id_r == 8'd7)  bh_disable <= 1'b1;   // soff
     end
 end
 
@@ -630,7 +623,7 @@ always@(posedge clk_i) begin
 end
 
 assign servo_work_error = (((a_bhv_id_r == 8'd1) & (servo_delay_ms >= 5000)) |
-                           ((a_bhv_id_r >= 8'd2 && a_bhv_id_r <= 8'd3) & (servo_delay_ms >= 1000))) ? 1'b1 : 1'b0;
+                           ((a_bhv_id_r >= 8'd2 && a_bhv_id_r <= 8'd4) & (servo_delay_ms >= 1000))) ? 1'b1 : 1'b0;
 
 always@(posedge clk_i) begin
     if(rst_i || !a_en)

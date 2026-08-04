@@ -21,7 +21,7 @@
 
 
 module pre_post_sta_check_slv_pul_axis#(
-		parameter		A_BHA_NUM		=	13      	
+		parameter		A_BHA_NUM		=	8
 		,parameter		B_BHA_NUM		=	1  
 )(
 		input							clk_i			
@@ -51,13 +51,17 @@ module pre_post_sta_check_slv_pul_axis#(
 		,input		[0:0]				i_axis_limf			
 		,input		[0:0]				i_axis_org			
 		,input		[0:0]				i_axis_limb			
-		,input		[0:0]				i_emerge_stop_signal	
+		,input		[0:0]				i_emerge_stop_signal
+		,input		[0:0]				i_safe_status
+		,input		[0:0]				i_axis_point
+		,input		[0:0]				i_axis_reset
 		//io port end
 		
 		,input							a_en
-		,input							b_en			
-		,input							c_en	
-			
+		,input							a_bhv_vld
+		,input							b_en
+		,input							c_en
+
 		,input		[7:0]				a_bhv_id
 		,input		[7:0]				b_bhv_id
 		,input		[7:0]				c_bhv_id
@@ -71,10 +75,11 @@ module pre_post_sta_check_slv_pul_axis#(
 
 		,output	reg	[A_BHA_NUM-1:0]		a_pre_sta_allow	
 		,output	reg	[A_BHA_NUM-1:0]		a_post_sta_allow
-		,output	reg	[B_BHA_NUM-1:0]		b_pre_sta_allow	
+		,output	reg	[B_BHA_NUM-1:0]		b_pre_sta_allow
 		,output	reg	[B_BHA_NUM-1:0]		b_post_sta_allow
-		,output	reg						c_pre_sta_allow	
+		,output	reg						c_pre_sta_allow
 		,output	reg						c_post_sta_allow
+		,output							o_pre_sta_fail
     );
 	
 	//========================================================================================//
@@ -83,63 +88,74 @@ module pre_post_sta_check_slv_pul_axis#(
 	
 	
 
-	//pre status
-	always@(posedge clk_i)begin
-	if(rst_i && !a_en)
-		a_pre_sta_allow <= {A_BHA_NUM{1'b0}};
-	else
-		a_pre_sta_allow <= {A_BHA_NUM{1'b1}};
+	//limit rising-edge latch (same as ctrl_ethercat_servo): latch on edge, clear when
+	//a new behavior starts and both limits released; level fallback below.
+	reg			limf_d1, limb_d1;
+	reg			limf_alarm, limb_alarm;
+	wire		limf_rise = i_axis_limf & ~limf_d1;
+	wire		limb_rise = i_axis_limb & ~limb_d1;
+	always@(posedge clk_i) begin
+		if(rst_i || !a_en) begin
+			limf_d1    <= 1'b0;
+			limb_d1    <= 1'b0;
+			limf_alarm <= 1'b0;
+			limb_alarm <= 1'b0;
+		end else begin
+			limf_d1 <= i_axis_limf;
+			limb_d1 <= i_axis_limb;
+			if(limf_rise)
+				limf_alarm <= 1'b1;
+			else if(limb_rise)
+				limb_alarm <= 1'b1;
+			else if(a_bhv_vld && !(i_axis_limf|i_axis_limb)) begin
+				limf_alarm <= 1'b0;
+				limb_alarm <= 1'b0;
+			end
+		end
+	end
+	wire servo_limit_alarm = limf_alarm | limb_alarm | (i_axis_limf|i_axis_limb);  //level fallback
+	assign o_pre_sta_fail = servo_limit_alarm;
+
+	//home completed: beh1 (home) passes post-check -> set; beh7 (soff) clears
+	reg home_completed;
+	always@(posedge clk_i) begin
+		if(rst_i || !a_en)
+			home_completed <= 1'b0;
+		else if(a_bhv_id == 8'd1 && a_post_sta_allow[0])
+			home_completed <= 1'b1;
+		else if(a_bhv_id == 8'd7)
+			home_completed <= 1'b0;
 	end
 
-	wire [A_BHA_NUM-1:0]	post_sta	;
+	//pre status per behavior (same as ctrl_ethercat_servo):
+	// beh1 home:                 axis ok (limit-exempt: home hits limit)
+	// beh2 move0/3 jog/4 moveabs: home_completed + axis ok + no limit alarm
+	// beh5 getpoint/6 son/7 soff/8 reset: always
+	wire axis_ok = !i_servo_notok && !i_emerge_stop_signal && !i_safe_status
+	            && !unit_st && !m_st && !m_saf_st && !link_m_saf_st;
+	always@(posedge clk_i)begin
+		if(rst_i || !a_en)
+			a_pre_sta_allow <= {A_BHA_NUM{1'b0}};
+		else begin
+			a_pre_sta_allow <= {A_BHA_NUM{1'b0}};
+			a_pre_sta_allow[0] <= axis_ok;                                           // beh1 home
+			a_pre_sta_allow[1] <= home_completed && axis_ok && !servo_limit_alarm;   // beh2 move0
+			a_pre_sta_allow[2] <= home_completed && axis_ok && !servo_limit_alarm;   // beh3 jog
+			a_pre_sta_allow[3] <= home_completed && axis_ok && !servo_limit_alarm;   // beh4 move abs
+			a_pre_sta_allow[4] <= 1'b1;                                              // beh5 get point
+			a_pre_sta_allow[5] <= 1'b1;                                              // beh6 son
+			a_pre_sta_allow[6] <= 1'b1;                                              // beh7 soff
+			a_pre_sta_allow[7] <= 1'b1;                                              // beh8 reset
+		end
+	end
 
-	assign	post_sta[0 ] = (a_bhv_id == 1 )&&(di_i ==4'bxx01);
-	assign	post_sta[1 ] = (a_bhv_id == 2 )&&(di_i ==4'bxx10);
-	assign	post_sta[2 ] = (a_bhv_id == 3 )&&(di_i ==4'bxx00);
-	assign	post_sta[3 ] = (a_bhv_id == 4 )&&(di_i ==4'bx001);
-	assign	post_sta[4 ] = (a_bhv_id == 5 )&&(di_i ==4'bx010);
-	assign	post_sta[5 ] = (a_bhv_id == 6 )&&(di_i ==4'bxxxx);
-	assign	post_sta[6 ] = (a_bhv_id == 7 )&&(di_i ==4'bxxxx);
-	assign	post_sta[7 ] = (a_bhv_id == 8 )&&(di_i ==4'bx1xx);
-	assign	post_sta[8 ] = (a_bhv_id == 9 )&&(di_i ==4'bx0xx);
-	assign	post_sta[9 ] = (a_bhv_id == 10)&&(di_i ==4'bxx01);
-	assign	post_sta[10] = (a_bhv_id == 11)&&(di_i ==4'bxx10);
-	assign	post_sta[11] = (a_bhv_id == 12)&&(di_i ==4'bxx01);
-	assign	post_sta[12] = (a_bhv_id == 13)&&(di_i ==4'bxx10);
-
-
-	always@(posedge clk_i) 
+	//post status: EXE completes directly (motion result confirmed by master via slave message)
+	always@(posedge clk_i)
 	begin
 		if(rst_i || !a_en)
 			a_post_sta_allow <= {A_BHA_NUM{1'b0}};
-		else if(post_sta[0] && A_BHA_NUM > 0)
-			a_post_sta_allow[0] <= 1;
-		else if(post_sta[1] && A_BHA_NUM > 1)
-			a_post_sta_allow[1] <= 1;
-		else if(post_sta[2] && A_BHA_NUM > 2)
-			a_post_sta_allow[2] <= 1;
-		else if(post_sta[3] && A_BHA_NUM > 3)
-			a_post_sta_allow[3] <= 1;
-		else if(post_sta[4] && A_BHA_NUM > 4)
-			a_post_sta_allow[4] <= 1;
-		else if(post_sta[5] && A_BHA_NUM > 5)
-			a_post_sta_allow[5] <= 1;
-		else if(post_sta[6] && A_BHA_NUM > 6)
-			a_post_sta_allow[6] <= 1;
-		else if(post_sta[7] && A_BHA_NUM > 7)
-			a_post_sta_allow[7] <= 1;
-		else if(post_sta[8] && A_BHA_NUM > 8)
-			a_post_sta_allow[8] <= 1;
-		else if(post_sta[9] && A_BHA_NUM > 9)
-			a_post_sta_allow[9] <= 1;
-		else if(post_sta[10] && A_BHA_NUM > 10)
-			a_post_sta_allow[10] <= 1;
-		else if(post_sta[11] && A_BHA_NUM > 11)
-			a_post_sta_allow[11] <= 1;
-		else if(post_sta[12] && A_BHA_NUM > 12)
-			a_post_sta_allow[12] <= 1;
 		else
-			a_post_sta_allow <= {A_BHA_NUM{1'b0}};
+			a_post_sta_allow <= {A_BHA_NUM{1'b1}};
 	end
 	
 	//========================================================================================//

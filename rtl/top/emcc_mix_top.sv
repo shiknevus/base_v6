@@ -659,8 +659,6 @@ module emcc_mix_top
 		    	,.pul_motor_flag		(pul_motor0_flag		)
 		    	,.m2s_pulm_msg			(pul_motor0_r_msg[0]	)
 		    	,.s2m_pulm_msg			(pul_motor0_msg[0]	)
-		    	,.o_dv_son				(o_dv_son[1]		    )
-		    	,.o_dv_reset			(o_dv_reset[1]		    )
 		    	,.o_intr_irq			(map_irq[10]		        )
 		    );
 
