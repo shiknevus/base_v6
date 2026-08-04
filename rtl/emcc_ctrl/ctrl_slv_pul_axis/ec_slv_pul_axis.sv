@@ -216,20 +216,10 @@ module ec_slv_pul_axis#(
 	wire	[31:0]	a_task_bhv_id;
 	wire			a_en;
 	wire 	[31:0]	bhv_en;
-	
-	reg		[7:0]	a_bhv_id_r;
-	
-	always@(posedge clk_i)
-	begin
-		if(rst_i)
-			a_bhv_id_r <= 8'd0;
-		else if(a_bhv_vld_sync)
-			a_bhv_id_r <= a_bhv_id;
-		else
-			a_bhv_id_r <= a_bhv_id_r;
-	end
-	
-	
+
+	wire	[7:0]	a_bhv_id_r;	//driven by proactive_beh output (latched on a_bhv_vld_sync)
+
+
 	ps_rw_pl_reg#(
 		.REG_SPACE_BIAS 	(REG_SPACE_BIAS		),
 		.REG_SPACE_SIZE 	(REG_SPACE_SIZE		)
