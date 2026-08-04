@@ -22,7 +22,6 @@
 
 module proactive_beh_pul_axis#(
     parameter                 	BHA_NUM 		= 2   //Number of active behaviors
-	,parameter					ARV_SIG_DET_TIM	= 5
 )(
     input                       clk_i
     ,input                      rst_i
@@ -113,11 +112,9 @@ module proactive_beh_pul_axis#(
 	reg [7:0]		ack_tx_result;
 	reg	[7:0]		ack_ps_alart_num;
 	
-	reg	[7:0]	detect_tim;	//s
-	reg			detect_flag;
-	
-	
-	localparam  S_IDLE          = 8'h00; 
+
+
+	localparam  S_IDLE          = 8'h00;
     localparam  S_BHA_PRE_DET	= 8'h01; 
 	localparam	S_READY_10		= 8'h02;
     localparam  S_READY_10_ACK  = 8'h03; 
@@ -167,12 +164,19 @@ module proactive_beh_pul_axis#(
 	
     //Current behavior number
     always@(posedge clk_i)begin
-        if(rst_i)
+        if(rst_i)begin
             a_bhv_id_r <= 8'd0;
-        else if(a_bhv_vld)
+			a_bhv_vld_r <= 1'b0;
+        end else if(a_en && ((a_bhv_id >= 8'd1) && (a_bhv_id <= BHA_NUM)) && a_bhv_vld)begin
             a_bhv_id_r <= a_bhv_id;
-        else
+			a_bhv_vld_r <= a_bhv_vld;
+        end else if(curr_state == S_IDLE && curr_state_1d != curr_state)begin
+            a_bhv_id_r <= 8'd0;
+			a_bhv_vld_r <= 1'b0;
+        end else begin
             a_bhv_id_r <= a_bhv_id_r;
+			a_bhv_vld_r <= 1'b0;
+        end
     end
 
 	reg match_10;
@@ -243,7 +247,7 @@ module proactive_beh_pul_axis#(
         case (curr_state)
             S_IDLE:
 			begin	//0
-                if (a_en && a_bhv_id != 8'd0 && a_bhv_vld)    //ps behavior execution instruction
+                if (a_en && ((a_bhv_id_r >= 8'd1) && (a_bhv_id_r <= BHA_NUM)) && a_bhv_vld_r)    //ps behavior execution instruction
                     next_state = S_BHA_PRE_DET;
                 else
                     next_state = S_IDLE;
@@ -251,12 +255,10 @@ module proactive_beh_pul_axis#(
 
             S_BHA_PRE_DET:
 			begin	//1
-                if ((a_bhv_id_r >= 8'd1) && (a_bhv_id_r <= BHA_NUM ) && pre_sta_allow[a_bhv_id_r - 1])
+                if(pre_sta_allow[a_bhv_id_r - 1'b1])
                     next_state = S_READY_10;
-                else if(timout)
-                    next_state = S_ALERT_40;
                 else
-                    next_state = S_BHA_PRE_DET;
+                    next_state = S_ALERT_40;		//pre not met: reject immediately (via a_pre_sta_allow)
             end
 
             S_READY_10: 
@@ -285,18 +287,12 @@ module proactive_beh_pul_axis#(
 			
             S_BHA_POST_DET:
 			begin	//7
-				if(detect_flag) begin
-                	if ((a_bhv_id_r >= 8'd1) && (a_bhv_id_r <= BHA_NUM ) && post_sta_allow[a_bhv_id_r - 1])
-                    	next_state = S_SUCC_30;
-                	else begin
-                        if (timout) 
-                            next_state = S_ALERT_40;
-                        else
-                            next_state = S_BHA_POST_DET;
-                    end
-				end
-				else
-					next_state = S_BHA_POST_DET;
+				if(post_sta_allow[a_bhv_id_r - 1'b1])
+                	next_state = S_SUCC_30;
+                else if(timout)
+                    next_state = S_ALERT_40;
+                else
+                    next_state = S_BHA_POST_DET;
             end
 
             S_SUCC_30: begin		//8						//Send Interrupt 30
@@ -347,7 +343,7 @@ module proactive_beh_pul_axis#(
             a_tx_id <= 8'd30;
         else if(curr_state == S_ALERT_40)
             a_tx_id <= 8'd40;
-		else if(match_40)
+		else if(curr_state == S_IDLE || curr_state == S_BHA_PRE_DET)
 			a_tx_id <= 8'd0;
         else
             a_tx_id <= a_tx_id;
@@ -377,25 +373,25 @@ module proactive_beh_pul_axis#(
             a_alm_num <= 8'd0;
 		else if(!a_en)
 			a_alm_num <= 8'd0;
-        else if(curr_state == S_BHA_PRE_DET && timout)						//The pre - full inspection is not met.
-			a_alm_num <= 8'd101;    
+        else if(curr_state == S_BHA_PRE_DET && !pre_sta_allow[a_bhv_id_r - 1'b1])	//pre not met: rejected immediately
+			a_alm_num <= 8'd101;
         else if(curr_state == S_READY_10_ACK && ack_tx_result == IRQ_NO_OK)	//Transaction 10 ps response error
-            a_alm_num <= ack_ps_alart_num;    
+            a_alm_num <= ack_ps_alart_num;
         else if(curr_state == S_READY_10_ACK && timout)						//For Transaction 10, waiting for the ps response timed out.
-            a_alm_num <= 8'd108;    
+            a_alm_num <= 8'd108;
 		//else if(curr_state == S_EXE_20_ACK && ack_tx_result == IRQ_NO_OK)	//Transaction 20 has a ps response error.
-        //    a_alm_num <= ack_ps_alart_num;    
+        //    a_alm_num <= ack_ps_alart_num;
         //else if(curr_state == S_EXE_20_ACK && timout)						//For Transaction 20, waiting for the ps response timed out.
-        //    a_alm_num <= 8'd103;    
+        //    a_alm_num <= 8'd103;
 		else if(curr_state_1d == S_EXE && curr_state == S_ALERT_40)			//The execution of Behavior 1 failed.
-				a_alm_num <= 8'd109;   
+				a_alm_num <= 8'd109;
 		else if(curr_state_1d == S_BHA_POST_DET && curr_state == S_ALERT_40)//The post - full inspection is not met.
-				a_alm_num <= 8'd116;    
+				a_alm_num <= 8'd116;
 		else if(curr_state == S_SUCC_30_ACK && ack_tx_result == IRQ_NO_OK)	//Transaction 30 has a ps response error.
 			a_alm_num <= ack_ps_alart_num;
 		else if(curr_state == S_SUCC_30_ACK && timout)						//For Transaction 30, waiting for the ps response timed out.
             a_alm_num <= 8'd123;
-		else if(match_40)
+		else if(curr_state == S_IDLE)
 			a_alm_num <= 8'd0;
         else
             a_alm_num <= a_alm_num;
@@ -428,34 +424,6 @@ module proactive_beh_pul_axis#(
 	//===============================================================================================================
 	//------------------------------------------------ user logic start ---------------------------------------------
 	//===============================================================================================================
-
-	always@(posedge clk_i)
-	begin
-    	if(rst_i) begin
-    	    detect_tim  <= 8'd0;
-    	    detect_flag <= 1'b0;
-    	end
-    	else if(curr_state != S_BHA_POST_DET) begin
-    	    detect_tim  <= 8'd0;
-    	    detect_flag <= 1'b0;
-    	end
-    	else begin
-    	    if((ARV_SIG_DET_TIM == 0) || (detect_tim > ARV_SIG_DET_TIM - 1'b1)) begin
-    	        detect_tim  <= detect_tim; 
-    	        detect_flag <= 1'b1;  
-    	    end
-    	    else begin
-                `ifdef ENB_SIM_MODE
-				    detect_tim  <= detect_tim + 1;	//sim
-    	            detect_flag <= 1'b0;	
-                `else
-    	            detect_tim  <= detect_tim + 1;	//actual
-    	            detect_flag <= 1'b0;
-                `endif 
-    	    end
-    	end
-	end
-
 
 // motion control signals
 reg        action_start;

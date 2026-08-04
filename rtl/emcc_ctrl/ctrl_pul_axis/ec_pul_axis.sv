@@ -9,7 +9,7 @@
 // Project Name: 
 // Target Devices: 
 // Tool Versions: 
-// Description: 
+// Description: ASS00637 Linear/3DI/Pulse Servo Control V6.0
 // 
 // Dependencies: 
 // 
@@ -60,9 +60,8 @@ module ec_pul_axis#(
     );
 	
 	
-	localparam		A_BHA_NUM		=	8;	
-	localparam		B_BHA_NUM		=	1;	
-	localparam		ARV_SIG_DET_TIM	=	5;
+	localparam		A_BHA_NUM		=	8;
+	localparam		B_BHA_NUM		=	1;
 	
 	//PS-PL    
 	wire 	[7:0]	unit_id         ;     	
@@ -337,8 +336,7 @@ module ec_pul_axis#(
 	end
 
 	proactive_beh_pul_axis#(
-	.BHA_NUM 				(A_BHA_NUM  	 	),	//Number of active behaviors
-	.ARV_SIG_DET_TIM		(ARV_SIG_DET_TIM	)		//In - place signal detection time
+	.BHA_NUM 				(A_BHA_NUM  	 	)	//Number of active behaviors
 )proactive_beh_pul_axis_u0(
     .clk_i                 	(clk_i				)
     ,.rst_i                	(rst_i				)
