@@ -40,7 +40,6 @@ module status_beh_siemens_cnc#(
 	,output	reg [7:0]			b_tx_id     
 	,output	reg [7:0]			b_alm_num   
 	
-//	,input						di				
 	
 	,output	reg					irq_o			
 	,input						irq_ack_i	

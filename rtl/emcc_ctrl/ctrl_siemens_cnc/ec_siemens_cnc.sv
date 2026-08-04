@@ -384,7 +384,9 @@ module ec_siemens_cnc#(
 	,.ec_chc_st	                (ec_chc_st			)
 	,.c_tx_id         	        (c_tx_id			)
 	,.c_alm_num                 (c_alm_num			)
-	,.c_gap_crl					(param8				)
+	,.c_gap_crl0				(param8				)
+	,.c_gap_crl1				(param9				)
+	,.c_gap_crl2				(param10			)
 	,.irq_o 					(irq_c				)
 	,.irq_ack_i                 (irq_c_grant		)
    );
