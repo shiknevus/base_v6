@@ -79,7 +79,6 @@ module pre_post_sta_check_slv_pul_axis#(
 		,output	reg	[B_BHA_NUM-1:0]		b_post_sta_allow
 		,output	reg						c_pre_sta_allow
 		,output	reg						c_post_sta_allow
-		,output							o_pre_sta_fail
     );
 	
 	//========================================================================================//
@@ -114,7 +113,6 @@ module pre_post_sta_check_slv_pul_axis#(
 		end
 	end
 	wire servo_limit_alarm = limf_alarm | limb_alarm | (i_axis_limf|i_axis_limb);  //level fallback
-	assign o_pre_sta_fail = servo_limit_alarm;
 
 	//home completed: beh1 (home) passes post-check -> set; beh7 (soff) clears
 	reg home_completed;

@@ -194,7 +194,6 @@ module ec_slv_pul_axis#(
 	wire 	[B_BHA_NUM-1:0]	b_post_sta_allow  ;
 	wire 					c_pre_sta_allow   ;
 	wire 					c_post_sta_allow  ;
-	wire					pre_sta_fail      ;
 	
 	wire	irq_a  ;
 	wire	irq_b  ;
@@ -357,7 +356,6 @@ module ec_slv_pul_axis#(
     ,.i_safe_status			(i_safe_status		)
     ,.i_axis_point			(i_axis_point		)
     ,.i_axis_reset			(i_axis_reset		)
-    ,.i_pre_sta_fail		(pre_sta_fail		)
     ,.cur_slv_board_id		(cur_slv_board_id	)
     ,.slv_board_id			(slv_board_id		)
     ,.pul_motor_r_flag		(pul_motor_r_flag	)
@@ -485,7 +483,6 @@ module ec_slv_pul_axis#(
 		,.i_axis_point			(i_axis_point		)
 		,.i_axis_reset			(i_axis_reset		)
 		,.a_bhv_vld				(a_bhv_vld_sync		)
-		,.o_pre_sta_fail		(pre_sta_fail		)
     );
 		
 	irq_3i1o_arbitrator irq_3i1o_arbitrator_u0(

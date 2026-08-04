@@ -52,7 +52,6 @@ module proactive_beh_slv_pul_axis#(
     ,input						i_safe_status       //safe status
     ,input						i_axis_point        //axis in position
     ,input						i_axis_reset        //axis reset
-    ,input						i_pre_sta_fail      //hard alarm from pre-check (limit etc): reject immediately
 
     ,input						cur_slv_board_id    //current slave board id
     ,input						slv_board_id        //slave board id
@@ -245,12 +244,8 @@ module proactive_beh_slv_pul_axis#(
 			begin	//1
                 if(pre_sta_allow[a_bhv_id_r - 1'b1])
                     next_state = S_READY_10;
-                else if(i_pre_sta_fail)
-                    next_state = S_ALERT_40;		//hard alarm: reject immediately (no timout wait)
-                else if(timout)
-                    next_state = S_ALERT_40;
                 else
-                    next_state = S_BHA_PRE_DET;
+                    next_state = S_ALERT_40;		//pre not met: reject immediately (via a_pre_sta_allow)
             end
 
             S_READY_10: 
@@ -361,16 +356,8 @@ module proactive_beh_slv_pul_axis#(
     always@(posedge clk_i)begin
         if(rst_i || !a_en)
             a_alm_num <= 8'd0;
-        else if(curr_state == S_BHA_PRE_DET && i_pre_sta_fail && !pre_sta_allow[a_bhv_id_r - 1'b1])	//hard alarm: limit
-            a_alm_num <= i_axis_limf ? 8'd101 : 8'd102;
-        else if(curr_state == S_BHA_PRE_DET && timout) begin				//The pre - full inspection is not met.
-			case(a_bhv_id_r)
-				8'd1:    a_alm_num <= 8'd102;	// home alarm
-				8'd3:    a_alm_num <= 8'd103;	// jog alarm
-				8'd2, 8'd4: a_alm_num <= 8'd104;	// move alarm
-				default: a_alm_num <= 8'd101;
-			endcase
-		end
+        else if(curr_state == S_BHA_PRE_DET && !pre_sta_allow[a_bhv_id_r - 1'b1])	//pre not met: rejected immediately
+            a_alm_num <= 8'd101;
         else if(curr_state == S_READY_10_ACK && ack_tx_result == IRQ_NO_OK)	//Transaction 10 ps response error
             a_alm_num <= ack_ps_alart_num;    
         else if(curr_state == S_READY_10_ACK && timout)						//For Transaction 10, waiting for the ps response timed out.
