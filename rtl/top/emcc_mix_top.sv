@@ -684,6 +684,25 @@ module emcc_mix_top
 		    	,.i_servo_zero			(~di_mst_msg[37]	    )
 		    	,.o_intr_irq			(map_irq[11]		        )
 		    );
+		ec_siemens_cnc#(
+			.REG_SPACE_BIAS			(20'h2000  )	//B010_2000
+			,.REG_SPACE_SIZE		(`REG_SPACE_SIZE    )
+		)ec_siemens_cnc_u0(
+			.clk_i					(clk					)
+			,.rst					(reset					)
+			,.i_time_1ms_vld		(time_1ms_vld			)
+			,.i_time_1s_vld 		(time_1s_vld			)
+			,.ps_reg_clk			(ps_reg_clk				)
+			,.ps_reg_reset			(ps_reg_reset			)
+			,.i_st_wr_en			(ps_reg_we				)
+			,.i_st_wr_addr  		(ps_reg_addr			)
+			,.i_st_wr_data  		(ps_reg_wr_dat			)
+			,.i_st_rd_en    		(ps_reg_re				)
+			,.i_st_rd_addr  		(ps_reg_rd_addr			)
+			,.o_st_rd_data  		(sub_comp_rd_dat[12]	)
+			,.o_st_rd_vld   		(sub_comp_rd_vld[12]	)
+			,.o_intr_irq			(map_irq[12]		        )
+		);
 
 
 	//==========================================================================================================//
