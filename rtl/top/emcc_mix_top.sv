@@ -650,13 +650,41 @@ module emcc_mix_top
 		    	,.i_axis_org			(~di_mst_msg[32]	    )
 		    	,.i_axis_limb			(~di_mst_msg[33]	    )
 		    	,.i_emerge_stop_signal	(~di_mst_msg[34]	    )
+		    	,.i_safe_status			(~di_mst_msg[38]	    )
+		    	,.i_axis_point			(~di_mst_msg[39]	    )
+		    	,.i_axis_reset			(~di_mst_msg[40]	    )
 		    	,.cur_slv_board_id		(slv_board_id[0]		)
 		    	,.slv_board_id			(slv_board_id[0]		)
 		    	,.pul_motor_r_flag		(pul_motor0_r_flag		)
 		    	,.pul_motor_flag		(pul_motor0_flag		)
 		    	,.m2s_pulm_msg			(pul_motor0_r_msg[0]	)
 		    	,.s2m_pulm_msg			(pul_motor0_msg[0]	)
+		    	,.o_dv_son				(o_dv_son[1]		    )
+		    	,.o_dv_reset			(o_dv_reset[1]		    )
 		    	,.o_intr_irq			(map_irq[10]		        )
+		    );
+
+		    ec_ethercat_servo#(
+		    	.REG_SPACE_BIAS			(20'h1e00  )	//B010_1E00
+		    	,.REG_SPACE_SIZE		(`REG_SPACE_SIZE    )
+		    )ec_ethercat_servo_u0(
+		    	.clk_i					(clk					)
+		    	,.rst					(reset					)
+		    	,.i_time_1ms_vld		(time_1ms_vld			)
+		    	,.i_time_1s_vld 		(time_1s_vld			)
+		    	,.ps_reg_clk			(ps_reg_clk				)
+		    	,.ps_reg_reset			(ps_reg_reset			)
+		    	,.i_st_wr_en			(ps_reg_we				)
+		    	,.i_st_wr_addr  		(ps_reg_addr			)
+		    	,.i_st_wr_data  		(ps_reg_wr_dat			)
+		    	,.i_st_rd_en    		(ps_reg_re				)
+		    	,.i_st_rd_addr  		(ps_reg_rd_addr			)
+		    	,.o_st_rd_data  		(sub_comp_rd_dat[11]	)
+		    	,.o_st_rd_vld   		(sub_comp_rd_vld[11]	)
+		    	,.i_servo_limf			(~di_mst_msg[35]	    )
+		    	,.i_servo_limb			(~di_mst_msg[36]	    )
+		    	,.i_servo_zero			(~di_mst_msg[37]	    )
+		    	,.o_intr_irq			(map_irq[11]		        )
 		    );
 
 
