@@ -382,22 +382,19 @@ static void PollIntcFallback(void)
 		ev.irq_reg1 = Xil_In32(irq_table[i].base_addr + IRQ_REG1);
 		ev.tick     = ts_ms();
 
-		// IRQ_REG1 may lag the INTC edge by a few AXI cycles.
-		// If it reads 0, do NOT clear the bit yet -- the component
-		// irq line is level, so clearing the edge loses the event forever.
+		// IRQ_REG1 == 0 while the bit is set: the component has finished
+		// the transaction and returned to IDLE, so its irq line is low
+		// again. Clearing the latched INTC bit is SAFE now (no pending
+		// edge to lose) and prevents poll from spinning forever on the
+		// stale bit. Do NOT clear it earlier: the component re-asserts
+		// within microseconds of the ack (S_SUCC_30), and clearing the
+		// edge during that window loses the event forever.
 		if (ev.irq_reg1 == 0U) {
-			xil_printf("[%08u]  [%s] poll: bit%u set, IRQ_REG1=0, retry\r\n",
-				   (unsigned)ts_ms(), irq_table[i].name,
-				   (unsigned)irq_table[i].intc_bit);
+			Xil_Out32(base + INTC_IAR, m);
 			continue;
 		}
 
 		ProcessEvent(&ev);
-		// Do NOT write IAR here. The INTC bit is edge-latched while the
-		// component irq line is level; the component re-asserts within
-		// microseconds of the ack (S_SUCC_30), so clearing the bit races
-		// with the next edge and loses it forever. Keeping the bit set
-		// is harmless: events are de-duplicated by last_acked_reg1.
 		pending &= ~m;
 	}
 }
