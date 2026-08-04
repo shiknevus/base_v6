@@ -527,8 +527,8 @@ localparam DO_BIT_WIDTH = 32;
             ,.m_axi_rx_tvalid_1 (m_axi_rx_tvalid_1)
             ,.m_axi_rx_tlast_1  (m_axi_rx_tlast_1 )
         );
-    assign  sfp0_disable = 1;
-    assign  sfp1_disable = 1;
+    assign  sfp0_disable = 0;
+    assign  sfp1_disable = 0;
     
 	ethcat_axi_rout_mststa ethcat_axi_rout_u
     (

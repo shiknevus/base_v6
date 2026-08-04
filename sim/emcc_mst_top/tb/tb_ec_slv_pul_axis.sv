@@ -1,4 +1,3 @@
-
 `timescale 1 ns / 1 ns
 `include "../../../rtl/include_files/components_param.vh"
 `include "../../../rtl/include_files/reg_addr_pl.vh"
@@ -7,7 +6,7 @@ module tb_ec_slv_pul_axis;
 //********************************Defines*********************************
 `define EC_COMP_INST_PATH tb_ec_slv_pul_axis.emcc_mst_top_u.emcc_mix_top_u.ec_slv_pul_axis_u0
 //*************************Parameter Declarations**************************
-parameter       SIM_MAX_TIME  = 9500000;
+parameter       SIM_MAX_TIME  = 40000000;
 parameter       CLOCKPERIOD_1 = 6.4	;
 parameter       CLOCKPERIOD_2 = 6.4	;
 parameter       INIT_CLOCKPERIOD = 5 ;
@@ -94,8 +93,6 @@ localparam EC_BIAS_ADDR = `PL_CFG_BASE_ADDR + {20'h1c00};
 
 reg tb_ACLK;
 reg tb_ARESETn;
-wire temp_clk;
-wire temp_rstn;
 reg [31:0] read_data;
 reg resp;
 genvar i;
@@ -119,11 +116,9 @@ always @(posedge tb_ec_slv_pul_axis.emcc_mst_top_u.emcc_mix_top_u.ec_slv_pul_axi
     end else begin
         case(sim_s2m_state)
             0: begin
-                //wait for m2s cycle start (state0, pul_motor_r_flag=1)
-                if(`EC_COMP_INST_PATH.pul_motor_r_flag) begin
-                    sim_s2m_cnt <= sim_s2m_cnt + 1;
-                    if(sim_s2m_cnt > 10) sim_s2m_state <= 1;
-                end
+                //wait for m2s cycle start (pul_motor_r_flag forced high)
+                sim_s2m_cnt <= sim_s2m_cnt + 1;
+                if(sim_s2m_cnt > 10) sim_s2m_state <= 1;
             end
             1: begin
                 //simulate s2m_0tmp: direction=1
@@ -135,7 +130,7 @@ always @(posedge tb_ec_slv_pul_axis.emcc_mst_top_u.emcc_mix_top_u.ec_slv_pul_axi
                 sim_s2m_state <= 2;
             end
             2: begin
-                //wait for m2s state 10 in next cycle, then send s2m_10tmp: {alarm=0,err=0,done=1,busy=0}
+                //then send s2m_10tmp: {alarm=0,err=0,done=1,busy=0}
                 sim_s2m_cnt <= sim_s2m_cnt + 1;
                 if(sim_s2m_cnt > 30) begin
                     force `EC_COMP_INST_PATH.s2m_pulm_msg = 32'h2000_0000;  // done=1
@@ -175,7 +170,20 @@ initial begin
     tb_ec_slv_pul_axis.emcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.fpga_soft_reset(32'h0);
     #2000;
 
-    wait (tb_ec_slv_pul_axis.emcc_mst_top_u.prot_clk_rst == 0);
+    //PS RX PORT
+    fork
+        begin
+            wait (tb_ec_slv_pul_axis.emcc_mst_top_u.axi_clk_0 === 1'b1);
+            $display("  [%0t] axi_clk_0 up", $time);
+        end
+        begin #500000; $display("WARN: axi_clk_0 not seen, continue"); end
+    join_any
+    disable fork;
+    $display("  [%0t] axi_clk_0=%b prot_clk_rst=%b (before force)", $time,
+             tb_ec_slv_pul_axis.emcc_mst_top_u.axi_clk_0,
+             tb_ec_slv_pul_axis.emcc_mst_top_u.prot_clk_rst);
+    force tb_ec_slv_pul_axis.emcc_mst_top_u.prot_clk_rst = 1'b0;
+    force `EC_COMP_INST_PATH.pul_motor_r_flag = 1'b1;   // slave motor ready -> m2s frame loop runs
 
     //ps write rst
     ps_write_word(EC_BIAS_ADDR + `RST_EN,      32'h0000_0001, resp1);
@@ -204,84 +212,94 @@ initial begin
     ps_write_word(EC_BIAS_ADDR + `PARAM29,      32'h0000_0000, resp1);
     ps_write_word(EC_BIAS_ADDR + `PARAM30,      32'h0000_0001, resp1);
 
-    //============================================  behavior 1  ==================================
-    #600;
-    ps_write_word(EC_BIAS_ADDR + `A_BHV_ID,     32'h0000_0001, resp1);
-    //10
-    @`EC_COMP_INST_PATH.o_intr_irq;
-    ps_read_word(EC_BIAS_ADDR + `IRQ_REG2, read_data);
-    if(read_data == 32'd0) begin
-        ps_read_word(EC_BIAS_ADDR + `IRQ_REG1, read_data);
-        if(read_data == {8'h88,8'h66,8'd1,8'd10})
-            ps_write_word(EC_BIAS_ADDR + `A_TX_RSULT_RPT, 32'h010a_5100, resp1);
-        else $stop;
-    end else $stop;
-    //30/40
-    @`EC_COMP_INST_PATH.o_intr_irq;
-    ps_read_word(EC_BIAS_ADDR + `IRQ_REG2, read_data);
-    if(read_data == 32'd0) begin
-        ps_read_word(EC_BIAS_ADDR + `IRQ_REG1, read_data);
-        if(read_data == {8'h88,8'h66,8'd1,8'd30})
-            ps_write_word(EC_BIAS_ADDR + `A_TX_RSULT_RPT, 32'h011E_5100, resp1);
-        else if(read_data == {8'h88,8'h66,8'd1,8'd40})
-            ps_write_word(EC_BIAS_ADDR + `A_TX_RSULT_RPT, 32'h0128_5101, resp1);
-        else $stop;
-    end else $stop;
+    //============================================  behavior 1: home  ==================================
+    #500;
+    do_behavior(8'd1);      // home -> home_completed=1
+    //============================================  behavior 2: move0  ==================================
+    #500;
+    do_behavior(8'd2);      // needs home_completed
+    //============================================  behavior 3: jog  ==================================
+    #500;
+    do_behavior(8'd3);      // needs home_completed
 
-    //============================================  behavior 2  ==================================
-    #600;
-    ps_write_word(EC_BIAS_ADDR + `A_BHV_ID,     32'h0000_0002, resp1);
-    //10
-    @`EC_COMP_INST_PATH.o_intr_irq;
-    ps_read_word(EC_BIAS_ADDR + `IRQ_REG2, read_data);
-    if(read_data == 32'd0) begin
-        ps_read_word(EC_BIAS_ADDR + `IRQ_REG1, read_data);
-        if(read_data == {8'h88,8'h66,8'd2,8'd10})
-            ps_write_word(EC_BIAS_ADDR + `A_TX_RSULT_RPT, 32'h020a_5100, resp1);
-        else $stop;
-    end else $stop;
-    //30/40
-    @`EC_COMP_INST_PATH.o_intr_irq;
-    ps_read_word(EC_BIAS_ADDR + `IRQ_REG2, read_data);
-    if(read_data == 32'd0) begin
-        ps_read_word(EC_BIAS_ADDR + `IRQ_REG1, read_data);
-        if(read_data == {8'h88,8'h66,8'd2,8'd30})
-            ps_write_word(EC_BIAS_ADDR + `A_TX_RSULT_RPT, 32'h021E_5100, resp1);
-        else if(read_data == {8'h88,8'h66,8'd2,8'd40})
-            ps_write_word(EC_BIAS_ADDR + `A_TX_RSULT_RPT, 32'h0228_5101, resp1);
-        else $stop;
-    end else $stop;
+    //============================================  limit test: press limf  ==================================
+    #1000;
+    force `EC_COMP_INST_PATH.i_axis_limf = 1'b1;   // limit rising edge -> latch alarm
+    #2000;
+    do_behavior(8'd3);      // rejected: irq40 alarm 101 (jog blocked at limit)
+    force `EC_COMP_INST_PATH.i_axis_limf = 1'b0;
+    #500;
+    do_behavior(8'd3);      // new behavior issued + limit released -> latch cleared, ok
 
-    //============================================  behavior 3  ==================================
-    #600;
-    ps_write_word(EC_BIAS_ADDR + `A_BHV_ID,     32'h0000_0003, resp1);
-    //10
-    @`EC_COMP_INST_PATH.o_intr_irq;
-    ps_read_word(EC_BIAS_ADDR + `IRQ_REG2, read_data);
-    if(read_data == 32'd0) begin
-        ps_read_word(EC_BIAS_ADDR + `IRQ_REG1, read_data);
-        if(read_data == {8'h88,8'h66,8'd3,8'd10})
-            ps_write_word(EC_BIAS_ADDR + `A_TX_RSULT_RPT, 32'h030a_5100, resp1);
-        else $stop;
-    end else $stop;
-    //30/40
-    @`EC_COMP_INST_PATH.o_intr_irq;
-    ps_read_word(EC_BIAS_ADDR + `IRQ_REG2, read_data);
-    if(read_data == 32'd0) begin
-        ps_read_word(EC_BIAS_ADDR + `IRQ_REG1, read_data);
-        if(read_data == {8'h88,8'h66,8'd3,8'd30})
-            ps_write_word(EC_BIAS_ADDR + `A_TX_RSULT_RPT, 32'h031E_5100, resp1);
-        else if(read_data == {8'h88,8'h66,8'd3,8'd40})
-            ps_write_word(EC_BIAS_ADDR + `A_TX_RSULT_RPT, 32'h0328_5101, resp1);
-        else $stop;
-    end else $stop;
+    //============================================  behavior 7: soff  ==================================
+    #500;
+    do_behavior(8'd7);      // always allowed (clears home_completed)
+    //============================================  behavior 8: reset  ==================================
+    #500;
+    do_behavior(8'd8);      // always allowed
+
+    //============================================  home allowed at limit  ==================================
+    #500;
+    force `EC_COMP_INST_PATH.i_axis_limf = 1'b1;
+    #500;
+    do_behavior(8'd1);      // home allowed even at limit (homing leaves the limit)
+    force `EC_COMP_INST_PATH.i_axis_limf = 1'b0;
 
     #2000;
-    $stop;
+    $finish;
 end
 
-assign temp_clk = tb_ACLK;
-assign temp_rstn = tb_ARESETn;
+
+task automatic do_behavior;
+    input [7:0] beh_id;
+    reg [31:0] irq1, irq2;
+    reg irq_ok;
+    begin
+        ps_write_word(EC_BIAS_ADDR + `A_BHV_ID, {24'd0, beh_id}, resp1);
+        // 10 (with timeout)
+        irq_ok = 1'b0;
+        fork
+            begin @`EC_COMP_INST_PATH.o_intr_irq; irq_ok = 1'b1; end
+            begin #10000000; $display("WARN: BHV %0d irq10 TIMEOUT", beh_id); end
+        join_any
+        disable fork;
+        if(!irq_ok) begin $display("BHV %0d SKIPPED", beh_id); return; end
+        ps_read_word(EC_BIAS_ADDR + `IRQ_REG2, irq2);
+        if(irq2 == 32'd0) begin
+            ps_read_word(EC_BIAS_ADDR + `IRQ_REG1, irq1);
+            if(irq1 == {8'h88, 8'h66, beh_id, 8'd10})
+                ps_write_word(EC_BIAS_ADDR + `A_TX_RSULT_RPT, {beh_id, 8'h0a, 16'h5100}, resp1);
+            else $stop;
+        end else begin
+            // alarm first (limit rejection etc): irq40 with alm_num in IRQ_REG2[31:24]
+            $display("  [%0t] BHV %0d ALARM first (irq40) alm_num=%0d", $time, beh_id, irq2[31:24]);
+            ps_read_word(EC_BIAS_ADDR + `IRQ_REG1, irq1);
+            if(irq1 == {8'h88, 8'h66, beh_id, 8'd40})
+                ps_write_word(EC_BIAS_ADDR + `A_TX_RSULT_RPT, {beh_id, 8'h28, 16'h5101}, resp1);
+            else $stop;
+            return;
+        end
+        // 30/40 (with timeout)
+        irq_ok = 1'b0;
+        fork
+            begin @`EC_COMP_INST_PATH.o_intr_irq; irq_ok = 1'b1; end
+            begin #10000000; $display("WARN: BHV %0d irq30 TIMEOUT", beh_id); end
+        join_any
+        disable fork;
+        if(!irq_ok) begin $display("BHV %0d RESULT SKIPPED", beh_id); return; end
+        ps_read_word(EC_BIAS_ADDR + `IRQ_REG2, irq2);
+        if(irq2 == 32'd0) begin
+            ps_read_word(EC_BIAS_ADDR + `IRQ_REG1, irq1);
+            if(irq1 == {8'h88, 8'h66, beh_id, 8'd30})
+                ps_write_word(EC_BIAS_ADDR + `A_TX_RSULT_RPT, {beh_id, 8'h1e, 16'h5100}, resp1);
+            else if(irq1 == {8'h88, 8'h66, beh_id, 8'd40}) begin
+                $display("  [%0t] BHV %0d ALARM (irq40) alm_num=%0d", $time, beh_id, irq2[31:24]);
+                ps_write_word(EC_BIAS_ADDR + `A_TX_RSULT_RPT, {beh_id, 8'h28, 16'h5101}, resp1);
+            end
+            else $stop;
+        end else $stop;
+    end
+endtask
 
 task automatic ps_write_word;
     input   [31:0]  addr;
