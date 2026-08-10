@@ -304,8 +304,8 @@ module mst_app_cfg
         // Address decoding for reading registers
         case ( rd_reg_addr_d2[PS_REG_AWIDTH-1:0] )
             `SLV_STA_NUM_ADDR:  ps_reg_rd_dat   <=  slv_sta_num;
-            `LINK_STATUS_ADDR:  ps_reg_rd_dat   <=  {8'd0,app_err_type[7:0],hb_err_slvsta[7:0],{6'd0,link_success,loop_link_success}};
-//            `LINK_STATUS_ADDR:  ps_reg_rd_dat   <=  {slv_sta_num,hb_err_slvsta_d2,app_err_type_d2,{err_code_d2,5'd0}};
+//            `LINK_STATUS_ADDR:  ps_reg_rd_dat   <=  {8'd0,app_err_type[7:0],hb_err_slvsta[7:0],{6'd0,link_success,loop_link_success}};
+            `LINK_STATUS_ADDR:  ps_reg_rd_dat   <=  {slv_sta_num[7:0],hb_err_slvsta_d2[7:0],app_err_type_d2[7:0],err_code_d2[2:0],{3'd0,link_success,loop_link_success}};
             `STAT_TIME_ADDR  :  ps_reg_rd_dat   <=  stat_rslt;
             `CHECK_SYSTERM_ADDR :  ps_reg_rd_dat   <=  32'hdeadbeaf;
             `BOARD_TEMPERATURE_ADDR:  ps_reg_rd_dat   <=  {16'b0,board_temp_82130};

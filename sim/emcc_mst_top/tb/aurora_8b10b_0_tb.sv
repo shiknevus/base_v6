@@ -307,39 +307,7 @@ module aurora_8b10b_0_TB;
                 optical_fiber_case0;
 //                tst_roller_component;
                 
-				aurora_8b10b_0_TB.emmcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.write_burst_strb
-                (
-                    `PL_CFG_BASE_ADDR + 20'h0000 + `RST_EN,  // start_addr
-                    10,                          // len (0 => 1 beat)
-                    4,                          // siz = 4 => 16 bytes/beat (128 bits)
-                    1,                          // burst = INCR
-                    0,                          // lck
-                    0,                          // cache
-                    0,                          // prot
-                    1280'd0,  // data
-                    1,                          // strb_en = 1 (enable byte strobes)
-                    160'hFFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF,                   // strb: byte lane valid mask
-                    4,                          // datasize
-                    resp
-                );
-
-
-                aurora_8b10b_0_TB.emmcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.read_burst
-                	(
-                    `PL_CFG_BASE_ADDR + 20'h0000 + `RST_EN+4,
-                    0,
-                    2,    // siz to use for the read
-                    1,
-                    0,
-                    0,
-                    0,
-                    rdata,
-                    resp
-                );	
 			#1000;	
-				
-				
-				
                 $display ("Simulation completed");
 //                $stop;
             end
@@ -387,25 +355,27 @@ module aurora_8b10b_0_TB;
                         wait_mststa_rcv_tst_dg_done;
                         ps_cfg_trsf_req(0);
                 end
-                #2000 ;
+                #200 ;
                 $display ("*************************STEP4***********************");
-                gen_slv_do_ao_dat;
+//                gen_slv_do_ao_dat;
                 ps_cfg_pl_intf_tst_mode(0);
                 ps_rd_depot_flag(0);
                 $display ("*************************STEP5***********************");
-                #200000;
+                #200;
                 $display ("*************************STEP6***********************");
                 ps_rd_depot_flag(1);
-                #20000;
+                #200;
                 $display ("*************************STEP7***********************");
                 ps_rd_depot_flag(0);
             end
-/*
             begin
+                $display ("Time = %0t,*************************STEP8***********************",$time);
+
                 gen_link_error[SLV_STA_NUM-1:0] = 0;
-//                #150000 gen_link_error[SLV_STA_NUM-2] = 1;
-                #550000  gen_link_error[SLV_STA_NUM-2] = 0;
+/////////////////                 gen_link_error[SLV_STA_NUM-2] = 1;
+ //               #550000  gen_link_error[SLV_STA_NUM-2] = 0;
             end
+/*
             begin
                 detect_optical_fiber_status;
             end
@@ -477,7 +447,8 @@ module aurora_8b10b_0_TB;
         input   work_flag;
         reg resp;
         begin
-            aurora_8b10b_0_TB.emmcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.write_data(`MST_APP_REG_BASE + `PS_TX_REQ_ADDR,4, work_flag, resp);//ps send request
+//            aurora_8b10b_0_TB.emmcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.write_data(`MST_APP_REG_BASE + `PS_TX_REQ_ADDR,4, work_flag, resp);//ps send request
+            sunny_ps_write(`MST_APP_REG_BASE + `PS_TX_REQ_ADDR,work_flag, resp);//ps send request
             if(work_flag)begin
                 $display ("PS send tx request signal to PL ");
             end else begin
@@ -490,7 +461,8 @@ module aurora_8b10b_0_TB;
         input   [31:0]  flag;
         reg resp;
         begin
-            aurora_8b10b_0_TB.emmcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.write_data(`MST_APP_REG_BASE + `PS_RD_DEPOT_FLAG_ADDR,4, flag, resp);//ps send request
+//            aurora_8b10b_0_TB.emmcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.write_data(`MST_APP_REG_BASE + `PS_RD_DEPOT_FLAG_ADDR,4, flag, resp);//ps send request
+            sunny_ps_write(`MST_APP_REG_BASE + `PS_RD_DEPOT_FLAG_ADDR, flag, resp);//ps send request
             $display ("PS send tx request signal to PL ");
         end
     endtask
@@ -500,10 +472,12 @@ module aurora_8b10b_0_TB;
         reg resp;
         begin
             if(tst_flag)begin
-                aurora_8b10b_0_TB.emmcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.write_data(`MST_APP_REG_BASE + `MST_APP_MODE_ADDR,4, 32'h0001_0001, resp);
+//                aurora_8b10b_0_TB.emmcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.write_data(`MST_APP_REG_BASE + `MST_APP_MODE_ADDR,4, 32'h8001_0001, resp);
+                sunny_ps_write(`MST_APP_REG_BASE + `MST_APP_MODE_ADDR, 32'h8001_0001, resp);
                 $display ("PS config pl part to go into test mode");
             end else begin
-                aurora_8b10b_0_TB.emmcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.write_data(`MST_APP_REG_BASE + `MST_APP_MODE_ADDR,4, 32'h0000_0001, resp);
+//                aurora_8b10b_0_TB.emmcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.write_data(`MST_APP_REG_BASE + `MST_APP_MODE_ADDR,4, 32'h0000_0001, resp);
+                sunny_ps_write(`MST_APP_REG_BASE + `MST_APP_MODE_ADDR, 32'h0000_0001, resp);
                 $display ("PS config pl part to go into work mode");
             end
         end
@@ -512,8 +486,10 @@ module aurora_8b10b_0_TB;
     task gen_slv_do_ao_dat;
         reg resp;
         begin
-            aurora_8b10b_0_TB.emmcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.write_data(`PL_CFG_BASE_ADDR + `GEN_OPT_DAT_BIAS + `SLV1ST_DO_DAT_CFG_ADDR,4, 32'hDEAD_BEAF, resp);
-            aurora_8b10b_0_TB.emmcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.write_data(`PL_CFG_BASE_ADDR + `GEN_OPT_DAT_BIAS + `SLV2ND_DO_DAT_CFG_ADDR,4, 32'hBEAF_DEAD, resp);
+//            aurora_8b10b_0_TB.emmcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.write_data(`PL_CFG_BASE_ADDR + `GEN_OPT_DAT_BIAS + `SLV1ST_DO_DAT_CFG_ADDR,4, 32'hDEAD_BEAF, resp);
+//            aurora_8b10b_0_TB.emmcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.write_data(`PL_CFG_BASE_ADDR + `GEN_OPT_DAT_BIAS + `SLV2ND_DO_DAT_CFG_ADDR,4, 32'hBEAF_DEAD, resp);
+            sunny_ps_write(`PL_CFG_BASE_ADDR + `GEN_OPT_DAT_BIAS + `SLV1ST_DO_DAT_CFG_ADDR, 32'hDEAD_BEAF, resp);
+            sunny_ps_write(`PL_CFG_BASE_ADDR + `GEN_OPT_DAT_BIAS + `SLV2ND_DO_DAT_CFG_ADDR, 32'hBEAF_DEAD, resp);
             $display ("config slave station do data");
         end
     endtask
@@ -532,7 +508,8 @@ module aurora_8b10b_0_TB;
         begin
             wait(aurora_8b10b_0_TB.emmcc_mst_top_u.emcc_mst_app_u.mst_app_cfg_u.app_err_flag)
             $display ("%t, optical fiber transfer data occur one error",$time);
-            aurora_8b10b_0_TB.emmcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.read_data(`MST_APP_REG_BASE + `LINK_STATUS_ADDR,4, read_data, resp);
+//            aurora_8b10b_0_TB.emmcc_mst_top_u.mststa_mpsoc_u.zynq_ultra_ps_e_0.inst.read_data(`MST_APP_REG_BASE + `LINK_STATUS_ADDR,4, read_data, resp);
+            sunny_ps_read(`MST_APP_REG_BASE + `LINK_STATUS_ADDR, read_data, resp);
             $display ("%t, current all slave station link status is 32'h%x",$time,read_data);
             wait(aurora_8b10b_0_TB.emmcc_mst_top_u.emcc_mst_app_u.mst_app_cfg_u.app_err_flag == 0)
             $display ("%t, all station link was recover",$time);

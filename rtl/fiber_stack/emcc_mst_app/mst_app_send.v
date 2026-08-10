@@ -95,6 +95,7 @@ module mst_app_send
     reg ps_tx_req_d1;
     reg ps_tx_req_d2;
     reg ps_tx_req_r;
+    reg ps_tx_req_latch;
     reg ps_trsf_port_en_d1;
     reg ps_trsf_port_en_d2;
     reg ps_tst_trsf_port_d1;
@@ -141,6 +142,18 @@ module mst_app_send
     end
 
     always @(posedge clk)begin
+        if(reset)begin
+            ps_tx_req_latch <=  'd0;
+        end else if(ps_tx_req_r)begin
+            ps_tx_req_latch <=  'd1;
+        end else if(wk_state == STM_WAIT_PS_REQ)begin
+            ps_tx_req_latch <=  'd0;
+        end else begin
+            ps_tx_req_latch <=  ps_tx_req_latch;
+        end
+    end
+
+    always @(posedge clk)begin
         ps_trsf_port_en_d1  <=  ps_trsf_port_en;
         ps_trsf_port_en_d2  <=  ps_trsf_port_en_d1;
         ps_tst_trsf_port_d1 <=  ps_tst_trsf_port;
@@ -167,7 +180,7 @@ module mst_app_send
                     end
                 end
                 STM_WAIT_PS_REQ:begin
-                    if(ps_tx_req_r)begin
+                    if(ps_tx_req_latch)begin
                         wk_state  <=  STM_TX_HS_TST;
                     end else if (~ps_tst_trsf_port_d2) begin//while ps configure pl to exit the test mode
                         wk_state  <=  STM_TX_HS;

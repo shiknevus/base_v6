@@ -344,8 +344,8 @@ module app_mst_tx_ctrl(
 						wk_state <= STM_END;
 					end else if(run_en)begin
 						// After init, start heartbeat scan to verify all slaves
-//						wk_state <= STM_CK_SLV_HB;
-						wk_state <= STM_TX_HS;
+						wk_state <= STM_CK_SLV_HB;
+//						wk_state <= STM_TX_HS;
                     end else begin
                         wk_state <= wk_state;
                     end
