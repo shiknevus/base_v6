@@ -260,6 +260,23 @@ set_property IOSTANDARD LVCMOS33 [get_ports adc_dout]
 set_property IOSTANDARD LVCMOS33 [get_ports adc_sclk]
 set_property IOSTANDARD LVCMOS33 [get_ports adc_sdin]
 
+##########################################################################
+
+set_property PACKAGE_PIN E13 [get_ports o_dac_syn]
+set_property PACKAGE_PIN E14 [get_ports o_dac_sclk]
+set_property PACKAGE_PIN F13 [get_ports o_dac_din]
+set_property PACKAGE_PIN W13 [get_ports o_dac_load]
+set_property PACKAGE_PIN Y13 [get_ports o_dac_clr]
+set_property PACKAGE_PIN C13 [get_ports i_dac_dout]
+
+set_property IOSTANDARD LVCMOS33 [get_ports o_dac_syn]
+set_property IOSTANDARD LVCMOS33 [get_ports o_dac_sclk]
+set_property IOSTANDARD LVCMOS33 [get_ports o_dac_din]
+set_property IOSTANDARD LVCMOS33 [get_ports o_dac_load]
+set_property IOSTANDARD LVCMOS33 [get_ports o_dac_clr]
+set_property IOSTANDARD LVCMOS33 [get_ports i_dac_dout]
+
+
 #########################################################################
 set_property PACKAGE_PIN Y14 [get_ports main_232_rxd]
 set_property PACKAGE_PIN W14 [get_ports main_232_txd]

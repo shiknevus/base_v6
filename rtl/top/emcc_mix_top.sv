@@ -66,6 +66,13 @@ module emcc_mix_top
     ,output  wire                       o_spi_mosi
     ,input   wire                       i_spi_miso
 	
+	,output 							o_dac_syn 	
+	,output 							o_dac_sclk	
+	,output 							o_dac_din 	
+	,output 							o_dac_load	
+	,output 							o_dac_clr	
+	,input								i_dac_dout	
+	
     ,input  wire                        i_wr_cfg_data_done
     ,input  wire                        i_do_dbg_data_vld
     ,input  wire    [31:0]              iv_io_mode_cfg // set and select mode and type of io
@@ -187,47 +194,46 @@ module emcc_mix_top
     wire    [31:0]              do_mst_msg_force      ;
     assign ov_dbg_enable = 0;
     
-	assign do_relay_mst_msg =  di_mst_msg[12]?do_mst_msg_force:do_mst_msg ;
+	//assign do_relay_mst_msg =  di_mst_msg[12]?do_mst_msg_force:do_mst_msg ;
 	
-	vio_0 vio (
-   .clk(clk),     
-  . probe_out0 ( do_mst_msg_force[0 ]  )
-  ,.probe_out1 ( do_mst_msg_force[1 ]  )
-  ,.probe_out2 ( do_mst_msg_force[2 ]  )
-  ,.probe_out3 ( do_mst_msg_force[3 ]  )
-  ,.probe_out4 ( do_mst_msg_force[4 ]  )
-  ,.probe_out5 ( do_mst_msg_force[5 ]  )
-  ,.probe_out6 ( do_mst_msg_force[6 ]  )
-  ,.probe_out7 ( do_mst_msg_force[7 ]  )
-  ,.probe_out8 ( do_mst_msg_force[8 ]  )
-  ,.probe_out9 ( do_mst_msg_force[9 ]  )
-  ,.probe_out10( do_mst_msg_force[10]  )
-  ,.probe_out11( do_mst_msg_force[11]  )
-  ,.probe_out12( do_mst_msg_force[12]  )
-  ,.probe_out13( do_mst_msg_force[13]  )
-  ,.probe_out14( do_mst_msg_force[14]  )
-  ,.probe_out15( do_mst_msg_force[15]  )
-  ,.probe_out16( do_mst_msg_force[16]  )
-  ,.probe_out17( do_mst_msg_force[17]  )
-  ,.probe_out18( do_mst_msg_force[18]  )
-  ,.probe_out19( do_mst_msg_force[19]  )
-  ,.probe_out20( do_mst_msg_force[20]  )
-  ,.probe_out21( do_mst_msg_force[21]  )
-  ,.probe_out22( do_mst_msg_force[22]  )
-  ,.probe_out23( do_mst_msg_force[23]  )
-  ,.probe_out24( do_mst_msg_force[24]  )
-  ,.probe_out25( do_mst_msg_force[25]  )
-  ,.probe_out26( do_mst_msg_force[26]  )
-  ,.probe_out27( do_mst_msg_force[27]  )
-  ,.probe_out28( do_mst_msg_force[28]  )
-  ,.probe_out29( do_mst_msg_force[29]  )
-  ,.probe_out30( do_mst_msg_force[30]  )
-  ,.probe_out31( do_mst_msg_force[31]  )
-);
+	assign do_relay_mst_msg =  do_mst_msg ;
 	
-	
-	
-	
+	//	vio_0 vio (
+	//	.clk(clk),     
+	//	. probe_out0 ( do_mst_msg_force[0 ]  )
+	//	,.probe_out1 ( do_mst_msg_force[1 ]  )
+	//	,.probe_out2 ( do_mst_msg_force[2 ]  )
+	//	,.probe_out3 ( do_mst_msg_force[3 ]  )
+	//	,.probe_out4 ( do_mst_msg_force[4 ]  )
+	//	,.probe_out5 ( do_mst_msg_force[5 ]  )
+	//	,.probe_out6 ( do_mst_msg_force[6 ]  )
+	//	,.probe_out7 ( do_mst_msg_force[7 ]  )
+	//	,.probe_out8 ( do_mst_msg_force[8 ]  )
+	//	,.probe_out9 ( do_mst_msg_force[9 ]  )
+	//	,.probe_out10( do_mst_msg_force[10]  )
+	//	,.probe_out11( do_mst_msg_force[11]  )
+	//	,.probe_out12( do_mst_msg_force[12]  )
+	//	,.probe_out13( do_mst_msg_force[13]  )
+	//	,.probe_out14( do_mst_msg_force[14]  )
+	//	,.probe_out15( do_mst_msg_force[15]  )
+	//	,.probe_out16( do_mst_msg_force[16]  )
+	//	,.probe_out17( do_mst_msg_force[17]  )
+	//	,.probe_out18( do_mst_msg_force[18]  )
+	//	,.probe_out19( do_mst_msg_force[19]  )
+	//	,.probe_out20( do_mst_msg_force[20]  )
+	//	,.probe_out21( do_mst_msg_force[21]  )
+	//	,.probe_out22( do_mst_msg_force[22]  )
+	//	,.probe_out23( do_mst_msg_force[23]  )
+	//	,.probe_out24( do_mst_msg_force[24]  )
+	//	,.probe_out25( do_mst_msg_force[25]  )
+	//	,.probe_out26( do_mst_msg_force[26]  )
+	//	,.probe_out27( do_mst_msg_force[27]  )
+	//	,.probe_out28( do_mst_msg_force[28]  )
+	//	,.probe_out29( do_mst_msg_force[29]  )
+	//	,.probe_out30( do_mst_msg_force[30]  )
+	//	,.probe_out31( do_mst_msg_force[31]  )
+	//	);
+
 	pkg_route
     #(
          .RAM_DEPTH             (RAM_DEPTH          )
@@ -416,10 +422,75 @@ module emcc_mix_top
 	// --------------------------------------------user component_v6_inst---------------------------------------//
 	//==========================================================================================================//
 
-			reg		di1;
+	//	ila_0 ila_0_u0 (
+	//	.clk(clk), // input wire clk
+	//	.probe0({32'd0,map_irq[31:0]}) // input wire [63:0] probe0
+	//	);
+
+
+	//	wire	[31:0]	di_o;
+	//	
+	//	vio_0 vio (
+	//	.clk(clk)    
+	//	,.probe_out0 	(	di_o[0 ]  )
+	//	,.probe_out1 	(	di_o[1 ]  )
+	//	,.probe_out2 	(	di_o[2 ]  )
+	//	,.probe_out3 	(	di_o[3 ]  )
+	//	,.probe_out4 	(	di_o[4 ]  )
+	//	,.probe_out5 	(	di_o[5 ]  )
+	//	,.probe_out6 	(	di_o[6 ]  )
+	//	,.probe_out7 	(	di_o[7 ]  )
+	//	,.probe_out8 	(	di_o[8 ]  )
+	//	,.probe_out9 	(	di_o[9 ]  )
+	//	,.probe_out10	(	di_o[10]  )
+	//	,.probe_out11	(	di_o[11]  )
+	//	,.probe_out12	(	di_o[12]  )
+	//	,.probe_out13	(	di_o[13]  )
+	//	,.probe_out14	(	di_o[14]  )
+	//	,.probe_out15	(	di_o[15]  )
+	//	,.probe_out16	(	di_o[16]  )
+	//	,.probe_out17	(	di_o[17]  )
+	//	,.probe_out18	(	di_o[18]  )
+	//	,.probe_out19	(	di_o[19]  )
+	//	,.probe_out20	(	di_o[20]  )
+	//	,.probe_out21	(	di_o[21]  )
+	//	,.probe_out22	(	di_o[22]  )
+	//	,.probe_out23	(	di_o[23]  )
+	//	,.probe_out24	(	di_o[24]  )
+	//	,.probe_out25	(	di_o[25]  )
+	//	,.probe_out26	(	di_o[26]  )
+	//	,.probe_out27	(	di_o[27]  )
+	//	,.probe_out28	(	di_o[28]  )
+	//	,.probe_out29	(	di_o[29]  )
+	//	,.probe_out30	(	di_o[30]  )
+	//	,.probe_out31	(	di_o[31]  )
+	//	);
 	
+	//ec_test#(
+	//		.REG_SPACE_BIAS 				(`ROLLER_2126_REG_BIAS)
+	//		,.REG_SPACE_SIZE 				(512				)
+	//	)ec_test_u0(
+	//		.clk_i							(clk				)
+	//		,.rst							(reset				)
+	//		,.i_time_1ms_vld  				(time_1ms_vld		)
+	//		,.i_time_1s_vld   				(time_1s_vld		)
+	//		,.ps_reg_clk					(ps_reg_clk			)
+	//		,.ps_reg_reset					(ps_reg_reset		)
+	//		,.i_st_wr_en					(ps_reg_we			)
+	//		,.i_st_wr_addr    				(ps_reg_addr		)
+	//		,.i_st_wr_data    				(ps_reg_wr_dat		)
+	//		,.i_st_rd_en      				(ps_reg_re			)
+	//		,.i_st_rd_addr    				(ps_reg_rd_addr		)
+	//		,.o_st_rd_data    				(sub_comp_rd_dat[0]	)
+	//		,.o_st_rd_vld     				(sub_comp_rd_vld[0]	)
+	//		,.o_intr_irq					( map_irq[0] )
+	//	);
+	
+	/*
+			reg	di1;
+			
 			ec_1di #(
-				.REG_SPACE_BIAS 		(`ROLLER_2126_REG_BIAS				)	//B010_0800
+				.REG_SPACE_BIAS 		(`ROLLER_2126_REG_BIAS	)	//B010_0800
 				,.REG_SPACE_SIZE 		(512					)
 			) ec_1di_u0 (	
 				.clk_i           		(clk					)
@@ -435,12 +506,14 @@ module emcc_mix_top
 				,.i_st_rd_addr    		(ps_reg_rd_addr			)
 				,.o_st_rd_data    		(sub_comp_rd_dat[0]		)
 				,.o_st_rd_vld     		(sub_comp_rd_vld[0]		)
-				,.di              		(di1					)
+				//,.i_sign1_check         (di_mst_msg[0]			)	//io
+				,.i_sign1_check       (di1					)	//sim
 				,.o_intr_irq      		(map_irq[0] 			)
 			);
-	
+			
+		
 			ec_1do#(
-				.REG_SPACE_BIAS 		(`ROLLER_3221_REG_BIAS	)	//Component offset address
+				.REG_SPACE_BIAS 		(`ROLLER_2037_REG_BIAS	)	//Component offset address
 				,.REG_SPACE_SIZE 		(512					)	//Component register size
 			)ec_1do_u0(
 				.clk_i					(clk					)
@@ -456,18 +529,66 @@ module emcc_mix_top
 				,.i_st_rd_addr  		(ps_reg_rd_addr			)
 				,.o_st_rd_data  		(sub_comp_rd_dat[1]		)
 				,.o_st_rd_vld   		(sub_comp_rd_vld[1]		)
-				,.do_o					(do_mst_msg[0]			)
+				,.o_sig_dri				(			)
 				,.o_intr_irq			(map_irq[1] 			)
 			);
 			
-			wire	[1:0]	do_2di_2do;
-			reg 	[1:0]	di_2di_2do;
 			
+			reg 	[1:0]	di_2di_2do;
 		
-			ec_2di_2do#(
-				.REG_SPACE_BIAS			(`ROLLER_1048_REG_BIAS	),	//Component offset address
-				.REG_SPACE_SIZE			(512					)
-			)ec_2di_2do_u0(
+		ec_2di_2do#(
+			.REG_SPACE_BIAS			(`ROLLER_3018_REG_BIAS	),	//Component offset address
+			.REG_SPACE_SIZE			(512					)
+		)ec_2di_2do_u0(
+			.clk_i					(clk					)
+			,.rst					(reset					)
+			,.i_time_1ms_vld		(time_1ms_vld			)
+			,.i_time_1s_vld 		(time_1s_vld			)
+			,.ps_reg_clk			(ps_reg_clk				)
+			,.ps_reg_reset			(ps_reg_reset			)
+			,.i_st_wr_en			(ps_reg_we				)
+			,.i_st_wr_addr  		(ps_reg_addr			)
+			,.i_st_wr_data  		(ps_reg_wr_dat			)
+			,.i_st_rd_en    		(ps_reg_re				)
+			,.i_st_rd_addr  		(ps_reg_rd_addr			)
+			,.o_st_rd_data  		(sub_comp_rd_dat[2]		)
+			,.o_st_rd_vld   		(sub_comp_rd_vld[2]		)
+			,.i_pos1				()
+			,.i_pos2				()
+			,.o_dri1				()
+			,.o_dri2				()
+			,.o_intr_irq			(map_irq[2]				)
+		);	
+			
+			ec_hw_sdcx#(
+				.REG_SPACE_BIAS 	(`ROLLER_3168_REG_BIAS	)
+				,.REG_SPACE_SIZE 	(512	)
+			)ec_hw_sdcx_u0(
+				.clk_i				(clk					)
+				,.rst				(reset					)
+				,.i_time_1ms_vld	(time_1ms_vld			)
+				,.i_time_1s_vld 	(time_1s_vld			)
+				,.ps_reg_clk		(ps_reg_clk				)
+				,.ps_reg_reset		(ps_reg_reset			)
+				,.i_st_wr_en		(ps_reg_we				)
+				,.i_st_wr_addr  	(ps_reg_addr			)
+				,.i_st_wr_data  	(ps_reg_wr_dat			)
+				,.i_st_rd_en    	(ps_reg_re				)
+				,.i_st_rd_addr  	(ps_reg_rd_addr			)
+				,.o_st_rd_data  	(sub_comp_rd_dat[3]		)
+				,.o_st_rd_vld   	(sub_comp_rd_vld[3]		)
+				,.i_mgs	            ()
+				,.i_dmgs	        ()
+				,.o_mag	            ()
+				,.o_demag	        ()
+				,.o_lock	        ()
+				,.o_intr_irq		(map_irq[3])
+			);
+			
+			ec_2do#(
+				.REG_SPACE_BIAS 		(`ROLLER_3189_REG_BIAS	),	//Component offset address
+				.REG_SPACE_SIZE 		(512					)		//Component register size
+			)ec_2do_u0(
 				.clk_i					(clk					)
 				,.rst					(reset					)
 				,.i_time_1ms_vld		(time_1ms_vld			)
@@ -479,12 +600,643 @@ module emcc_mix_top
 				,.i_st_wr_data  		(ps_reg_wr_dat			)
 				,.i_st_rd_en    		(ps_reg_re				)
 				,.i_st_rd_addr  		(ps_reg_rd_addr			)
-				,.o_st_rd_data  		(sub_comp_rd_dat[2]		)
-				,.o_st_rd_vld   		(sub_comp_rd_vld[2]		)
-				,.di_i					(di_2di_2do				)
-				,.do_o					(do_2di_2do				)
-				,.o_intr_irq			(map_irq[2]				)
+				,.o_st_rd_data  		(sub_comp_rd_dat[4]		)
+				,.o_st_rd_vld   		(sub_comp_rd_vld[4]		)
+				,.o_dri1				()
+				,.o_dri2				()
+				,.o_intr_irq			(map_irq[4]		 	)
 			);
+			
+			reg				di_i11;
+			
+			ec_1di_2do#(
+			.REG_SPACE_BIAS 			(`ROLLER_2108_REG_BIAS	)
+			,.REG_SPACE_SIZE 			(512					)
+		)ec_1di_2do_u0(
+			.clk_i						(clk)
+			,.rst						(reset)
+			,.i_time_1ms_vld			(time_1ms_vld		)
+			,.i_time_1s_vld 			(time_1s_vld		)
+			,.ps_reg_clk				(ps_reg_clk			)
+			,.ps_reg_reset				(ps_reg_reset		)
+			,.i_st_wr_en				(ps_reg_we			)
+			,.i_st_wr_addr  			(ps_reg_addr		)
+			,.i_st_wr_data  			(ps_reg_wr_dat		)
+			,.i_st_rd_en    			(ps_reg_re			)
+			,.i_st_rd_addr  			(ps_reg_rd_addr		)
+			,.o_st_rd_data  			(sub_comp_rd_dat[5]	)
+			,.o_st_rd_vld   			(sub_comp_rd_vld[5]	)
+			,.di_i						(di_i11				)
+			,.do_o						(do_o11				)
+			,.o_intr_irq				(map_irq[5]			)
+		);
+		
+		*/
+		
+		
+	//	ec_1avi_1avo#(
+	//		.REG_SPACE_BIAS 			(`ROLLER_2113_REG_BIAS		)	//Component offset address
+	//		,.REG_SPACE_SIZE 			(512		)		//Component register size
+	//	)ec_1avi_1avo_u0(
+	//		.clk_i						(clk				)
+	//		,.rst						(reset				)
+	//		,.i_time_1ms_vld			(time_1ms_vld		)
+	//		,.i_time_1s_vld 			(time_1s_vld		)
+	//		,.ps_reg_clk				(ps_reg_clk			)
+	//		,.ps_reg_reset				(ps_reg_reset		)
+	//		,.i_st_wr_en				(ps_reg_we			)
+	//		,.i_st_wr_addr  			(ps_reg_addr		)
+	//		,.i_st_wr_data  			(ps_reg_wr_dat		)
+	//		,.i_st_rd_en    			(ps_reg_re			)
+	//		,.i_st_rd_addr  			(ps_reg_rd_addr		)
+	//		,.o_st_rd_data  			(sub_comp_rd_dat[6]	)
+	//		,.o_st_rd_vld   			(sub_comp_rd_vld[6]	)
+	//		,.spi_do_o	    			(o_spi_mosi			)
+	//		,.spi_clk_o	    			(o_spi_clk			)
+	//		,.spi_csn_o	    			(o_spi_cs_n			)
+	//		,.spi_di_i	    			(i_spi_miso			)
+	//		,.o_dac_syn 				(o_dac_syn 			)
+	//		,.o_dac_sclk				(o_dac_sclk			)
+	//		,.o_dac_din 				(o_dac_din 			)
+	//		,.i_dac_dout				(i_dac_dout			)
+	//		,.o_dac_load				(o_dac_load			)
+	//		,.o_dac_clr					(o_dac_clr			)
+	//		,.o_intr_irq				(map_irq[6]		)
+	//	);
+		
+		
+	//	reg	[1:0]	di_i1;
+	//
+	//	ec_2di_1do#(
+	//		.REG_SPACE_BIAS 			(`ROLLER_2095_REG_BIAS	)
+	//		,.REG_SPACE_SIZE 			(512					)
+	//	)ec_2di_1do_u0(
+	//		.clk_i						(clk				)
+	//		,.rst						(reset				)
+	//		,.i_time_1ms_vld			(time_1ms_vld		)
+	//		,.i_time_1s_vld 			(time_1s_vld		)
+	//		,.ps_reg_clk				(ps_reg_clk			)
+	//		,.ps_reg_reset				(ps_reg_reset		)
+	//		,.i_st_wr_en				(ps_reg_we			)
+	//		,.i_st_wr_addr  			(ps_reg_addr		)
+	//		,.i_st_wr_data  			(ps_reg_wr_dat		)
+	//		,.i_st_rd_en    			(ps_reg_re			)
+	//		,.i_st_rd_addr  			(ps_reg_rd_addr		)
+	//		,.o_st_rd_data  			(sub_comp_rd_dat[7]	)
+	//		,.o_st_rd_vld   			(sub_comp_rd_vld[7]	)
+	//		,.i_pos1					()	
+	//		,.i_pos2					()	
+	//		,.o_dri						()
+	//		,.o_intr_irq				(map_irq[7]			)
+	//	);
+		
+		
+	//	wire 	spi_do_o	;
+	//	wire 	spi_clk_o	;
+	//	wire 	spi_csn_o	;
+	//	reg 	spi_di_i	;
+	//
+	//
+	//	ec_1avi#(
+	//		.REG_SPACE_BIAS 			(`ROLLER_3135_REG_BIAS	)	//Component offset address
+	//		,.REG_SPACE_SIZE 			(512					)		//Component register size
+	//	)ec_1avi_u0(
+	//		.clk_i						(clk				)
+	//		,.rst						(reset				)
+	//		,.i_time_1ms_vld			(time_1ms_vld		)
+	//		,.i_time_1s_vld 			(time_1s_vld		)
+	//		,.ps_reg_clk				(ps_reg_clk			)
+	//		,.ps_reg_reset				(ps_reg_reset		)
+	//		,.i_st_wr_en				(ps_reg_we			)
+	//		,.i_st_wr_addr  			(ps_reg_addr		)
+	//		,.i_st_wr_data  			(ps_reg_wr_dat		)
+	//		,.i_st_rd_en    			(ps_reg_re			)
+	//		,.i_st_rd_addr  			(ps_reg_rd_addr		)
+	//		,.o_st_rd_data  			(sub_comp_rd_dat[8]	)
+	//		,.o_st_rd_vld   			(sub_comp_rd_vld[8]	)
+	//		,.spi_do_o	    			(spi_do_o			)
+	//		,.spi_clk_o	    			(spi_clk_o			)
+	//		,.spi_csn_o	    			(spi_csn_o			)
+	//		,.spi_di_i	    			(spi_di_i			)
+	//		,.o_intr_irq				(map_irq[8]			)
+	//	);	
+	//	
+		
+		//	wire 		o_dac_syn 	;
+		//	wire 		o_dac_sclk	;
+		//	wire 		o_dac_din 	;
+		//	reg			i_dac_dout	;
+		//	wire		o_dac_load	;
+		//	wire		o_dac_clr 	;
+
+	//	ec_1avo#(
+	//		.REG_SPACE_BIAS 			(`ROLLER_3048_REG_BIAS	)	//Component offset address
+	//		,.REG_SPACE_SIZE 			(512					)		//Component register size
+	//	)ec_1avo_u0(
+	//		.clk_i						(clk				)
+	//		,.rst						(reset				)
+	//		,.i_time_1ms_vld			(time_1ms_vld		)
+	//		,.i_time_1s_vld 			(time_1s_vld		)
+	//		,.ps_reg_clk				(ps_reg_clk			)
+	//		,.ps_reg_reset				(ps_reg_reset		)
+	//		,.i_st_wr_en				(ps_reg_we			)
+	//		,.i_st_wr_addr  			(ps_reg_addr		)
+	//		,.i_st_wr_data  			(ps_reg_wr_dat		)
+	//		,.i_st_rd_en    			(ps_reg_re			)
+	//		,.i_st_rd_addr  			(ps_reg_rd_addr		)
+	//		,.o_st_rd_data  			(sub_comp_rd_dat[9])
+	//		,.o_st_rd_vld   			(sub_comp_rd_vld[9])
+	//		,.o_dac_syn     			(o_dac_syn 			)
+	//		,.o_dac_sclk				(o_dac_sclk			)
+	//		,.o_dac_din 				(o_dac_din 			)
+	//		,.i_dac_dout				(i_dac_dout			)
+	//		,.o_dac_load				(o_dac_load			)
+	//		,.o_dac_clr 				(o_dac_clr 			)
+	//		,.o_intr_irq				(map_irq[9]		)
+	//	);
+		
+	/*	
+		reg	[2:0]	di_i_ec_3di_1do;
+	
+			ec_3di_1do#(
+					.REG_SPACE_BIAS 			(`ROLLER_3050_REG_BIAS				)
+					,.REG_SPACE_SIZE 			(512				)
+			)ec_3di_1do_u0(
+					.clk_i						(clk				)
+					,.rst						(reset				)
+					,.i_time_1ms_vld			(time_1ms_vld		)
+					,.i_time_1s_vld 			(time_1s_vld		)
+					,.ps_reg_clk				(ps_reg_clk			)
+					,.ps_reg_reset				(ps_reg_reset		)
+					,.i_st_wr_en				(ps_reg_we			)
+					,.i_st_wr_addr  			(ps_reg_addr		)
+					,.i_st_wr_data  			(ps_reg_wr_dat		)
+					,.i_st_rd_en    			(ps_reg_re			)
+					,.i_st_rd_addr  			(ps_reg_rd_addr		)
+					,.o_st_rd_data  			(sub_comp_rd_dat[10])
+					,.o_st_rd_vld   			(sub_comp_rd_vld[10])
+					,.i_pos1					()	
+					,.i_pos2					()	
+					,.i_poa						()
+					,.o_dri						()
+					,.o_intr_irq				(map_irq[10])
+			);
+		
+		reg		[2:0]	di_i3;
+	
+		ec_3di_2do#(
+			.REG_SPACE_BIAS 				(`ROLLER_3078_REG_BIAS)
+			,.REG_SPACE_SIZE 				(512				)
+		)ec_3di_2do_u0(                                  
+			.clk_i					        (clk				)
+			,.rst						    (reset				)
+			,.i_time_1ms_vld  		        (time_1ms_vld		)
+			,.i_time_1s_vld   		        (time_1s_vld		)
+			,.ps_reg_clk				    (ps_reg_clk			)
+			,.ps_reg_reset			        (ps_reg_reset		)
+			,.i_st_wr_en				    (ps_reg_we			)
+			,.i_st_wr_addr    		        (ps_reg_addr		)
+			,.i_st_wr_data    		        (ps_reg_wr_dat		)
+			,.i_st_rd_en      		        (ps_reg_re			)
+			,.i_st_rd_addr    		        (ps_reg_rd_addr		)
+			,.o_st_rd_data    		        (sub_comp_rd_dat[11])
+			,.o_st_rd_vld     		        (sub_comp_rd_vld[11])
+			,.i_pos1						()
+			,.i_pos2						()
+			,.i_poa							()
+			,.o_dri1						()
+			,.o_dri2						()
+			,.o_intr_irq			        (map_irq[11]		)
+		); 
+		
+		reg di_i_ec_1di_1do;
+		
+		ec_1di_1do#(
+			.REG_SPACE_BIAS 			(`ROLLER_3106_REG_BIAS		)
+			,.REG_SPACE_SIZE 			(512		)
+		)ec_1di_1do_u0(
+			.clk_i							(clk				)
+			,.rst							(reset				)
+			,.i_time_1ms_vld				(time_1ms_vld		)
+			,.i_time_1s_vld 				(time_1s_vld		)
+			,.ps_reg_clk					(ps_reg_clk			)
+			,.ps_reg_reset					(ps_reg_reset		)
+			,.i_st_wr_en					(ps_reg_we			)
+			,.i_st_wr_addr  				(ps_reg_addr		)
+			,.i_st_wr_data  				(ps_reg_wr_dat		)
+			,.i_st_rd_en    				(ps_reg_re			)
+			,.i_st_rd_addr  				(ps_reg_rd_addr		)
+			,.o_st_rd_data  				(sub_comp_rd_dat[12])
+			,.o_st_rd_vld   				(sub_comp_rd_vld[12])
+			,.i_pos							(di_i_ec_1di_1do)
+			,.o_dri							()
+			,.o_intr_irq					(map_irq[12])
+		);
+		
+		reg	[3:0]	di_i_ec_4di_2do;
+	
+			ec_4di_2do#(
+				.REG_SPACE_BIAS 				(`ROLLER_2009_REG_BIAS)
+				,.REG_SPACE_SIZE 				(512	)	
+			)ec_4di_2do_u0(
+				.clk_i							(clk				)
+				,.rst							(reset				)
+				,.i_time_1ms_vld				(time_1ms_vld		)
+				,.i_time_1s_vld 				(time_1s_vld		)
+				,.ps_reg_clk					(ps_reg_clk			)
+				,.ps_reg_reset					(ps_reg_reset		)
+				,.i_st_wr_en					(ps_reg_we			)
+				,.i_st_wr_addr  				(ps_reg_addr		)
+				,.i_st_wr_data  				(ps_reg_wr_dat		)
+				,.i_st_rd_en    				(ps_reg_re			)
+				,.i_st_rd_addr  				(ps_reg_rd_addr		)
+				,.o_st_rd_data  				(sub_comp_rd_dat[13])
+				,.o_st_rd_vld   				(sub_comp_rd_vld[13])
+				,.i_pos1_1			            ()
+				,.i_pos1_2			            ()
+				,.i_pos2_1			            ()
+				,.i_pos2_2			            ()
+				,.o_dri1				        ()
+				,.o_dri2				        ()
+				,.o_intr_irq					(map_irq[13])
+			);
+	*/
+		
+	//	ec_3led_buzzer#(
+	//		.REG_SPACE_BIAS 				(`ROLLER_2060_REG_BIAS				)
+	//		,.REG_SPACE_SIZE 				(512				)
+	//	)ec_3led_buzzer_u0(
+	//		.clk_i							(clk				)
+	//		,.rst							(reset				)
+	//		,.i_time_1ms_vld				(time_1ms_vld		)
+	//		,.i_time_1s_vld 				(time_1s_vld		)
+	//		,.ps_reg_clk					(ps_reg_clk			)
+	//		,.ps_reg_reset					(ps_reg_reset		)
+	//		,.i_st_wr_en					(ps_reg_we			)
+	//		,.i_st_wr_addr  				(ps_reg_addr		)
+	//		,.i_st_wr_data  				(ps_reg_wr_dat		)
+	//		,.i_st_rd_en    				(ps_reg_re			)
+	//		,.i_st_rd_addr  				(ps_reg_rd_addr		)
+	//		,.o_st_rd_data  				(sub_comp_rd_dat[14])
+	//		,.o_st_rd_vld   				(sub_comp_rd_vld[14])
+	//		,.o_led_r						()
+	//		,.o_led_g						()
+	//		,.o_led_y						()
+	//		,.o_bz							()
+	//		,.o_intr_irq					(map_irq[14])
+	//	);
+		
+	/*
+
+	reg	[1:0]	di_i_ec_2di;
+	
+			ec_2di#(
+				.REG_SPACE_BIAS 				(`ROLLER_2094_REG_BIAS			)
+				,.REG_SPACE_SIZE 				(512			)
+			)ec_2di_u0(
+				.clk_i							(clk				)
+				,.rst							(reset				)
+				,.i_time_1ms_vld				(time_1ms_vld		)
+				,.i_time_1s_vld 				(time_1s_vld		)
+				,.ps_reg_clk					(ps_reg_clk			)
+				,.ps_reg_reset					(ps_reg_reset		)
+				,.i_st_wr_en					(ps_reg_we			)
+				,.i_st_wr_addr  				(ps_reg_addr		)
+				,.i_st_wr_data  				(ps_reg_wr_dat		)
+				,.i_st_rd_en    				(ps_reg_re			)
+				,.i_st_rd_addr  				(ps_reg_rd_addr		)
+				,.o_st_rd_data  				(sub_comp_rd_dat[15]	)
+				,.o_st_rd_vld   				(sub_comp_rd_vld[15]	)
+				,.i_sign1_check					()
+				,.i_sign2_check					()
+				,.o_intr_irq					(map_irq[15]			)
+			);
+		
+		
+		reg		[1:0]	di_2di_3do;		
+	
+			ec_2di_3do#(
+				.REG_SPACE_BIAS 				(`ROLLER_3212_REG_BIAS	)
+				,.REG_SPACE_SIZE 				(512					)
+			)ec_2di_3do_u0(
+				.clk_i							(clk				)
+				,.rst							(reset				)
+				,.i_time_1ms_vld				(time_1ms_vld		)
+				,.i_time_1s_vld 				(time_1s_vld		)
+				,.ps_reg_clk					(ps_reg_clk			)
+				,.ps_reg_reset					(ps_reg_reset		)
+				,.i_st_wr_en					(ps_reg_we			)
+				,.i_st_wr_addr  				(ps_reg_addr		)
+				,.i_st_wr_data  				(ps_reg_wr_dat		)
+				,.i_st_rd_en    				(ps_reg_re			)
+				,.i_st_rd_addr  				(ps_reg_rd_addr		)
+				,.o_st_rd_data  				(sub_comp_rd_dat[16]	)
+				,.o_st_rd_vld   				(sub_comp_rd_vld[16]	)
+				,.i_pos			                ()
+				,.i_poa			                ()
+				,.o_dri			                ()
+				,.o_dri2			            ()
+				,.o_dri1			            ()
+				,.o_intr_irq					(map_irq[16])
+			);
+	*/	
+	
+	
+	//	ec_trayclaw#(
+	//		.REG_SPACE_BIAS 					(`ROLLER_3119_REG_BIAS	)
+	//		,.REG_SPACE_SIZE 					(512	)
+	//	)ec_trayclaw_u0(
+	//		.clk_i								(clk				)
+	//		,.rst								(reset				)
+	//		,.i_time_1ms_vld					(time_1ms_vld		)
+	//		,.i_time_1s_vld 					(time_1s_vld		)
+	//		,.ps_reg_clk						(ps_reg_clk			)
+	//		,.ps_reg_reset						(ps_reg_reset		)
+	//		,.i_st_wr_en						(ps_reg_we			)
+	//		,.i_st_wr_addr  					(ps_reg_addr		)
+	//		,.i_st_wr_data  					(ps_reg_wr_dat		)
+	//		,.i_st_rd_en    					(ps_reg_re			)
+	//		,.i_st_rd_addr  					(ps_reg_rd_addr		)
+	//		,.o_st_rd_data  					(sub_comp_rd_dat[17])
+	//		,.o_st_rd_vld   					(sub_comp_rd_vld[17])
+	//		,.i_close_arr						()
+	//		,.i_open_arr    					()
+	//		,.i_material_arr					()
+	//		,.i_airtight_arr					()
+	//		,.o_claw_unlock 					()
+	//		,.o_claw_press  					()
+	//		,.o_claw_blow   					()
+	//		,.o_intr_irq						(map_irq[17])
+	//	);
+	
+	
+		reg		[5:0]	signal_i;	
+		
+		ec_sys_sf#(
+			.REG_SPACE_BIAS 		(`ROLLER_3155_REG_BIAS	)
+			,.REG_SPACE_SIZE 		(512	)
+		)ec_sys_sf_u0(
+			.clk_i					(clk				)
+			,.rst					(reset				)
+			,.i_time_1ms_vld		(time_1ms_vld		)
+			,.i_time_1s_vld 		(time_1s_vld		)
+			,.ps_reg_clk			(ps_reg_clk			)
+			,.ps_reg_reset			(ps_reg_reset		)
+			,.i_st_wr_en			(ps_reg_we			)
+			,.i_st_wr_addr  		(ps_reg_addr		)
+			,.i_st_wr_data  		(ps_reg_wr_dat		)
+			,.i_st_rd_en    		(ps_reg_re			)
+			,.i_st_rd_addr  		(ps_reg_rd_addr		)
+			,.o_st_rd_data  		(sub_comp_rd_dat[18])
+			,.o_st_rd_vld   		(sub_comp_rd_vld[18])
+			,.i_start       		(signal_i[5]		)
+			,.i_stop        		(signal_i[4]		)
+			,.i_rst         		(signal_i[3]		)
+			,.i_estop       		(signal_i[2]		)
+			,.i_manul	   			(signal_i[1]		)
+			,.i_auto	 			(signal_i[0]		)
+			,.o_intr_irq			(map_irq[18]		)
+		);
+		
+	//	ec_pulmotor_handwheel#(
+	//		.REG_SPACE_BIAS 		(`ROLLER_2156_REG_BIAS	)
+	//		,.REG_SPACE_SIZE 		(512	)
+	//	)ec_pulmotor_handwheel_u0(
+	//	.clk_i						(clk				)
+	//	,.rst						(reset				)
+	//	,.i_time_1ms_vld			(time_1ms_vld		)
+	//	,.i_time_1s_vld 			(time_1s_vld		)
+	//	,.ps_reg_clk				(ps_reg_clk			)
+	//	,.ps_reg_reset				(ps_reg_reset		)
+	//	,.i_st_wr_en				(ps_reg_we			)
+	//	,.i_st_wr_addr  			(ps_reg_addr		)
+	//	,.i_st_wr_data  			(ps_reg_wr_dat		)
+	//	,.i_st_rd_en    			(ps_reg_re			)
+	//	,.i_st_rd_addr  			(ps_reg_rd_addr		)
+	//	,.o_st_rd_data  			(sub_comp_rd_dat[19])
+	//	,.o_st_rd_vld   			(sub_comp_rd_vld[19])
+	//	,.i_estop      				()
+	//	,.i_pulse_a    				()
+	//	,.i_pulse_b    				()
+	//	,.i_stp_x1     				()
+	//	,.i_stp_x10    				()
+	//	,.i_stp_x100   				()
+	//	,.i_axis_x     				()
+	//	,.i_axis_y     				()
+	//	,.i_axis_z     				()
+	//	,.i_axis_4     				()
+	//	,.i_axis_5     				()
+	//	,.i_axis_6     				()
+	//	,.i_axis_7     				()
+	//	,.o_wheel_prog 				()
+	//	,.o_pulse_cnt  				()
+	//	,.o_estop_sta  				()
+	//	,.o_axis_num   				()
+	//	,.o_wheel_dir  				()
+	//	,.o_intr_irq				(map_irq[19])
+	//	);
+
+	//	reg [4:0] di_i_ec_5di;
+	//	
+	//	ec_5di#(
+	//		.REG_SPACE_BIAS 				(`ROLLER_1037_REG_BIAS	)
+	//		,.REG_SPACE_SIZE 				(512	)
+	//	)ec_5di_u0(
+	//		.clk_i							(clk				)
+	//		,.rst							(reset				)
+	//		,.i_time_1ms_vld				(time_1ms_vld		)
+	//		,.i_time_1s_vld 				(time_1s_vld		)
+	//		,.ps_reg_clk					(ps_reg_clk			)
+	//		,.ps_reg_reset					(ps_reg_reset		)
+	//		,.i_st_wr_en					(ps_reg_we			)
+	//		,.i_st_wr_addr  				(ps_reg_addr		)
+	//		,.i_st_wr_data  				(ps_reg_wr_dat		)
+	//		,.i_st_rd_en    				(ps_reg_re			)
+	//		,.i_st_rd_addr  				(ps_reg_rd_addr		)
+	//		,.o_st_rd_data  				(sub_comp_rd_dat[20]	)
+	//		,.o_st_rd_vld   				(sub_comp_rd_vld[20]	)
+	//		,.i_sign1_check					()
+	//		,.i_sign2_check					()
+	//		,.i_sign3_check					()
+	//		,.i_sign4_check					()
+	//		,.i_sign5_check					()
+	//		,.o_intr_irq					(map_irq[20]			)
+	//	);
+	
+	//	reg	[2:0]	ctrl_signal	;
+	//			
+	//		ec_sf_door#(
+	//			.REG_SPACE_BIAS 				(`ROLLER_3060_REG_BIAS				)
+	//			,.REG_SPACE_SIZE 				(512				)
+	//		)ec_sf_door_u0(
+	//			.clk_i							(clk				)
+	//			,.rst							(reset				)
+	//			,.i_time_1ms_vld  				(time_1ms_vld		)
+	//			,.i_time_1s_vld   				(time_1s_vld		)
+	//			,.ps_reg_clk					(ps_reg_clk			)
+	//			,.ps_reg_reset					(ps_reg_reset		)
+	//			,.i_st_wr_en					(ps_reg_we			)
+	//			,.i_st_wr_addr    				(ps_reg_addr		)
+	//			,.i_st_wr_data    				(ps_reg_wr_dat		)
+	//			,.i_st_rd_en      				(ps_reg_re			)
+	//			,.i_st_rd_addr    				(ps_reg_rd_addr		)
+	//			,.o_st_rd_data    				(sub_comp_rd_dat[21]	)
+	//			,.o_st_rd_vld     				(sub_comp_rd_vld[21]	)
+	//			,.i_open_req_key				(ctrl_signal[2])
+	//			,.i_close_confirm_key 			(ctrl_signal[1])
+	//			,.i_lock_monitor  				(ctrl_signal[0])
+	//			,.o_lock_open    				()
+	//			,.o_intr_irq					( map_irq[21] )
+	//		);
+			
+			
+	//		ec_8do#(
+	//			.REG_SPACE_BIAS 				(`ROLLER_1052_REG_BIAS		)	//Component offset address
+	//			,.REG_SPACE_SIZE 				(512			)		//Component register size
+	//		)ec_8do_u0(
+	//			.clk_i							(clk				)
+	//			,.rst							(reset				)
+	//			,.i_time_1ms_vld				(time_1ms_vld		)
+	//			,.i_time_1s_vld 				(time_1s_vld		)
+	//			,.ps_reg_clk					(ps_reg_clk			)
+	//			,.ps_reg_reset					(ps_reg_reset		)
+	//			,.i_st_wr_en					(ps_reg_we			)
+	//			,.i_st_wr_addr  				(ps_reg_addr		)
+	//			,.i_st_wr_data  				(ps_reg_wr_dat		)
+	//			,.i_st_rd_en    				(ps_reg_re			)
+	//			,.i_st_rd_addr  				(ps_reg_rd_addr		)
+	//			,.o_st_rd_data  				(sub_comp_rd_dat[22]	)
+	//			,.o_st_rd_vld   				(sub_comp_rd_vld[22]	)
+	//			,.o_dri1						()
+	//			,.o_dri2						()
+	//			,.o_dri3						()
+	//			,.o_dri4						()
+	//			,.o_dri5						()
+	//			,.o_dri6						()
+	//			,.o_dri7						()
+	//			,.o_dri8						()
+	//			,.o_intr_irq					(map_irq[22])
+	//		);
+    //
+	//		
+	//
+	//		reg 	[15:0]	di_ec_16i_check;
+	//		
+	//		ec_16di#(
+	//			.REG_SPACE_BIAS 				(`ROLLER_2127_REG_BIAS				)	//Component offset address
+	//			,.REG_SPACE_SIZE 				(512				)		//Component register size
+	//		)ec_16di_u0(
+	//			.clk_i							(clk				)
+	//			,.rst							(reset				)
+	//			,.i_time_1ms_vld				(time_1ms_vld		)
+	//			,.i_time_1s_vld 				(time_1s_vld		)
+	//			,.ps_reg_clk					(ps_reg_clk			)
+	//			,.ps_reg_reset					(ps_reg_reset		)
+	//			,.i_st_wr_en					(ps_reg_we			)
+	//			,.i_st_wr_addr  				(ps_reg_addr		)
+	//			,.i_st_wr_data  				(ps_reg_wr_dat		)
+	//			,.i_st_rd_en    				(ps_reg_re			)
+	//			,.i_st_rd_addr  				(ps_reg_rd_addr		)
+	//			,.o_st_rd_data  				(sub_comp_rd_dat[23]	)
+	//			,.o_st_rd_vld   				(sub_comp_rd_vld[23]	)
+	//			,.i_sign1_check					()
+	//			,.i_sign2_check					()
+	//			,.i_sign3_check					()
+	//			,.i_sign4_check					()
+	//			,.i_sign5_check					()
+	//			,.i_sign6_check					()
+	//			,.i_sign7_check					()
+	//			,.i_sign8_check					()
+	//			,.i_sign9_check					()
+	//			,.i_sign10_check				()
+	//			,.i_sign11_check				()
+	//			,.i_sign12_check				()
+	//			,.i_sign13_check				()
+	//			,.i_sign14_check				()
+	//			,.i_sign15_check				()
+	//			,.i_sign16_check				()
+	//			,.o_intr_irq					(map_irq[23]		)
+	//		);
+			
+
+	//reg 	i_estop      ;
+	//reg 	i_pulse_a    ;
+	//reg 	i_pulse_b    ;
+	//reg 	i_stp_x1  	 ;
+	//reg 	i_stp_x10 	 ;
+	//reg 	i_stp_x100	 ;
+	//reg 	i_axis_x     ;
+	//reg 	i_axis_y     ;
+	//reg 	i_axis_z     ;
+	//reg 	i_axis_4     ;
+	//reg 	i_axis_5     ;
+	//reg 	i_axis_6     ;
+	//reg 	i_axis_7     ;
+	
+	//reg		[6:0] 	axis ;
+	//reg		[1:0]	gear;
+	//
+	//
+	//ec_pulmotor_handwheel#(
+	//	.REG_SPACE_BIAS 				(`ROLLER_1104_REG_BIAS	)
+	//	,.REG_SPACE_SIZE 				(512	)
+	//)ec_pulmotor_handwheel_u0(
+	//	.clk_i							(clk				)
+	//	,.rst							(reset				)
+	//	,.i_time_1ms_vld				(time_1ms_vld		)
+	//	,.i_time_1s_vld 				(time_1s_vld		)
+	//	,.ps_reg_clk					(ps_reg_clk			)
+	//	,.ps_reg_reset					(ps_reg_reset		)
+	//	,.i_st_wr_en					(ps_reg_we			)
+	//	,.i_st_wr_addr  				(ps_reg_addr		)
+	//	,.i_st_wr_data  				(ps_reg_wr_dat		)
+	//	,.i_st_rd_en    				(ps_reg_re			)
+	//	,.i_st_rd_addr  				(ps_reg_rd_addr		)
+	//	,.o_st_rd_data  				(sub_comp_rd_dat[18])
+	//	,.o_st_rd_vld   				(sub_comp_rd_vld[18])
+	//	,.i_estop     					(0   )
+	//	,.i_pulse_a   					(i_pulse_a )
+	//	,.i_pulse_b   					(i_pulse_b )
+	//	,.i_stp_x1    					(axis[0] 	)
+	//	,.i_stp_x10   					(axis[1] 	)
+	//	,.i_stp_x100  					(axis[2]	)
+	//	,.i_axis_x    					(axis[0]  )
+	//	,.i_axis_y    					(axis[1]  )
+	//	,.i_axis_z    					(axis[2]  )
+	//	,.i_axis_4    					(axis[3]  )
+	//	,.i_axis_5    					(axis[4]  )
+	//	,.i_axis_6    					(axis[5]  )
+	//	,.i_axis_7    					(axis[6]  )
+	//	,.o_intr_irq					(map_irq[18])
+    //);
+	
+
+
+	/*		
+
+		ec_3led_buzzer#(
+				.REG_SPACE_BIAS 			(`ROLLER_3168_REG_BIAS	)
+				,.REG_SPACE_SIZE 			(512	)
+			)ec_3led_buzzer_u0(
+				.clk_i						(clk				)
+				,.rst						(reset				)
+				,.i_time_1ms_vld			(time_1ms_vld		)
+				,.i_time_1s_vld 			(time_1s_vld		)
+				,.ps_reg_clk				(ps_reg_clk			)
+				,.ps_reg_reset				(ps_reg_reset		)
+				,.i_st_wr_en				(ps_reg_we			)
+				,.i_st_wr_addr  			(ps_reg_addr		)
+				,.i_st_wr_data  			(ps_reg_wr_dat		)
+				,.i_st_rd_en    			(ps_reg_re			)
+				,.i_st_rd_addr  			(ps_reg_rd_addr		)
+				,.o_st_rd_data  			(sub_comp_rd_dat[6]	)
+				,.o_st_rd_vld   			(sub_comp_rd_vld[6]	)
+				,.do_o						()
+				,.o_intr_irq				(map_irq[6]			)
+			);
+			
+			
+			
 			
 			reg		[1:0]	di_2di_3do;
 			wire	[2:0]	do_2di_3do;
@@ -511,353 +1263,11 @@ module emcc_mix_top
 				,.do_o					(do_2di_3do				)
 				,.o_intr_irq			(map_irq[3]				)
 			);
-			
-			reg [1:0]	do_2do;
-			
-			ec_2do#(
-				.REG_SPACE_BIAS 		(`ROLLER_1089_REG_BIAS	),	//Component offset address
-				.REG_SPACE_SIZE 		(512					)		//Component register size
-			)ec_2do_u0(
-				.clk_i					(clk					)
-				,.rst					(reset					)
-				,.i_time_1ms_vld		(time_1ms_vld			)
-				,.i_time_1s_vld 		(time_1s_vld			)
-				,.ps_reg_clk			(ps_reg_clk				)
-				,.ps_reg_reset			(ps_reg_reset			)
-				,.i_st_wr_en			(ps_reg_we				)
-				,.i_st_wr_addr  		(ps_reg_addr			)
-				,.i_st_wr_data  		(ps_reg_wr_dat			)
-				,.i_st_rd_en    		(ps_reg_re				)
-				,.i_st_rd_addr  		(ps_reg_rd_addr			)
-				,.o_st_rd_data  		(sub_comp_rd_dat[4]		)
-				,.o_st_rd_vld   		(sub_comp_rd_vld[4]		)
-				,.do_o					(do_2do					)
-				,.o_intr_irq			(map_irq[4]				)
-			);
-	
-			
-			
-			reg				di_i11;
-			wire	[1:0]	do_o11;
-			
-		ec_1di_2do#(
-			.REG_SPACE_BIAS 			(`ROLLER_1079_REG_BIAS	)
-			,.REG_SPACE_SIZE 			(512					)
-		)ec_1di_2do_u0(
-			.clk_i						(clk)
-			,.rst						(reset)
-			,.i_time_1ms_vld			(time_1ms_vld		)
-			,.i_time_1s_vld 			(time_1s_vld		)
-			,.ps_reg_clk				(ps_reg_clk			)
-			,.ps_reg_reset				(ps_reg_reset		)
-			,.i_st_wr_en				(ps_reg_we			)
-			,.i_st_wr_addr  			(ps_reg_addr		)
-			,.i_st_wr_data  			(ps_reg_wr_dat		)
-			,.i_st_rd_en    			(ps_reg_re			)
-			,.i_st_rd_addr  			(ps_reg_rd_addr		)
-			,.o_st_rd_data  			(sub_comp_rd_dat[5]	)
-			,.o_st_rd_vld   			(sub_comp_rd_vld[5]	)
-			,.di_i						(di_i11				)
-			,.do_o						(do_o11				)
-			,.o_intr_irq				(map_irq[5]			)
-    );
-	
-	ec_1avi_1avo#(
-			.REG_SPACE_BIAS 			(`ROLLER_1085_REG_BIAS		)	//Component offset address
-			,.REG_SPACE_SIZE 			(512		)		//Component register size
-		)ec_1avi_1avo_u0(
-			.clk_i						(clk				)
-			,.rst						(reset				)
-			,.i_time_1ms_vld			(time_1ms_vld		)
-			,.i_time_1s_vld 			(time_1s_vld		)
-			,.ps_reg_clk				(ps_reg_clk			)
-			,.ps_reg_reset				(ps_reg_reset		)
-			,.i_st_wr_en				(ps_reg_we			)
-			,.i_st_wr_addr  			(ps_reg_addr		)
-			,.i_st_wr_data  			(ps_reg_wr_dat		)
-			,.i_st_rd_en    			(ps_reg_re			)
-			,.i_st_rd_addr  			(ps_reg_rd_addr		)
-			,.o_st_rd_data  			(sub_comp_rd_dat[6]	)
-			,.o_st_rd_vld   			(sub_comp_rd_vld[6]	)
-			,.spi_do_o	    			(spi_do_o			)
-			,.spi_clk_o	    			(spi_clk_o			)
-			,.spi_csn_o	    			(spi_csn_o			)
-			,.spi_di_i	    			(spi_di_i			)
-			,.o_dac_syn 				(o_dac_syn 			)
-			,.o_dac_sclk				(o_dac_sclk			)
-			,.o_dac_din 				(o_dac_din 			)
-			,.i_dac_dout				(i_dac_dout			)
-			,.o_dac_load				(o_dac_load			)
-			,.o_dac_clr					(o_dac_clr			)
-			,.o_intr_irq				(map_irq[6]			)
-    );
-	
-		
-		reg	[1:0]	di_i1;
-		wire		do_o1;
-	
-	
-	ec_2di_1do#(
-			.REG_SPACE_BIAS 			(`ROLLER_1055_REG_BIAS	)
-			,.REG_SPACE_SIZE 			(512					)
-	)ec_2di_1do_u0(
-		.clk_i							(clk				)
-		,.rst							(reset				)
-		,.i_time_1ms_vld				(time_1ms_vld		)
-		,.i_time_1s_vld 				(time_1s_vld		)
-		,.ps_reg_clk					(ps_reg_clk			)
-		,.ps_reg_reset					(ps_reg_reset		)
-		,.i_st_wr_en					(ps_reg_we			)
-		,.i_st_wr_addr  				(ps_reg_addr		)
-		,.i_st_wr_data  				(ps_reg_wr_dat		)
-		,.i_st_rd_en    				(ps_reg_re			)
-		,.i_st_rd_addr  				(ps_reg_rd_addr		)
-		,.o_st_rd_data  				(sub_comp_rd_dat[7]	)
-		,.o_st_rd_vld   				(sub_comp_rd_vld[7]	)
-		,.di_i							(di_i1				)
-		,.do_o							(do_o1				)
-		,.o_intr_irq					(map_irq[7]			)
-    );
-		
-		wire 	spi_do_o	;
-		wire 	spi_clk_o	;
-		wire 	spi_csn_o	;
-		reg 	spi_di_i	;
-	
-	
-		ec_1avi#(
-			.REG_SPACE_BIAS 			(`ROLLER_1036_REG_BIAS	)	//Component offset address
-			,.REG_SPACE_SIZE 			(512					)		//Component register size
-		)ec_1avi_u0(
-			.clk_i						(clk				)
-			,.rst						(reset				)
-			,.i_time_1ms_vld			(time_1ms_vld		)
-			,.i_time_1s_vld 			(time_1s_vld		)
-			,.ps_reg_clk				(ps_reg_clk			)
-			,.ps_reg_reset				(ps_reg_reset		)
-			,.i_st_wr_en				(ps_reg_we			)
-			,.i_st_wr_addr  			(ps_reg_addr		)
-			,.i_st_wr_data  			(ps_reg_wr_dat		)
-			,.i_st_rd_en    			(ps_reg_re			)
-			,.i_st_rd_addr  			(ps_reg_rd_addr		)
-			,.o_st_rd_data  			(sub_comp_rd_dat[8]	)
-			,.o_st_rd_vld   			(sub_comp_rd_vld[8]	)
-			,.spi_do_o	    			(spi_do_o			)
-			,.spi_clk_o	    			(spi_clk_o			)
-			,.spi_csn_o	    			(spi_csn_o			)
-			,.spi_di_i	    			(spi_di_i			)
-			,.o_intr_irq				(map_irq[8]			)
-		);	
-		
-		wire 		o_dac_syn 	;
-		wire 		o_dac_sclk	;
-		wire 		o_dac_din 	;
-		reg			i_dac_dout	;
-		wire		o_dac_load	;
-		wire		o_dac_clr 	;
-
-		ec_1avo#(
-			.REG_SPACE_BIAS 			(`ROLLER_1023_REG_BIAS	)	//Component offset address
-			,.REG_SPACE_SIZE 			(512					)		//Component register size
-		)ec_1avo_u0(
-			.clk_i						(clk				)
-			,.rst						(reset				)
-			,.i_time_1ms_vld			(time_1ms_vld		)
-			,.i_time_1s_vld 			(time_1s_vld		)
-			,.ps_reg_clk				(ps_reg_clk			)
-			,.ps_reg_reset				(ps_reg_reset		)
-			,.i_st_wr_en				(ps_reg_we			)
-			,.i_st_wr_addr  			(ps_reg_addr		)
-			,.i_st_wr_data  			(ps_reg_wr_dat		)
-			,.i_st_rd_en    			(ps_reg_re			)
-			,.i_st_rd_addr  			(ps_reg_rd_addr		)
-			,.o_st_rd_data  			(sub_comp_rd_dat[9]	)
-			,.o_st_rd_vld   			(sub_comp_rd_vld[9]	)
-			,.o_dac_syn     			(o_dac_syn 			)
-			,.o_dac_sclk				(o_dac_sclk			)
-			,.o_dac_din 				(o_dac_din 			)
-			,.i_dac_dout				(i_dac_dout			)
-			,.o_dac_load				(o_dac_load			)
-			,.o_dac_clr 				(o_dac_clr 			)
-			,.o_intr_irq				(map_irq[9]			)
-		);
-		
-		
-		reg	[2:0]	di_i_ec_3di_1do;
-	
-	ec_3di_1do#(
-			.REG_SPACE_BIAS 			(2000				)
-			,.REG_SPACE_SIZE 			(512				)
-	)ec_3di_1do_u0(
-			,.clk_i						(clk				)
-			,.rst						(reset				)
-			,.i_time_1ms_vld			(time_1ms_vld		)
-			,.i_time_1s_vld 			(time_1s_vld		)
-			,.ps_reg_clk				(ps_reg_clk			)
-			,.ps_reg_reset				(ps_reg_reset		)
-			,.i_st_wr_en				(ps_reg_we			)
-			,.i_st_wr_addr  			(ps_reg_addr		)
-			,.i_st_wr_data  			(ps_reg_wr_dat		)
-			,.i_st_rd_en    			(ps_reg_re			)
-			,.i_st_rd_addr  			(ps_reg_rd_addr		)
-			,.o_st_rd_data  			(sub_comp_rd_dat[10])
-			,.o_st_rd_vld   			(sub_comp_rd_vld[10])
-			,.di_i						(di_i_ec_3di_1do)
-			,.do_o						()
-			,.o_intr_irq				()
-    );
-	
-	wire	[1:0]	do_o3;
-	reg		[2:0]	di_i3;
-	
-	ec_3di_2do#(
-		.REG_SPACE_BIAS 				(`ROLLER_1110_REG_BIAS	)
-		,.REG_SPACE_SIZE 				(512				)
-	)ec_3di_2do_u0(                                  
-		.clk_i					        (clk				)
-		,.rst						    (reset				)
-		,.i_time_1ms_vld  		        (time_1ms_vld		)
-		,.i_time_1s_vld   		        (time_1s_vld		)
-		,.ps_reg_clk				    (ps_reg_clk			)
-		,.ps_reg_reset			        (ps_reg_reset		)
-		,.i_st_wr_en				    (ps_reg_we			)
-		,.i_st_wr_addr    		        (ps_reg_addr		)
-		,.i_st_wr_data    		        (ps_reg_wr_dat		)
-		,.i_st_rd_en      		        (ps_reg_re			)
-		,.i_st_rd_addr    		        (ps_reg_rd_addr		)
-		,.o_st_rd_data    		        (sub_comp_rd_dat[11])
-		,.o_st_rd_vld     		        (sub_comp_rd_vld[11])
-		,.di_i					        (di_i3				)
-		,.do_o					        (do_o3				)
-		,.o_intr_irq			        (map_irq[10]		)
-    );         
-
-		reg di_i_ec_1di_1do;
-		
-		ec_1di_1do#(
-			.REG_SPACE_BIAS 			(`ROLLER_2037_REG_BIAS		)
-			,.REG_SPACE_SIZE 			(512		)
-	)ec_1di_1do_u0(
-		.clk_i							(clk				)
-		,.rst							(reset				)
-		,.i_time_1ms_vld				(time_1ms_vld		)
-		,.i_time_1s_vld 				(time_1s_vld		)
-		,.ps_reg_clk					(ps_reg_clk			)
-		,.ps_reg_reset					(ps_reg_reset		)
-		,.i_st_wr_en					(ps_reg_we			)
-		,.i_st_wr_addr  				(ps_reg_addr		)
-		,.i_st_wr_data  				(ps_reg_wr_dat		)
-		,.i_st_rd_en    				(ps_reg_re			)
-		,.i_st_rd_addr  				(ps_reg_rd_addr		)
-		,.o_st_rd_data  				(sub_comp_rd_dat[12])
-		,.o_st_rd_vld   				(sub_comp_rd_vld[12])
-		,.di_i							(di_i_ec_1di_1do)
-		,.do_o							()
-		,.o_intr_irq					()
-    );
-	
-	
-	reg	[3:0]	di_i_ec_4di_2do;
-	
-	ec_4di_2do#(
-		.REG_SPACE_BIAS 				(`ROLLER_3018_REG_BIAS	)
-		,.REG_SPACE_SIZE 				(512	)	
-	)ec_4di_2do_u0(
-		.clk_i							(clk				)
-		,.rst							(reset				)
-		,.i_time_1ms_vld				(time_1ms_vld		)
-		,.i_time_1s_vld 				(time_1s_vld		)
-		,.ps_reg_clk					(ps_reg_clk			)
-		,.ps_reg_reset					(ps_reg_reset		)
-		,.i_st_wr_en					(ps_reg_we			)
-		,.i_st_wr_addr  				(ps_reg_addr		)
-		,.i_st_wr_data  				(ps_reg_wr_dat		)
-		,.i_st_rd_en    				(ps_reg_re			)
-		,.i_st_rd_addr  				(ps_reg_rd_addr		)
-		,.o_st_rd_data  				(sub_comp_rd_dat[13])
-		,.o_st_rd_vld   				(sub_comp_rd_vld[13])
-		,.di_i							(di_i_ec_4di_2do	)
-		,.do_o							()
-		,.o_intr_irq					()
-    );
-	
-	
-	ec_3led#(
-			,REG_SPACE_BIAS 			(`ROLLER_3168_REG_BIAS	)
-			,.REG_SPACE_SIZE 			(512	)
-	)ec_3led_u0(
-		.clk_i							(clk				)
-		,.rst							(reset				)
-		,.i_time_1ms_vld				(time_1ms_vld		)
-		,.i_time_1s_vld 				(time_1s_vld		)
-		,.ps_reg_clk					(ps_reg_clk			)
-		,.ps_reg_reset					(ps_reg_reset		)
-		,.i_st_wr_en					(ps_reg_we			)
-		,.i_st_wr_addr  				(ps_reg_addr		)
-		,.i_st_wr_data  				(ps_reg_wr_dat		)
-		,.i_st_rd_en    				(ps_reg_re			)
-		,.i_st_rd_addr  				(ps_reg_rd_addr		)
-		,.o_st_rd_data  				(sub_comp_rd_dat[14])
-		,.o_st_rd_vld   				(sub_comp_rd_vld[14])
-		,.do_o							()
-		,.o_intr_irq					()
-    );
-	
-	
-	reg	[1:0]	di_i_ec_2di;
-	
-	ec_2di#(
-		.REG_SPACE_BIAS 				(`ROLLER_2108_REG_BIAS			)
-		,.REG_SPACE_SIZE 				(512			)
-	)ec_2di_u0(
-		.clk_i							(clk				)
-		,.rst							(reset				)
-		,.i_time_1ms_vld				(time_1ms_vld		)
-		,.i_time_1s_vld 				(time_1s_vld		)
-		,.ps_reg_clk					(ps_reg_clk			)
-		,.ps_reg_reset					(ps_reg_reset		)
-		,.i_st_wr_en					(ps_reg_we			)
-		,.i_st_wr_addr  				(ps_reg_addr		)
-		,.i_st_wr_data  				(ps_reg_wr_dat		)
-		,.i_st_rd_en    				(ps_reg_re			)
-		,.i_st_rd_addr  				(ps_reg_rd_addr		)
-		,.o_st_rd_data  				(sub_comp_rd_dat[15])
-		,.o_st_rd_vld   				(sub_comp_rd_vld[15])
-		,.di_i							(di_i_ec_2di)
-		,.do_o							()
-		,.o_intr_irq					()
-    );
-	
-	reg		[1:0]	di_iec_2di_3do;
-	
-	ec_2di_3do#(
-		.REG_SPACE_BIAS 				(`ROLLER_3050_REG_BIAS	)
-		,.REG_SPACE_SIZE 				(512					)
-	)ec_2di_3do_u0(
-		.clk_i							(clk				)
-		,.rst							(reset				)
-		,.i_time_1ms_vld				(time_1ms_vld		)
-		,.i_time_1s_vld 				(time_1s_vld		)
-		,.ps_reg_clk					(ps_reg_clk			)
-		,.ps_reg_reset					(ps_reg_reset		)
-		,.i_st_wr_en					(ps_reg_we			)
-		,.i_st_wr_addr  				(ps_reg_addr		)
-		,.i_st_wr_data  				(ps_reg_wr_dat		)
-		,.i_st_rd_en    				(ps_reg_re			)
-		,.i_st_rd_addr  				(ps_reg_rd_addr		)
-		,.o_st_rd_data  				(sub_comp_rd_dat[16])
-		,.o_st_rd_vld   				(sub_comp_rd_vld[16])
-		,.di_i							(di_iec_2di_3do)
-		,.do_o							()
-		,.o_intr_irq					()
-    );
 	
 	reg 		i_close_arr	   ;
 	reg 		i_open_arr     ;
 	reg 		i_material_arr ;
 	reg 		i_airtight_arr ;
-	
-	
 	
 	ec_trayclaw#(
 		.REG_SPACE_BIAS 				(`ROLLER_3095_REG_BIAS	)
@@ -923,72 +1333,10 @@ module emcc_mix_top
 	
 	
 	
-	reg 	i_estop      ;
-	reg 	i_pulse_a    ;
-	reg 	i_pulse_b    ;
-	reg 	i_axis_x     ;
-	reg 	i_axis_y     ;
-	reg 	i_axis_z     ;
-	reg 	i_axis_4     ;
-	reg 	i_axis_5     ;
-	reg 	i_axis_6     ;
-	reg 	i_axis_7     ;
-	
-	ec_pulmotor_handwheel#(
-		.REG_SPACE_BIAS 				(`ROLLER_1104_REG_BIAS	),
-		,.REG_SPACE_SIZE 				(512	)
-	)ec_pulmotor_handwheel_u0(
-		.clk_i							(clk				)
-		,.rst							(reset				)
-		,.i_time_1ms_vld				(time_1ms_vld		)
-		,.i_time_1s_vld 				(time_1s_vld		)
-		,.ps_reg_clk					(ps_reg_clk			)
-		,.ps_reg_reset					(ps_reg_reset		)
-		,.i_st_wr_en					(ps_reg_we			)
-		,.i_st_wr_addr  				(ps_reg_addr		)
-		,.i_st_wr_data  				(ps_reg_wr_dat		)
-		,.i_st_rd_en    				(ps_reg_re			)
-		,.i_st_rd_addr  				(ps_reg_rd_addr		)
-		,.o_st_rd_data  				(sub_comp_rd_dat[23])
-		,.o_st_rd_vld   				(sub_comp_rd_vld[23])
-		,.i_estop     					(i_estop   )
-		,.i_pulse_a   					(i_pulse_a )
-		,.i_pulse_b   					(i_pulse_b )
-		,.i_axis_x    					(i_axis_x  )
-		,.i_axis_y    					(i_axis_y  )
-		,.i_axis_z    					(i_axis_z  )
-		,.i_axis_4    					(i_axis_4  )
-		,.i_axis_5    					(i_axis_5  )
-		,.i_axis_6    					(i_axis_6  )
-		,.i_axis_7    					(i_axis_7  )
-		,.o_intr_irq					()
-    );
 	
 	
 	
-	reg [4:0] di_i_ec_5di;
 	
-	ec_5di#(
-		.REG_SPACE_BIAS 				(`ROLLER_3151_REG_BIAS	)
-		,.REG_SPACE_SIZE 				(512	)
-	)ec_5di_u0(
-		,.clk_i							(clk				)
-		,.rst							(reset				)
-		,.i_time_1ms_vld				(time_1ms_vld		)
-		,.i_time_1s_vld 				(time_1s_vld		)
-		,.ps_reg_clk					(ps_reg_clk			)
-		,.ps_reg_reset					(ps_reg_reset		)
-		,.i_st_wr_en					(ps_reg_we			)
-		,.i_st_wr_addr  				(ps_reg_addr		)
-		,.i_st_wr_data  				(ps_reg_wr_dat		)
-		,.i_st_rd_en    				(ps_reg_re			)
-		,.i_st_rd_addr  				(ps_reg_rd_addr		)
-		,.o_st_rd_data  				(sub_comp_rd_dat[19])
-		,.o_st_rd_vld   				(sub_comp_rd_vld[19])
-		,.di_i							(di_i_ec_5di)
-		,.do_o							()
-		,.o_intr_irq					()
-    );
 	
 		
 		reg 		i_req_entry_key ;
@@ -1024,56 +1372,10 @@ module emcc_mix_top
 		,.o_intr_irq					(map_irq[11]		)
     );
 	
-	reg	[7:0]	do_o_ec_8do;
-	
-	ec_8do#(
-		.REG_SPACE_BIAS 				(`ROLLER_2138_REG_BIAS		)	//Component offset address
-		,.REG_SPACE_SIZE 				(512			)		//Component register size
-	)ec_8do_u(
-		.clk_i							(clk				)
-		,.rst							(reset				)
-		,.i_time_1ms_vld				(time_1ms_vld		)
-		,.i_time_1s_vld 				(time_1s_vld		)
-		,.ps_reg_clk					(ps_reg_clk			)
-		,.ps_reg_reset					(ps_reg_reset		)
-		,.i_st_wr_en					(ps_reg_we			)
-		,.i_st_wr_addr  				(ps_reg_addr		)
-		,.i_st_wr_data  				(ps_reg_wr_dat		)
-		,.i_st_rd_en    				(ps_reg_re			)
-		,.i_st_rd_addr  				(ps_reg_rd_addr		)
-		,.o_st_rd_data  				(sub_comp_rd_dat[21])
-		,.o_st_rd_vld   				(sub_comp_rd_vld[21])
-		,.do_o							(do_o_ec_8do)
-		,.o_intr_irq					()
-    );
 	
 	
 	
-	
-	reg 	[15:0]	di_ec_16i_check;
-	
-	ec_16i_check#(
-		.REG_SPACE_BIAS 				(`ROLLER_1045_REG_BIAS				)	//Component offset address
-		,.REG_SPACE_SIZE 				(512				)		//Component register size
-	)ec_16i_check_u0(
-		.clk_i							(clk				)
-		,.rst							(reset				)
-		,.i_time_1ms_vld				(time_1ms_vld		)
-		,.i_time_1s_vld 				(time_1s_vld		)
-		,.ps_reg_clk					(ps_reg_clk			)
-		,.ps_reg_reset					(ps_reg_reset		)
-		,.i_st_wr_en					(ps_reg_we			)
-		,.i_st_wr_addr  				(ps_reg_addr		)
-		,.i_st_wr_data  				(ps_reg_wr_dat		)
-		,.i_st_rd_en    				(ps_reg_re			)
-		,.i_st_rd_addr  				(ps_reg_rd_addr		)
-		,.o_st_rd_data  				(sub_comp_rd_dat[22])
-		,.o_st_rd_vld   				(sub_comp_rd_vld[22])
-		,.di							(di_ec_16i_check	)
-		,.o_intr_irq					(map_irq[12]		)
-    );
-	
-	
+	*/
 		
 		
 	//==========================================================================================================//

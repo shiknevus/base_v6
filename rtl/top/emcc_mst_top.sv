@@ -67,10 +67,19 @@ module emcc_mst_top #
     ,output wire [7:0]      o_dv_dir
     ,output wire [7:0]      o_dv_reset
     ,output wire [7:0]      o_dv_son
+	
     ,output wire            adc_cs          //ADC
     ,input  wire            adc_dout
     ,output wire            adc_sclk
     ,output wire            adc_sdin
+	
+	,output 				o_dac_syn 		//DAC
+	,output 				o_dac_sclk	
+	,output 				o_dac_din 	
+	,output 				o_dac_load	
+	,output 				o_dac_clr	
+	,input					i_dac_dout	
+	
     ,input  wire            main_232_rxd
     ,output wire            main_232_txd
 );
@@ -875,7 +884,14 @@ localparam DO_BIT_WIDTH = 32;
             ,.o_spi_clk   ( o_spi_clk  )
             ,.o_spi_mosi  ( o_spi_mosi )
             ,.i_spi_miso  ( i_spi_miso )
-            
+			
+			,.o_dac_syn  	(o_dac_syn )
+			,.o_dac_sclk 	(o_dac_sclk)
+			,.o_dac_din  	(o_dac_din )
+			,.o_dac_load 	(o_dac_load)
+			,.o_dac_clr  	(o_dac_clr)
+			,.i_dac_dout 	(i_dac_dout)
+			
             //	,.ov_di_slv_msg        ( dbg_iv_di_slv_msg  )
             //	,.ov_do_slv_msg        ( dbg_iv_do_slv_msg  )
             //	,.iv_di_slv_msg        ( dbg_ov_di_slv_msg  )

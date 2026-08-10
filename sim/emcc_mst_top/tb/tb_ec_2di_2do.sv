@@ -1,8 +1,8 @@
 
 `timescale 1 ns / 100 ps
-`include "./../rtl/include_files/reg_addr_pl.vh"
-`include "./../rtl/include_files/globe_includes.vh"
-`include "./../rtl/include_files/components_param.vh"
+`include "./../../../rtl/include_files/reg_addr_pl.vh"
+`include "./../../../rtl/include_files/globe_includes.vh"
+`include "./../../../rtl/include_files/components_param.vh"
 module tb_ec_2di_2do;
 
 //*************************Parameter Declarations**************************

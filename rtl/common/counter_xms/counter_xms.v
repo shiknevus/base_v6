@@ -66,7 +66,8 @@ module counter_xms #(
          time_1ms_vld <= 'b0 ;
       end
       else begin
-        if(cnt_time_1ms < TIME_1MS_TIMER - 1) begin
+		if(cnt_time_1ms < TIME_1MS_TIMER - 1) begin
+		//if(cnt_time_1ms < 100 - 1) begin	//sim
            cnt_time_1ms <= cnt_time_1ms + 1 ;
            time_1ms_vld <= 'b0 ;
         end

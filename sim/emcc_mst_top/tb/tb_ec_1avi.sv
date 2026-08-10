@@ -1,8 +1,8 @@
 
 `timescale 1 ns / 100 ps
-`include "./../rtl/include_files/reg_addr_pl.vh"
-`include "./../rtl/include_files/globe_includes.vh"
-`include "./../rtl/include_files/components_param.vh"
+`include "./../../../rtl/include_files/reg_addr_pl.vh"
+`include "./../../../rtl/include_files/globe_includes.vh"
+`include "./../../../rtl/include_files/components_param.vh"
 
 module tb_ec_2do;
 
@@ -221,7 +221,7 @@ emcc_mst_top emcc_mst_top_u
 				loop_end = 1'b0;
 				while(loop_end == 1'b0) begin
 					ps_read_word(`PL_CFG_BASE_ADDR + REG_BIAS_ADDR + `EC_CHA_ST, read_data);
-					@(posedge init_clk_p); 
+					@(posedge tb_ACLK);
 					
 					if(read_data == 32'h0000_0000) begin
 						loop_end = 1'b1; 
@@ -232,6 +232,7 @@ emcc_mst_top emcc_mst_top_u
 				ps_write_word(	`PL_CFG_BASE_ADDR + REG_BIAS_ADDR + `A_BHV_ID,32'h0000_0001,resp1);	
 				
 				
+				@(posedge tb_ACLK);
 				wait (tb_ec_2do.emcc_mst_top_u.emcc_mix_top_u.ec_2do_u0.o_intr_irq === 1'b1);
 				ps_read_word(`PL_CFG_BASE_ADDR + REG_BIAS_ADDR + `IRQ_REG1, read_data);
 				if(read_data == {8'h88,8'h66,8'd1,8'd10})	
@@ -239,6 +240,7 @@ emcc_mst_top emcc_mst_top_u
 				else
 					$stop;
 				
+				@(posedge tb_ACLK);
 				wait (tb_ec_2do.emcc_mst_top_u.emcc_mix_top_u.ec_2do_u0.o_intr_irq === 1'b1);
 				ps_read_word(`PL_CFG_BASE_ADDR + REG_BIAS_ADDR + `IRQ_REG1, read_data);
 				if(read_data == {8'h88,8'h66,8'd1,8'd30})	
@@ -253,7 +255,7 @@ emcc_mst_top emcc_mst_top_u
 				#6000;
 				ps_write_word(	`PL_CFG_BASE_ADDR + REG_BIAS_ADDR + `A_BHV_ID,32'h0000_0002,resp1);	
 				
-				
+				@(posedge tb_ACLK);
 				wait (tb_ec_2do.emcc_mst_top_u.emcc_mix_top_u.ec_2do_u0.o_intr_irq === 1'b1);
 				ps_read_word(`PL_CFG_BASE_ADDR + REG_BIAS_ADDR + `IRQ_REG1, read_data);
 				if(read_data == {8'h88,8'h66,8'd2,8'd10})	
@@ -261,6 +263,7 @@ emcc_mst_top emcc_mst_top_u
 				else
 					$stop;
 				
+				@(posedge tb_ACLK);
 				wait (tb_ec_2do.emcc_mst_top_u.emcc_mix_top_u.ec_2do_u0.o_intr_irq === 1'b1);
 				ps_read_word(`PL_CFG_BASE_ADDR + REG_BIAS_ADDR + `IRQ_REG1, read_data);
 				if(read_data == {8'h88,8'h66,8'd2,8'd30})	
@@ -275,7 +278,7 @@ emcc_mst_top emcc_mst_top_u
 				#6000;
 				ps_write_word(	`PL_CFG_BASE_ADDR + REG_BIAS_ADDR + `A_BHV_ID,32'h0000_0003,resp1);	
 				
-				
+				@(posedge tb_ACLK);
 				wait (tb_ec_2do.emcc_mst_top_u.emcc_mix_top_u.ec_2do_u0.o_intr_irq === 1'b1);
 				ps_read_word(`PL_CFG_BASE_ADDR + REG_BIAS_ADDR + `IRQ_REG1, read_data);
 				if(read_data == {8'h88,8'h66,8'd3,8'd10})	
@@ -283,6 +286,7 @@ emcc_mst_top emcc_mst_top_u
 				else
 					$stop;
 				
+				@(posedge tb_ACLK);
 				wait (tb_ec_2do.emcc_mst_top_u.emcc_mix_top_u.ec_2do_u0.o_intr_irq === 1'b1);
 				ps_read_word(`PL_CFG_BASE_ADDR + REG_BIAS_ADDR + `IRQ_REG1, read_data);
 				if(read_data == {8'h88,8'h66,8'd3,8'd30})	
@@ -297,7 +301,7 @@ emcc_mst_top emcc_mst_top_u
 				#6000;
 				ps_write_word(	`PL_CFG_BASE_ADDR + REG_BIAS_ADDR + `A_BHV_ID,32'h0000_0004,resp1);	
 				
-				
+				@(posedge tb_ACLK);
 				wait (tb_ec_2do.emcc_mst_top_u.emcc_mix_top_u.ec_2do_u0.o_intr_irq === 1'b1);
 				ps_read_word(`PL_CFG_BASE_ADDR + REG_BIAS_ADDR + `IRQ_REG1, read_data);
 				if(read_data == {8'h88,8'h66,8'd4,8'd10})	
@@ -305,6 +309,7 @@ emcc_mst_top emcc_mst_top_u
 				else
 					$stop;
 				
+				@(posedge tb_ACLK);
 				wait (tb_ec_2do.emcc_mst_top_u.emcc_mix_top_u.ec_2do_u0.o_intr_irq === 1'b1);
 				ps_read_word(`PL_CFG_BASE_ADDR + REG_BIAS_ADDR + `IRQ_REG1, read_data);
 				if(read_data == {8'h88,8'h66,8'd4,8'd30})	
@@ -316,7 +321,7 @@ emcc_mst_top emcc_mst_top_u
 				
 
 				
-				//==========================================ps告警 =============================================
+				//==========================================行为2 ps告警 =============================================
 				#6000;
 				ps_write_word(	`PL_CFG_BASE_ADDR + REG_BIAS_ADDR + `A_BHV_ID,32'h0000_0002,resp1);	
 				

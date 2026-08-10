@@ -26,9 +26,9 @@ module fen_1
     ,input              reset
    
     //receive buffer
-    ,input wire     [3:0]               accept_buf_wea//1
+    ,input wire     [3:0]               accept_buf_wea	//1
     ,input wire     [RAM_AWIDTH-1:0]    accept_buf_addra//1
-    ,input wire     [RAM_DWIDTH-1:0]    accept_buf_dina//1
+    ,input wire     [RAM_DWIDTH-1:0]    accept_buf_dina	//1	
     
     ,output  reg     [RAM_AWIDTH-1:0]             sys_addra//1
     ,output  reg     [3:0]                        sys_wea//1
