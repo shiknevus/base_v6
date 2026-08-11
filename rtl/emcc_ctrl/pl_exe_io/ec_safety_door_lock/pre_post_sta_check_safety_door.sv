@@ -121,10 +121,8 @@ module pre_post_sta_check_safety_door#(
 	begin
 		if(rst_i || !a_en) begin
 			a_pre_sta_allow <= {A_BHA_NUM{1'b0}};
-		end else if(safe_allow) begin
-			a_pre_sta_allow <= {A_BHA_NUM{1'b1}};
 		end else begin
-			a_pre_sta_allow <= {A_BHA_NUM{1'b0}};
+			a_pre_sta_allow <= {A_BHA_NUM{1'b1}};
 		end
 	end
 	

@@ -75,10 +75,8 @@ module pre_post_sta_check_2di_3do#(
 	begin
 		if(rst_i || !a_en) begin
 			a_pre_sta_allow <= {A_BHA_NUM{1'b0}};
-		end else if(!unit_st && !m_st && !m_saf_st && !link_m_saf_st) begin
-			a_pre_sta_allow <= {A_BHA_NUM{1'b1}};
 		end else begin
-			a_pre_sta_allow <= {A_BHA_NUM{1'b0}};
+			a_pre_sta_allow <= {A_BHA_NUM{1'b1}};
 		end
 	end
 	

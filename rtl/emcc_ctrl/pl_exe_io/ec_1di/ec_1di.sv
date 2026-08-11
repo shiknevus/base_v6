@@ -185,8 +185,6 @@ module ec_1di#(
 	
 	wire	[7:0]	a_bhv_id_r;
 	
-	wire	di		;
-	
 	assign	di = i_sign1_check;
 	
 	
@@ -292,7 +290,7 @@ module ec_1di#(
 	,.param63               (param63		)
 	,.param64               (param64		)
 	,.param65               (param65		)
-	,.param66               (di				)
+	,.param66               (param66		)
 	,.param67               (param67		)
 	,.param68               (param68		)
 	,.param69               (param69		)
@@ -346,7 +344,7 @@ module ec_1di#(
 	,.ec_chb_st             (ec_chb_st			)
 	,.b_tx_id               (b_tx_id			)
 	,.b_alm_num             (b_alm_num			)
-	,.di				    (di					)
+	,.di				    (param66			)
 	,.irq_o			        (irq_o				)
 	,.irq_ack_i	            (irq_ack_i			)	
     );
@@ -434,10 +432,5 @@ module ec_1di#(
 		,.irq_busy_o		(irq_busy_o			)
 		,.irq_receive_ack_i (a_tx_result_vld || b_tx_result_vld || c_tx_result_vld)	
     );
-	
-	
-	
-	
-	
 	
 endmodule

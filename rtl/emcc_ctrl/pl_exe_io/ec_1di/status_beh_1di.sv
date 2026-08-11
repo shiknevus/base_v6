@@ -63,7 +63,7 @@ module status_beh_1di#(
     localparam  IRQ_NO_OK       = 8'h52;
 	
 	always@(posedge clk_i)begin
-	if(rst_i)begin
+	if(rst_i || !b_en)begin
 		ack_beh_id 	 	<=	8'd0;
 		ack_tx_id	 	<=	8'd0;
 		ack_tx_result	<=	8'd0;

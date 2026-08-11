@@ -41,6 +41,13 @@ module status_beh_3led_buzzer#(
 	,output		 				ec_chb_st   
 	,output	reg [7:0]			b_tx_id     
 	,output	reg [7:0]			b_alm_num   
+	
+	,output 					o_led_r
+	,output 					o_led_y
+	,output 					o_led_g
+	,output 					o_bz
+	
+	,input		[7:0]			ctrl_signal
 
 	,output	reg	[31:0]			state_monitor_o
 	,output	reg					irq_o			
@@ -58,6 +65,9 @@ module status_beh_3led_buzzer#(
 	reg [7:0]		ack_tx_id;
 	reg [7:0]		ack_tx_result;
 	reg	[7:0]		ack_ps_alart_num;
+	
+	reg		[7:0]	ctrl_signal_r;
+	reg				sta_vld;
 	
 	//State machine state
 	localparam  S_IDLE          = 8'd0; 	//idle
@@ -177,10 +187,10 @@ module status_beh_3led_buzzer#(
         next_state = curr_state;
         case (curr_state)
             S_IDLE: begin
-                if (b_en && pre_sta_allow != 0)
-                    next_state = S_READY_10;
-                else
-                    next_state = S_IDLE;
+               if (b_en && sta_vld)
+                   next_state = S_READY_10;
+               else
+                   next_state = S_IDLE;
             end
 			
 			S_READY_10: begin        //Send 10 interrupt
@@ -347,13 +357,105 @@ module status_beh_3led_buzzer#(
     end
 
 	
-	
 	//===============================================================================================================
 	//------------------------------------------------ user logic start ---------------------------------------------
 	//===============================================================================================================
+	
+	always@(posedge i_clk)
+	begin
+		if(i_rst)
+			ctrl_signal_r <= 8'd0;
+		else
+			ctrl_signal_r <= ctrl_signal;
+	end
+	
+	always@(posedge i_clk)
+	begin
+		if(i_rst)
+			sta_vld <= 1'b0;
+		else if(ctrl_signal_r != ctrl_signal)
+			sta_vld <= 1'b1;
+		else
+			sta_vld <= 1'b0;
+	end
+	
+	
+	//-------------------------------------------------------------------
+	
+	reg		[9:0]	cnt_tim;
+	
+	always@(posedge i_clk)
+	begin
+		if(i_rst)
+			cnt_tim <= 'd0;
+		else if(cnt_tim >= 499)		//0.5s
+			cnt_tim <= 'd0;
+		else if(i_time_1ms_vld)
+			cnt_tim <= cnt_tim + 1;
+		else
+			cnt_tim <= cnt_tim;
+	end
+		
+	always@(posedge i_clk)
+	begin
+		if(i_rst)
+			o_led_r <= 1'b0;
+		else if(curr_state == S_EXE)
+			case(ctrl_signal[7:6])
+				2'd0:o_led_r <= 1'b0;
+				2'd1:o_led_r <= 1'b1;
+				2'd2:o_led_r <= (cnt_tim >= 499)?(!o_led_r):o_led_r;
+				default:o_led_r <= o_led_r;
+			endcase
+		else
+			o_led_r <= o_led_r;
+	end
+	
+	always@(posedge i_clk)
+	begin
+		if(i_rst)
+			o_led_y <= 1'b0;
+		else if(curr_state == S_EXE)
+			case(ctrl_signal[5:4])
+				2'd0:o_led_y <= 1'b0;
+				2'd1:o_led_y <= 1'b1;
+				2'd2:o_led_y <= (cnt_tim >= 499)?(!o_led_y):o_led_y;
+				default:o_led_y <= o_led_y;
+			endcase
+		else
+			o_led_y <= o_led_y;
+	end
+	
+	always@(posedge i_clk)
+	begin
+		if(i_rst)
+			o_led_g <= 1'b0;
+		else if(curr_state == S_EXE)
+			case(ctrl_signal[3:2])
+				2'd0:o_led_g <= 1'b0;
+				2'd1:o_led_g <= 1'b1;
+				2'd2:o_led_g <= (cnt_tim >= 499)?(!o_led_g):o_led_g;
+				default:o_led_g <= o_led_g;
+			endcase
+		else
+			o_led_g <= o_led_g;
+	end
+	
+	always@(posedge i_clk)
+	begin
+		if(i_rst)
+			o_bz <= 1'b0;
+		else if(curr_state == S_EXE)
+			case(ctrl_signal[1:0])
+				2'd0:o_bz <= 1'b0;
+				2'd1:o_bz <= 1'b1;
+				2'd2:o_bz <= (cnt_tim >= 499)?(!o_bz):o_bz;
+				default:o_bz <= o_bz;
+			endcase
+		else
+			o_bz <= o_bz;
+	end
 
-	
-	
 	
 	//===============================================================================================================
 	//------------------------------------------------ user logic end -----------------------------------------------
