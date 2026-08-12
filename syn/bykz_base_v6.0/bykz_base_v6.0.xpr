@@ -87,92 +87,92 @@
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
+        <CompFileExtendedInfo CompFileName="mststa_mpsoc_v2.bd" FileRelPathName="ip/mststa_mpsoc_v2_axi_bram_ctrl_0_0/mststa_mpsoc_v2_axi_bram_ctrl_0_0.xci">
+          <Proxy FileSetName="mststa_mpsoc_v2_axi_bram_ctrl_0_0"/>
+        </CompFileExtendedInfo>
+        <CompFileExtendedInfo CompFileName="mststa_mpsoc_v2.bd" FileRelPathName="ip/mststa_mpsoc_v2_axi_intc_2_3/mststa_mpsoc_v2_axi_intc_2_3.xci">
+          <Proxy FileSetName="mststa_mpsoc_v2_axi_intc_2_3"/>
+        </CompFileExtendedInfo>
+        <CompFileExtendedInfo CompFileName="mststa_mpsoc_v2.bd" FileRelPathName="ip/mststa_mpsoc_v2_axi_intc_3_3/mststa_mpsoc_v2_axi_intc_3_3.xci">
+          <Proxy FileSetName="mststa_mpsoc_v2_axi_intc_3_3"/>
+        </CompFileExtendedInfo>
+        <CompFileExtendedInfo CompFileName="mststa_mpsoc_v2.bd" FileRelPathName="ip/mststa_mpsoc_v2_smartconnect_1_0/mststa_mpsoc_v2_smartconnect_1_0.xci">
+          <Proxy FileSetName="mststa_mpsoc_v2_smartconnect_1_0"/>
+        </CompFileExtendedInfo>
+        <CompFileExtendedInfo CompFileName="mststa_mpsoc_v2.bd" FileRelPathName="ip/mststa_mpsoc_v2_zynq_ultra_ps_e_0_0/mststa_mpsoc_v2_zynq_ultra_ps_e_0_0.xci">
+          <Proxy FileSetName="mststa_mpsoc_v2_zynq_ultra_ps_e_0_0"/>
+        </CompFileExtendedInfo>
+        <CompFileExtendedInfo CompFileName="mststa_mpsoc_v2.bd" FileRelPathName="ip/mststa_mpsoc_v2_axi_intc_1_3/mststa_mpsoc_v2_axi_intc_1_3.xci">
+          <Proxy FileSetName="mststa_mpsoc_v2_axi_intc_1_3"/>
+        </CompFileExtendedInfo>
         <CompFileExtendedInfo CompFileName="mststa_mpsoc_v2.bd" FileRelPathName="ip/mststa_mpsoc_v2_axi_intc_0_3/mststa_mpsoc_v2_axi_intc_0_3.xci">
           <Proxy FileSetName="mststa_mpsoc_v2_axi_intc_0_3"/>
         </CompFileExtendedInfo>
         <CompFileExtendedInfo CompFileName="mststa_mpsoc_v2.bd" FileRelPathName="ip/mststa_mpsoc_v2_xbar_0/mststa_mpsoc_v2_xbar_0.xci">
           <Proxy FileSetName="mststa_mpsoc_v2_xbar_0"/>
         </CompFileExtendedInfo>
-        <CompFileExtendedInfo CompFileName="mststa_mpsoc_v2.bd" FileRelPathName="ip/mststa_mpsoc_v2_axi_intc_1_1/mststa_mpsoc_v2_axi_intc_1_1.xci">
-          <Proxy FileSetName="mststa_mpsoc_v2_axi_intc_1_1"/>
-        </CompFileExtendedInfo>
-        <CompFileExtendedInfo CompFileName="mststa_mpsoc_v2.bd" FileRelPathName="ip/mststa_mpsoc_v2_axi_intc_3_1/mststa_mpsoc_v2_axi_intc_3_1.xci">
-          <Proxy FileSetName="mststa_mpsoc_v2_axi_intc_3_1"/>
-        </CompFileExtendedInfo>
-        <CompFileExtendedInfo CompFileName="mststa_mpsoc_v2.bd" FileRelPathName="ip/mststa_mpsoc_v2_axi_intc_2_0/mststa_mpsoc_v2_axi_intc_2_0.xci">
-          <Proxy FileSetName="mststa_mpsoc_v2_axi_intc_2_0"/>
-        </CompFileExtendedInfo>
-        <CompFileExtendedInfo CompFileName="mststa_mpsoc_v2.bd" FileRelPathName="ip/mststa_mpsoc_v2_axi_crossbar_0_0/mststa_mpsoc_v2_axi_crossbar_0_0.xci">
-          <Proxy FileSetName="mststa_mpsoc_v2_axi_crossbar_0_0"/>
-        </CompFileExtendedInfo>
-        <CompFileExtendedInfo CompFileName="mststa_mpsoc_v2.bd" FileRelPathName="ip/mststa_mpsoc_v2_axi_intc_2_1/mststa_mpsoc_v2_axi_intc_2_1.xci">
-          <Proxy FileSetName="mststa_mpsoc_v2_axi_intc_2_1"/>
-        </CompFileExtendedInfo>
-        <CompFileExtendedInfo CompFileName="mststa_mpsoc_v2.bd" FileRelPathName="ip/mststa_mpsoc_v2_axi_intc_0_0/mststa_mpsoc_v2_axi_intc_0_0.xci">
-          <Proxy FileSetName="mststa_mpsoc_v2_axi_intc_0_0"/>
-        </CompFileExtendedInfo>
-        <CompFileExtendedInfo CompFileName="mststa_mpsoc_v2.bd" FileRelPathName="ip/mststa_mpsoc_v2_axi_intc_3_0/mststa_mpsoc_v2_axi_intc_3_0.xci">
-          <Proxy FileSetName="mststa_mpsoc_v2_axi_intc_3_0"/>
-        </CompFileExtendedInfo>
-        <CompFileExtendedInfo CompFileName="mststa_mpsoc_v2.bd" FileRelPathName="ip/mststa_mpsoc_v2_blk_mem_gen_1_0/mststa_mpsoc_v2_blk_mem_gen_1_0.xci">
-          <Proxy FileSetName="mststa_mpsoc_v2_blk_mem_gen_1_0"/>
-        </CompFileExtendedInfo>
-        <CompFileExtendedInfo CompFileName="mststa_mpsoc_v2.bd" FileRelPathName="ip/mststa_mpsoc_v2_axi_intc_1_0/mststa_mpsoc_v2_axi_intc_1_0.xci">
-          <Proxy FileSetName="mststa_mpsoc_v2_axi_intc_1_0"/>
-        </CompFileExtendedInfo>
-        <CompFileExtendedInfo CompFileName="mststa_mpsoc_v2.bd" FileRelPathName="ip/mststa_mpsoc_v2_blk_mem_gen_0_0/mststa_mpsoc_v2_blk_mem_gen_0_0.xci">
-          <Proxy FileSetName="mststa_mpsoc_v2_blk_mem_gen_0_0"/>
-        </CompFileExtendedInfo>
-        <CompFileExtendedInfo CompFileName="mststa_mpsoc_v2.bd" FileRelPathName="ip/mststa_mpsoc_v2_axi_crossbar_0_2/mststa_mpsoc_v2_axi_crossbar_0_2.xci">
-          <Proxy FileSetName="mststa_mpsoc_v2_axi_crossbar_0_2"/>
-        </CompFileExtendedInfo>
-        <CompFileExtendedInfo CompFileName="mststa_mpsoc_v2.bd" FileRelPathName="ip/mststa_mpsoc_v2_rst_ps8_0_99M_0/mststa_mpsoc_v2_rst_ps8_0_99M_0.xci">
-          <Proxy FileSetName="mststa_mpsoc_v2_rst_ps8_0_99M_0"/>
-        </CompFileExtendedInfo>
-        <CompFileExtendedInfo CompFileName="mststa_mpsoc_v2.bd" FileRelPathName="ip/mststa_mpsoc_v2_proc_prot_reset_0/mststa_mpsoc_v2_proc_prot_reset_0.xci">
-          <Proxy FileSetName="mststa_mpsoc_v2_proc_prot_reset_0"/>
-        </CompFileExtendedInfo>
-        <CompFileExtendedInfo CompFileName="mststa_mpsoc_v2.bd" FileRelPathName="ip/mststa_mpsoc_v2_smartconnect_0_0/mststa_mpsoc_v2_smartconnect_0_0.xci">
-          <Proxy FileSetName="mststa_mpsoc_v2_smartconnect_0_0"/>
-        </CompFileExtendedInfo>
-        <CompFileExtendedInfo CompFileName="mststa_mpsoc_v2.bd" FileRelPathName="ip/mststa_mpsoc_v2_smartconnect_1_0/mststa_mpsoc_v2_smartconnect_1_0.xci">
-          <Proxy FileSetName="mststa_mpsoc_v2_smartconnect_1_0"/>
-        </CompFileExtendedInfo>
-        <CompFileExtendedInfo CompFileName="mststa_mpsoc_v2.bd" FileRelPathName="ip/mststa_mpsoc_v2_axi_intc_0_2/mststa_mpsoc_v2_axi_intc_0_2.xci">
-          <Proxy FileSetName="mststa_mpsoc_v2_axi_intc_0_2"/>
-        </CompFileExtendedInfo>
-        <CompFileExtendedInfo CompFileName="mststa_mpsoc_v2.bd" FileRelPathName="ip/mststa_mpsoc_v2_axi_bram_ctrl_0_0/mststa_mpsoc_v2_axi_bram_ctrl_0_0.xci">
-          <Proxy FileSetName="mststa_mpsoc_v2_axi_bram_ctrl_0_0"/>
-        </CompFileExtendedInfo>
-        <CompFileExtendedInfo CompFileName="mststa_mpsoc_v2.bd" FileRelPathName="ip/mststa_mpsoc_v2_axi_bram_ctrl_1_0/mststa_mpsoc_v2_axi_bram_ctrl_1_0.xci">
-          <Proxy FileSetName="mststa_mpsoc_v2_axi_bram_ctrl_1_0"/>
-        </CompFileExtendedInfo>
-        <CompFileExtendedInfo CompFileName="mststa_mpsoc_v2.bd" FileRelPathName="ip/mststa_mpsoc_v2_axi_intc_3_3/mststa_mpsoc_v2_axi_intc_3_3.xci">
-          <Proxy FileSetName="mststa_mpsoc_v2_axi_intc_3_3"/>
-        </CompFileExtendedInfo>
-        <CompFileExtendedInfo CompFileName="mststa_mpsoc_v2.bd" FileRelPathName="ip/mststa_mpsoc_v2_zynq_ultra_ps_e_0_0/mststa_mpsoc_v2_zynq_ultra_ps_e_0_0.xci">
-          <Proxy FileSetName="mststa_mpsoc_v2_zynq_ultra_ps_e_0_0"/>
-        </CompFileExtendedInfo>
-        <CompFileExtendedInfo CompFileName="mststa_mpsoc_v2.bd" FileRelPathName="ip/mststa_mpsoc_v2_axi_intc_2_3/mststa_mpsoc_v2_axi_intc_2_3.xci">
-          <Proxy FileSetName="mststa_mpsoc_v2_axi_intc_2_3"/>
-        </CompFileExtendedInfo>
-        <CompFileExtendedInfo CompFileName="mststa_mpsoc_v2.bd" FileRelPathName="ip/mststa_mpsoc_v2_axi_intc_1_3/mststa_mpsoc_v2_axi_intc_1_3.xci">
-          <Proxy FileSetName="mststa_mpsoc_v2_axi_intc_1_3"/>
-        </CompFileExtendedInfo>
-        <CompFileExtendedInfo CompFileName="mststa_mpsoc_v2.bd" FileRelPathName="ip/mststa_mpsoc_v2_axi_intc_1_2/mststa_mpsoc_v2_axi_intc_1_2.xci">
-          <Proxy FileSetName="mststa_mpsoc_v2_axi_intc_1_2"/>
-        </CompFileExtendedInfo>
-        <CompFileExtendedInfo CompFileName="mststa_mpsoc_v2.bd" FileRelPathName="ip/mststa_mpsoc_v2_axi_intc_3_2/mststa_mpsoc_v2_axi_intc_3_2.xci">
-          <Proxy FileSetName="mststa_mpsoc_v2_axi_intc_3_2"/>
-        </CompFileExtendedInfo>
         <CompFileExtendedInfo CompFileName="mststa_mpsoc_v2.bd" FileRelPathName="ip/mststa_mpsoc_v2_axi_crossbar_0_1/mststa_mpsoc_v2_axi_crossbar_0_1.xci">
           <Proxy FileSetName="mststa_mpsoc_v2_axi_crossbar_0_1"/>
+        </CompFileExtendedInfo>
+        <CompFileExtendedInfo CompFileName="mststa_mpsoc_v2.bd" FileRelPathName="ip/mststa_mpsoc_v2_axi_intc_2_2/mststa_mpsoc_v2_axi_intc_2_2.xci">
+          <Proxy FileSetName="mststa_mpsoc_v2_axi_intc_2_2"/>
         </CompFileExtendedInfo>
         <CompFileExtendedInfo CompFileName="mststa_mpsoc_v2.bd" FileRelPathName="ip/mststa_mpsoc_v2_axi_intc_0_1/mststa_mpsoc_v2_axi_intc_0_1.xci">
           <Proxy FileSetName="mststa_mpsoc_v2_axi_intc_0_1"/>
         </CompFileExtendedInfo>
-        <CompFileExtendedInfo CompFileName="mststa_mpsoc_v2.bd" FileRelPathName="ip/mststa_mpsoc_v2_axi_intc_2_2/mststa_mpsoc_v2_axi_intc_2_2.xci">
-          <Proxy FileSetName="mststa_mpsoc_v2_axi_intc_2_2"/>
+        <CompFileExtendedInfo CompFileName="mststa_mpsoc_v2.bd" FileRelPathName="ip/mststa_mpsoc_v2_axi_intc_3_2/mststa_mpsoc_v2_axi_intc_3_2.xci">
+          <Proxy FileSetName="mststa_mpsoc_v2_axi_intc_3_2"/>
+        </CompFileExtendedInfo>
+        <CompFileExtendedInfo CompFileName="mststa_mpsoc_v2.bd" FileRelPathName="ip/mststa_mpsoc_v2_axi_intc_1_2/mststa_mpsoc_v2_axi_intc_1_2.xci">
+          <Proxy FileSetName="mststa_mpsoc_v2_axi_intc_1_2"/>
+        </CompFileExtendedInfo>
+        <CompFileExtendedInfo CompFileName="mststa_mpsoc_v2.bd" FileRelPathName="ip/mststa_mpsoc_v2_axi_crossbar_0_2/mststa_mpsoc_v2_axi_crossbar_0_2.xci">
+          <Proxy FileSetName="mststa_mpsoc_v2_axi_crossbar_0_2"/>
+        </CompFileExtendedInfo>
+        <CompFileExtendedInfo CompFileName="mststa_mpsoc_v2.bd" FileRelPathName="ip/mststa_mpsoc_v2_proc_prot_reset_0/mststa_mpsoc_v2_proc_prot_reset_0.xci">
+          <Proxy FileSetName="mststa_mpsoc_v2_proc_prot_reset_0"/>
+        </CompFileExtendedInfo>
+        <CompFileExtendedInfo CompFileName="mststa_mpsoc_v2.bd" FileRelPathName="ip/mststa_mpsoc_v2_rst_ps8_0_99M_0/mststa_mpsoc_v2_rst_ps8_0_99M_0.xci">
+          <Proxy FileSetName="mststa_mpsoc_v2_rst_ps8_0_99M_0"/>
+        </CompFileExtendedInfo>
+        <CompFileExtendedInfo CompFileName="mststa_mpsoc_v2.bd" FileRelPathName="ip/mststa_mpsoc_v2_smartconnect_0_0/mststa_mpsoc_v2_smartconnect_0_0.xci">
+          <Proxy FileSetName="mststa_mpsoc_v2_smartconnect_0_0"/>
+        </CompFileExtendedInfo>
+        <CompFileExtendedInfo CompFileName="mststa_mpsoc_v2.bd" FileRelPathName="ip/mststa_mpsoc_v2_axi_intc_0_2/mststa_mpsoc_v2_axi_intc_0_2.xci">
+          <Proxy FileSetName="mststa_mpsoc_v2_axi_intc_0_2"/>
+        </CompFileExtendedInfo>
+        <CompFileExtendedInfo CompFileName="mststa_mpsoc_v2.bd" FileRelPathName="ip/mststa_mpsoc_v2_blk_mem_gen_0_0/mststa_mpsoc_v2_blk_mem_gen_0_0.xci">
+          <Proxy FileSetName="mststa_mpsoc_v2_blk_mem_gen_0_0"/>
+        </CompFileExtendedInfo>
+        <CompFileExtendedInfo CompFileName="mststa_mpsoc_v2.bd" FileRelPathName="ip/mststa_mpsoc_v2_axi_bram_ctrl_1_0/mststa_mpsoc_v2_axi_bram_ctrl_1_0.xci">
+          <Proxy FileSetName="mststa_mpsoc_v2_axi_bram_ctrl_1_0"/>
+        </CompFileExtendedInfo>
+        <CompFileExtendedInfo CompFileName="mststa_mpsoc_v2.bd" FileRelPathName="ip/mststa_mpsoc_v2_blk_mem_gen_1_0/mststa_mpsoc_v2_blk_mem_gen_1_0.xci">
+          <Proxy FileSetName="mststa_mpsoc_v2_blk_mem_gen_1_0"/>
+        </CompFileExtendedInfo>
+        <CompFileExtendedInfo CompFileName="mststa_mpsoc_v2.bd" FileRelPathName="ip/mststa_mpsoc_v2_axi_intc_0_0/mststa_mpsoc_v2_axi_intc_0_0.xci">
+          <Proxy FileSetName="mststa_mpsoc_v2_axi_intc_0_0"/>
+        </CompFileExtendedInfo>
+        <CompFileExtendedInfo CompFileName="mststa_mpsoc_v2.bd" FileRelPathName="ip/mststa_mpsoc_v2_axi_intc_1_0/mststa_mpsoc_v2_axi_intc_1_0.xci">
+          <Proxy FileSetName="mststa_mpsoc_v2_axi_intc_1_0"/>
+        </CompFileExtendedInfo>
+        <CompFileExtendedInfo CompFileName="mststa_mpsoc_v2.bd" FileRelPathName="ip/mststa_mpsoc_v2_axi_crossbar_0_0/mststa_mpsoc_v2_axi_crossbar_0_0.xci">
+          <Proxy FileSetName="mststa_mpsoc_v2_axi_crossbar_0_0"/>
+        </CompFileExtendedInfo>
+        <CompFileExtendedInfo CompFileName="mststa_mpsoc_v2.bd" FileRelPathName="ip/mststa_mpsoc_v2_axi_intc_3_1/mststa_mpsoc_v2_axi_intc_3_1.xci">
+          <Proxy FileSetName="mststa_mpsoc_v2_axi_intc_3_1"/>
+        </CompFileExtendedInfo>
+        <CompFileExtendedInfo CompFileName="mststa_mpsoc_v2.bd" FileRelPathName="ip/mststa_mpsoc_v2_axi_intc_1_1/mststa_mpsoc_v2_axi_intc_1_1.xci">
+          <Proxy FileSetName="mststa_mpsoc_v2_axi_intc_1_1"/>
+        </CompFileExtendedInfo>
+        <CompFileExtendedInfo CompFileName="mststa_mpsoc_v2.bd" FileRelPathName="ip/mststa_mpsoc_v2_axi_intc_2_0/mststa_mpsoc_v2_axi_intc_2_0.xci">
+          <Proxy FileSetName="mststa_mpsoc_v2_axi_intc_2_0"/>
+        </CompFileExtendedInfo>
+        <CompFileExtendedInfo CompFileName="mststa_mpsoc_v2.bd" FileRelPathName="ip/mststa_mpsoc_v2_axi_intc_3_0/mststa_mpsoc_v2_axi_intc_3_0.xci">
+          <Proxy FileSetName="mststa_mpsoc_v2_axi_intc_3_0"/>
+        </CompFileExtendedInfo>
+        <CompFileExtendedInfo CompFileName="mststa_mpsoc_v2.bd" FileRelPathName="ip/mststa_mpsoc_v2_axi_intc_2_1/mststa_mpsoc_v2_axi_intc_2_1.xci">
+          <Proxy FileSetName="mststa_mpsoc_v2_axi_intc_2_1"/>
         </CompFileExtendedInfo>
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/ctrl_pul_axis/Home_fa_std.v">
@@ -1084,6 +1084,22 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/top/emcc_mst_top.sv">
         <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/ctrl_pul_axis/fp32_mul.sv">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/ctrl_pul_axis/fp32_to_fix.sv">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
