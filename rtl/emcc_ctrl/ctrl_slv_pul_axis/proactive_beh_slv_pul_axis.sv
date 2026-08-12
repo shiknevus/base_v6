@@ -52,7 +52,11 @@ module proactive_beh_slv_pul_axis#(
     ,input						i_safe_status       //safe status
     ,input						i_axis_point        //axis in position
     ,input						i_axis_reset        //axis reset
-
+    //for post check start
+    ,output                     action_busy
+    ,output                     action_done
+    ,output                     action_error
+    //for post check start end
     ,input						cur_slv_board_id    //current slave board id
     ,input						slv_board_id        //slave board id
     ,input						pul_motor_r_flag    //pul motor ready flag
@@ -88,6 +92,7 @@ module proactive_beh_slv_pul_axis#(
     ,output reg                 irq_o
     ,input                      irq_ack_i       //Interrupt response
 	,output reg [31:0]			state_monitor_o
+	,output     [31:0]			dbg_o			//debug: link/frame/action status
     );
 
     reg  [7:0]      a_bhv_id_r;
@@ -414,17 +419,16 @@ module proactive_beh_slv_pul_axis#(
 // Internal motion control signals
 reg        action_son;
 reg        action_start;
-reg [7:0]  action_delay_cnt;
-reg        bh_disable;
+reg        get_point_flag;
+reg        son_bhv_flag;
+reg        soff_bhv_flag;
+reg        reset_bhv_flag;
 reg        action_alarm;
 reg [15:0] servo_delay_ms;
 reg        act_done_d1;
 reg        servo_stop_timeout;
 reg [15:0] servo_stop_timeout_cnt_ms;
 
-wire       action_busy;
-wire       action_done;
-wire       action_error;
 wire       dv_alarm;
 wire       o_dv_dir;
 wire       o_dv_son;
@@ -444,8 +448,8 @@ reg [31:0] s2m_10tmp;
 localparam P_EN_EFF  = 1'b0;  // servo enable active low
 localparam P_RST_EFF = 1'b0;  // servo reset active low
 
-assign o_dv_reset = rctrl_drive_reset;
-assign o_dv_son   = rctrl_drive_on ? (bh_disable ? 1'b0 : 1'b1) : 1'b0;
+assign o_dv_reset = reset_bhv_flag ? 1'b1 : 1'b0;
+assign o_dv_son   = action_son;
 
 assign {dv_alarm, action_error, action_done, action_busy} = s2m_10tmp[3:0];
 assign o_dv_dir = s2m_0tmp[0];
@@ -486,7 +490,7 @@ always@(posedge clk_i) begin
             1 : begin m2s_pulm_msg <= rserv_step_pulse;                    m2s_state <= 4'd2;  end
             2 : begin m2s_pulm_msg <= rserv_target_pulse;                  m2s_state <= 4'd3;  end
             3 : begin m2s_pulm_msg <= {rcfg_home_spd, rcfg_move_spd};      m2s_state <= 4'd4;  end
-            4 : begin m2s_pulm_msg <= {12'd0, rctrl_drive_reset, o_dv_son,
+            4 : begin m2s_pulm_msg <= {12'd0, o_dv_reset, o_dv_son,
                                        rcfg_pf_mode, rserv_dir, rcfg_jog_spd};
                                                                            m2s_state <= 4'd5;  end
             5 : begin m2s_pulm_msg <= {rcfg_home_acc, rcfg_home_dec};      m2s_state <= 4'd6;  end
@@ -531,44 +535,42 @@ always@(posedge clk_i) begin
     end
 end
 
+// behavior flags in S_EXE 
 always@(posedge clk_i) begin
-    if(rst_i || !a_en)
-        bh_disable <= 1'b0;
+    if(rst_i || !a_en) begin
+        action_start    <= 1'b0;
+        get_point_flag  <= 1'b0;
+        son_bhv_flag    <= 1'b0;
+        soff_bhv_flag   <= 1'b0;
+        reset_bhv_flag  <= 1'b0;
+    end
     else if(curr_state == S_EXE) begin
-        if(a_bhv_id_r == 8'd6)       bh_disable <= 1'b0;   // son
-        else if(a_bhv_id_r == 8'd7)  bh_disable <= 1'b1;   // soff
+        if (a_bhv_id_r == 8'd1)      action_start   <= 1'b1;   // Home search
+        else if(a_bhv_id_r == 8'd2)  action_start   <= 1'b1;   // Move 0
+        else if(a_bhv_id_r == 8'd3)  action_start   <= 1'b1;   // JOG
+        else if(a_bhv_id_r == 8'd4)  action_start   <= 1'b1;   // Move abs
+        else if(a_bhv_id_r == 8'd5)  get_point_flag <= 1'b1;   // Get point
+        else if(a_bhv_id_r == 8'd6)  son_bhv_flag   <= 1'b1;   // S-on servo
+        else if(a_bhv_id_r == 8'd7)  soff_bhv_flag  <= 1'b1;   // S-off servo
+        else if(a_bhv_id_r == 8'd8)  reset_bhv_flag <= 1'b1;   // Reset servo
+    end
+    else begin
+        action_start    <= 1'b0;
+        get_point_flag  <= 1'b0;
+        son_bhv_flag    <= 1'b0;
+        soff_bhv_flag   <= 1'b0;
+        reset_bhv_flag  <= 1'b0;
     end
 end
 
+// servo enable 
 always@(posedge clk_i) begin
-    if(rst_i || !a_en) begin
-        action_son       <= 1'b0;
-        action_start     <= 1'b0;
-        action_delay_cnt <= 8'd0;
-    end
-    else if(curr_state == S_EXE) begin
-        action_son <= rctrl_drive_on;
-        if(action_son) begin
-            if(action_busy) begin
-                action_start     <= 1'b0;
-                action_delay_cnt <= action_delay_cnt;
-            end else if(action_delay_cnt == 10) begin
-                action_start     <= 1'b1;
-                action_delay_cnt <= action_delay_cnt;
-            end else begin
-                action_start     <= action_start;
-                action_delay_cnt <= action_delay_cnt + i_time_1ms_vld;
-            end
-        end else begin
-            action_delay_cnt <= 8'd0;
-            action_start     <= 1'b0;
-        end
-    end
-    else begin
-        action_son       <= 1'b0;
-        action_start     <= 1'b0;
-        action_delay_cnt <= 8'd0;
-    end
+    if(rst_i || !a_en)
+        action_son <= 1'b0;
+    else if(soff_bhv_flag)
+        action_son <= 1'b0;
+    else if(son_bhv_flag)
+        action_son <= 1'b1;
 end
 
 always@(posedge clk_i) begin
@@ -622,4 +624,16 @@ always@(posedge clk_i) begin
     else if(curr_state == S_IDLE)
         action_alarm <= 1'b0;
 end
+
+//debug readback (PS reads via PARAM53):
+// [31]    action_beat        (link heartbeat, 20ms toggle)
+// [30:27] s2m_state          (receiver 0-14 loop = receiving frames)
+// [26:23] m2s_state          (sender 0-14 loop = sending frames)
+// [22]    pul_motor_flag_d2  (s2m frame flag, synced)
+// [21]    pul_motor_r_flag   (m2s frame trigger)
+// [20:17] s2m_10tmp[3:0]     (slave status word {alarm,error,done,busy})
+// [16]    action_son         (servo enable state)
+// [15:0]  reserved
+assign dbg_o = {action_beat, s2m_state, m2s_state, pul_motor_flag_d2, pul_motor_r_flag,
+                s2m_10tmp[3:0], action_son, 16'd0};
 endmodule

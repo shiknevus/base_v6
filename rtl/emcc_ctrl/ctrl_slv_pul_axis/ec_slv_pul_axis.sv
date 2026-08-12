@@ -9,7 +9,7 @@
 // Project Name: 
 // Target Devices: 
 // Tool Versions: 
-// Description: ASS00645 Linear/3DI/Pulse Servo Panel Control V6.0
+// Description: ASS00645 Linear/3DI/Pulse Servo Slave Control V6.0
 // 
 // Dependencies: 
 // 
@@ -194,7 +194,11 @@ module ec_slv_pul_axis#(
 	wire 	[B_BHA_NUM-1:0]	b_post_sta_allow  ;
 	wire 					c_pre_sta_allow   ;
 	wire 					c_post_sta_allow  ;
-	
+
+	wire           action_busy, action_done, action_error;
+
+	assign param52 = {29'd0, action_error, action_done, action_busy};	//slave action status readback
+
 	wire	irq_a  ;
 	wire	irq_b  ;
 	wire	irq_c  ;
@@ -216,7 +220,6 @@ module ec_slv_pul_axis#(
 	wire			a_en;
 	wire 	[31:0]	bhv_en;
 
-	wire	[7:0]	a_bhv_id_r;	//driven by proactive_beh output (latched on a_bhv_vld_sync)
 
 
 	ps_rw_pl_reg#(
@@ -356,6 +359,10 @@ module ec_slv_pul_axis#(
     ,.i_safe_status			(i_safe_status		)
     ,.i_axis_point			(i_axis_point		)
     ,.i_axis_reset			(i_axis_reset		)
+    ,.action_busy			(action_busy		)
+    ,.action_done			(action_done		)
+    ,.action_error			(action_error		)
+    ,.dbg_o					(param53			)
     ,.cur_slv_board_id		(cur_slv_board_id	)
     ,.slv_board_id			(slv_board_id		)
     ,.pul_motor_r_flag		(pul_motor_r_flag	)
@@ -458,7 +465,7 @@ module ec_slv_pul_axis#(
 			.a_en				(a_en			),
 			.b_en				(b_en			),	
 			.c_en				(c_en			),	
-			.a_bhv_id			(a_bhv_id_r		),
+			.a_bhv_id			(a_bhv_id		),
 			.b_bhv_id			(b_bhv_id		),
 			.c_bhv_id			(c_bhv_id		),
 			.ec_cha_st			(ec_cha_st		),
@@ -483,6 +490,9 @@ module ec_slv_pul_axis#(
 		,.i_axis_point			(i_axis_point		)
 		,.i_axis_reset			(i_axis_reset		)
 		,.a_bhv_vld				(a_bhv_vld_sync		)
+		,.action_busy			(action_busy		)
+		,.action_done			(action_done		)
+		,.action_error			(action_error		)
     );
 		
 	irq_3i1o_arbitrator irq_3i1o_arbitrator_u0(
@@ -493,7 +503,7 @@ module ec_slv_pul_axis#(
 		,.chl_priority		(chl_priority		)
 		,.irq_a_i			(irq_a				)
 		,.irq_a_grant_o		(irq_a_grant		)
-		,.a_bhv_id          (a_bhv_id_r         )
+		,.a_bhv_id          (a_bhv_id       	)
 		,.a_tx_id           (a_tx_id          	)
 		,.a_alm_num         (a_alm_num        	)
 		,.irq_b_i			(irq_b				)

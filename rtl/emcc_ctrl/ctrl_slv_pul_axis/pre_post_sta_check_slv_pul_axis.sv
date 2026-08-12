@@ -79,6 +79,10 @@ module pre_post_sta_check_slv_pul_axis#(
 		,output	reg	[B_BHA_NUM-1:0]		b_post_sta_allow
 		,output	reg						c_pre_sta_allow
 		,output	reg						c_post_sta_allow
+
+		,input							action_busy
+		,input							action_done
+		,input							action_error
     );
 	
 	//========================================================================================//
@@ -86,6 +90,15 @@ module pre_post_sta_check_slv_pul_axis#(
 	//========================================================================================//
 	
 	
+
+	//behavior id re-pipeline (latched inside this module, no external latch needed)
+	reg [7:0]	a_bhv_id_d1;
+	always@(posedge clk_i) begin
+		if(rst_i || !a_en)
+			a_bhv_id_d1 <= 8'd0;
+		else if(a_bhv_vld)
+			a_bhv_id_d1 <= a_bhv_id;
+	end
 
 	//limit rising-edge latch (same as ctrl_ethercat_servo): latch on edge, clear when
 	//a new behavior starts and both limits released; level fallback below.
@@ -114,18 +127,18 @@ module pre_post_sta_check_slv_pul_axis#(
 	end
 	wire servo_limit_alarm = limf_alarm | limb_alarm | (i_axis_limf|i_axis_limb);  //level fallback
 
-	//home completed: beh1 (home) passes post-check -> set; beh7 (soff) clears
+	//home completed: beh1 (home) done without error -> set; beh7 (soff) clears
 	reg home_completed;
 	always@(posedge clk_i) begin
 		if(rst_i || !a_en)
 			home_completed <= 1'b0;
-		else if(a_bhv_id == 8'd1 && a_post_sta_allow[0])
+		else if(a_bhv_id_d1 == 8'd1 && action_done && ~action_error)
 			home_completed <= 1'b1;
-		else if(a_bhv_id == 8'd7)
+		else if(a_bhv_id_d1 == 8'd7)
 			home_completed <= 1'b0;
 	end
 
-	//pre status per behavior (same as ctrl_ethercat_servo):
+	//pre status
 	// beh1 home:                 axis ok (limit-exempt: home hits limit)
 	// beh2 move0/3 jog/4 moveabs: home_completed + axis ok + no limit alarm
 	// beh5 getpoint/6 son/7 soff/8 reset: always
@@ -147,13 +160,38 @@ module pre_post_sta_check_slv_pul_axis#(
 		end
 	end
 
-	//post status: EXE completes directly (motion result confirmed by master via slave message)
+	//post status
+	// beh1-4 need action_done && !action_error (slave motion completed);
+	// beh5-8 always pass. Cleared on action_busy rising edge (new motion starts).
+	wire [A_BHA_NUM-1:0]	post_sta;
+	assign post_sta[0] = (a_bhv_id_d1 == 8'd1) && action_done && (~action_error);
+	assign post_sta[1] = (a_bhv_id_d1 == 8'd2) && action_done && (~action_error);
+	assign post_sta[2] = (a_bhv_id_d1 == 8'd3) && action_done && (~action_error);
+	assign post_sta[3] = (a_bhv_id_d1 == 8'd4) && action_done && (~action_error);
+	assign post_sta[4] = (a_bhv_id_d1 == 8'd5);
+	assign post_sta[5] = (a_bhv_id_d1 == 8'd6);
+	assign post_sta[6] = (a_bhv_id_d1 == 8'd7);
+	assign post_sta[7] = (a_bhv_id_d1 == 8'd8);
+
+	reg action_busy_d1;
+	wire action_busy_rise;
+	always@(posedge clk_i)
+		action_busy_d1 <= action_busy;
+	assign action_busy_rise = action_busy & ~action_busy_d1;
+
 	always@(posedge clk_i)
 	begin
+		integer i;
 		if(rst_i || !a_en)
 			a_post_sta_allow <= {A_BHA_NUM{1'b0}};
-		else
-			a_post_sta_allow <= {A_BHA_NUM{1'b1}};
+		else if(action_busy_rise)
+			a_post_sta_allow <= {A_BHA_NUM{1'b0}};
+		else begin
+			for(i = 0; i < A_BHA_NUM; i = i + 1) begin
+				if(post_sta[i])
+					a_post_sta_allow[i] <= 1'b1;
+			end
+		end
 	end
 	
 	//========================================================================================//
