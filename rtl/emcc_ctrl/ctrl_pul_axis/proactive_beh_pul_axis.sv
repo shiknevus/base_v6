@@ -19,22 +19,18 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
-
 module proactive_beh_pul_axis#(
-    parameter                 	BHA_NUM 		= 2   //Number of active behaviors
-	,parameter					ARV_SIG_DET_TIM	= 5
+    parameter                 	BHA_NUM = 2   		//Number of active behaviors
 )(
     input                       clk_i
     ,input                      rst_i
     ,input                      i_time_1ms_vld      //ms pulse
     ,input                      i_time_1s_vld       //s pulse
 
-    ,input      [BHA_NUM-1:0]   pre_sta_allow   //Pre - sufficient condition satisfied signal. 0: Not satisfied. 1: Satisfied.
-    ,input      [BHA_NUM-1:0]   post_sta_allow  //Post - sufficient condition satisfied signal
+    ,input      [BHA_NUM-1:0]   pre_sta_allow   	//Pre - sufficient condition satisfied signal. 0: Not satisfied. 1: Satisfied.
+    ,input      [BHA_NUM-1:0]   post_sta_allow  	//Post - sufficient condition satisfied signal
 
-
-	,input      [7:0]           ec_id
-	,input						a_en			//A enable
+	,input						a_en				//A enable
     ,input      [7:0]           a_bhv_id
     ,input                      a_bhv_vld
     ,input      [19:0]          a_tx_ot
@@ -43,7 +39,14 @@ module proactive_beh_pul_axis#(
     ,output		                ec_cha_st
     ,output reg [7:0]           a_tx_id
     ,output reg	[7:0]           a_alm_num
-    //io port start
+
+	,output reg [7:0]      		a_bhv_id_r
+	,output	reg	[31:0]			state_monitor_o
+    ,output reg                 irq_o
+    ,input                      irq_ack_i       	//Interrupt response pulse
+
+
+//----------------------------------------------------- user logic begin -----------------------------------------------------//
     ,input					    i_servo_notok       //servo not ok
     ,input					    i_servo_stop        //servo stop
     ,input					    i_axis_limf         //axis limit forward
@@ -70,38 +73,33 @@ module proactive_beh_pul_axis#(
 	,input		[ 0:0]			rctrl_drive_reset 	//reset servo
 	,input		[ 0:0]			rctrl_resume      	//resume servo
 	,input		[ 0:0]			rctrl_pause       	//pause servo
-	,input		[ 0:0]			rctrl_quickstop   	//quick stop
-	,input		[ 0:0]			rcfg_pf_mode     	//position feedback mode
+	,input		[ 0:0]			rctrl_stop   	    //stop
 	,input		[ 0:0]			rserv_dir         	//servo direction
 	,input		[31:0]			rserv_step_pulse 	//servo step pulse
 	,input		[31:0]			rserv_target_pulse	//servo target pulse
-	,input		[15:0]			rcfg_home_spd     	//home speed
-	,input		[15:0]			rcfg_home_acc     	//home acceleration
-	,input		[15:0]			rcfg_home_dec     	//home deceleration
-	,input		[15:0]			rcfg_jog_spd      	//jog speed
-	,input		[15:0]			rcfg_jog_acc      	//jog acceleration
-	,input		[15:0]			rcfg_jog_dec      	//jog deceleration
-	,input		[15:0]			rcfg_move_spd     	//move speed
-	,input		[15:0]			rcfg_move_acc     	//move acceleration
-	,input		[15:0]			rcfg_move_dec     	//move deceleration
-	,input		[15:0]			rcfg_spd_max      	//maximum speed
-	,input		[15:0]			rcfg_acc_max      	//maximum acceleration
-	,input		[15:0]			rcfg_dec_max      	//maximum deceleration
-	,input		[15:0]			rcfg_qs_dec       	//quick stop deceleration
-	,input		[31:0]			rcfg_timedly      	//timedly time
-	//register end
+	,input		[31:0]			rcfg_home_spd     	//home speed
+	,input		[31:0]			rcfg_home_acc     	//home acceleration
+	,input		[31:0]			rcfg_home_dec     	//home deceleration
+	,input		[31:0]			rcfg_jog_spd      	//jog speed
+	,input		[31:0]			rcfg_jog_acc      	//jog acceleration
+	,input		[31:0]			rcfg_jog_dec      	//jog deceleration
+	,input		[31:0]			rcfg_move_spd     	//move speed
+	,input		[31:0]			rcfg_move_acc     	//move acceleration
+	,input		[31:0]			rcfg_move_dec     	//move deceleration
+	,input		[31:0]			rcfg_spd_max      	//maximum speed
+	,input		[31:0]			rcfg_acc_max      	//maximum acceleration
+	,input		[31:0]			rcfg_dec_max      	//maximum deceleration
+	,input		[31:0]			rcfg_touch_spd     	//home clamp speed
+	
 
-    ,output reg                 irq_o
-    ,input                      irq_ack_i       //Interrupt response
-    //face to output register
-	,output reg [31:0]			state_monitor_o
-	,output reg signed [31:0]			r_pf_abspos
-    //face to output register end
+	,output reg signed [31:0]			r_pf_abspos //postion
+//----------------------------------------------------- user logic end -------------------------------------------------------//
     );
 
-    reg  [7:0]      a_bhv_id_r;
 
-	reg	[7:0]		curr_state;
+
+
+    reg [7:0]    	curr_state;
 	reg [7:0]    	curr_state_1d;
     reg [7:0]    	next_state;
 
@@ -113,27 +111,47 @@ module proactive_beh_pul_axis#(
 	reg [7:0]		ack_tx_result;
 	reg	[7:0]		ack_ps_alart_num;
 	
-	reg	[7:0]	detect_tim;	//s
-	reg			detect_flag;
 	
-	
-	localparam  S_IDLE          = 8'h00; 
-    localparam  S_BHA_PRE_DET	= 8'h01; 
-	localparam	S_READY_10		= 8'h02;
-    localparam  S_READY_10_ACK  = 8'h03; 
-    localparam  S_EXE_20     	= 8'h04; 
-	localparam	S_EXE			= 8'h05;
+	//State machine state
+	localparam  S_IDLE          = 8'd0; 	//idle
+    localparam  S_BHA_PRE_DET	= 8'd1; 	//Pre-condition check
+	localparam	S_READY_10		= 8'd2;		//ready
+    localparam  S_READY_10_ACK  = 8'd3; 	//ready ok/no ok
+    localparam  S_EXE_20     	= 8'd4; 	//Action begin
+	localparam	S_EXE			= 8'd5;		//Action execute
+    localparam  S_EXE_20_ACK	= 8'd6;		//Action end
+    localparam  S_BHA_POST_DET  = 8'd7; 	//Post-condition check
+    localparam  S_SUCC_30       = 8'd8; 	//success
+    localparam  S_SUCC_30_ACK	= 8'd9; 	//success ack
+	localparam 	S_ALERT_40		= 8'd10;	//Alert
+	localparam 	S_ALERT_40_ACK	= 8'd11;	//Alert ack
 
-    // localparam  S_EXE_20_ACK	= 8'h06; 
-    localparam  S_BHA_POST_DET  = 8'h07; 
-    localparam  S_SUCC_30       = 8'h08; 
-    localparam  S_SUCC_30_ACK	= 8'h09; 
-	localparam 	S_ALERT_40		= 8'h0a;
-	localparam 	S_ALERT_40_ACK	= 8'h0b;
-
-    localparam  IRQ_OK          = 8'h51;
-    localparam  IRQ_NO_OK       = 8'h52;
+    localparam  IRQ_OK          = 8'h51;	//ps ack:OK
+    localparam  IRQ_NO_OK       = 8'h52;	//ps ack:NO OK
 	
+	
+	//state monitor
+	reg [7:0]	curr_state_m1;
+	reg [7:0]	curr_state_m2;
+	reg [7:0]	curr_state_m3;
+	
+    always @(posedge clk_i) 
+	begin
+        if (rst_i)begin
+			curr_state_m1 <= 8'b0;
+			curr_state_m2 <= 8'b0;
+			curr_state_m3 <= 8'b0;
+			state_monitor_o <= 32'b0;
+			end
+        else if (curr_state != curr_state_m1) begin
+            curr_state_m1 <= curr_state;
+            curr_state_m2 <= curr_state_m1;
+            curr_state_m3 <= curr_state_m2;
+			state_monitor_o <= {curr_state_m3,curr_state_m2,curr_state_m1, curr_state};
+		end
+    end
+	
+	//Analyze interrupt response register
 	always@(posedge clk_i)begin
 	if(rst_i)begin
 		ack_beh_id 	 	<=	8'd0;
@@ -158,23 +176,26 @@ module proactive_beh_pul_axis#(
 		end
 	end
 	
-	always@(posedge clk_i)begin
-	if(rst_i)
-		curr_state_1d <= 8'd0;
-	else
-		curr_state_1d <= curr_state;
-	end
 	
     //Current behavior number 
     reg         a_bhv_vld_r;
     always@(posedge clk_i)begin
-        if(rst_i)
+        if(rst_i)begin
             a_bhv_id_r <= 8'd0;
-        else if(a_bhv_vld)
+			a_bhv_vld_r <= 1'b0;
+		end else if(a_en && ((a_bhv_id >= 8'd1) && (a_bhv_id <= BHA_NUM)) && a_bhv_vld)begin
             a_bhv_id_r <= a_bhv_id;
-        else
+			a_bhv_vld_r <= a_bhv_vld;
+		end else if(curr_state == S_IDLE && curr_state_1d != curr_state)begin
+			a_bhv_id_r <= 8'd0;
+			a_bhv_vld_r <= 1'b0;
+		end else begin
             a_bhv_id_r <= a_bhv_id_r;
+			a_bhv_vld_r <= 1'b0;
+		end
     end
+	
+//------------------------------------------- FSM begin => Control 10/20/30/40 interrupt -----------------------------------------------//
 
 	reg match_10;
 	//reg match_20;
@@ -182,22 +203,19 @@ module proactive_beh_pul_axis#(
 	reg match_40;
 	
 	always @(posedge clk_i) begin
-    if(rst_i) 
-		begin
+    if(rst_i) begin
         	match_10 <= 1'b0;
 			//match_20 <= 1'b0;
 			match_30 <= 1'b0;
 			match_40 <= 1'b0;
-    	end 
-	else if(curr_state == S_READY_10_ACK)
+    end else if(curr_state == S_READY_10_ACK)
         match_10 <= (ack_tx_result == IRQ_OK && ack_tx_id == 8'd10 && ack_beh_id == a_bhv_id_r);
 		//match_20 <= (ack_tx_result == IRQ_OK && ack_tx_id == 8'd20 && ack_beh_id == a_bhv_id_r);
 	else if(curr_state == S_SUCC_30_ACK)
 		match_30 <= (ack_tx_result == IRQ_OK && ack_tx_id == 8'd30 && ack_beh_id == a_bhv_id_r);
 	else if(curr_state == S_ALERT_40_ACK)
 		match_40 <= (ack_tx_id == 8'd40 && ack_beh_id == a_bhv_id_r);
-	else 
-		begin
+	else begin
 			match_10 <= 1'b0;
 			//match_20 <= 1'b0;
 			match_30 <= 1'b0;
@@ -205,6 +223,12 @@ module proactive_beh_pul_axis#(
 		end
 	end
     
+	always@(posedge clk_i)begin
+	if(rst_i)
+		curr_state_1d <= 8'd0;
+	else
+		curr_state_1d <= curr_state;
+	end
 
     always @(posedge clk_i) begin
         if (rst_i)
@@ -213,60 +237,30 @@ module proactive_beh_pul_axis#(
             curr_state <= next_state;
     end
 
-	//state monitor
-	reg [7:0] curr_state_m1;
-	reg [7:0] curr_state_m2;
-	reg [7:0] curr_state_m3;
-    always @(posedge clk_i) 
-	begin
-        if (rst_i)begin
-			curr_state_m1 <= 8'b0;
-			curr_state_m2 <= 8'b0;
-			curr_state_m3 <= 8'b0;
-			state_monitor_o <= 32'b0;
-			end
-        else begin
-            curr_state_m1 <= curr_state;
-			if (curr_state_m1 != curr_state) begin
-            curr_state_m2 <= curr_state_m1;
-            curr_state_m3 <= curr_state_m2;
-				state_monitor_o <= {curr_state_m3, curr_state_m2, curr_state_m1, curr_state};
-			end
-			else begin
-				curr_state_m2 <= curr_state_m2;
-				curr_state_m3 <= curr_state_m3;
-				state_monitor_o <= state_monitor_o;
-			end
-		end
-    end
-
     always @(*) begin
         case (curr_state)
-            S_IDLE:
-			begin	//0
-                if (a_en && a_bhv_id != 8'd0 && a_bhv_vld)    //ps behavior execution instruction
+            S_IDLE: begin			//curr_state = 0
+                if (a_en && ((a_bhv_id_r >= 8'd1) && (a_bhv_id_r <= BHA_NUM)) && a_bhv_vld_r)	//behavior start
                     next_state = S_BHA_PRE_DET;
                 else
                     next_state = S_IDLE;
             end
 
-            S_BHA_PRE_DET:
-			begin	//1
-                if ((a_bhv_id_r >= 8'd1) && (a_bhv_id_r <= BHA_NUM ) && pre_sta_allow[a_bhv_id_r - 1])
+            S_BHA_PRE_DET: begin	//curr_state = 1
+				if(pre_sta_allow[a_bhv_id_r - 1'b1]) begin
                     next_state = S_READY_10;
-                else if(timout)
+				end else if(timout) begin
                     next_state = S_ALERT_40;
-                else
+				end else begin
                     next_state = S_BHA_PRE_DET;
+				end
             end
 
-            S_READY_10: 
-			begin  //2      						//Send 10 interrupt
-				next_state = S_READY_10_ACK;
+            S_READY_10: begin  		//curr_state = 2    					
+				next_state = S_READY_10_ACK;				//Send 10 interrupt
             end
 
-			S_READY_10_ACK: 
-			begin	//3
+			S_READY_10_ACK: begin	//curr_state = 3
 				if(match_10) 								//Transaction 10 Acknowledged OK
                     next_state = S_EXE_20;
                 else if(ack_tx_result == IRQ_NO_OK || timout)
@@ -275,36 +269,38 @@ module proactive_beh_pul_axis#(
                     next_state = S_READY_10_ACK;
 			end
 
-            S_EXE_20: begin		//4							//Send 20 interrupt
-				next_state = S_EXE;
+            S_EXE_20: begin			//curr_state = 4						
+				next_state = S_EXE;							//Send 20 interrupt
             end
 						
-			S_EXE:
-			begin		//5								//active Execution
+			S_EXE:begin				//curr_state = 5								
 					next_state = S_BHA_POST_DET;
 			end
 			
-            S_BHA_POST_DET:
-			begin	//7
-				if(detect_flag) begin
-                	if ((a_bhv_id_r >= 8'd1) && (a_bhv_id_r <= BHA_NUM ) && post_sta_allow[a_bhv_id_r - 1])
+			//S_EXE_20_ACK: begin
+			//	if(match_20) 								//Transaction 20 Acknowledged OK
+            //        next_state = S_EXE;
+            //    else if(ack_tx_result == IRQ_NO_OK || timout)
+            //        next_state = S_ALERT_40;
+            //    else
+            //        next_state = S_EXE_20_ACK;
+			//end
+			
+            S_BHA_POST_DET: begin	//curr_state = 7
+				if(post_sta_allow[a_bhv_id_r - 1'b1]) begin
                     	next_state = S_SUCC_30;
-                	else begin
-                        if (timout) 
+				end else if(timout) begin
                             next_state = S_ALERT_40;
-                        else
-                            next_state = S_BHA_POST_DET;
-                    end
-				end
-				else
+				end else begin
 					next_state = S_BHA_POST_DET;
+				end
             end
 
-            S_SUCC_30: begin		//8						//Send Interrupt 30
-				next_state = S_SUCC_30_ACK;
+            S_SUCC_30: begin		//curr_state = 7					
+				next_state = S_SUCC_30_ACK;					//Send Interrupt 30
             end
 			
-			S_SUCC_30_ACK:begin	//9
+			S_SUCC_30_ACK:begin		//curr_state = 8
 				if(match_30)    							//30 response success
                     next_state = S_IDLE;
                 else if(ack_tx_result == IRQ_NO_OK || timout)
@@ -313,12 +309,12 @@ module proactive_beh_pul_axis#(
                     next_state = S_SUCC_30_ACK;
 			end
 
-            S_ALERT_40: begin		//a					//Send Interrupt 40
-				next_state = S_ALERT_40_ACK;
+            S_ALERT_40: begin		//curr_state = 9					
+				next_state = S_ALERT_40_ACK;				//Send Interrupt 40
             end
 			
-			S_ALERT_40_ACK:begin	//b
-				if(match_40 || timout) 						//40 response
+			S_ALERT_40_ACK:begin	//curr_state = 10
+				if(match_40 || timout) 						//40 Interrupt response
                     next_state = S_IDLE;
                 else
                     next_state = S_ALERT_40_ACK;
@@ -330,15 +326,15 @@ module proactive_beh_pul_axis#(
 
         endcase
     end
+	
+//----------------------------------------------------------- FSM end ------------------------------------------------------//
 
     //Channel A busy signal
 	assign ec_cha_st = (curr_state != S_IDLE)?1'b1:1'b0;
 
     //Channel A transaction ID: 10 20 30 40
     always@(posedge clk_i)begin
-        if(rst_i)
-            a_tx_id <= 8'd0;
-		else if(!a_en)
+        if(rst_i || !a_en)
 			a_tx_id <= 8'd0;
         else if(curr_state == S_READY_10)
             a_tx_id <= 8'd10;
@@ -348,16 +344,14 @@ module proactive_beh_pul_axis#(
             a_tx_id <= 8'd30;
         else if(curr_state == S_ALERT_40)
             a_tx_id <= 8'd40;
-		else if(match_40)
+		else if(curr_state == S_IDLE || curr_state == S_BHA_PRE_DET)
 			a_tx_id <= 8'd0;
         else
             a_tx_id <= a_tx_id;
     end
 
     always@(posedge clk_i)begin
-        if(rst_i)
-            irq_o <= 1'b0;
-		else if(!a_en)
+        if(rst_i || !a_en)
 			irq_o <= 1'b0;
 		else if(irq_ack_i)    		//interrupt arbiter receives the interrupt.
             irq_o <= 1'b0;
@@ -374,33 +368,30 @@ module proactive_beh_pul_axis#(
     end
 
     always@(posedge clk_i)begin
-        if(rst_i)
+        if(rst_i || !a_en)
             a_alm_num <= 8'd0;
-		else if(!a_en)
-			a_alm_num <= 8'd0;
-        else if(curr_state == S_BHA_PRE_DET && timout)						//The pre - full inspection is not met.
-			a_alm_num <= 8'd101;    
-        else if(curr_state == S_READY_10_ACK && ack_tx_result == IRQ_NO_OK)	//Transaction 10 ps response error
+        else if(curr_state == S_BHA_PRE_DET && timout)			
+            a_alm_num <= 8'd151;     
+        else if(curr_state == S_READY_10_ACK && ack_tx_result == IRQ_NO_OK)				
             a_alm_num <= ack_ps_alart_num;    
-        else if(curr_state == S_READY_10_ACK && timout)						//For Transaction 10, waiting for the ps response timed out.
-            a_alm_num <= 8'd108;    
-		//else if(curr_state == S_EXE_20_ACK && ack_tx_result == IRQ_NO_OK)	//Transaction 20 has a ps response error.
+        else if(curr_state == S_READY_10_ACK && timout)									
+            a_alm_num <= 8'd152;    
+		//else if(curr_state == S_EXE_20_ACK && ack_tx_result == IRQ_NO_OK)				
         //    a_alm_num <= ack_ps_alart_num;    
-        //else if(curr_state == S_EXE_20_ACK && timout)						//For Transaction 20, waiting for the ps response timed out.
+        //else if(curr_state == S_EXE_20_ACK && timout)									
         //    a_alm_num <= 8'd103;    
-		else if(curr_state_1d == S_EXE && curr_state == S_ALERT_40)			//The execution of Behavior 1 failed.
-				a_alm_num <= 8'd109;   
-		else if(curr_state_1d == S_BHA_POST_DET && curr_state == S_ALERT_40)//The post - full inspection is not met.
-				a_alm_num <= 8'd116;    
-		else if(curr_state == S_SUCC_30_ACK && ack_tx_result == IRQ_NO_OK)	//Transaction 30 has a ps response error.
+		else if(curr_state == S_BHA_POST_DET && timout)			
+            a_alm_num <= 8'd153;     
+		else if(curr_state == S_SUCC_30_ACK && ack_tx_result == IRQ_NO_OK)				
 			a_alm_num <= ack_ps_alart_num;
-		else if(curr_state == S_SUCC_30_ACK && timout)						//For Transaction 30, waiting for the ps response timed out.
-            a_alm_num <= 8'd123;
-		else if(match_40)
+		else if(curr_state == S_SUCC_30_ACK && timout)									
+            a_alm_num <= 8'd154;
+		else if(curr_state == S_IDLE)
 			a_alm_num <= 8'd0;
         else
             a_alm_num <= a_alm_num;
     end
+	
 
     //Timeout count
     always@(posedge clk_i)begin
@@ -414,6 +405,8 @@ module proactive_beh_pul_axis#(
             timout_cnt <= 20'd0;
         else if(i_time_1s_vld)
             timout_cnt <= timout_cnt+1;
+		else
+			timout_cnt <= timout_cnt;
     end
 
     always@(posedge clk_i)begin
@@ -425,104 +418,41 @@ module proactive_beh_pul_axis#(
             timout <= 1'b0;
     end
 	
-	
-	//===============================================================================================================
-	//------------------------------------------------ user logic start ---------------------------------------------
-	//===============================================================================================================
-
-	always@(posedge clk_i)
-	begin
-    	if(rst_i) begin
-    	    detect_tim  <= 8'd0;
-    	    detect_flag <= 1'b0;
-    	end
-    	else if(curr_state != S_BHA_POST_DET) begin
-    	    detect_tim  <= 8'd0;
-    	    detect_flag <= 1'b0;
-    	end
-    	else begin
-    	    if((ARV_SIG_DET_TIM == 0) || (detect_tim > ARV_SIG_DET_TIM - 1'b1)) begin
-    	        detect_tim  <= detect_tim; 
-    	        detect_flag <= 1'b1;  
-    	    end
-    	    else begin
-                `ifdef ENB_SIM_MODE
-				    detect_tim  <= detect_tim + 1;	//sim
-    	            detect_flag <= 1'b0;	
-                `else
-    	            detect_tim  <= detect_tim + 1;	//actual
-    	            detect_flag <= 1'b0;
-                `endif 
-    	    end
-    	end
-	end
-
-
-// motion control signals
-reg        action_start;
-reg        get_point_flag;
-reg        alarm_flag;
-reg        son_bhv_flag;
-reg        soff_bhv_flag;
-reg        reset_bhv_flag;
-reg        action_alarm;
-reg [7:0]  action_delay_cnt;
-reg [15:0] servo_delay_ms;
-reg        act_done_d1;
-reg        servo_stop_timeout;
-reg [15:0] servo_stop_timeout_cnt_ms;
-
-wire       servo_work_error;
-
-
+//==============================================================================================================================//
+//----------------------------------------------------- user logic begin -----------------------------------------------------//
+//==============================================================================================================================//
 // behavior flags in S_EXE
+reg        action_start;
+reg        get_postion_flag;
 always@(posedge clk_i) begin
     if(rst_i || !a_en) begin
         action_start    <= 1'b0;
-        get_point_flag  <= 1'b0;
-        son_bhv_flag    <= 1'b0;
-        soff_bhv_flag   <= 1'b0;
-        reset_bhv_flag  <= 1'b0;
     end
     else if(curr_state == S_EXE) begin
-        if (a_bhv_id_r == 8'd1)      action_start   <= 1'b1;   // Home serch
-        else if(a_bhv_id_r == 8'd2)  action_start   <= 1'b1;   // Move 0
-        else if(a_bhv_id_r == 8'd3)  action_start   <= 1'b1;   // JOG
-        else if(a_bhv_id_r == 8'd4)  action_start   <= 1'b1;   // Move absul
-        else if(a_bhv_id_r == 8'd5)  get_point_flag <= 1'b1;   // Get point
-        else if(a_bhv_id_r == 8'd6)  son_bhv_flag   <= 1'b1;   // S-on servo
-        else if(a_bhv_id_r == 8'd7)  soff_bhv_flag  <= 1'b1;   // S-off servo
-        else if(a_bhv_id_r == 8'd8)  reset_bhv_flag <= 1'b1;   // Reset servo
+        if     (a_bhv_id_r == 8'd1 )  action_start   <= 1'b1;   // Home serch
+        else if(a_bhv_id_r == 8'd2 )  action_start   <= 1'b1;   // JOG
+        else if(a_bhv_id_r == 8'd3 )  action_start   <= 1'b1;   // Move absul
+        else if(a_bhv_id_r == 8'd20)  action_start   <= 1'b1;   // JOG          [safe]
+        else if(a_bhv_id_r == 8'd21)  action_start   <= 1'b1;   // Move absul   [safe]
+        else if(a_bhv_id_r == 8'd30)  get_postion_flag <= 1'b1;   // Get postion
+        else begin
+            action_start    <= 1'b0;
+            get_postion_flag<= 1'b0;
+        end
     end
     else begin
         action_start    <= 1'b0;
-        get_point_flag  <= 1'b0;
-        son_bhv_flag    <= 1'b0;
-        soff_bhv_flag   <= 1'b0;
-        reset_bhv_flag  <= 1'b0;
+        get_postion_flag<= 1'b0;
     end
 end
-
-// servo outputs
-reg r_dv_son;
-always@(posedge clk_i) begin
-    if(rst_i)
-        r_dv_son <= 1'b0;
-    else if(soff_bhv_flag)          
-        r_dv_son <= 1'b0;//
-    else if(son_bhv_flag)           
-        r_dv_son <= 1'b1;//
-end
-assign o_dv_son = r_dv_son;
-assign o_dv_reset = (reset_bhv_flag) ? 1'b1 : 1'b0;
 
 // motion start triggers
 wire home_start;
 wire jog_start;
 wire move_start;
 assign home_start = (a_bhv_id_r == 8'd1) ? action_start : 1'b0;
-assign jog_start  = (a_bhv_id_r == 8'd3) ? action_start : 1'b0;
-assign move_start = ((a_bhv_id_r == 8'd2)||(a_bhv_id_r == 8'd4)) ? action_start : 1'b0;
+assign jog_start  = ((a_bhv_id_r == 8'd2)||(a_bhv_id_r == 8'd20)) ? action_start : 1'b0;
+assign move_start = ((a_bhv_id_r == 8'd3)||(a_bhv_id_r == 8'd21)) ? action_start : 1'b0;
 
 // axis_org register
 reg axis_org;
@@ -561,13 +491,13 @@ home_u
   .clk            ( clk_i              ),
   .reset          ( rst_i              ),
 
-  .i_drv_son      ( r_dv_son         ),
+  .i_drv_son      ( 1'b1               ),
   .i_lim_f        ( i_axis_limf        ),
   .i_lim_b        ( i_axis_limb        ),
   .i_org          ( axis_org           ),
-  .i_pf_spd       ( {16'd0,rcfg_home_spd} ),
-  .i_pf_acc       ( {16'd0,rcfg_home_acc} ),
-  .i_pf_dec       ( {16'd0,rcfg_home_dec} ),
+  .i_pf_spd       ( rcfg_home_spd      ),
+  .i_pf_acc       ( rcfg_home_acc      ),
+  .i_pf_dec       ( rcfg_home_dec      ),
   .i_pf_dir       ( DIR_NEG            ),
   .i_start        ( home_start         ),
   .i_stop         ( home_stop          ),
@@ -586,7 +516,7 @@ home_u
   .i_pf_done      ( pos_pf_done        )
 );
 
-// JOG (beh=3)
+// JOG (beh=2;20)
 reg          jog_stop;
 wire         jog_busy;
 wire         jog_done;
@@ -605,13 +535,13 @@ Jog_fa_std jog_u
   .clk            ( clk_i              ),
   .reset          ( rst_i              ),
 
-  .i_drv_son      ( r_dv_son         ),
+  .i_drv_son      ( 1'b1               ),
   .i_lim_f        ( i_axis_limf        ),
   .i_lim_b        ( i_axis_limb        ),
   .i_org          ( axis_org           ),
-  .i_pf_spd       ( {16'd0,rcfg_jog_spd}  ),
-  .i_pf_acc       ( {16'd0,rcfg_jog_acc}  ),
-  .i_pf_dec       ( {16'd0,rcfg_jog_dec}  ),
+  .i_pf_spd       ( rcfg_jog_spd       ),
+  .i_pf_acc       ( rcfg_jog_acc       ),
+  .i_pf_dec       ( rcfg_jog_dec       ),
   .i_pf_pulse     ( rserv_step_pulse   ),
   .i_pf_dir       ( rserv_dir          ),
   .i_start        ( jog_start          ),
@@ -631,7 +561,7 @@ Jog_fa_std jog_u
   .i_pf_done      ( pos_pf_done        )
 );
 
-// MOVE (beh=3)
+// MOVE (beh=3;21)
 reg          move_stop;
 wire         move_busy;
 wire         move_done;
@@ -645,22 +575,20 @@ wire         move_pf_start;
 wire         move_pf_stop;
 wire         move_pf_quickstop;
 
-// reg signed [31:0] r_pf_abspos;
-
 Move_fa_std move_u
 (
   .clk            ( clk_i              ),
   .reset          ( rst_i              ),
 
-  .i_drv_son      ( r_dv_son         ),
+  .i_drv_son      ( 1'b1               ),
   .i_lim_f        ( i_axis_limf        ),
   .i_lim_b        ( i_axis_limb        ),
   .i_org          ( axis_org           ),
   .i_abspos       ( r_pf_abspos        ),
-  .i_pf_spd       ( {16'd0,rcfg_move_spd} ),
-  .i_pf_acc       ( {16'd0,rcfg_move_acc} ),
-  .i_pf_dec       ( {16'd0,rcfg_move_dec} ),
-  .i_pf_pulse     ( (a_bhv_id_r == 8'd2) ? 32'd0 : rserv_target_pulse ),
+  .i_pf_spd       ( rcfg_move_spd      ),
+  .i_pf_acc       ( rcfg_move_acc      ),
+  .i_pf_dec       ( rcfg_move_dec      ),
+  .i_pf_pulse     ( rserv_target_pulse ),
   .i_start        ( move_start         ),
   .i_stop         ( move_stop          ),
   .o_busy         ( move_busy          ),
@@ -682,7 +610,7 @@ Move_fa_std move_u
 reg  [31:0]  pos_pf_spd;
 reg  [31:0]  pos_pf_acc;
 reg  [31:0]  pos_pf_dec;
-wire [31:0]  pos_quickstop_dec = rcfg_qs_dec;
+wire [31:0]  pos_quickstop_dec = rcfg_dec_max;
 reg          pos_quickstop;
 reg  [31:0]  pos_pf_mode;
 reg          pos_pf_start;
@@ -742,6 +670,7 @@ Pulmot_fd Pulmot_fd00
 );
 
 // action status 
+reg  action_alarm;
 always@(posedge clk_i) begin
     if(rst_i) begin
         action_busy  <= 1'b0;
@@ -755,23 +684,17 @@ always@(posedge clk_i) begin
                 action_error <= home_error;
                 home_stop    <= action_alarm;
             end
-            8'd2: begin
-                action_busy  <= move_busy;
-                action_done  <= move_done;
-                action_error <= move_error;
-                move_stop    <= action_alarm;
-            end
-            8'd3: begin
+            8'd2, 8'd20 : begin
                 action_busy  <= jog_busy;
                 action_done  <= jog_done;
                 action_error <= jog_error;
-                jog_stop     <= action_alarm;
+                move_stop    <= action_alarm;
             end
-            8'd4: begin
+            8'd3, 8'd21 : begin
                 action_busy  <= move_busy;
                 action_done  <= move_done;
                 action_error <= move_error;
-                move_stop    <= action_alarm;
+                jog_stop     <= action_alarm;
             end
             default: begin
                 action_busy  <= 1'b0;
@@ -782,47 +705,36 @@ always@(posedge clk_i) begin
     end
 end
 
-// Positioner
+// data mux
 always@(*) begin
     case(a_bhv_id_r)
         8'd1: begin
             pos_pf_spd    = home_pf_spd   > rcfg_spd_max ? rcfg_spd_max : home_pf_spd;
             pos_pf_acc    = home_pf_acc   > rcfg_acc_max ? rcfg_acc_max : home_pf_acc;
             pos_pf_dec    = home_pf_dec   > rcfg_dec_max ? rcfg_dec_max : home_pf_dec;
-            pos_pf_mode   = rcfg_pf_mode ? 32'h10 : 32'h00;   // home: absolute mode
+            pos_pf_mode   = 32'h00;   // home
             pos_pf_pulse  = home_pf_pulse;
             pos_pf_start  = home_pf_start;
             pos_pf_stop   = home_pf_stop;
             pos_pf_dir    = home_pf_dir;
             pos_quickstop = home_pf_quickstop;
         end
-        8'd2: begin
-            pos_pf_spd    = move_pf_spd   > rcfg_spd_max ? rcfg_spd_max : move_pf_spd;
-            pos_pf_acc    = move_pf_acc   > rcfg_acc_max ? rcfg_acc_max : move_pf_acc;
-            pos_pf_dec    = move_pf_dec   > rcfg_dec_max ? rcfg_dec_max : move_pf_dec;
-            pos_pf_mode   = rcfg_pf_mode ? 32'h11 : 32'h01;   // move: incremental mode
-            pos_pf_pulse  = move_pf_pulse;
-            pos_pf_start  = move_pf_start;
-            pos_pf_stop   = move_pf_stop;
-            pos_pf_dir    = move_pf_dir;
-            pos_quickstop = move_pf_quickstop;
-        end
-        8'd3: begin
+        8'd2, 8'd20: begin
             pos_pf_spd    = jog_pf_spd    > rcfg_spd_max ? rcfg_spd_max : jog_pf_spd;
             pos_pf_acc    = jog_pf_acc    > rcfg_acc_max ? rcfg_acc_max : jog_pf_acc;
             pos_pf_dec    = jog_pf_dec    > rcfg_dec_max ? rcfg_dec_max : jog_pf_dec;
-            pos_pf_mode   = rcfg_pf_mode ? 32'h11 : 32'h01;   // jog: incremental mode
+            pos_pf_mode   = 32'h01;   // jog
             pos_pf_pulse  = jog_pf_pulse;
             pos_pf_start  = jog_pf_start;
             pos_pf_stop   = jog_pf_stop;
             pos_pf_dir    = jog_pf_dir;
             pos_quickstop = jog_pf_quickstop;
         end
-        8'd4: begin
+        8'd3, 8'd21: begin
             pos_pf_spd    = move_pf_spd   > rcfg_spd_max ? rcfg_spd_max : move_pf_spd;
             pos_pf_acc    = move_pf_acc   > rcfg_acc_max ? rcfg_acc_max : move_pf_acc;
             pos_pf_dec    = move_pf_dec   > rcfg_dec_max ? rcfg_dec_max : move_pf_dec;
-            pos_pf_mode   = rcfg_pf_mode ? 32'h11 : 32'h01;   // move: incremental mode
+            pos_pf_mode   = 32'h01;   // move
             pos_pf_pulse  = move_pf_pulse;
             pos_pf_start  = move_pf_start;
             pos_pf_stop   = move_pf_stop;
@@ -850,77 +762,42 @@ always@(posedge clk_i) begin
         home_pos_reset <= 1'b0;
     else if(home_done & ~home_busy & ~home_error)
         home_pos_reset <= 1'b1;
+    else 
+        home_pos_reset <= home_pos_reset;
 end
 
 always@(posedge clk_i) begin
     if(rst_i)
         r_pf_abspos <= 32'd0;
-    else if(r_dv_son) begin
+    else begin
         if(home_done & ~home_busy & ~home_error & ~home_pos_reset)
             r_pf_abspos <= 32'd0;
         else if(i_rc_pulse_done)
             r_pf_abspos <= (o_rc_pulse_dir == DIR_POS) ? r_pf_abspos + 1'b1 : r_pf_abspos - 1'b1;
-`ifdef PF_SIM
-        else if(pos_pf_done)
-            r_pf_abspos <= (o_rc_pulse_dir == DIR_POS) ? r_pf_abspos + 1'b1 : r_pf_abspos - 1'b1;
-`endif
+        `ifdef PF_SIM
+            else if(pos_pf_done)
+                r_pf_abspos <= (o_rc_pulse_dir == DIR_POS) ? r_pf_abspos + 1'b1 : r_pf_abspos - 1'b1;
+        `endif
+        else
+            r_pf_abspos <= r_pf_abspos;
+            
     end
 end
 
-// servo delay monitor
-always@(posedge clk_i) begin
-    act_done_d1 <= action_done;
-    if(rst_i || !a_en) begin
-        servo_delay_ms <= 16'd0;
-    end else begin
-        if(r_dv_son) begin
-            if(action_busy) begin
-                if(i_servo_stop)
-                    servo_delay_ms <= servo_delay_ms + i_time_1ms_vld;
-                else
-                    servo_delay_ms <= 16'd0;
-            end
-        end else begin
-            servo_delay_ms <= 16'd0;
-        end
-    end
-end
-
-// servo stop timeout (5s)
-always@(posedge clk_i) begin
-    if(rst_i || !a_en) begin
-        servo_stop_timeout        <= 1'd0;
-        servo_stop_timeout_cnt_ms <= 16'd0;
-    end else begin
-        if(r_dv_son & act_done_d1) begin
-            if(servo_stop_timeout_cnt_ms < 5000) begin
-                servo_stop_timeout_cnt_ms <= servo_stop_timeout_cnt_ms + i_time_1ms_vld;
-                servo_stop_timeout        <= 1'b0;
-            end else begin
-                servo_stop_timeout_cnt_ms <= servo_stop_timeout_cnt_ms;
-                servo_stop_timeout        <= 1'b1;
-            end
-        end else begin
-            servo_stop_timeout        <= 1'b0;
-            servo_stop_timeout_cnt_ms <= 16'd0;
-        end
-    end
-end
-
-// servo work error: home=5s, jog-move=1s
-assign servo_work_error = (((a_bhv_id_r == 8'd1) & (servo_delay_ms >= 5000)) |
-                           ((a_bhv_id_r >= 8'd2 && a_bhv_id_r <= 8'd4) & (servo_delay_ms >= 1000))) ? 1'b1 : 1'b0;
-
-// action alarm
 always@(posedge clk_i) begin
     if(rst_i || !a_en)
         action_alarm <= 1'b0;
     else if(curr_state == S_EXE)
         action_alarm <= 1'b0;
-    else if(curr_state_1d == S_EXE && curr_state == S_ALERT_40)
+    else if(curr_state == S_ALERT_40)
         action_alarm <= 1'b1;
     else if(curr_state == S_IDLE)
         action_alarm <= 1'b0;
+    else 
+        action_alarm <= action_alarm;    
 end
+//==============================================================================================================================//
+//----------------------------------------------------- user logic end -------------------------------------------------------//
+//==============================================================================================================================//
 
 endmodule

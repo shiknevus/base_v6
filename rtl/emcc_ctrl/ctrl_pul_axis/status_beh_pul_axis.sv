@@ -39,8 +39,9 @@ module status_beh_pul_axis#(
 	,output		 				ec_chb_st   
 	,output	reg [7:0]			b_tx_id     
 	,output	reg [7:0]			b_alm_num   
-	
-	,input						di				
+//----------------------------------------------------- user logic end -------------------------------------------------------//
+
+//----------------------------------------------------- user logic end -------------------------------------------------------//
 	
 	,output	reg					irq_o			
 	,input						irq_ack_i	

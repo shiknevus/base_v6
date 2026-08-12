@@ -100,8 +100,15 @@ module ps_rw_pl_reg#(
 	,output		reg 			param27			
 	,output		reg 			param28			
 	,output		reg 			param29			
-	,output		reg 			param30					
-	
+	,output		reg 			param30
+	,output		reg [31:0]		param31
+	,output		reg [31:0]		param32
+	,output		reg [31:0]		param33
+	,output		reg [31:0]		param34
+	,output		reg [31:0]		param35
+	,output		reg [31:0]		param36
+	,output		reg [31:0]		param37
+
 	,input 			[31:0]		irq_reg1	
 	,input 			[31:0]		irq_reg2	
 	
@@ -325,6 +332,13 @@ module ps_rw_pl_reg#(
 			param28			<=	(wr_task_vld && wr_task_addr == `PARAM28		) ? i_st_wr_data[0]		: param28	;
 			param29			<=	(wr_task_vld && wr_task_addr == `PARAM29		) ? i_st_wr_data[0]		: param29	;
 			param30			<=	(wr_task_vld && wr_task_addr == `PARAM30		) ? i_st_wr_data[0]		: param30	;
+			param31			<=	(wr_task_vld && wr_task_addr == `PARAM31		) ? i_st_wr_data 		: param31	;
+			param32			<=	(wr_task_vld && wr_task_addr == `PARAM32		) ? i_st_wr_data 		: param32	;
+			param33			<=	(wr_task_vld && wr_task_addr == `PARAM33		) ? i_st_wr_data 		: param33	;
+			param34			<=	(wr_task_vld && wr_task_addr == `PARAM34		) ? i_st_wr_data 		: param34	;
+			param35			<=	(wr_task_vld && wr_task_addr == `PARAM35		) ? i_st_wr_data 		: param35	;
+			param36			<=	(wr_task_vld && wr_task_addr == `PARAM36		) ? i_st_wr_data 		: param36	;
+			param37			<=	(wr_task_vld && wr_task_addr == `PARAM37		) ? i_st_wr_data 		: param37	;
 		end
 	end
 	
@@ -438,6 +452,14 @@ module ps_rw_pl_reg#(
 		`PARAM28		      	:		o_st_rd_data <= {31'd0,param28	}		;
 		`PARAM29		      	:		o_st_rd_data <= {31'd0,param29	}		;
 		`PARAM30		      	:		o_st_rd_data <= {31'd0,param30	}		;
+
+		`PARAM31		      	:		o_st_rd_data <= param31					;
+		`PARAM32		      	:		o_st_rd_data <= param32					;
+		`PARAM33		      	:		o_st_rd_data <= param33					;
+		`PARAM34		      	:		o_st_rd_data <= param34					;
+		`PARAM35		      	:		o_st_rd_data <= param35					;
+		`PARAM36		      	:		o_st_rd_data <= param36					;
+		`PARAM37		      	:		o_st_rd_data <= param37					;
        default : o_st_rd_data <= 32'h7FFFFFFF;
    endcase    
 end   

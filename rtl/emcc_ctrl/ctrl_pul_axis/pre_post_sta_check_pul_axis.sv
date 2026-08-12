@@ -23,6 +23,7 @@
 module pre_post_sta_check_pul_axis#(
 		parameter		A_BHA_NUM		=	13
 		,parameter		B_BHA_NUM		=	1
+		,parameter		C_BHA_NUM		=	1
 )(
 		input							clk_i
 		,input							rst_i
