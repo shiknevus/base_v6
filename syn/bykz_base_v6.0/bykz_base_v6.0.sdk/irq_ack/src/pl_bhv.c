@@ -18,10 +18,24 @@ static u32            bhv_deadline = 0;
 //  fire several times before the ACK lands; only the first event matters)
 static u32 last_acked_reg1[NUM_IRQ_SLOTS];
 
+// EC/SC ids programmed at init; IRQ_REG1[31:16] must echo them back.
+#define EC_ID_VAL 0x88U
+#define SC_ID_VAL 0x66U
+
+// Per-behavior RTL tx timeout (seconds): motion behaviors get a long window,
+// others (virtual/GETPOS/undefined) a short one so the 40-timeout path is
+// reachable within the PS deadline.
+static u32 BhvTxTimeout(u8 id)
+{
+	if (id == 1U || id == 2U || id == 3U || id == 20U || id == 21U)
+		return 30U;
+	return 3U;
+}
+
 // ACK with the values captured in the event (main-loop context only)
 static void PsIrqAck(IrqSlot *slot, u32 irq_reg1, u32 irq_reg2)
 {
-	u32 bhv_id, irq_num, status, resp;
+	u32 bhv_id, irq_num, status, resp, hdr;
 	int idx;
 
 	if (irq_reg1 == 0U)
@@ -37,6 +51,13 @@ static void PsIrqAck(IrqSlot *slot, u32 irq_reg1, u32 irq_reg2)
 
 	bhv_id  = (irq_reg1 >> 8) & 0xFFU;
 	irq_num = irq_reg1 & 0xFFU;
+
+	// sanity: arbiter packs {ec_id,sc_id} into IRQ_REG1[31:16]
+	hdr = (irq_reg1 >> 16) & 0xFFFFU;
+	if (hdr != ((EC_ID_VAL << 8) | SC_ID_VAL))
+		xil_printf("[%08u]  [%s] !! IRQ_REG1 hdr=0x%04x expect 0x%04x (ec/sc id)\r\n",
+			   (unsigned)ts_ms(), slot->name, (unsigned)hdr,
+			   (unsigned)((EC_ID_VAL << 8) | SC_ID_VAL));
 
 	if (bhv_id == 1U || bhv_id == 2U)
 		status = (irq_num == 0x28U) ? 0x5101U : 0x5100U;
@@ -59,8 +80,13 @@ static void PsIrqAck(IrqSlot *slot, u32 irq_reg1, u32 irq_reg2)
 // Trigger a behavior on the given component (async, returns immediately)
 void BhvStart(IrqSlot *slot, u8 id)
 {
-	xil_printf("[%08u] \r\n[BHV %u] %s @0x%08x...\r\n",
-		   (unsigned)ts_ms(), (unsigned)id, slot->name, (unsigned)slot->base_addr);
+	u32 ot = BhvTxTimeout(id);
+
+	xil_printf("[%08u] \r\n[BHV %u] %s @0x%08x (A_TX_OT=%us)...\r\n",
+		   (unsigned)ts_ms(), (unsigned)id, slot->name, (unsigned)slot->base_addr,
+		   (unsigned)ot);
+	// per-behavior RTL tx timeout before triggering
+	Xil_Out32(slot->base_addr + A_TX_OT, ot);
 	Xil_Out32(slot->base_addr + A_BHV_ID, (u32)id);
 
 	bhv_slot  = slot;
@@ -128,6 +154,14 @@ void ProcessEvent(const IrqEvent *ev)
 		PsIrqAck(slot, ev->irq_reg1, ev->irq_reg2);
 		xil_printf("[%08u] [BHV %u] %s COMPLETE!\r\n",
 			   (unsigned)ts_ms(), (unsigned)bhv_id, slot->name);
+		// report the tracked absolute position after the transaction
+		{
+			u32 p51 = Xil_In32(slot->base_addr + PARAM51);
+			xil_printf("[%08u] [BHV %u] %s POS abs_pulse=%d (0x%08x)%s\r\n",
+				   (unsigned)ts_ms(), (unsigned)bhv_id, slot->name,
+				   (int)p51, (unsigned)p51,
+				   (bhv_id == 30U) ? " [GETPOS]" : "");
+		}
 		bhv_state = BHV_IDLE;
 		bhv_slot  = NULL;
 		return;

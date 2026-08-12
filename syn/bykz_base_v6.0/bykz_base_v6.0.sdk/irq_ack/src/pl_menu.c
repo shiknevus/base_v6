@@ -20,11 +20,13 @@ typedef enum {
 	MODE_SELECT_COMP,    // waiting for digits to select component
 	MODE_SET_PARAM,      // waiting for param selection (1~6)
 	MODE_PARAM_VAL,      // waiting for value input
+	MODE_EXT_BHV,        // '.' pressed: enter behavior number (1-100)
 } InputMode;
 
 static InputMode input_mode = MODE_BEHAVIOR;
 static int  comp_select_buf = -1;    // accumulated digit buffer, -1 = empty
 static int  param_sel        = 0;    // which param is being edited (1..6)
+static int  ext_bhv_val      = -1;   // accumulated behavior number, -1 = none
 #define PARAM_STR_MAX 24
 static char param_str_buf[PARAM_STR_MAX];  // decimal value accumulator
 static int  param_str_len = 0;
@@ -48,6 +50,7 @@ void PrintMenu(void)
 	xil_printf("===========================================\r\n");
 	xil_printf(" Keys:\r\n");
 	xil_printf("  0~f      - Send behavior 0~15 to CURRENT component\r\n");
+	xil_printf("  .        - Enter behavior number (1-100)\r\n");
 	xil_printf("  c        - Enter component-select mode \r\n");
 	xil_printf("  w        - Set motion params (spd/acc/dec/target_mm/step_mm/factor)\r\n");
 	xil_printf("  p        - Read position (pulse + mm) of current component\r\n");
@@ -153,6 +156,45 @@ int MenuHandleKey(char key)
 			input_mode = MODE_BEHAVIOR;
 		}
 	}
+	// Extended behavior number (1-100): accumulate digits, Enter to run
+	else if (input_mode == MODE_EXT_BHV) {
+		if (key >= '0' && key <= '9') {
+			int d = (int)(key - '0');
+			if (ext_bhv_val < 0)
+				ext_bhv_val = d;
+			else if (ext_bhv_val <= 99)
+				ext_bhv_val = ext_bhv_val * 10 + d;
+			if (ext_bhv_val > 100) {
+				xil_printf("\r\nInvalid behavior %d (max 100)\r\n",
+					   ext_bhv_val);
+				ext_bhv_val = -1;
+				input_mode = MODE_BEHAVIOR;
+			} else {
+				xil_printf("%c", key);
+			}
+		} else if (key == '\r' || key == '\n') {
+			if (ext_bhv_val > 0) {
+				IrqSlot *comp = &irq_table[cur_component];
+				xil_printf("\r\n>>> [BHV=%d] on [%d] %s <<<\r\n",
+					   ext_bhv_val, cur_component, comp->name);
+				if (BhvIsRunning()) {
+					xil_printf("\r\n[BHV %u] still running on %s, ignore\r\n",
+						   (unsigned)BhvActiveId(), BhvActiveName());
+				} else {
+					BhvStart(comp, (u8)ext_bhv_val);
+				}
+			} else {
+				xil_printf("\r\nNo behavior, cancelled.\r\n");
+			}
+			ext_bhv_val = -1;
+			input_mode = MODE_BEHAVIOR;
+		} else if (key == 0x1B || key == 0x7F || key == 0x08) {
+			xil_printf("\r\nCancelled.\r\n");
+			ext_bhv_val = -1;
+			input_mode = MODE_BEHAVIOR;
+		}
+		/* else: ignore other chars, stay in MODE_EXT_BHV */
+	}
 	// Component select: enter selection mode
 	else if (key == 'c' || key == 'C') {
 		input_mode = MODE_SELECT_COMP;
@@ -162,6 +204,12 @@ int MenuHandleKey(char key)
 	else if (key == 'w' || key == 'W') {
 		input_mode = MODE_SET_PARAM;
 		PrintParamMenu();
+	}
+	// Extended behavior number mode
+	else if (key == '.') {
+		input_mode = MODE_EXT_BHV;
+		ext_bhv_val = -1;
+		xil_printf("\r\nEnter behavior (1-100): ");
 	}
 	// Behavior hex digits (0-9, a-f, A-F)
 	else if ((key >= '0' && key <= '9') ||

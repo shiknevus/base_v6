@@ -56,7 +56,7 @@
 #define PARAM13              0x108U
 #define PARAM14              0x10CU
 #define PARAM15              0x110U
-#define PARAM16              0x114U   // rctrl_stop
+#define PARAM16              0x114U   // rserv_dir (jog dir) [0]
 #define PARAM17              0x118U
 #define PARAM18              0x11CU
 #define PARAM19              0x120U
@@ -67,11 +67,11 @@
 #define PARAM24              0x134U
 #define PARAM25              0x138U
 #define PARAM26              0x13CU   // rctrl_pause
-#define PARAM27              0x140U
+#define PARAM27              0x140U   // rctrl_stop
 #define PARAM28              0x144U   // rctrl_resume
 #define PARAM29              0x148U   // rctrl_drive_reset
 #define PARAM30              0x14CU   // rctrl_drive_on
-#define PARAM33              0x1A8U   // rcfg_qs_dec
+#define PARAM33              0x1A8U   // rcfg_touch_spd
 #define PARAM34              0x1ACU   // home/jog/move_dec
 #define PARAM35              0x1B0U   // home/jog/move_spd (kpps)
 #define PARAM36              0x1B4U   // rserv_target_pulse (mm, float32)
