@@ -58,10 +58,10 @@ module proactive_beh_pul_axis#(
    	,input  	                i_axis_point		//axis point
    	,input  	                i_axis_reset		//axis reset
    	,input  	                i_dv_alarm			//drive alarm
+   	,input  	                i_pause			    //motor pause (B channel beh 100)
+   	,input  	                i_stop			    //motor stop (B channel beh 103)
    	,output wire                o_dv_pulse			//axi pulse
    	,output wire                o_dv_dir			//axis dir
-   	,output wire                o_dv_reset			//servo reset
-   	,output wire                o_dv_son			//servo en
     //io port end
     //for post check start
     ,output reg                 action_busy
@@ -289,7 +289,7 @@ module proactive_beh_pul_axis#(
             S_BHA_POST_DET: begin	//curr_state = 7
 				if(post_sta_allow[a_bhv_id_r - 1'b1]) begin
                     	next_state = S_SUCC_30;
-				end else if(timout) begin
+				end else if(timout | action_error) begin
                             next_state = S_ALERT_40;
 				end else begin
 					next_state = S_BHA_POST_DET;
@@ -380,8 +380,10 @@ module proactive_beh_pul_axis#(
         //    a_alm_num <= ack_ps_alart_num;    
         //else if(curr_state == S_EXE_20_ACK && timout)									
         //    a_alm_num <= 8'd103;    
-		else if(curr_state == S_BHA_POST_DET && timout)			
-            a_alm_num <= 8'd153;     
+		else if(curr_state == S_BHA_POST_DET && timout)
+            a_alm_num <= 8'd153;
+		else if(curr_state == S_BHA_POST_DET && action_error)
+            a_alm_num <= 8'd155;
 		else if(curr_state == S_SUCC_30_ACK && ack_tx_result == IRQ_NO_OK)				
 			a_alm_num <= ack_ps_alart_num;
 		else if(curr_state == S_SUCC_30_ACK && timout)									
@@ -401,6 +403,8 @@ module proactive_beh_pul_axis#(
 			timout_cnt <= 20'd0;
 		else if(curr_state != curr_state_1d)
 			timout_cnt <= 20'd0;
+		else if(i_pause)
+			timout_cnt <= timout_cnt;   
         else if(timout_cnt >= a_tx_ot-1)
             timout_cnt <= 20'd0;
         else if(i_time_1s_vld)
@@ -638,6 +642,7 @@ Positioner_std pos_u
   .i_pf_pulse     ( pos_pf_pulse       ),
   .i_quickstop    ( pos_quickstop      ),
   .i_quickstop_dec( pos_quickstop_dec  ),
+  .i_pause        ( i_pause            ),
   .o_pf_done      ( pos_pf_done        ),
   .o_pf_error     ( pos_pf_error       ),
   .o_pf_busy      ( pos_pf_busy        ),
@@ -654,7 +659,7 @@ Pulmot_fd Pulmot_fd00
   .clk              ( clk_i              ),
   .reset            ( rst_i              ),
 
-  .i_bv_pulse_start ( o_rc_pulse_start   ),
+  .i_bv_pulse_start ( i_pause ? 1'b0 : o_rc_pulse_start ),
   .i_bv_pulse_period( o_rc_pulse_period  ),
   .i_bv_pulse_number( o_rc_pulse_number  ),
   .i_bv_pulse_dir   ( o_rc_pulse_dir     ),
@@ -682,19 +687,19 @@ always@(posedge clk_i) begin
                 action_busy  <= home_busy;
                 action_done  <= home_done;
                 action_error <= home_error;
-                home_stop    <= action_alarm;
+                home_stop    <= action_alarm | i_stop;
             end
             8'd2, 8'd20 : begin
                 action_busy  <= jog_busy;
                 action_done  <= jog_done;
                 action_error <= jog_error;
-                move_stop    <= action_alarm;
+                jog_stop     <= action_alarm | i_stop;
             end
             8'd3, 8'd21 : begin
                 action_busy  <= move_busy;
                 action_done  <= move_done;
                 action_error <= move_error;
-                jog_stop     <= action_alarm;
+                move_stop    <= action_alarm | i_stop;
             end
             default: begin
                 action_busy  <= 1'b0;
@@ -772,12 +777,8 @@ always@(posedge clk_i) begin
     else begin
         if(home_done & ~home_busy & ~home_error & ~home_pos_reset)
             r_pf_abspos <= 32'd0;
-        else if(i_rc_pulse_done)
+        else if(i_rc_pulse_done & o_rc_pulse_start)
             r_pf_abspos <= (o_rc_pulse_dir == DIR_POS) ? r_pf_abspos + 1'b1 : r_pf_abspos - 1'b1;
-        `ifdef PF_SIM
-            else if(pos_pf_done)
-                r_pf_abspos <= (o_rc_pulse_dir == DIR_POS) ? r_pf_abspos + 1'b1 : r_pf_abspos - 1'b1;
-        `endif
         else
             r_pf_abspos <= r_pf_abspos;
             

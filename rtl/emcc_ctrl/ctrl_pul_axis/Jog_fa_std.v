@@ -103,7 +103,7 @@ module Jog_fa_std
                            r_st_error <= 1'b0;
                        end
                        if(i_pf_done) begin
-                           fsm_st <= r_st_error ? ST_JOG_ERROR : (r_pf_stop ? ST_JOG_IDLE : ST_JOG_DONE);
+                           fsm_st <= r_st_error ? ST_JOG_ERROR : ST_JOG_DONE;//change by szzhang 20260813
                        end
                    end
                end

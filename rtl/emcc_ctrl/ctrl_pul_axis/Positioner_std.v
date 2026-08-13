@@ -14,6 +14,7 @@ module Positioner_std
    ,input  wire [31:0]      i_pf_pulse
    ,input  wire             i_quickstop
    ,input  wire [31:0]      i_quickstop_dec
+   ,input  wire             i_pause
    ,output wire             o_pf_done
    ,output wire             o_pf_error
    ,output wire             o_pf_busy
@@ -168,7 +169,7 @@ module Positioner_std
          r_pf_dec_target  <= 0;
          r_pf_jerk_state  <= 1'b0;
          r_pf_quickstop   <= 1'b0;
-      end else begin         
+      end else if(~i_pause) begin
          case(fsm_st)
             ST_POS_IDLE: begin
                if(i_pf_start) begin
@@ -215,15 +216,18 @@ module Positioner_std
                   r_pf_spd_act <= r_pf_spd_act + r_pf_acc*UNIT_DT;
 `endif
                end else begin
+`ifdef PF_SIM
+                  if(r_pf_spd_act < {r_pf_spd_target,{P_DIV_WIDTH{1'b0}}})
+                     r_pf_spd_act <= r_pf_spd_act + r_pf_acc*UNIT_DT*256;
+                  else
+                     r_pf_spd_act <= {r_pf_spd_target,{P_DIV_WIDTH{1'b0}}};
+`else
                   if(spd_div_ready) begin
                      r_pf_spd_next <= spd_div_quo*r_pf_acc;
 
                      if((r_pf_mode&MODE_S) == MODE_S) // S Wave Mode
                         if(r_pf_acc_act[P_DIV_WIDTH+31:P_DIV_WIDTH] < r_pf_acc_target)
                            r_pf_spd_next <= (spd_div_quo*r_pf_acc)<<1;
-`ifdef PF_SIM
-                     r_pf_spd_next <= r_pf_spd_next << 8;  // add by szzhang 20260729
-`endif
                   end
 
                   if(r_div_ready) begin
@@ -232,6 +236,7 @@ module Positioner_std
                      else
                         r_pf_spd_act <= {r_pf_spd_target,{P_DIV_WIDTH{1'b0}}};
                   end
+`endif
                end
                
                // acceleration
@@ -384,7 +389,7 @@ module Positioner_std
          r_pf_acc_inv      <= 0;
          r_pf_pulse_first  <= 1'b1;
       end
-      else begin         
+      else if(~i_pause) begin
          case(fsm_st)
             ST_POS_IDLE: begin
                r_pf_pulse_count  <= 0;
@@ -419,39 +424,19 @@ module Positioner_std
                r_pf_pulse_count <= r_pf_pulse_count + 1'b1;
                               
                if(r_pf_pulse_first) begin
-`ifndef PF_SIM
                   if(r_pf_pulse_done) begin
-`else
-                  if(~spd_div_ready&r_div_ready&r_pf_pulse_done) begin
-`endif
                      r_pf_pulse_count <= 0;
                      r_pf_pulse_first <= 1'b0;
                      r_pf_pulse_act <= r_pf_pulse_act + 1'b1;
                   end
                end
                else begin
-`ifndef PF_SIM
                   if(r_pf_pulse_done)
-`else
-                  if(r_div_ready)
-`endif
                      r_pf_pulse_count <= 0;
 
                   // actual pulse
-`ifndef PF_SIM
-                  if(r_pf_pulse_done) begin
+                  if(r_pf_pulse_done)
                      r_pf_pulse_act <= r_pf_pulse_act + 1'b1;
-                  end
-`else
-                  if(r_div_ready) begin
-                     r_pf_pulse_dif <= r_pf_pulse_act - r_pf_pulse_acc;
-                     r_pf_pulse_act <= r_pf_pulse_act + 1'b1;
-                     if(r_pf_spd==r_pf_spd_target) begin
-                        r_pf_pulse_dif <= 0;
-                        r_pf_pulse_act <= r_pf_pulse_acc;
-                     end
-                  end
-`endif
                end
                
                // pulse calculation: (spd^2/dec + spd^2/acc)/2
@@ -473,22 +458,12 @@ module Positioner_std
                   r_pf_pulse_period <= period_div_quo[P_PERIOD_WIDTH-1:0];//r_pf_pulse_period_next;
 
                r_pf_pulse_count <= r_pf_pulse_count + 1'b1;
-`ifndef PF_SIM
                if(r_pf_pulse_done)
-`else
-               if(r_div_ready)
-`endif
                   r_pf_pulse_count <= 0;
                
                // actual pulse
-`ifndef PF_SIM
                if(r_pf_pulse_done)
                   r_pf_pulse_act <= r_pf_pulse_act + 1'b1;
-`else
-               if(r_div_ready) begin
-                  r_pf_pulse_dif <= r_pf_pulse_act - r_pf_pulse_dec;
-                  r_pf_pulse_act <= r_pf_pulse_act - 1'b1;
-               end
                
                // pulse calculation: (spd^2/dec + spd^2/acc)/2
                r_pf_spd_red <= r_pf_spd;
@@ -496,7 +471,6 @@ module Positioner_std
                
                r_pf_pulse_dec_red_in <= r_pf_spd_p2 * r_pf_dec_inv;
                r_pf_pulse_dec <= r_pf_pulse_dec_next; // pulse_dec = spd^2/dec/2
-`endif
             end
          endcase
       end
@@ -519,9 +493,11 @@ module Positioner_std
       else begin
          r_div_ready <= spd_div_ready;
          p_div_ready <= period_div_ready;
+         if(~i_pause)   //change by szzhang 20260813
          case(fsm_st)
             ST_POS_IDLE: begin
                r_pf_busy  <= 1'b0;
+               r_pf_done  <= 1'b0;   //change by szzhang 20260813
                if(i_pf_start) begin
                   r_pf_error <= 1'b0;
                   r_pf_busy  <= 1'b1;
@@ -533,7 +509,6 @@ module Positioner_std
                                  
                if(i_pf_stop) begin
                   fsm_st <= ST_POS_IDLE;
-                  r_pf_done <= 1'b1;
                end
             end
             ST_POS_INIT: begin
@@ -559,24 +534,10 @@ module Positioner_std
                         fsm_st <= ST_POS_DEC;
                end
                else begin
-`ifndef PF_SIM
                   if(r_pf_pulse_done) begin
                      if(r_pf_pulse_cal>=r_pf_pulse-1'b1 | r_pf_quickstop)
                         fsm_st <= ST_POS_DEC;
                   end
-`else
-`ifdef PF_SIM
-                  if(r_pf_spd==r_pf_spd_target | r_pf_quickstop) begin
-                     fsm_st <= ST_POS_DEC;
-                  end
-`else
-                  if(r_div_ready) begin
-                     if(r_pf_spd==r_pf_spd_target | r_pf_quickstop) begin
-                        fsm_st <= ST_POS_DEC;
-                     end
-                  end
-`endif
-`endif
                end
 
                if(i_pf_stop) begin
@@ -588,7 +549,6 @@ module Positioner_std
                r_pf_error <= 1'b0;
                r_pf_busy  <= 1'b1;
                r_pf_done  <= 1'b0;
-`ifndef PF_SIM
                if(r_pf_pulse_done) begin
                   case(r_pf_mode[3:0])
                      0: begin // stop at mini speed
@@ -605,21 +565,6 @@ module Positioner_std
                      end
                   endcase
                end
-`else
-`ifdef PF_SIM
-               if(r_pf_spd<=P_SPD_MIN) begin
-                  fsm_st <= ST_POS_IDLE;
-                  r_pf_done <= 1'b1;
-               end
-`else
-               if(r_div_ready) begin
-                  if(r_pf_spd<=P_SPD_MIN) begin
-                     fsm_st <= ST_POS_IDLE;
-                     r_pf_done <= 1'b1;
-                  end
-               end
-`endif
-`endif
 
                if(i_pf_stop) begin
                   fsm_st <= ST_POS_IDLE;
@@ -680,11 +625,7 @@ module Positioner_std
                period_div_den <= r_pf_spd;
             end
             ST_POS_ACC: begin
-`ifdef PF_SIM
-               r_pulse_start  <= 1'b0;
-`else
-               r_pulse_start  <= 1'b1;//(r_pf_pulse_count<=r_pf_pulse_period-1'b1);
-`endif
+               r_pulse_start  <= ~i_pause;
                r_pulse_period <= r_pf_pulse_period;
                r_pulse_number <= 32'd1;
                r_pulse_dir    <= r_pf_dir;
@@ -692,15 +633,15 @@ module Positioner_std
                spd_div_nom    <= {P_DIV_WIDTH{1'b1}}; // 0 - period = 10^8/spd
                spd_div_den    <= r_pf_spd[P_SPD_WIDTH-1:0]; // Speed: 0 ~ 8M, 23-bit
                period_div_start  <= r_pf_pulse_first ? (r_div_ready&r_pf_pulse_count<=r_pf_pulse_period-1'b1) : r_pf_pulse_count==0;
+`ifdef PF_SIM
+               period_div_nom <= 27'd390625; //change by szzhang 20260813
+`else
                period_div_nom <= 27'd100_000_000;
-               period_div_den <= r_pf_spd[P_SPD_WIDTH-1:0]; // Speed: 0 ~ 8M, 23-bit;    
+`endif
+               period_div_den <= r_pf_spd[P_SPD_WIDTH-1:0]; // Speed: 0 ~ 8M, 23-bit;
             end
             ST_POS_DEC: begin
-`ifdef PF_SIM
-               r_pulse_start  <= 1'b0;
-`else
-               r_pulse_start  <= 1'b1;
-`endif
+               r_pulse_start  <= ~i_pause;   //change by szzhang 20260813
                r_pulse_period <= r_pf_pulse_period;
                r_pulse_number <= 32'd1;
                r_pulse_dir    <= r_pf_dir;
@@ -708,7 +649,11 @@ module Positioner_std
                spd_div_nom    <= {P_DIV_WIDTH{1'b1}}; // 0 - period = 10^8/spd
                spd_div_den    <= r_pf_spd[P_SPD_WIDTH-1:0]; // Speed: 0 ~ 8M, 23-bit
                period_div_start  <= r_pf_pulse_count==0;
+`ifdef PF_SIM
+               period_div_nom <= 27'd390625; //change by szzhang 20260813
+`else
                period_div_nom <= 27'd100_000_000;
+`endif
                period_div_den <= r_pf_spd[P_SPD_WIDTH-1:0]; // Speed: 0 ~ 8M, 23-bit;    
             end
             default: begin

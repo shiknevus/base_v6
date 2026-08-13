@@ -110,7 +110,7 @@ module Move_fa_std
                            r_st_error <= 1'b0;
                        end
                        if(i_pf_done) begin
-                           fsm_st <= r_st_error ? ST_MOVE_ERROR : (r_pf_stop ? ST_MOVE_IDLE : ST_MOVE_DONE);
+                           fsm_st <= r_st_error ? ST_MOVE_ERROR : ST_MOVE_DONE;//change by szzhang 20260813
                        end    
                    end
                end

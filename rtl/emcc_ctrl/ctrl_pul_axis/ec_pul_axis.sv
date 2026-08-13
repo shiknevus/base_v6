@@ -60,9 +60,9 @@ module ec_pul_axis#(
     );
 	
 //----------------------------------------------------- user logic begin -----------------------------------------------------//
-	localparam		A_BHA_NUM	=	100;
-	localparam		B_BHA_NUM	=	1;
-	localparam		C_BHA_NUM	=	1;
+	localparam		A_BHA_NUM	=	200;
+	localparam		B_BHA_NUM	=	200;
+	localparam		C_BHA_NUM	=	200;
 //----------------------------------------------------- user logic end -------------------------------------------------------//
 	//PS-PL    
 	wire 	[7:0]	unit_id         ;     	
@@ -211,12 +211,17 @@ module ec_pul_axis#(
 	wire 	[0:0]	action_busy	;
 	wire 	[0:0]	action_done	;
 	wire 	[0:0]	action_error;
+	wire 			b_clr_pause	;
+	wire 			b_clr_resume;
+	wire 			b_clr_stop	;
+	wire 			b_pause		;
+	wire 			b_stop		;
 //----------------------------------------------------- user logic end -------------------------------------------------------//
 	
-	ps_rw_pl_reg#(
+	ps_rw_pl_reg_pul_axis#(
 		.REG_SPACE_BIAS 	(REG_SPACE_BIAS		),
 		.REG_SPACE_SIZE 	(REG_SPACE_SIZE		)
-)ps_rw_pl_reg_u0(
+)ps_rw_pl_reg_pul_axis_u0(
 	.clk_i			        (ps_reg_clk		)
 	,.rst_i			        (ps_reg_reset	)
 	,.i_st_wr_en		    (i_st_wr_en		)
@@ -295,6 +300,9 @@ module ec_pul_axis#(
 	,.param35				(param35		)
 	,.param36				(param36		)
 	,.param37				(param37		)
+	,.clr_pause				(b_clr_pause	)
+	,.clr_resume			(b_clr_resume	)
+	,.clr_stop				(b_clr_stop		)
 //----------------------------------------------------- user logic end -------------------------------------------------------//
 	,.irq_reg1	            (irq_reg1		)
 	,.irq_reg2	            (irq_reg2		)
@@ -371,8 +379,8 @@ module ec_pul_axis#(
     ,.i_dv_alarm			(i_dv_alarm			)
     ,.o_dv_pulse			(o_dv_pulse			)
     ,.o_dv_dir				(o_dv_dir			)
-    ,.o_dv_reset			(o_dv_reset			)
-    ,.o_dv_son				(o_dv_son			)
+    ,.i_pause				(b_pause			)
+    ,.i_stop				(b_stop				)
 	
 	,.action_busy			(action_busy)
 	,.action_done			(action_done)
@@ -425,6 +433,14 @@ module ec_pul_axis#(
 	,.b_alm_num             (b_alm_num			)
 	,.irq_o			        (irq_b				)
 	,.irq_ack_i	            (irq_b_grant		)	
+
+//----------------------------------------------------- user logic begin -----------------------------------------------------//
+    ,.o_dv_reset			(o_dv_reset			)
+    ,.o_dv_son				(o_dv_son			)
+    ,.b_pause				(b_pause			)
+    ,.b_stop				(b_stop				)
+
+//----------------------------------------------------- user logic end -------------------------------------------------------//
     );
 	 
 	tim_beh_pul_axis 
@@ -465,8 +481,6 @@ module ec_pul_axis#(
 			.m_wk_mod        	(m_wk_mod       ),
 			.m_saf_st        	(m_saf_st       ),
 			.link_m_saf_st   	(link_m_saf_st  ),
-			.sc_id				(sc_id			),
-			.ec_id           	(ec_id          ),
 			.a_en				(a_en			),
 			.b_en				(b_en			),	
 			.c_en				(c_en			),	
@@ -488,6 +502,15 @@ module ec_pul_axis#(
 			,.action_busy		(action_busy	)
 			,.action_done		(action_done	)
 			,.action_error		(action_error	)
+
+    		,.rctrl_drive_on	(param30				)
+    		,.rctrl_drive_reset	(param29			    )
+    		,.rctrl_resume		(param28			    )
+    		,.rctrl_pause		(param26				)
+    		,.rctrl_stop		(param27			    )
+    		,.b_clr_pause		(b_clr_pause			)
+    		,.b_clr_resume		(b_clr_resume			)
+    		,.b_clr_stop		(b_clr_stop				)
 //----------------------------------------------------- user logic end -------------------------------------------------------//
 		);
 		
