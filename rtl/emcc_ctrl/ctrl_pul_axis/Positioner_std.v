@@ -397,7 +397,7 @@ module Positioner_std
                r_pf_pulse_cal    <= 0;
                r_pf_pulse_dec    <= 0;
                r_pf_pulse_acc    <= 0;
-               
+               r_pf_pulse_act    <= 0;
                if(i_pf_start) begin
                   r_pf_pulse       <= i_pf_pulse;
                   r_pf_pulse_act   <= 0;

@@ -338,7 +338,26 @@ module status_beh_pul_axis#(
 	end
 
 	assign o_dv_son   = bh_disable ? ~P_EN_EFF : P_EN_EFF;
-	assign o_dv_reset = (curr_state == S_EXE && b_bhv_id == 8'd102) ? P_RST_EFF : ~P_RST_EFF;
+
+	// reset pulse 5ms
+	reg [2:0] rst_cnt;
+	reg o_dv_reset_r;
+	always@(posedge clk_i) begin
+		if(rst_i || !b_en) begin
+			o_dv_reset_r <= 1'b0;
+			rst_cnt      <= 3'd0;
+		end else if(curr_state == S_EXE && b_bhv_id == 8'd102) begin
+			o_dv_reset_r <= 1'b1;
+			rst_cnt      <= 3'd5;
+		end else if(o_dv_reset_r && i_time_1ms_vld) begin
+			if(rst_cnt <= 3'd1) begin
+				o_dv_reset_r <= 1'b0;
+				rst_cnt      <= 3'd0;
+			end else
+				rst_cnt <= rst_cnt - 1'b1;
+		end
+	end
+	assign o_dv_reset = o_dv_reset_r ? P_RST_EFF : ~P_RST_EFF;
 
 	always@(posedge clk_i) begin
 		if(rst_i || !b_en)

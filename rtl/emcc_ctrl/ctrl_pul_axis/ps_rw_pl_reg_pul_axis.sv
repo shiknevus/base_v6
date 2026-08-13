@@ -159,6 +159,9 @@ module ps_rw_pl_reg_pul_axis#(
 
 	reg  		rd_en_d1;
 	reg  		rd_en_d2;
+	reg [4:0]	a_vld_cnt;
+	reg [4:0]	b_vld_cnt;
+	reg [4:0]	c_vld_cnt;
 	wire 		rd_space_select;
 	wire 		wr_space_select;
 	wire 		wr_task_vld;
@@ -228,16 +231,19 @@ module ps_rw_pl_reg_pul_axis#(
 			a_tsc_result_vld	<= 	1'b0			;	
 			a_bhv_id       		<=	8'd0		   	;
 			a_bhv_vld			<=  1'b0			;
+			a_vld_cnt			<=	5'd0			;
 			
 			b_en				<=	1'b0		   	;
 			b_bhv_ot 			<= 	20'd0		  	;
 			b_tsc_result_rpt	<=	32'd0		   	;
 			b_tsc_result_vld	<= 	1'b0			;	
+			b_vld_cnt			<=	5'd0			;
 			
 			c_en				<=	1'b0		   	;
 			c_bhv_ot 			<= 	20'd0		   	;
 			c_tsc_result_rpt	<=	32'd0		   	;
 			c_tsc_result_vld	<= 	1'b0			;	
+			c_vld_cnt			<=	5'd0			;
 			c_bhv_gap_crl      	<=	20'd0		   	;
 
 			param1				<=	32'd0	  	;
@@ -291,19 +297,22 @@ module ps_rw_pl_reg_pul_axis#(
 			a_en			<=	(wr_task_vld && wr_task_addr == `A_EN			) ? i_st_wr_data[0] 	: a_en  		;
 			a_bhv_ot        <=	(wr_task_vld && wr_task_addr == `A_TX_OT       	) ? i_st_wr_data[19:0] 	: a_bhv_ot      ;
 			a_tsc_result_rpt<=	(wr_task_vld && wr_task_addr == `A_TX_RSULT_RPT	) ? i_st_wr_data 		: a_tsc_result_rpt;
-			a_tsc_result_vld<=	(wr_task_vld && wr_task_addr == `A_TX_RSULT_RPT	) ? 1'b1: 1'b0							;
+			a_tsc_result_vld<=	(a_vld_cnt != 5'd0);
+			a_vld_cnt		<=	(wr_task_vld && wr_task_addr == `A_TX_RSULT_RPT	) ? 5'd31 : ((a_vld_cnt != 5'd0) ? a_vld_cnt - 1'b1 : 5'd0);
 			a_bhv_id       	<=	(wr_task_vld && wr_task_addr == `A_BHV_ID      	) ? i_st_wr_data[7:0]	: a_bhv_id      ;
 			a_bhv_vld       <=	(wr_task_vld && wr_task_addr == `A_BHV_ID      	) ? 1'b1: 1'b0;
-			
+
 			b_en			<=	(wr_task_vld && wr_task_addr == `B_EN			) ? i_st_wr_data[0] 	: b_en			 ;
 			b_bhv_ot		<=	(wr_task_vld && wr_task_addr == `B_TX_OT		) ? i_st_wr_data[19:0] 	: b_bhv_ot		 ;
 			b_tsc_result_rpt<=	(wr_task_vld && wr_task_addr == `B_TX_RSULT_RPT	) ? i_st_wr_data 		: b_tsc_result_rpt;
-			b_tsc_result_vld<=	(wr_task_vld && wr_task_addr == `B_TX_RSULT_RPT	) ? 1'b1: 1'b0;
-			
+			b_tsc_result_vld<=	(b_vld_cnt != 5'd0);
+			b_vld_cnt		<=	(wr_task_vld && wr_task_addr == `B_TX_RSULT_RPT	) ? 5'd31 : ((b_vld_cnt != 5'd0) ? b_vld_cnt - 1'b1 : 5'd0);
+
 			c_en			<=	(wr_task_vld && wr_task_addr == `C_EN			) ? i_st_wr_data[0] 	: c_en			 ;
 			c_bhv_ot		<=	(wr_task_vld && wr_task_addr == `C_TX_OT		) ? i_st_wr_data[19:0] 	: c_bhv_ot		 ;
 			c_tsc_result_rpt<=	(wr_task_vld && wr_task_addr == `C_TX_RSULT_RPT	) ? i_st_wr_data 		: c_tsc_result_rpt;
-			c_tsc_result_vld<=	(wr_task_vld && wr_task_addr == `C_TX_RSULT_RPT	) ? 1'b1: 1'b0							 ;
+			c_tsc_result_vld<=	(c_vld_cnt != 5'd0);
+			c_vld_cnt		<=	(wr_task_vld && wr_task_addr == `C_TX_RSULT_RPT	) ? 5'd31 : ((c_vld_cnt != 5'd0) ? c_vld_cnt - 1'b1 : 5'd0);
 			c_bhv_gap_crl   <=	(wr_task_vld && wr_task_addr == `C_GAP_CRL     	) ? i_st_wr_data[19:0] 	: c_bhv_gap_crl	;
 			
 			param1			<=	(wr_task_vld && wr_task_addr == `PARAM1			) ? i_st_wr_data 		: param1	;
