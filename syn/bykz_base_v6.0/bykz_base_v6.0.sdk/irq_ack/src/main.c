@@ -32,7 +32,6 @@ int main(void)
 	// starts depot polling so m2s frames (pul_motor etc.) are actually sent.
 	// bit16=0 normal mode, bit31=0 no loopback.
 	Xil_Out32(PL_CFG_BASE + MST_APP_MODE, 0x00000001U);
-	xil_printf("[%08u] MST_APP_MODE <= 0x00000001 (trsf_port_en)\r\n", (unsigned)ts_ms());
 
 	// Initialize ALL components
 	xil_printf("\r\nInitializing all components...\r\n");

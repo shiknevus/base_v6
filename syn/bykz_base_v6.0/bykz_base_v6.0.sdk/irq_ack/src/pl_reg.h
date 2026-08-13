@@ -8,10 +8,8 @@
 
 #define PL_CFG_BASE          XPAR_PLCFG_M_AXI_BASEADDR    // 0xB0100000
 
-// mst app control/diag registers (inside PL_CFG_BASE window)
+// mst app control register (inside PL_CFG_BASE window)
 #define MST_APP_MODE         0x030U   // [0]=trsf_port_en; bit16=0 normal, bit31=0 no loopback
-#define LINK_STATUS          0x050U   // [1]=ch0 link(lane_up&channel_up) [0]=ch1
-#define SEND_DBG             0x068U   // [4]=link [3]=ack [2:0]=wk_state(0=IDLE 2=TX_HS 3=GEN_DAT)
 
 // Component register offset base address
 #define REG_BIAS_EC_1DI         0x0800U

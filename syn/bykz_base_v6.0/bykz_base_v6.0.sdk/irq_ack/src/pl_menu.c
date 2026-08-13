@@ -234,20 +234,10 @@ int MenuHandleKey(char key)
 		u32 p51 = Xil_In32(comp->base_addr + PARAM51);  // abs pulse (int)
 		u32 p52 = Xil_In32(comp->base_addr + PARAM52);  // abs mm (float32)
 		u32 p53 = Xil_In32(comp->base_addr + PARAM53);
-		u32 link_st = Xil_In32(PL_CFG_BASE + LINK_STATUS);
 		xil_printf("\r\n[%d:%s] abs_pulse=%d (0x%08x)  abs_mm=",
 			   cur_component, comp->name, (int)p51, (unsigned)p51);
 		PrintFp(U32ToFp(p52));
 		xil_printf("  PARAM53=0x%08x\r\n", (unsigned)p53);
-		u32 send_dbg = Xil_In32(PL_CFG_BASE + SEND_DBG);
-		xil_printf("  LINK_STATUS=0x%08x (ch0=%d ch1=%d slv_sta=%u)\r\n",
-			   (unsigned)link_st,
-			   (int)((link_st >> 1) & 1U), (int)(link_st & 1U),
-			   (unsigned)((link_st >> 24) & 0xFFU));
-		xil_printf("  SEND_DBG=0x%08x (link=%d ack=%d wk_state=%d)\r\n",
-			   (unsigned)send_dbg,
-			   (int)((send_dbg >> 4) & 1U), (int)((send_dbg >> 3) & 1U),
-			   (int)(send_dbg & 7U));
 	}
 	// Read all registers of current component
 	else if (key == 'r' || key == 'R') {
