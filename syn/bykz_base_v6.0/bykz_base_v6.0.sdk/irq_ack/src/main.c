@@ -1,6 +1,5 @@
 // @file main.c
-// Entry point only: init, main loop (event drain + fallback + timeout + menu).
-// All functionality lives in modules: util / pl_intc / pl_bhv / pl_comp / pl_menu.
+// init + main loop
 
 #include "platform.h"
 #include "xil_printf.h"
@@ -23,14 +22,10 @@ int main(void)
 	init_platform();
 
 	xil_printf("\r\n==============================================\r\n");
-	xil_printf(" PL IRQ: Multi-Component BM (pure event-driven)\r\n");
-	xil_printf(" 16-INTC dispatch architecture\r\n");
-	xil_printf(" %d components registered on INTC#0\r\n", NUM_IRQ_SLOTS);
+	xil_printf(" ec_pul_axis test (event-driven)\r\n");
 	xil_printf("==============================================\r\n");
 
-	// Enable master app transfer port: mst_app_wk_mode[0]=1 (trsf_port_en) ->
-	// starts depot polling so m2s frames (pul_motor etc.) are actually sent.
-	// bit16=0 normal mode, bit31=0 no loopback.
+	// trsf_port_en
 	Xil_Out32(PL_CFG_BASE + MST_APP_MODE, 0x00000001U);
 
 	// Initialize ALL components
@@ -52,11 +47,11 @@ int main(void)
 	while (1) {
 		IrqEvent ev;
 
-		// 1. drain event queue (ISR feeds, main-loop consumes)
+		// 1. drain events
 		while (EvPop(&ev))
 			ProcessEvent(&ev);
 
-		// 1b. INTC polling fallback (GIC ISR path may not deliver)
+		// 1b. INTC poll fallback
 		PollIntcFallback();
 
 		if (EvDropCountGet()) {
@@ -65,11 +60,11 @@ int main(void)
 			EvDropCountClear();
 		}
 
-		// 2. behavior timeout (timestamp deadline, non-blocking)
+		// 2. bhv timeout
 		if (BhvIsRunning() && (s32)(ts_ms() - BhvDeadline()) > 0)
 			BhvTimeout();
 
-		// 3. UART menu (non-blocking, so events/timeouts run while idle)
+		// 3. menu
 		key = MenuPollKey();
 		if (key != 0 && MenuHandleKey((char)key))
 			break;

@@ -1,5 +1,5 @@
 // @file pl_intc.c
-// Interrupt infrastructure: 16-INTC dispatch, component table, ISR event queue
+// 16-INTC dispatch + ISR queue
 
 #include "pl_intc.h"
 #include "pl_reg.h"
@@ -25,32 +25,22 @@ const IntcDesc intc_desc[NUM_INTC] = {
 };
 
 IrqSlot irq_table[NUM_IRQ_SLOTS] = {
-	{ "ec_1di",          0,  0, PL_CFG_BASE + REG_BIAS_EC_1DI         },
-	{ "ec_1do",          0,  1, PL_CFG_BASE + REG_BIAS_EC_1DO         },
-	{ "ec_2di_2do",      0,  2, PL_CFG_BASE + REG_BIAS_EC_2DI_2DO     },
-	{ "ec_3di_2do",      0,  3, PL_CFG_BASE + REG_BIAS_EC_3DI_2DO     },
-	{ "ec_3di_1do",      0,  4, PL_CFG_BASE + REG_BIAS_EC_3DI_1DO     },
-	{ "ec_1di_1do",      0,  5, PL_CFG_BASE + REG_BIAS_EC_1DI_1DO     },
-	{ "ec_4di_2do",      0,  6, PL_CFG_BASE + REG_BIAS_EC_4DI_2DO     },
-	{ "ec_3led",         0,  7, PL_CFG_BASE + REG_BIAS_EC_3LED        },
-	{ "ec_5di",          0,  8, PL_CFG_BASE + REG_BIAS_EC_5DI         },
-	{ "ec_pul_axis",     0,  9, PL_CFG_BASE + REG_BIAS_EC_PUL_AXIS    },
-	{ "ec_slv_pul_axis", 0, 10, PL_CFG_BASE + REG_BIAS_EC_SLV_PUL_AXIS },
+	{ "ec_pul_axis", 0, 9, PL_CFG_BASE + REG_BIAS_EC_PUL_AXIS },
 };
 
-int  cur_component = 0;          // currently selected component index [0..NUM_IRQ_SLOTS-1]
+int  cur_component = 0;
 
 static XScuGic Gic;
 static XIntc   Intc;
 
-// Event queue (ISR -> main loop)
+// ISR -> main queue
 #define EVQ_SIZE 64
 static IrqEvent evq[EVQ_SIZE];
 static volatile int  evq_head, evq_tail;
 static volatile u32  EvDropCount;
-static volatile u32  IsrCount;   // diag: how many times the ISR ran
+static volatile u32  IsrCount;   // diag
 
-// Called from ISR context only. Non-blocking; drops and counts on overflow.
+// ISR ctx
 static int EvPush(const IrqEvent *ev)
 {
 	int next = (evq_head + 1) % EVQ_SIZE;
@@ -61,7 +51,7 @@ static int EvPush(const IrqEvent *ev)
 	return 1;
 }
 
-// Called from main loop only.
+// main ctx
 int EvPop(IrqEvent *ev)
 {
 	if (evq_head == evq_tail)
@@ -71,7 +61,7 @@ int EvPop(IrqEvent *ev)
 	return 1;
 }
 
-// Per-bit ISR: capture registers, push event. No ack, no print, no wait.
+// capture + push
 static void ComponentIsr(void *ref)
 {
 	IrqSlot *slot = (IrqSlot *)ref;
@@ -83,9 +73,7 @@ static void ComponentIsr(void *ref)
 	ev.slot     = slot;
 	ev.irq_reg2 = Xil_In32(slot->base_addr + IRQ_REG2);
 	ev.irq_reg1 = 0;
-	// IRQ_REG1 may lag the INTC edge by a few AXI cycles; retry briefly.
-	// Dropping this event loses the edge forever (level source + edge INTC),
-	// because the bit is cleared by IAR right after this handler returns.
+	// IRQ_REG1 may lag the INTC edge, retry
 	for (i = 0; i < 8; i++) {
 		ev.irq_reg1 = Xil_In32(slot->base_addr + IRQ_REG1);
 		if (ev.irq_reg1 != 0U) break;
@@ -111,9 +99,7 @@ void EvDropCountClear(void)
 	EvDropCount = 0;
 }
 
-//---------------------------------------------------------------------------
-// Interrupt system setup
-//---------------------------------------------------------------------------
+// interrupt setup
 int SetupInterruptSystem(void)
 {
 	XScuGic_Config *GicCfg;
@@ -125,11 +111,11 @@ int SetupInterruptSystem(void)
 	Status = XScuGic_CfgInitialize(&Gic, GicCfg, GicCfg->CpuBaseAddress);
 	if (Status != XST_SUCCESS) return XST_FAILURE;
 
-	// Initialize all INTCs used by irq_table
+	// init INTC
 	Status = XIntc_Initialize(&Intc, intc_desc[0].dev_id);
 	if (Status != XST_SUCCESS) return XST_FAILURE;
 
-	// Per-bit handler: hardware dispatches, no software polling
+	// per-bit handler
 	for (i = 0; i < NUM_IRQ_SLOTS; i++) {
 		if (!irq_table[i].name) continue;
 		XIntc_Connect(&Intc, irq_table[i].intc_bit,
@@ -143,7 +129,7 @@ int SetupInterruptSystem(void)
 		XIntc_Enable(&Intc, irq_table[i].intc_bit);
 	}
 
-	// Connect INTC#0 to GIC
+	// INTC#0 -> GIC
 	Status = XScuGic_Connect(&Gic, intc_desc[0].gic_spi,
 				 (Xil_ExceptionHandler)XIntc_InterruptHandler, &Intc);
 	if (Status != XST_SUCCESS) return XST_FAILURE;

@@ -1,10 +1,10 @@
 // @file util.c
-// Time stamp + float32 helpers (xil_printf has no %f support)
+// time + float32
 
 #include "util.h"
 #include "xil_printf.h"
 
-// ARM generic timer helpers (Cortex-A53)
+// ARM timer
 static inline u64 get_cntpct(void) {
 	u64 cnt;
 	__asm__ volatile("mrs %0, cntpct_el0" : "=r"(cnt));
@@ -36,7 +36,7 @@ float U32ToFp(u32 u)
 	return c.f;
 }
 
-// parse "[-]ddd[.ddd]" to float, no libc dependency
+// parse float
 float ParseFloat(const char *s)
 {
 	float val = 0.0f, frac = 0.1f;
@@ -63,7 +63,7 @@ u32 ParseUint(const char *s)
 	return v;
 }
 
-// print float with 3 decimals
+// print float
 void PrintFp(float f)
 {
 	u32 ip, fp;

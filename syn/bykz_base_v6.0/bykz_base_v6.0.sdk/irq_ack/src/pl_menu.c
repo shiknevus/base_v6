@@ -1,5 +1,5 @@
 // @file pl_menu.c
-// Interactive UART menu + input mode state machine
+// menu + input FSM
 
 #include "pl_menu.h"
 #include "pl_reg.h"
@@ -9,26 +9,25 @@
 #include "util.h"
 
 #include "platform.h"
+#include "sleep.h"
 #include "xil_io.h"
 #include "xil_printf.h"
 #include "xparameters.h"
 #include "xuartps_hw.h"
 
-// Input mode state machine
+// input mode
 typedef enum {
-	MODE_BEHAVIOR,       // 0~f triggers behavior on current component
-	MODE_SELECT_COMP,    // waiting for digits to select component
-	MODE_SET_PARAM,      // waiting for param selection (1~6)
-	MODE_PARAM_VAL,      // waiting for value input
-	MODE_EXT_BHV,        // '.' pressed: enter behavior number (1-100)
+	MODE_BEHAVIOR,       // 0~f behavior
+	MODE_SET_PARAM,      // param sel 1~6
+	MODE_PARAM_VAL,      // value input
+	MODE_EXT_BHV,        // '.' ext bhv
 } InputMode;
 
 static InputMode input_mode = MODE_BEHAVIOR;
-static int  comp_select_buf = -1;    // accumulated digit buffer, -1 = empty
-static int  param_sel        = 0;    // which param is being edited (1..6)
-static int  ext_bhv_val      = -1;   // accumulated behavior number, -1 = none
+static int  param_sel        = 0;    // param sel
+static int  ext_bhv_val      = -1;   // bhv buf
 #define PARAM_STR_MAX 24
-static char param_str_buf[PARAM_STR_MAX];  // decimal value accumulator
+static char param_str_buf[PARAM_STR_MAX];  // value buf
 static int  param_str_len = 0;
 
 int MenuPollKey(void)
@@ -49,69 +48,23 @@ void PrintMenu(void)
 		   cur_component, irq_table[cur_component].name);
 	xil_printf("===========================================\r\n");
 	xil_printf(" Keys:\r\n");
-	xil_printf("  0~f      - Send behavior 0~15 to CURRENT component\r\n");
-	xil_printf("  .        - Enter behavior number (1-100)\r\n");
-	xil_printf("  c        - Enter component-select mode \r\n");
-	xil_printf("  w        - Set motion params (spd/acc/dec/target_mm/step_mm/factor)\r\n");
-	xil_printf("  p        - Read position (pulse + mm) of current component\r\n");
-	xil_printf("  r        - Read all registers of current component\r\n");
-	xil_printf("  m        - Show this menu\r\n");
-	xil_printf("  i        - Init/re-init current component\r\n");
-	xil_printf("  I        - Init ALL components\r\n");
-	xil_printf("  s        - Scan: read PARAM51 of all components\r\n");
+	xil_printf("  0~f / .  - Behavior (A ch)\r\n");
+	xil_printf("  x/v/k    - Pause / Resume / Stop (B ch)\r\n");
+	xil_printf("  d        - Drive reset (B ch)\r\n");
+	xil_printf("  e/f      - Servo on / off (B ch)\r\n");
+	xil_printf("  w        - Set motion params\r\n");
+	xil_printf("  p        - Read position (mm)\r\n");
+	xil_printf("  r        - Read all registers\r\n");
+	xil_printf("  m        - Menu\r\n");
+	xil_printf("  i        - Re-init\r\n");
 	xil_printf("  q        - Exit\r\n");
-	xil_printf("===========================================\r\n");
-	xil_printf(" Component list:\r\n");
-	for (int i = 0; i < NUM_IRQ_SLOTS; i++) {
-		xil_printf("  [%d] %s%s (bit%u @0x%08x)\r\n",
-			   i, irq_table[i].name,
-			   (i == cur_component) ? " <--" : "",
-			   irq_table[i].intc_bit, (unsigned)irq_table[i].base_addr);
-	}
 	xil_printf("===========================================\r\n");
 }
 
 int MenuHandleKey(char key)
 {
-	// mode branches first (they own the key while active)
-	if (input_mode == MODE_SELECT_COMP) {
-		// Accumulate digits, Enter to confirm, Esc to cancel
-		if (key >= '0' && key <= '9') {
-			int d = (int)(key - '0');
-			if (comp_select_buf < 0)
-				comp_select_buf = d;
-			else
-				comp_select_buf = comp_select_buf * 10 + d;
-			xil_printf("%c", key);
-			if (comp_select_buf > NUM_IRQ_SLOTS - 1) {
-				xil_printf("\r\nInvalid index %d (max %d)\r\n",
-					   comp_select_buf, NUM_IRQ_SLOTS - 1);
-				comp_select_buf = -1;
-				input_mode = MODE_BEHAVIOR;
-			}
-			// else: stay in MODE_SELECT_COMP for more digits
-		} else if (key == '\r' || key == '\n') {
-			// Enter confirms selection
-			if (comp_select_buf >= 0) {
-				cur_component = comp_select_buf;
-				xil_printf("\r\n>>> Switched to [%d] %s <<<\r\n",
-					   cur_component,
-					   irq_table[cur_component].name);
-			} else {
-				xil_printf("\r\nNo digit, cancelled.\r\n");
-			}
-			comp_select_buf = -1;
-			input_mode = MODE_BEHAVIOR;
-		} else if (key == 0x1B || key == 0x7F || key == 0x08) {
-			// Esc / Backspace / Del -> cancel
-			xil_printf("\r\nCancelled.\r\n");
-			comp_select_buf = -1;
-			input_mode = MODE_BEHAVIOR;
-		}
-		/* else: ignore other chars, stay in MODE_SELECT_COMP */
-	}
-	// Param config: select which parameter
-	else if (input_mode == MODE_SET_PARAM) {
+	// modes first
+	if (input_mode == MODE_SET_PARAM) {
 		if (key >= '1' && key <= '6') {
 			param_sel = (int)(key - '0');
 			param_str_len = 0;
@@ -123,7 +76,7 @@ int MenuHandleKey(char key)
 			input_mode = MODE_BEHAVIOR;
 		}
 	}
-	// Param config: enter decimal value (string buffer, supports "[-]ddd[.ddd]")
+	// value input
 	else if (input_mode == MODE_PARAM_VAL) {
 		if ((key >= '0' && key <= '9') ||
 		    key == '.' || key == '-') {
@@ -143,7 +96,7 @@ int MenuHandleKey(char key)
 			param_str_buf[0] = 0;
 			input_mode = MODE_BEHAVIOR;
 		} else if (key == 0x7F || key == 0x08) {
-			// backspace: drop last char
+			// backspace
 			if (param_str_len > 0) {
 				param_str_len--;
 				param_str_buf[param_str_len] = 0;
@@ -156,7 +109,7 @@ int MenuHandleKey(char key)
 			input_mode = MODE_BEHAVIOR;
 		}
 	}
-	// Extended behavior number (1-100): accumulate digits, Enter to run
+	// ext bhv
 	else if (input_mode == MODE_EXT_BHV) {
 		if (key >= '0' && key <= '9') {
 			int d = (int)(key - '0');
@@ -195,23 +148,53 @@ int MenuHandleKey(char key)
 		}
 		/* else: ignore other chars, stay in MODE_EXT_BHV */
 	}
-	// Component select: enter selection mode
-	else if (key == 'c' || key == 'C') {
-		input_mode = MODE_SELECT_COMP;
-		xil_printf("\r\nSelect component (0-%d): ", NUM_IRQ_SLOTS - 1);
-	}
-	// Set motion params
+	// params
 	else if (key == 'w' || key == 'W') {
 		input_mode = MODE_SET_PARAM;
 		PrintParamMenu();
 	}
-	// Extended behavior number mode
+	// ext bhv
 	else if (key == '.') {
 		input_mode = MODE_EXT_BHV;
 		ext_bhv_val = -1;
 		xil_printf("\r\nEnter behavior (1-100): ");
 	}
-	// Behavior hex digits (0-9, a-f, A-F)
+	// B: self-dispatch + auto-clear
+	else if (key == 'x') {
+		IrqSlot *comp = &irq_table[cur_component];
+		Xil_Out32(comp->base_addr + PARAM26, 1U);   // pause
+		xil_printf("\r\n>>> [%d:%s] PAUSE <<<\r\n", cur_component, comp->name);
+	}
+	else if (key == 'v') {
+		IrqSlot *comp = &irq_table[cur_component];
+		Xil_Out32(comp->base_addr + PARAM28, 1U);   // P28 first
+		Xil_Out32(comp->base_addr + PARAM26, 1U);
+		xil_printf("\r\n>>> [%d:%s] RESUME <<<\r\n", cur_component, comp->name);
+	}
+	else if (key == 'k') {
+		IrqSlot *comp = &irq_table[cur_component];
+		Xil_Out32(comp->base_addr + PARAM27, 1U);   // P27 first
+		Xil_Out32(comp->base_addr + PARAM26, 1U);
+		xil_printf("\r\n>>> [%d:%s] STOP <<<\r\n", cur_component, comp->name);
+	}
+	else if (key == 'd') {
+		IrqSlot *comp = &irq_table[cur_component];
+		Xil_Out32(comp->base_addr + PARAM29, 1U);   // drive reset
+		usleep(10000);
+		Xil_Out32(comp->base_addr + PARAM29, 0U);
+		xil_printf("\r\n>>> [%d:%s] DRIVE RESET <<<\r\n", cur_component, comp->name);
+	}
+	else if (key == 'e') {
+		IrqSlot *comp = &irq_table[cur_component];
+		Xil_Out32(comp->base_addr + PARAM30, 1U);   // son on
+		xil_printf("\r\n>>> [%d:%s] SON ON <<<\r\n", cur_component, comp->name);
+	}
+	else if (key == 'f') {
+		IrqSlot *comp = &irq_table[cur_component];
+		Xil_Out32(comp->base_addr + PARAM30, 0U);   // son off
+		xil_printf("\r\n>>> [%d:%s] SON OFF <<<\r\n", cur_component, comp->name);
+	}
+	// hex bhv
 	else if ((key >= '0' && key <= '9') ||
 		 (key >= 'a' && key <= 'f') ||
 		 (key >= 'A' && key <= 'F')) {
@@ -228,53 +211,31 @@ int MenuHandleKey(char key)
 			BhvStart(comp, bhv);
 		}
 	}
-	// Read position of current component
+	// position
 	else if (key == 'p' || key == 'P') {
 		IrqSlot *comp = &irq_table[cur_component];
-		u32 p51 = Xil_In32(comp->base_addr + PARAM51);  // abs pulse (int)
-		u32 p52 = Xil_In32(comp->base_addr + PARAM52);  // abs mm (float32)
+		u32 p51 = Xil_In32(comp->base_addr + PARAM51);
 		u32 p53 = Xil_In32(comp->base_addr + PARAM53);
-		xil_printf("\r\n[%d:%s] abs_pulse=%d (0x%08x)  abs_mm=",
+		xil_printf("\r\n[%d:%s] abs_pulse=%d (0x%08x) = ",
 			   cur_component, comp->name, (int)p51, (unsigned)p51);
-		PrintFp(U32ToFp(p52));
-		xil_printf("  PARAM53=0x%08x\r\n", (unsigned)p53);
+		PrintFp(PulseToMm(p51));
+		xil_printf(" mm  PARAM53=0x%08x\r\n", (unsigned)p53);
 	}
-	// Read all registers of current component
+	// regs
 	else if (key == 'r' || key == 'R') {
 		IrqSlot *comp = &irq_table[cur_component];
 		xil_printf("\r\n");
 		PlRegRead(comp->base_addr, comp->name);
 	}
-	// Re-init current component
+	// re-init
 	else if (key == 'i') {
 		IrqSlot *comp = &irq_table[cur_component];
 		xil_printf("\r\nRe-init [%d] %s...\r\n",
 			   cur_component, comp->name);
-		if (CompIsPulAxis(comp->base_addr))
-			PlRegWritePulAxis(comp->base_addr);
-		else
-			PlRegWrite(comp->base_addr);
+		PlRegWritePulAxis(comp->base_addr);
 		PlRegRead(comp->base_addr, comp->name);
 	}
-	// Init ALL components
-	else if (key == 'I') {
-		xil_printf("\r\nRe-initializing ALL components...\r\n");
-		CompInitAll();
-		xil_printf("All components re-initialized.\r\n");
-	}
-	// Scan all components PARAM51
-	else if (key == 's' || key == 'S') {
-		xil_printf("\r\n=== Scanning all components ===\r\n");
-		for (int i = 0; i < NUM_IRQ_SLOTS; i++) {
-			u32 p51 = Xil_In32(irq_table[i].base_addr + PARAM51);
-			u32 irq1 = Xil_In32(irq_table[i].base_addr + IRQ_REG1);
-			xil_printf("  [%d] %-20s PARAM51=0x%08x IRQ_REG1=0x%08x\r\n",
-				   i, irq_table[i].name,
-				   (unsigned)p51, (unsigned)irq1);
-		}
-		xil_printf("=== Scan complete ===\r\n");
-	}
-	// Show menu
+	// menu
 	else if (key == 'm' || key == 'M') {
 		PrintMenu();
 	}

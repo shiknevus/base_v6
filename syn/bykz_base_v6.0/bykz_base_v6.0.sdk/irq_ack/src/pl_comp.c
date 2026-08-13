@@ -1,5 +1,5 @@
 // @file pl_comp.c
-// Component register access + motion params (main-loop context)
+// reg access + motion params
 
 #include "pl_comp.h"
 #include "pl_reg.h"
@@ -9,14 +9,15 @@
 #include "xil_io.h"
 #include "xil_printf.h"
 
-u32  param_spd         = 0x00000064U; // PARAM35: spd (kpps)
-u32  param_acc         = 0x00000064U; // PARAM5:  acc
-u32  param_dec         = 0x00000064U; // PARAM34: dec
-float param_target_mm  = 500.0f;      // PARAM36: move target (mm)
-float param_step_mm    = 50.0f;       // PARAM37: jog step (mm)
-u32  param_factor      = 1000U;       // PARAM4:  pulse/mm
+float param_spd       = 20.0f;        // spd mm/s
+float param_acc       = 100.0f;       // acc mm/s2
+float param_dec       = 100.0f;       // dec mm/s2
+float param_target_mm = 500.0f;       // target mm
+float param_step_mm   = 50.0f;        // step mm
+u32  param_factor     = 50000U;       // pulse/mm 
 
 // common component init
+// common init
 void PlRegWrite(u32 base_addr)
 {
 	Xil_Out32(base_addr + RST_EN,  0x00000000U);
@@ -24,37 +25,34 @@ void PlRegWrite(u32 base_addr)
 	Xil_Out32(base_addr + SC_ID,   0x00000066U);
 	Xil_Out32(base_addr + EC_ID,   0x00000088U);
 	Xil_Out32(base_addr + A_EN,    0x00000001U);
-	Xil_Out32(base_addr + B_EN,    0x00000000U);
 	Xil_Out32(base_addr + C_EN,    0x00000000U);
-	// A_TX_OT: RTL tx timeout in seconds (20-bit, 1s tick). 30s default,
-	// BhvStart overrides per behavior.
 	Xil_Out32(base_addr + A_TX_OT, 30U);
 }
 
-// ec_pul_axis specific initialization
+// pul_axis init
 void PlRegWritePulAxis(u32 base_addr)
 {
 	PlRegWrite(base_addr);  // common init first
+	Xil_Out32(base_addr + B_EN,    0x00000001U);
+	Xil_Out32(base_addr + B_TX_OT, 30U);
 
 	Xil_Out32(base_addr + PARAM1,  0x00002710U); // rcfg_spd_max
 	Xil_Out32(base_addr + PARAM2,  0x00002710U); // rcfg_acc_max
 	Xil_Out32(base_addr + PARAM3,  0x00002710U); // rcfg_dec_max
-	// PARAM4 (factor) not written: unused in RTL, PS keeps it for mm->pulse
-	Xil_Out32(base_addr + PARAM5,  param_acc);      // home/jog/move_acc
-	Xil_Out32(base_addr + PARAM33, 0x00004E20U);    // rcfg_touch_spd
-	Xil_Out32(base_addr + PARAM34, param_dec);      // home/jog/move_dec
-	Xil_Out32(base_addr + PARAM35, param_spd);      // home/jog/move_spd (kpps)
-	// PARAM36/37 are INTEGER pulses in the RTL (no mm->pulse logic), the
-	// PS applies the factor here.
+	Xil_Out32(base_addr + PARAM5,  (u32)(param_acc * (float)param_factor / 1000.0f)); // acc
+	Xil_Out32(base_addr + PARAM33, 0x00004E20U);    // touch_spd
+	Xil_Out32(base_addr + PARAM34, (u32)(param_dec * (float)param_factor / 1000.0f)); // dec
+	Xil_Out32(base_addr + PARAM35, (u32)(param_spd * (float)param_factor / 1000.0f)); // spd
+	// mm -> pulses
 	Xil_Out32(base_addr + PARAM36, (u32)(param_target_mm * (float)param_factor));
 	Xil_Out32(base_addr + PARAM37, (u32)(param_step_mm   * (float)param_factor));
-	// control regs: all inactive, drive_on = 1; PARAM16[0] = jog dir (POS)
-	Xil_Out32(base_addr + PARAM16, 0x00000001U);    // rserv_dir (jog dir)
-	Xil_Out32(base_addr + PARAM26, 0x00000000U);    // rctrl_pause
-	Xil_Out32(base_addr + PARAM27, 0x00000000U);    // rctrl_stop
-	Xil_Out32(base_addr + PARAM28, 0x00000000U);    // rctrl_resume
-	Xil_Out32(base_addr + PARAM29, 0x00000000U);    // rctrl_drive_reset
-	Xil_Out32(base_addr + PARAM30, 0x00000001U);    // rctrl_drive_on
+	// drive_on=1, dir POS
+	Xil_Out32(base_addr + PARAM16, 0x00000001U);
+	Xil_Out32(base_addr + PARAM26, 0x00000000U);
+	Xil_Out32(base_addr + PARAM27, 0x00000000U);
+	Xil_Out32(base_addr + PARAM28, 0x00000000U);
+	Xil_Out32(base_addr + PARAM29, 0x00000000U);
+	Xil_Out32(base_addr + PARAM30, 0x00000001U);
 }
 
 void PlRegRead(u32 base_addr, const char *name)
@@ -86,38 +84,42 @@ void PlRegRead(u32 base_addr, const char *name)
 		(unsigned)Xil_In32(base_addr + PARAM37));
 	PrintFp(U32ToFp(Xil_In32(base_addr + PARAM37)));
 	xil_printf("\r\n");
-	xil_printf("  PARAM16=0x%08x (jog dir) PARAM26=0x%08x (pause) PARAM27=0x%08x (stop) PARAM28=0x%08x (resume)\r\n",
+	xil_printf("  PARAM16=0x%08x (dir) P26=0x%08x (pause) P27=0x%08x (stop) P28=0x%08x (resume)\r\n",
 		(unsigned)Xil_In32(base_addr + PARAM16),
 		(unsigned)Xil_In32(base_addr + PARAM26),
+		(unsigned)Xil_In32(base_addr + PARAM27),
 		(unsigned)Xil_In32(base_addr + PARAM28));
 	xil_printf("  PARAM29=0x%08x (drv_reset) PARAM30=0x%08x (drv_on)\r\n",
 		(unsigned)Xil_In32(base_addr + PARAM29),
 		(unsigned)Xil_In32(base_addr + PARAM30));
-	xil_printf("  PARAM51=0x%08x (abs pulse) PARAM52=0x%08x (abs mm) PARAM53=0x%08x\r\n",
-		(unsigned)Xil_In32(base_addr + PARAM51),
-		(unsigned)Xil_In32(base_addr + PARAM52),
+	u32 p51 = Xil_In32(base_addr + PARAM51);
+	xil_printf("  PARAM51=0x%08x (abs pulse = ", (unsigned)p51);
+	PrintFp(PulseToMm(p51));
+	xil_printf(" mm) PARAM53=0x%08x\r\n",
 		(unsigned)Xil_In32(base_addr + PARAM53));
+	xil_printf("  DEBUG1=0x%08x (A fsm) 2=0x%08x 3=0x%08x 4=0x%08x 5=0x%08x\r\n",
+		(unsigned)Xil_In32(base_addr + DEBUG_REG1),
+		(unsigned)Xil_In32(base_addr + DEBUG_REG2),
+		(unsigned)Xil_In32(base_addr + DEBUG_REG3),
+		(unsigned)Xil_In32(base_addr + DEBUG_REG4),
+		(unsigned)Xil_In32(base_addr + DEBUG_REG5));
+	xil_printf("  B_BHV_ID=0x%08x B_TX_OT=0x%08x\r\n",
+		(unsigned)Xil_In32(base_addr + B_BHV_ID),
+		(unsigned)Xil_In32(base_addr + B_TX_OT));
 }
 
-int CompIsPulAxis(u32 base_addr)
+// pulse -> mm
+float PulseToMm(u32 pulse)
 {
-	return (base_addr == (PL_CFG_BASE + REG_BIAS_EC_PUL_AXIS) ||
-		base_addr == (PL_CFG_BASE + REG_BIAS_EC_SLV_PUL_AXIS));
+	return (float)(int)pulse / (float)param_factor;
 }
 
 void CompInitAll(void)
 {
 	for (int i = 0; i < NUM_IRQ_SLOTS; i++) {
-		if (CompIsPulAxis(irq_table[i].base_addr)) {
-			PlRegWritePulAxis(irq_table[i].base_addr);
-			xil_printf("  [%d] pul_axis init @0x%08x\r\n",
-				   i, (unsigned)irq_table[i].base_addr);
-		} else {
-			PlRegWrite(irq_table[i].base_addr);
-			xil_printf("  [%d] %s init @0x%08x\r\n",
-				   i, irq_table[i].name,
-				   (unsigned)irq_table[i].base_addr);
-		}
+		PlRegWritePulAxis(irq_table[i].base_addr);
+		xil_printf("  [%d] pul_axis init @0x%08x\r\n",
+			   i, (unsigned)irq_table[i].base_addr);
 	}
 }
 
@@ -134,38 +136,38 @@ const char* ParamName(int sel)
 	}
 }
 
-// Write one param (value as decimal string) to current component's register
+// write param
 void ParamWriteCur(int sel, const char *str)
 {
 	IrqSlot *comp = &irq_table[cur_component];
 	u32 off;
 	switch (sel) {
-		case 1: param_spd   = ParseUint(str); off = PARAM35; break;
-		case 2: param_acc   = ParseUint(str); off = PARAM5;  break;
-		case 3: param_dec   = ParseUint(str); off = PARAM34; break;
+		case 1: param_spd = ParseFloat(str); off = PARAM35; break;
+		case 2: param_acc = ParseFloat(str); off = PARAM5;  break;
+		case 3: param_dec = ParseFloat(str); off = PARAM34; break;
 		case 4: param_target_mm = ParseFloat(str); off = PARAM36; break;
 		case 5: param_step_mm   = ParseFloat(str); off = PARAM37; break;
 		case 6: param_factor = ParseUint(str); off = PARAM4;  break;
 		default: return;
 	}
-	if (sel == 4 || sel == 5) {
-		// RTL expects integer pulses; convert mm -> pulse via the factor.
-		float mm = (sel == 4) ? param_target_mm : param_step_mm;
-		u32 pulse = (u32)(mm * (float)param_factor);
-		Xil_Out32(comp->base_addr + off, pulse);
-		xil_printf("  [%d:%s] PARAM%u(%-9s) <= ", cur_component, comp->name,
-			   (unsigned)(sel == 4 ? 36 : 37), ParamName(sel));
-		PrintFp(mm);
-		xil_printf(" mm = %u pulse\r\n", (unsigned)pulse);
-	} else {
-		u32 v = (sel == 1) ? param_spd : (sel == 2) ? param_acc :
-			(sel == 3) ? param_dec : param_factor;
+	if (sel >= 1 && sel <= 5) {
+		// mm -> pulses / kpps
+		float vf = (sel == 1) ? param_spd : (sel == 2) ? param_acc :
+			   (sel == 3) ? param_dec : (sel == 4) ? param_target_mm : param_step_mm;
+		u32 v = (sel == 4 || sel == 5)
+			? (u32)(vf * (float)param_factor)
+			: (u32)(vf * (float)param_factor / 1000.0f);
 		Xil_Out32(comp->base_addr + off, v);
-		xil_printf("  [%d:%s] PARAM%u(%-9s) <= %u (0x%08x)%s\r\n",
-			   cur_component, comp->name,
-			   (unsigned)(sel == 1 ? 35 : sel == 2 ? 5 : sel == 3 ? 34 : 4),
-			   ParamName(sel), (unsigned)v, (unsigned)v,
-			   (sel == 1) ? " kpps" : (sel == 6) ? " pulse/mm" : "");
+		xil_printf("  [%d:%s] PARAM%u(%-9s) <= ", cur_component, comp->name,
+			   (unsigned)(sel == 1 ? 35 : sel == 2 ? 5 : sel == 3 ? 34 : sel == 4 ? 36 : 37),
+			   ParamName(sel));
+		PrintFp(vf);
+		xil_printf(" -> %u\r\n", (unsigned)v);
+	} else {
+		u32 v = param_factor;
+		Xil_Out32(comp->base_addr + off, v);
+		xil_printf("  [%d:%s] PARAM4(%-9s) <= %u (0x%08x) pulse/mm\r\n",
+			   cur_component, comp->name, ParamName(sel), (unsigned)v, (unsigned)v);
 	}
 }
 
@@ -173,9 +175,15 @@ void PrintParamMenu(void)
 {
 	IrqSlot *comp = &irq_table[cur_component];
 	xil_printf("\r\n--- Set Param on [%d] %s ---\r\n", cur_component, comp->name);
-	xil_printf("  1: spd    (PARAM35) = %u (0x%08x) kpps\r\n", (unsigned)param_spd, (unsigned)param_spd);
-	xil_printf("  2: acc    (PARAM5)  = %u (0x%08x)\r\n", (unsigned)param_acc, (unsigned)param_acc);
-	xil_printf("  3: dec    (PARAM34) = %u (0x%08x)\r\n", (unsigned)param_dec, (unsigned)param_dec);
+	xil_printf("  1: spd    (PARAM35) = ");
+	PrintFp(param_spd);
+	xil_printf(" mm/s = %u kpps\r\n", (unsigned)(param_spd * (float)param_factor / 1000.0f));
+	xil_printf("  2: acc    (PARAM5)  = ");
+	PrintFp(param_acc);
+	xil_printf(" mm/s2 = %u kpps/s\r\n", (unsigned)(param_acc * (float)param_factor / 1000.0f));
+	xil_printf("  3: dec    (PARAM34) = ");
+	PrintFp(param_dec);
+	xil_printf(" mm/s2 = %u kpps/s\r\n", (unsigned)(param_dec * (float)param_factor / 1000.0f));
 	xil_printf("  4: target (PARAM36) = ");
 	PrintFp(param_target_mm);
 	xil_printf(" mm = %u pulse\r\n", (unsigned)(param_target_mm * (float)param_factor));
