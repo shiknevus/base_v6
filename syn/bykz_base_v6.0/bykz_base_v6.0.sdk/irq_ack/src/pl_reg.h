@@ -1,5 +1,5 @@
 // @file pl_reg.h
-// PL register map: ec_pul_axis
+// PL register map: mirror of rtl/include_files/reg_addr_pl.vh, keep in sync
 
 #ifndef PL_REG_H
 #define PL_REG_H
@@ -8,50 +8,123 @@
 
 #define PL_CFG_BASE          XPAR_PLCFG_M_AXI_BASEADDR    // 0xB0100000
 
-// mst app ctrl
-#define MST_APP_MODE         0x030U   // [0]=trsf_port_en
-
 #define REG_BIAS_EC_PUL_AXIS 0x1A00U
 
-// Common register offsets
-#define IRQ_REG1             0x000U
-#define IRQ_REG2             0x004U
+// common register offsets
+#define IRQ_REG1             0x000U   // {ec_id,sc_id,bhv_id,tx_id}
+#define IRQ_REG2             0x004U   // {alm_num,24'd0}
 #define RST_EN               0x008U
 #define EC_ID                0x00CU
 #define SC_ID                0x010U
 #define BHV_PRIORITY         0x014U
+#define UNIT_ID              0x018U
+#define UNIT_ECTRL           0x01CU
+#define UNIT_ST              0x020U
+#define M_ID                 0x024U
+#define M_ECTRL              0x028U
+#define M_ST                 0x02CU
+#define M_WK_MOD             0x030U
+#define BHV_EN               0x034U
+#define M_SAF_ST             0x038U
+#define LINK_M_SAF_ST        0x03CU
+
+// A ch (proactive)
+#define A_TASK_ID            0x054U
+#define A_TASK_BHV_ID        0x058U
 #define A_EN                 0x05CU
+#define EC_CHA_ST            0x060U
 #define A_TX_OT              0x064U
 #define A_TX_RSULT_RPT       0x068U
+#define A_ALM_NUM            0x06CU
+#define A_TX_ID              0x070U
 #define A_BHV_ID             0x074U
+
+// B ch (status)
 #define B_EN                 0x084U
+#define EC_CHB_ST            0x088U
 #define B_TX_OT              0x08CU
 #define B_TX_RSULT_RPT       0x090U
+#define B_ALM_NUM            0x094U
+#define B_TX_ID              0x098U
 #define B_BHV_ID             0x09CU
-#define C_EN                 0x0ACU
 
-// PARAM register offsets
+// C ch (timing)
+#define C_EN                 0x0ACU
+#define EC_CHC_ST            0x0B0U
+#define C_TX_OT              0x0B4U
+#define C_TX_RSULT_RPT       0x0B8U
+#define C_ALM_NUM            0x0BCU
+#define C_TX_ID              0x0C0U
+#define C_BHV_ID             0x0C4U
+#define C_GAP_CRL            0x0C8U
+
+// PARAM1-15
 #define PARAM1               0x0D8U
 #define PARAM2               0x0DCU
 #define PARAM3               0x0E0U
-#define PARAM4               0x0E4U   // factor (PS side only)
-#define PARAM5               0x0E8U   // acc
-#define PARAM16              0x114U   // rserv_dir [0]
-#define PARAM26              0x13CU   // rctrl_pause
-#define PARAM27              0x140U   // rctrl_stop
-#define PARAM28              0x144U   // rctrl_resume
-#define PARAM29              0x148U   // rctrl_drive_reset
-#define PARAM30              0x14CU   // rctrl_drive_on
-#define PARAM33              0x1A8U   // touch_spd
-#define PARAM34              0x1ACU   // dec
-#define PARAM35              0x1B0U   // spd
-#define PARAM36              0x1B4U   // target pulse
-#define PARAM37              0x1B8U   // step pulse
-#define PARAM51              0x150U   // abspos
+#define PARAM4               0x0E4U
+#define PARAM5               0x0E8U
+#define PARAM6               0x0ECU
+#define PARAM7               0x0F0U
+#define PARAM8               0x0F4U
+#define PARAM9               0x0F8U
+#define PARAM10              0x0FCU
+#define PARAM11              0x100U
+#define PARAM12              0x104U
+#define PARAM13              0x108U
+#define PARAM14              0x10CU
+#define PARAM15              0x110U
+
+// PARAM16-30
+#define PARAM16              0x114U
+#define PARAM17              0x118U
+#define PARAM18              0x11CU
+#define PARAM19              0x120U
+#define PARAM20              0x124U
+#define PARAM21              0x128U
+#define PARAM22              0x12CU
+#define PARAM23              0x130U
+#define PARAM24              0x134U
+#define PARAM25              0x138U
+#define PARAM26              0x13CU
+#define PARAM27              0x140U
+#define PARAM28              0x144U
+#define PARAM29              0x148U
+#define PARAM30              0x14CU
+
+// PARAM31-37
+#define PARAM31              0x1A0U
+#define PARAM32              0x1A4U
+#define PARAM33              0x1A8U
+#define PARAM34              0x1ACU
+#define PARAM35              0x1B0U
+#define PARAM36              0x1B4U
+#define PARAM37              0x1B8U
+
+// PARAM51-70
+#define PARAM51              0x150U
+#define PARAM52              0x154U
 #define PARAM53              0x158U
+#define PARAM54              0x15CU
+#define PARAM55              0x160U
+#define PARAM56              0x164U
+#define PARAM57              0x168U
+#define PARAM58              0x16CU
+#define PARAM59              0x170U
+#define PARAM60              0x174U
+#define PARAM61              0x178U
+#define PARAM62              0x17CU
+#define PARAM63              0x180U
+#define PARAM64              0x184U
+#define PARAM65              0x188U
+#define PARAM66              0x18CU
+#define PARAM67              0x190U
+#define PARAM68              0x194U
+#define PARAM69              0x198U
+#define PARAM70              0x19CU
 
 // debug
-#define DEBUG_REG1           0x1ECU   // A FSM {m3,m2,m1,cur}
+#define DEBUG_REG1           0x1ECU
 #define DEBUG_REG2           0x1F0U
 #define DEBUG_REG3           0x1F4U
 #define DEBUG_REG4           0x1F8U

@@ -1,5 +1,5 @@
 // @file main.c
-// init + main loop
+// bare-metal: init regs -> enable interrupt -> serial cmds; irq ack in ISR + poll fallback
 
 #include "platform.h"
 #include "xil_printf.h"
@@ -8,70 +8,51 @@
 #include "sleep.h"
 
 #include "pl_reg.h"
-#include "util.h"
-#include "pl_intc.h"
-#include "pl_bhv.h"
-#include "pl_comp.h"
-#include "pl_menu.h"
+#include "pl_irq.h"
+#include "pl_cmd.h"
+
+// PL regs for irq ack
+static void PlRegInit(void)
+{
+    u32 base = PL_CFG_BASE + REG_BIAS_EC_PUL_AXIS;
+
+    Xil_Out32(base + RST_EN, 0x00000000U);              // reset
+    Xil_Out32(base + RST_EN, 0x00000001U);              // release
+    Xil_Out32(base + EC_ID, 0x00000088U);
+    Xil_Out32(base + SC_ID, 0x00000066U);
+    Xil_Out32(base + BHV_PRIORITY, 0x00000000U);        // abc
+
+    Xil_Out32(base + A_EN, 0x00000001U);
+    Xil_Out32(base + A_TX_OT, 30U);                     // tx timeout 30s
+    Xil_Out32(base + B_EN, 0x00000001U);
+    Xil_Out32(base + B_TX_OT, 30U);
+    Xil_Out32(base + C_EN, 0x00000000U);
+}
 
 int main(void)
 {
-	int Status;
-	int key;
+    int Status;
 
-	init_platform();
+    init_platform();
 
-	xil_printf("\r\n==============================================\r\n");
-	xil_printf(" ec_pul_axis test (event-driven)\r\n");
-	xil_printf("==============================================\r\n");
+    PlRegInit();
+    CmdInit();
 
-	// trsf_port_en
-	Xil_Out32(PL_CFG_BASE + MST_APP_MODE, 0x00000001U);
+    Status = SetupInterruptSystem();
+    if (Status != XST_SUCCESS) {
+        xil_printf("Setup FAILED.\r\n");
+        cleanup_platform();
+        return XST_FAILURE;
+    }
 
-	// Initialize ALL components
-	xil_printf("\r\nInitializing all components...\r\n");
-	CompInitAll();
+    xil_printf("ec_pul_axis ready\r\n");
+    PrintMenu();
 
-	Status = SetupInterruptSystem();
-	if (Status != XST_SUCCESS) {
-		xil_printf("Setup FAILED.\r\n");
-		cleanup_platform();
-		return XST_FAILURE;
-	}
-	BhvResetAck();
+    while (1) {
+        CmdPoll();
+        PollIrqFallback();
+        usleep(10000);
+    }
 
-	xil_printf("\r\nAll components ready! Interrupts enabled.\r\n");
-
-	PrintMenu();
-
-	while (1) {
-		IrqEvent ev;
-
-		// 1. drain events
-		while (EvPop(&ev))
-			ProcessEvent(&ev);
-
-		// 1b. INTC poll fallback
-		PollIntcFallback();
-
-		if (EvDropCountGet()) {
-			xil_printf("[%08u] EVQ overflow: %u dropped\r\n",
-				   (unsigned)ts_ms(), (unsigned)EvDropCountGet());
-			EvDropCountClear();
-		}
-
-		// 2. bhv timeout
-		if (BhvIsRunning() && (s32)(ts_ms() - BhvDeadline()) > 0)
-			BhvTimeout();
-
-		// 3. menu
-		key = MenuPollKey();
-		if (key != 0 && MenuHandleKey((char)key))
-			break;
-
-		usleep(10000);
-	}
-
-	cleanup_platform();
-	return 0;
+    return 0;
 }
