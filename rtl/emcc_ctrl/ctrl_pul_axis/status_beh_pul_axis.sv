@@ -33,6 +33,7 @@ module status_beh_pul_axis#(
 
 	,input						b_en	
 	,output	reg [7:0]			b_bhv_id    
+	,output	reg	[31:0]			state_monitor_o
 	,input 		[31:0]			b_tx_ot         
 	,input 		[31:0]			b_tx_result_rpt 
 	,input						b_tx_result_vld
@@ -104,10 +105,10 @@ module status_beh_pul_axis#(
 		match_30 <= 1'b0;
 		match_40 <= 1'b0;
     end else begin
-        match_10 <= 1'b1;
-		match_20 <= 1'b1;
-		match_30 <= 1'b1;
-		match_40 <= 1'b1;
+        match_10 <= (ack_tx_result == IRQ_OK && ack_tx_id == 8'd10 && ack_beh_id == b_bhv_id);
+		match_20 <= (ack_tx_result == IRQ_OK && ack_tx_id == 8'd20 && ack_beh_id == b_bhv_id);
+		match_30 <= (ack_tx_result == IRQ_OK && ack_tx_id == 8'd30 && ack_beh_id == b_bhv_id);
+		match_40 <= (ack_tx_result == IRQ_OK && ack_tx_id == 8'd40 && ack_beh_id == b_bhv_id);
     end
 	end
 	
@@ -123,6 +124,27 @@ module status_beh_pul_axis#(
 	localparam 	S_ALERT_40		= 8'd9;
 	localparam 	S_ALERT_40_ACK	= 8'd10;
 	localparam	S_EXE			= 8'd11;
+
+	//state monitor
+	reg [7:0]	curr_state_m1;
+	reg [7:0]	curr_state_m2;
+	reg [7:0]	curr_state_m3;
+	
+    always @(posedge clk_i) 
+	begin
+        if (rst_i)begin
+			curr_state_m1 <= 8'b0;
+			curr_state_m2 <= 8'b0;
+			curr_state_m3 <= 8'b0;
+			state_monitor_o <= 32'b0;
+			end
+        else if (curr_state != curr_state_m1) begin
+            curr_state_m1 <= curr_state;
+            curr_state_m2 <= curr_state_m1;
+            curr_state_m3 <= curr_state_m2;
+			state_monitor_o <= {curr_state_m3,curr_state_m2,curr_state_m1, curr_state};
+		end
+    end
 
 	always @(posedge clk_i) begin
         if (rst_i)

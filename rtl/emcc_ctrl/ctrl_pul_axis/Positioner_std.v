@@ -36,9 +36,12 @@ module Positioner_std
    ///////////////// ARCH ////////////////////
    localparam  P_DIV_WIDTH    = 46;
    localparam  P_SPD_WIDTH    = 23; // 0 ~ 8M
-   localparam  P_PERIOD_WIDTH = 27; // 0 ~ 100M
+   localparam  P_PERIOD_WIDTH = 28; // 0 ~ 256M
+   localparam  CLK_HZ         = 156_250_000;   
    localparam  P_JERK_WIDTH   = 65-P_SPD_WIDTH;
-   
+
+   localparam  SIM_PERIOD_DIV = 512; // simulation only // add by szzhang 20260813
+
    localparam  ST_POS_IDLE = 0;
    localparam  ST_POS_INIT = 1;
    localparam  ST_POS_ACC  = 2;
@@ -46,7 +49,6 @@ module Positioner_std
    
    localparam  MODE_T    	 = 32'h00;
    localparam  MODE_S 		 = 32'h10;
-   localparam  UNIT_SCALE  = 1000;
    localparam  UNIT_DT     = ({P_DIV_WIDTH{1'b1}}/(10**8));
    
    ////////////////// Division
@@ -150,7 +152,7 @@ module Positioner_std
       if(reset) begin
          r_pf_spd_target  <= 0;
       end else begin
-         r_pf_spd_target  <= i_pf_spd*UNIT_SCALE;
+         r_pf_spd_target  <= i_pf_spd;
       end
    end
     `endif
@@ -174,12 +176,12 @@ module Positioner_std
             ST_POS_IDLE: begin
                if(i_pf_start) begin
                 `ifndef CHANGE_SPD
-                 r_pf_spd_target  <= i_pf_spd*UNIT_SCALE;
+                 r_pf_spd_target  <= i_pf_spd;
                 `endif
                   r_pf_acc         <= i_pf_acc;
-                  r_pf_acc_target  <= i_pf_acc*UNIT_SCALE;
+                  r_pf_acc_target  <= i_pf_acc;
                   r_pf_dec         <= i_pf_dec;
-                  r_pf_dec_target  <= i_pf_dec*UNIT_SCALE;
+                  r_pf_dec_target  <= i_pf_dec;
                   r_pf_spd_act     <= {i_pf_spd,{P_DIV_WIDTH{1'b0}}};
                   r_pf_acc_act     <= 0;
                   r_pf_dec_act     <= 0;
@@ -264,7 +266,7 @@ module Positioner_std
                
                // quickstop
                if(i_quickstop) begin
-                  r_pf_dec <= i_quickstop_dec*UNIT_SCALE;
+                  r_pf_dec <= i_quickstop_dec;
                   r_pf_quickstop <= 1'b1;
                end
             end
@@ -276,23 +278,16 @@ module Positioner_std
                      if(r_pf_dec_act[P_DIV_WIDTH+31:P_DIV_WIDTH] < r_pf_dec_target)
                         r_pf_spd_next <= (spd_div_quo*r_pf_dec)<<1;
 `ifdef PF_SIM
-                  r_pf_spd_next <= r_pf_spd_next << 8;  // add by szzhang 20260729 
+                        r_pf_spd_next <= r_pf_spd_next << 8;  // add by szzhang 20260729 
 `endif
                end
 
-`ifdef PF_SIM
-               if(r_pf_spd > P_SPD_MIN + 1)
-                  r_pf_spd_act <= r_pf_spd_act - r_pf_acc*UNIT_DT*256;
-               else
-                  r_pf_spd_act <= {P_SPD_MIN,{P_DIV_WIDTH{1'b0}}};
-`else
                if(r_div_ready) begin
                   if(r_pf_spd > r_pf_spd_next[P_DIV_WIDTH+P_SPD_WIDTH-1:P_DIV_WIDTH] + P_SPD_MIN)
                      r_pf_spd_act <= r_pf_spd_act - r_pf_spd_next;
                   else
                      r_pf_spd_act <= {P_SPD_MIN,{P_DIV_WIDTH{1'b0}}};
                end
-`endif
 
                // deceleration             
                if((r_pf_mode&MODE_S) == MODE_S) begin // S Wave Mode
@@ -321,7 +316,7 @@ module Positioner_std
                   r_pf_quickstop <= 1'b1;
                   
                if(r_pf_quickstop)
-                  r_pf_dec <= i_quickstop_dec*UNIT_SCALE;
+                  r_pf_dec <= i_quickstop_dec;
             end
          endcase
       end
@@ -634,9 +629,9 @@ module Positioner_std
                spd_div_den    <= r_pf_spd[P_SPD_WIDTH-1:0]; // Speed: 0 ~ 8M, 23-bit
                period_div_start  <= r_pf_pulse_first ? (r_div_ready&r_pf_pulse_count<=r_pf_pulse_period-1'b1) : r_pf_pulse_count==0;
 `ifdef PF_SIM
-               period_div_nom <= 27'd390625; //change by szzhang 20260813
+               period_div_nom <= CLK_HZ[P_PERIOD_WIDTH-1:0] / SIM_PERIOD_DIV; //add by szzhang 20260813
 `else
-               period_div_nom <= 27'd100_000_000;
+               period_div_nom <= CLK_HZ[P_PERIOD_WIDTH-1:0];
 `endif
                period_div_den <= r_pf_spd[P_SPD_WIDTH-1:0]; // Speed: 0 ~ 8M, 23-bit;
             end
@@ -650,9 +645,9 @@ module Positioner_std
                spd_div_den    <= r_pf_spd[P_SPD_WIDTH-1:0]; // Speed: 0 ~ 8M, 23-bit
                period_div_start  <= r_pf_pulse_count==0;
 `ifdef PF_SIM
-               period_div_nom <= 27'd390625; //change by szzhang 20260813
+               period_div_nom <= CLK_HZ[P_PERIOD_WIDTH-1:0] / SIM_PERIOD_DIV;
 `else
-               period_div_nom <= 27'd100_000_000;
+               period_div_nom <= CLK_HZ[P_PERIOD_WIDTH-1:0];
 `endif
                period_div_den <= r_pf_spd[P_SPD_WIDTH-1:0]; // Speed: 0 ~ 8M, 23-bit;    
             end

@@ -470,7 +470,25 @@ end
 // common params
 localparam DIR_POS = 1'b1;
 localparam DIR_NEG = 1'b0;
-localparam P_SPD_MIN = 32'd5000;  // pulse/s
+
+// 0 register -> default
+function [31:0] zdef(input [31:0] v, input [31:0] d);
+    zdef = (v == 32'b0) ? d : v;
+endfunction
+
+wire [31:0] home_spd_eff  = zdef(rcfg_home_spd,  32'd1000000); // 20mm/s
+wire [31:0] home_acc_eff  = zdef(rcfg_home_acc,  32'd2500000); // 50mm/s2
+wire [31:0] home_dec_eff  = zdef(rcfg_home_dec,  32'd2500000);
+wire [31:0] jog_spd_eff   = zdef(rcfg_jog_spd,   32'd1000000);
+wire [31:0] jog_acc_eff   = zdef(rcfg_jog_acc,   32'd2500000);
+wire [31:0] jog_dec_eff   = zdef(rcfg_jog_dec,   32'd2500000);
+wire [31:0] move_spd_eff  = zdef(rcfg_move_spd,  32'd1000000);
+wire [31:0] move_acc_eff  = zdef(rcfg_move_acc,  32'd2500000);
+wire [31:0] move_dec_eff  = zdef(rcfg_move_dec,  32'd2500000);
+wire [31:0] spd_max_eff   = zdef(rcfg_spd_max,   32'd4000000); // 80mm/s
+wire [31:0] acc_max_eff   = zdef(rcfg_acc_max,   32'd10000000);// 200mm/s2
+wire [31:0] dec_max_eff   = zdef(rcfg_dec_max,   32'd10000000);
+wire [31:0] touch_spd_eff = zdef(rcfg_touch_spd, 32'd5000);
 
 // HOME (beh=1)
 reg          home_stop;
@@ -489,7 +507,7 @@ wire         pos_pf_busy;
 wire         pos_pf_done;
 wire         pos_pf_error;
 
-Home_fa_std #(P_SPD_MIN/1000)
+Home_fa_std
 home_u
 (
   .clk            ( clk_i              ),
@@ -499,9 +517,10 @@ home_u
   .i_lim_f        ( i_axis_limf        ),
   .i_lim_b        ( i_axis_limb        ),
   .i_org          ( axis_org           ),
-  .i_pf_spd       ( rcfg_home_spd      ),
-  .i_pf_acc       ( rcfg_home_acc      ),
-  .i_pf_dec       ( rcfg_home_dec      ),
+  .i_pf_spd       ( home_spd_eff       ),
+  .i_spd_min      ( touch_spd_eff      ),
+  .i_pf_acc       ( home_acc_eff       ),
+  .i_pf_dec       ( home_dec_eff       ),
   .i_pf_dir       ( DIR_NEG            ),
   .i_start        ( home_start         ),
   .i_stop         ( home_stop          ),
@@ -543,9 +562,9 @@ Jog_fa_std jog_u
   .i_lim_f        ( i_axis_limf        ),
   .i_lim_b        ( i_axis_limb        ),
   .i_org          ( axis_org           ),
-  .i_pf_spd       ( rcfg_jog_spd       ),
-  .i_pf_acc       ( rcfg_jog_acc       ),
-  .i_pf_dec       ( rcfg_jog_dec       ),
+  .i_pf_spd       ( jog_spd_eff        ),
+  .i_pf_acc       ( jog_acc_eff        ),
+  .i_pf_dec       ( jog_dec_eff        ),
   .i_pf_pulse     ( rserv_step_pulse   ),
   .i_pf_dir       ( rserv_dir          ),
   .i_start        ( jog_start          ),
@@ -589,9 +608,9 @@ Move_fa_std move_u
   .i_lim_b        ( i_axis_limb        ),
   .i_org          ( axis_org           ),
   .i_abspos       ( r_pf_abspos        ),
-  .i_pf_spd       ( rcfg_move_spd      ),
-  .i_pf_acc       ( rcfg_move_acc      ),
-  .i_pf_dec       ( rcfg_move_dec      ),
+  .i_pf_spd       ( move_spd_eff       ),
+  .i_pf_acc       ( move_acc_eff       ),
+  .i_pf_dec       ( move_dec_eff       ),
   .i_pf_pulse     ( rserv_target_pulse ),
   .i_start        ( move_start         ),
   .i_stop         ( move_stop          ),
@@ -614,7 +633,7 @@ Move_fa_std move_u
 reg  [31:0]  pos_pf_spd;
 reg  [31:0]  pos_pf_acc;
 reg  [31:0]  pos_pf_dec;
-wire [31:0]  pos_quickstop_dec = rcfg_dec_max;
+wire [31:0]  pos_quickstop_dec = dec_max_eff;
 reg          pos_quickstop;
 reg  [31:0]  pos_pf_mode;
 reg          pos_pf_start;
@@ -714,9 +733,9 @@ end
 always@(*) begin
     case(a_bhv_id_r)
         8'd1: begin
-            pos_pf_spd    = home_pf_spd   > rcfg_spd_max ? rcfg_spd_max : home_pf_spd;
-            pos_pf_acc    = home_pf_acc   > rcfg_acc_max ? rcfg_acc_max : home_pf_acc;
-            pos_pf_dec    = home_pf_dec   > rcfg_dec_max ? rcfg_dec_max : home_pf_dec;
+            pos_pf_spd    = home_pf_spd   > spd_max_eff ? spd_max_eff :home_pf_spd;
+            pos_pf_acc    = home_pf_acc   > acc_max_eff ? acc_max_eff :home_pf_acc;
+            pos_pf_dec    = home_pf_dec   > dec_max_eff ? dec_max_eff :home_pf_dec;
             pos_pf_mode   = 32'h00;   // home
             pos_pf_pulse  = home_pf_pulse;
             pos_pf_start  = home_pf_start;
@@ -725,9 +744,9 @@ always@(*) begin
             pos_quickstop = home_pf_quickstop;
         end
         8'd2, 8'd20: begin
-            pos_pf_spd    = jog_pf_spd    > rcfg_spd_max ? rcfg_spd_max : jog_pf_spd;
-            pos_pf_acc    = jog_pf_acc    > rcfg_acc_max ? rcfg_acc_max : jog_pf_acc;
-            pos_pf_dec    = jog_pf_dec    > rcfg_dec_max ? rcfg_dec_max : jog_pf_dec;
+            pos_pf_spd    = jog_pf_spd    > spd_max_eff ? spd_max_eff :jog_pf_spd;
+            pos_pf_acc    = jog_pf_acc    > acc_max_eff ? acc_max_eff :jog_pf_acc;
+            pos_pf_dec    = jog_pf_dec    > dec_max_eff ? dec_max_eff :jog_pf_dec;
             pos_pf_mode   = 32'h01;   // jog
             pos_pf_pulse  = jog_pf_pulse;
             pos_pf_start  = jog_pf_start;
@@ -736,9 +755,9 @@ always@(*) begin
             pos_quickstop = jog_pf_quickstop;
         end
         8'd3, 8'd21: begin
-            pos_pf_spd    = move_pf_spd   > rcfg_spd_max ? rcfg_spd_max : move_pf_spd;
-            pos_pf_acc    = move_pf_acc   > rcfg_acc_max ? rcfg_acc_max : move_pf_acc;
-            pos_pf_dec    = move_pf_dec   > rcfg_dec_max ? rcfg_dec_max : move_pf_dec;
+            pos_pf_spd    = move_pf_spd   > spd_max_eff ? spd_max_eff :move_pf_spd;
+            pos_pf_acc    = move_pf_acc   > acc_max_eff ? acc_max_eff :move_pf_acc;
+            pos_pf_dec    = move_pf_dec   > dec_max_eff ? dec_max_eff :move_pf_dec;
             pos_pf_mode   = 32'h01;   // move
             pos_pf_pulse  = move_pf_pulse;
             pos_pf_start  = move_pf_start;

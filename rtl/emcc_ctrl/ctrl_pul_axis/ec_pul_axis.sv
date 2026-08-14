@@ -425,6 +425,7 @@ module ec_pul_axis#(
 	,.post_sta_allow	    (b_post_sta_allow	)
 	,.b_en	                (b_en				)
 	,.b_bhv_id              (b_bhv_id			)
+	,.state_monitor_o		(debug_reg2			)
 	,.b_tx_ot               (b_tx_ot			)
 	,.b_tx_result_rpt       (b_tx_result_rpt	)
 	,.b_tx_result_vld       (b_tx_result_vld	)
@@ -514,7 +515,7 @@ module ec_pul_axis#(
 //----------------------------------------------------- user logic end -------------------------------------------------------//
 		);
 		
-	irq_3i1o_arbitrator irq_3i1o_arbitrator_u0(
+	irq_3i1o_arbitrator_pul_axis irq_3i1o_arbitrator_u0(
 		.clk_i              (clk_i            	)
 		,.rst_i             (rst_i           	)
 		,.sc_id             (sc_id            	)
@@ -539,7 +540,9 @@ module ec_pul_axis#(
 		,.irq_reg2_o		(irq_reg2			)
 		,.irq_o				(o_intr_irq			)
 		,.irq_busy_o		(irq_busy_o			)
-		,.irq_receive_ack_i (a_tx_result_vld || b_tx_result_vld || c_tx_result_vld)	
+		,.irq_ack_a_i		(a_tx_result_vld	)
+		,.irq_ack_b_i		(b_tx_result_vld	)
+		,.irq_ack_c_i		(c_tx_result_vld	)
     );
 	
 	

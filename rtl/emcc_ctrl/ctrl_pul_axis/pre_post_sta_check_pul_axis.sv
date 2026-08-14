@@ -126,17 +126,13 @@ module pre_post_sta_check_pul_axis#(
 	assign	a_post_sta[20] = (a_bhv_id == 21)&&action_done&&(~action_error);
 	assign	a_post_sta[29] = (a_bhv_id == 30);
 
-	reg action_busy_d1;
-	wire action_busy_rise;
-	always@(posedge clk_i) action_busy_d1 <= action_busy;
-	assign action_busy_rise = action_busy & ~action_busy_d1;
+	reg [7:0] a_bhv_id_d;
+	always@(posedge clk_i) a_bhv_id_d <= a_bhv_id;
 
 	always@(posedge clk_i)
 	begin
 		integer i;
-		if(rst_i || !a_en)
-			a_post_sta_allow <= {A_BHA_NUM{1'b0}};
-		else if(action_busy_rise)
+		if(rst_i || !a_en || action_busy || (a_bhv_id != a_bhv_id_d))
 			a_post_sta_allow <= {A_BHA_NUM{1'b0}};
 		else begin
 			for(i = 0; i < A_BHA_NUM; i = i + 1) begin
