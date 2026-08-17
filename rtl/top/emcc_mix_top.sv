@@ -66,6 +66,13 @@ module emcc_mix_top
     ,output  wire                       o_spi_mosi
     ,input   wire                       i_spi_miso
 	
+	,output 							o_dac_syn 	
+	,output 							o_dac_sclk	
+	,output 							o_dac_din 	
+	,output 							o_dac_load	
+	,output 							o_dac_clr	
+	,input								i_dac_dout	
+	
     ,input  wire                        i_wr_cfg_data_done
     ,input  wire                        i_do_dbg_data_vld
     ,input  wire    [31:0]              iv_io_mode_cfg // set and select mode and type of io
@@ -187,6 +194,7 @@ module emcc_mix_top
     wire    [31:0]              do_mst_msg_force      ;
     assign ov_dbg_enable = 0;
     
+<<<<<<< HEAD
 	assign do_relay_mst_msg = ~di_mst_msg[0]?do_mst_msg_force:do_mst_msg;
 	
     vio_0 vio (
@@ -194,6 +202,47 @@ module emcc_mix_top
       .probe_in0 (di_mst_msg),    // input wire [63 : 0] probe_in0
       .probe_out0(do_mst_msg_force)  // output wire [31 : 0] probe_out0
     );
+=======
+	//assign do_relay_mst_msg =  di_mst_msg[12]?do_mst_msg_force:do_mst_msg ;
+	
+	assign do_relay_mst_msg =  do_mst_msg ;
+	
+	//	vio_0 vio (
+	//	.clk(clk),     
+	//	. probe_out0 ( do_mst_msg_force[0 ]  )
+	//	,.probe_out1 ( do_mst_msg_force[1 ]  )
+	//	,.probe_out2 ( do_mst_msg_force[2 ]  )
+	//	,.probe_out3 ( do_mst_msg_force[3 ]  )
+	//	,.probe_out4 ( do_mst_msg_force[4 ]  )
+	//	,.probe_out5 ( do_mst_msg_force[5 ]  )
+	//	,.probe_out6 ( do_mst_msg_force[6 ]  )
+	//	,.probe_out7 ( do_mst_msg_force[7 ]  )
+	//	,.probe_out8 ( do_mst_msg_force[8 ]  )
+	//	,.probe_out9 ( do_mst_msg_force[9 ]  )
+	//	,.probe_out10( do_mst_msg_force[10]  )
+	//	,.probe_out11( do_mst_msg_force[11]  )
+	//	,.probe_out12( do_mst_msg_force[12]  )
+	//	,.probe_out13( do_mst_msg_force[13]  )
+	//	,.probe_out14( do_mst_msg_force[14]  )
+	//	,.probe_out15( do_mst_msg_force[15]  )
+	//	,.probe_out16( do_mst_msg_force[16]  )
+	//	,.probe_out17( do_mst_msg_force[17]  )
+	//	,.probe_out18( do_mst_msg_force[18]  )
+	//	,.probe_out19( do_mst_msg_force[19]  )
+	//	,.probe_out20( do_mst_msg_force[20]  )
+	//	,.probe_out21( do_mst_msg_force[21]  )
+	//	,.probe_out22( do_mst_msg_force[22]  )
+	//	,.probe_out23( do_mst_msg_force[23]  )
+	//	,.probe_out24( do_mst_msg_force[24]  )
+	//	,.probe_out25( do_mst_msg_force[25]  )
+	//	,.probe_out26( do_mst_msg_force[26]  )
+	//	,.probe_out27( do_mst_msg_force[27]  )
+	//	,.probe_out28( do_mst_msg_force[28]  )
+	//	,.probe_out29( do_mst_msg_force[29]  )
+	//	,.probe_out30( do_mst_msg_force[30]  )
+	//	,.probe_out31( do_mst_msg_force[31]  )
+	//	);
+>>>>>>> origin/cgliu
 
 	pkg_route
     #(
@@ -383,9 +432,81 @@ module emcc_mix_top
 	// --------------------------------------------user component_v6_inst---------------------------------------//
 	//==========================================================================================================//
 
+<<<<<<< HEAD
 	
 			ec_1di #(
 				.REG_SPACE_BIAS 		(20'h800)	//B010_0800
+=======
+	//	ila_0 ila_0_u0 (
+	//	.clk(clk), // input wire clk
+	//	.probe0({32'd0,map_irq[31:0]}) // input wire [63:0] probe0
+	//	);
+
+
+	//	wire	[31:0]	di_o;
+	//	
+	//	vio_0 vio (
+	//	.clk(clk)    
+	//	,.probe_out0 	(	di_o[0 ]  )
+	//	,.probe_out1 	(	di_o[1 ]  )
+	//	,.probe_out2 	(	di_o[2 ]  )
+	//	,.probe_out3 	(	di_o[3 ]  )
+	//	,.probe_out4 	(	di_o[4 ]  )
+	//	,.probe_out5 	(	di_o[5 ]  )
+	//	,.probe_out6 	(	di_o[6 ]  )
+	//	,.probe_out7 	(	di_o[7 ]  )
+	//	,.probe_out8 	(	di_o[8 ]  )
+	//	,.probe_out9 	(	di_o[9 ]  )
+	//	,.probe_out10	(	di_o[10]  )
+	//	,.probe_out11	(	di_o[11]  )
+	//	,.probe_out12	(	di_o[12]  )
+	//	,.probe_out13	(	di_o[13]  )
+	//	,.probe_out14	(	di_o[14]  )
+	//	,.probe_out15	(	di_o[15]  )
+	//	,.probe_out16	(	di_o[16]  )
+	//	,.probe_out17	(	di_o[17]  )
+	//	,.probe_out18	(	di_o[18]  )
+	//	,.probe_out19	(	di_o[19]  )
+	//	,.probe_out20	(	di_o[20]  )
+	//	,.probe_out21	(	di_o[21]  )
+	//	,.probe_out22	(	di_o[22]  )
+	//	,.probe_out23	(	di_o[23]  )
+	//	,.probe_out24	(	di_o[24]  )
+	//	,.probe_out25	(	di_o[25]  )
+	//	,.probe_out26	(	di_o[26]  )
+	//	,.probe_out27	(	di_o[27]  )
+	//	,.probe_out28	(	di_o[28]  )
+	//	,.probe_out29	(	di_o[29]  )
+	//	,.probe_out30	(	di_o[30]  )
+	//	,.probe_out31	(	di_o[31]  )
+	//	);
+	
+	//ec_test#(
+	//		.REG_SPACE_BIAS 				(`ROLLER_2126_REG_BIAS)
+	//		,.REG_SPACE_SIZE 				(512				)
+	//	)ec_test_u0(
+	//		.clk_i							(clk				)
+	//		,.rst							(reset				)
+	//		,.i_time_1ms_vld  				(time_1ms_vld		)
+	//		,.i_time_1s_vld   				(time_1s_vld		)
+	//		,.ps_reg_clk					(ps_reg_clk			)
+	//		,.ps_reg_reset					(ps_reg_reset		)
+	//		,.i_st_wr_en					(ps_reg_we			)
+	//		,.i_st_wr_addr    				(ps_reg_addr		)
+	//		,.i_st_wr_data    				(ps_reg_wr_dat		)
+	//		,.i_st_rd_en      				(ps_reg_re			)
+	//		,.i_st_rd_addr    				(ps_reg_rd_addr		)
+	//		,.o_st_rd_data    				(sub_comp_rd_dat[0]	)
+	//		,.o_st_rd_vld     				(sub_comp_rd_vld[0]	)
+	//		,.o_intr_irq					( map_irq[0] )
+	//	);
+	
+	/*
+			reg	di1;
+			
+			ec_1di #(
+				.REG_SPACE_BIAS 		(`ROLLER_2126_REG_BIAS	)	//B010_0800
+>>>>>>> origin/cgliu
 				,.REG_SPACE_SIZE 		(512					)
 			) ec_1di_u0 (	
 				.clk_i           		(clk					)
@@ -401,6 +522,7 @@ module emcc_mix_top
 				,.i_st_rd_addr    		(ps_reg_rd_addr			)
 				,.o_st_rd_data    		(sub_comp_rd_dat[0]		)
 				,.o_st_rd_vld     		(sub_comp_rd_vld[0]		)
+<<<<<<< HEAD
 				,.di              		(~di_mst_msg[0]         )
 				,.o_intr_irq      		(map_irq[0] 			)
 			);
@@ -409,6 +531,17 @@ module emcc_mix_top
 			ec_1do#(
 				.REG_SPACE_BIAS 		(20'ha00	),	//Component offset address
 				.REG_SPACE_SIZE 		(512					)	//Component register size
+=======
+				//,.i_sign1_check         (di_mst_msg[0]			)	//io
+				,.i_sign1_check       (di1					)	//sim
+				,.o_intr_irq      		(map_irq[0] 			)
+			);
+			
+		
+			ec_1do#(
+				.REG_SPACE_BIAS 		(`ROLLER_2037_REG_BIAS	)	//Component offset address
+				,.REG_SPACE_SIZE 		(512					)	//Component register size
+>>>>>>> origin/cgliu
 			)ec_1do_u0(
 				.clk_i					(clk					)
 				,.rst					(reset					)
@@ -423,6 +556,7 @@ module emcc_mix_top
 				,.i_st_rd_addr  		(ps_reg_rd_addr			)
 				,.o_st_rd_data  		(sub_comp_rd_dat[1]		)
 				,.o_st_rd_vld   		(sub_comp_rd_vld[1]		)
+<<<<<<< HEAD
 				,.do_o					(m_1do_do			    )
 				,.o_intr_irq			(map_irq[1]			    )
 			);
@@ -481,6 +615,68 @@ module emcc_mix_top
 				.REG_SPACE_BIAS			(20'h1000  ),	//Component offset address h'a00
 				.REG_SPACE_SIZE			(`REG_SPACE_SIZE        )
 			)ec_3di_1do_u0(
+=======
+				,.o_sig_dri				(			)
+				,.o_intr_irq			(map_irq[1] 			)
+			);
+			
+			
+			reg 	[1:0]	di_2di_2do;
+		
+		ec_2di_2do#(
+			.REG_SPACE_BIAS			(`ROLLER_3018_REG_BIAS	),	//Component offset address
+			.REG_SPACE_SIZE			(512					)
+		)ec_2di_2do_u0(
+			.clk_i					(clk					)
+			,.rst					(reset					)
+			,.i_time_1ms_vld		(time_1ms_vld			)
+			,.i_time_1s_vld 		(time_1s_vld			)
+			,.ps_reg_clk			(ps_reg_clk				)
+			,.ps_reg_reset			(ps_reg_reset			)
+			,.i_st_wr_en			(ps_reg_we				)
+			,.i_st_wr_addr  		(ps_reg_addr			)
+			,.i_st_wr_data  		(ps_reg_wr_dat			)
+			,.i_st_rd_en    		(ps_reg_re				)
+			,.i_st_rd_addr  		(ps_reg_rd_addr			)
+			,.o_st_rd_data  		(sub_comp_rd_dat[2]		)
+			,.o_st_rd_vld   		(sub_comp_rd_vld[2]		)
+			,.i_pos1				()
+			,.i_pos2				()
+			,.o_dri1				()
+			,.o_dri2				()
+			,.o_intr_irq			(map_irq[2]				)
+		);	
+			
+			ec_hw_sdcx#(
+				.REG_SPACE_BIAS 	(`ROLLER_3168_REG_BIAS	)
+				,.REG_SPACE_SIZE 	(512	)
+			)ec_hw_sdcx_u0(
+				.clk_i				(clk					)
+				,.rst				(reset					)
+				,.i_time_1ms_vld	(time_1ms_vld			)
+				,.i_time_1s_vld 	(time_1s_vld			)
+				,.ps_reg_clk		(ps_reg_clk				)
+				,.ps_reg_reset		(ps_reg_reset			)
+				,.i_st_wr_en		(ps_reg_we				)
+				,.i_st_wr_addr  	(ps_reg_addr			)
+				,.i_st_wr_data  	(ps_reg_wr_dat			)
+				,.i_st_rd_en    	(ps_reg_re				)
+				,.i_st_rd_addr  	(ps_reg_rd_addr			)
+				,.o_st_rd_data  	(sub_comp_rd_dat[3]		)
+				,.o_st_rd_vld   	(sub_comp_rd_vld[3]		)
+				,.i_mgs	            ()
+				,.i_dmgs	        ()
+				,.o_mag	            ()
+				,.o_demag	        ()
+				,.o_lock	        ()
+				,.o_intr_irq		(map_irq[3])
+			);
+			
+			ec_2do#(
+				.REG_SPACE_BIAS 		(`ROLLER_3189_REG_BIAS	),	//Component offset address
+				.REG_SPACE_SIZE 		(512					)		//Component register size
+			)ec_2do_u0(
+>>>>>>> origin/cgliu
 				.clk_i					(clk					)
 				,.rst					(reset					)
 				,.i_time_1ms_vld		(time_1ms_vld			)
@@ -494,11 +690,1608 @@ module emcc_mix_top
 				,.i_st_rd_addr  		(ps_reg_rd_addr			)
 				,.o_st_rd_data  		(sub_comp_rd_dat[4]		)
 				,.o_st_rd_vld   		(sub_comp_rd_vld[4]		)
+<<<<<<< HEAD
 				,.di_i					(~di_mst_msg[8:6]	    )
 				,.do_o					(m_3di_1do_do	        )
 				,.o_intr_irq			(map_irq[4]		        )
 			);
             assign   do_mst_msg[5] = ~m_3di_1do_do;
+=======
+				,.o_dri1				()
+				,.o_dri2				()
+				,.o_intr_irq			(map_irq[4]		 	)
+			);
+			
+			reg				di_i11;
+			
+			ec_1di_2do#(
+			.REG_SPACE_BIAS 			(`ROLLER_2108_REG_BIAS	)
+			,.REG_SPACE_SIZE 			(512					)
+		)ec_1di_2do_u0(
+			.clk_i						(clk)
+			,.rst						(reset)
+			,.i_time_1ms_vld			(time_1ms_vld		)
+			,.i_time_1s_vld 			(time_1s_vld		)
+			,.ps_reg_clk				(ps_reg_clk			)
+			,.ps_reg_reset				(ps_reg_reset		)
+			,.i_st_wr_en				(ps_reg_we			)
+			,.i_st_wr_addr  			(ps_reg_addr		)
+			,.i_st_wr_data  			(ps_reg_wr_dat		)
+			,.i_st_rd_en    			(ps_reg_re			)
+			,.i_st_rd_addr  			(ps_reg_rd_addr		)
+			,.o_st_rd_data  			(sub_comp_rd_dat[5]	)
+			,.o_st_rd_vld   			(sub_comp_rd_vld[5]	)
+			,.di_i						(di_i11				)
+			,.do_o						(do_o11				)
+			,.o_intr_irq				(map_irq[5]			)
+		);
+		
+		*/
+		
+		
+	//	ec_1avi_1avo#(
+	//		.REG_SPACE_BIAS 			(`ROLLER_2113_REG_BIAS		)	//Component offset address
+	//		,.REG_SPACE_SIZE 			(512		)		//Component register size
+	//	)ec_1avi_1avo_u0(
+	//		.clk_i						(clk				)
+	//		,.rst						(reset				)
+	//		,.i_time_1ms_vld			(time_1ms_vld		)
+	//		,.i_time_1s_vld 			(time_1s_vld		)
+	//		,.ps_reg_clk				(ps_reg_clk			)
+	//		,.ps_reg_reset				(ps_reg_reset		)
+	//		,.i_st_wr_en				(ps_reg_we			)
+	//		,.i_st_wr_addr  			(ps_reg_addr		)
+	//		,.i_st_wr_data  			(ps_reg_wr_dat		)
+	//		,.i_st_rd_en    			(ps_reg_re			)
+	//		,.i_st_rd_addr  			(ps_reg_rd_addr		)
+	//		,.o_st_rd_data  			(sub_comp_rd_dat[6]	)
+	//		,.o_st_rd_vld   			(sub_comp_rd_vld[6]	)
+	//		,.spi_do_o	    			(o_spi_mosi			)
+	//		,.spi_clk_o	    			(o_spi_clk			)
+	//		,.spi_csn_o	    			(o_spi_cs_n			)
+	//		,.spi_di_i	    			(i_spi_miso			)
+	//		,.o_dac_syn 				(o_dac_syn 			)
+	//		,.o_dac_sclk				(o_dac_sclk			)
+	//		,.o_dac_din 				(o_dac_din 			)
+	//		,.i_dac_dout				(i_dac_dout			)
+	//		,.o_dac_load				(o_dac_load			)
+	//		,.o_dac_clr					(o_dac_clr			)
+	//		,.o_intr_irq				(map_irq[6]		)
+	//	);
+		
+		
+	//	reg	[1:0]	di_i1;
+	//
+	//	ec_2di_1do#(
+	//		.REG_SPACE_BIAS 			(`ROLLER_2095_REG_BIAS	)
+	//		,.REG_SPACE_SIZE 			(512					)
+	//	)ec_2di_1do_u0(
+	//		.clk_i						(clk				)
+	//		,.rst						(reset				)
+	//		,.i_time_1ms_vld			(time_1ms_vld		)
+	//		,.i_time_1s_vld 			(time_1s_vld		)
+	//		,.ps_reg_clk				(ps_reg_clk			)
+	//		,.ps_reg_reset				(ps_reg_reset		)
+	//		,.i_st_wr_en				(ps_reg_we			)
+	//		,.i_st_wr_addr  			(ps_reg_addr		)
+	//		,.i_st_wr_data  			(ps_reg_wr_dat		)
+	//		,.i_st_rd_en    			(ps_reg_re			)
+	//		,.i_st_rd_addr  			(ps_reg_rd_addr		)
+	//		,.o_st_rd_data  			(sub_comp_rd_dat[7]	)
+	//		,.o_st_rd_vld   			(sub_comp_rd_vld[7]	)
+	//		,.i_pos1					()	
+	//		,.i_pos2					()	
+	//		,.o_dri						()
+	//		,.o_intr_irq				(map_irq[7]			)
+	//	);
+		
+		
+	//	wire 	spi_do_o	;
+	//	wire 	spi_clk_o	;
+	//	wire 	spi_csn_o	;
+	//	reg 	spi_di_i	;
+	//
+	//
+	//	ec_1avi#(
+	//		.REG_SPACE_BIAS 			(`ROLLER_3135_REG_BIAS	)	//Component offset address
+	//		,.REG_SPACE_SIZE 			(512					)		//Component register size
+	//	)ec_1avi_u0(
+	//		.clk_i						(clk				)
+	//		,.rst						(reset				)
+	//		,.i_time_1ms_vld			(time_1ms_vld		)
+	//		,.i_time_1s_vld 			(time_1s_vld		)
+	//		,.ps_reg_clk				(ps_reg_clk			)
+	//		,.ps_reg_reset				(ps_reg_reset		)
+	//		,.i_st_wr_en				(ps_reg_we			)
+	//		,.i_st_wr_addr  			(ps_reg_addr		)
+	//		,.i_st_wr_data  			(ps_reg_wr_dat		)
+	//		,.i_st_rd_en    			(ps_reg_re			)
+	//		,.i_st_rd_addr  			(ps_reg_rd_addr		)
+	//		,.o_st_rd_data  			(sub_comp_rd_dat[8]	)
+	//		,.o_st_rd_vld   			(sub_comp_rd_vld[8]	)
+	//		,.spi_do_o	    			(spi_do_o			)
+	//		,.spi_clk_o	    			(spi_clk_o			)
+	//		,.spi_csn_o	    			(spi_csn_o			)
+	//		,.spi_di_i	    			(spi_di_i			)
+	//		,.o_intr_irq				(map_irq[8]			)
+	//	);	
+	//	
+		
+		//	wire 		o_dac_syn 	;
+		//	wire 		o_dac_sclk	;
+		//	wire 		o_dac_din 	;
+		//	reg			i_dac_dout	;
+		//	wire		o_dac_load	;
+		//	wire		o_dac_clr 	;
+
+	//	ec_1avo#(
+	//		.REG_SPACE_BIAS 			(`ROLLER_3048_REG_BIAS	)	//Component offset address
+	//		,.REG_SPACE_SIZE 			(512					)		//Component register size
+	//	)ec_1avo_u0(
+	//		.clk_i						(clk				)
+	//		,.rst						(reset				)
+	//		,.i_time_1ms_vld			(time_1ms_vld		)
+	//		,.i_time_1s_vld 			(time_1s_vld		)
+	//		,.ps_reg_clk				(ps_reg_clk			)
+	//		,.ps_reg_reset				(ps_reg_reset		)
+	//		,.i_st_wr_en				(ps_reg_we			)
+	//		,.i_st_wr_addr  			(ps_reg_addr		)
+	//		,.i_st_wr_data  			(ps_reg_wr_dat		)
+	//		,.i_st_rd_en    			(ps_reg_re			)
+	//		,.i_st_rd_addr  			(ps_reg_rd_addr		)
+	//		,.o_st_rd_data  			(sub_comp_rd_dat[9])
+	//		,.o_st_rd_vld   			(sub_comp_rd_vld[9])
+	//		,.o_dac_syn     			(o_dac_syn 			)
+	//		,.o_dac_sclk				(o_dac_sclk			)
+	//		,.o_dac_din 				(o_dac_din 			)
+	//		,.i_dac_dout				(i_dac_dout			)
+	//		,.o_dac_load				(o_dac_load			)
+	//		,.o_dac_clr 				(o_dac_clr 			)
+	//		,.o_intr_irq				(map_irq[9]		)
+	//	);
+		
+	/*	
+		reg	[2:0]	di_i_ec_3di_1do;
+	
+			ec_3di_1do#(
+					.REG_SPACE_BIAS 			(`ROLLER_3050_REG_BIAS				)
+					,.REG_SPACE_SIZE 			(512				)
+			)ec_3di_1do_u0(
+					.clk_i						(clk				)
+					,.rst						(reset				)
+					,.i_time_1ms_vld			(time_1ms_vld		)
+					,.i_time_1s_vld 			(time_1s_vld		)
+					,.ps_reg_clk				(ps_reg_clk			)
+					,.ps_reg_reset				(ps_reg_reset		)
+					,.i_st_wr_en				(ps_reg_we			)
+					,.i_st_wr_addr  			(ps_reg_addr		)
+					,.i_st_wr_data  			(ps_reg_wr_dat		)
+					,.i_st_rd_en    			(ps_reg_re			)
+					,.i_st_rd_addr  			(ps_reg_rd_addr		)
+					,.o_st_rd_data  			(sub_comp_rd_dat[10])
+					,.o_st_rd_vld   			(sub_comp_rd_vld[10])
+					,.i_pos1					()	
+					,.i_pos2					()	
+					,.i_poa						()
+					,.o_dri						()
+					,.o_intr_irq				(map_irq[10])
+			);
+		
+		reg		[2:0]	di_i3;
+	
+		ec_3di_2do#(
+			.REG_SPACE_BIAS 				(`ROLLER_3078_REG_BIAS)
+			,.REG_SPACE_SIZE 				(512				)
+		)ec_3di_2do_u0(                                  
+			.clk_i					        (clk				)
+			,.rst						    (reset				)
+			,.i_time_1ms_vld  		        (time_1ms_vld		)
+			,.i_time_1s_vld   		        (time_1s_vld		)
+			,.ps_reg_clk				    (ps_reg_clk			)
+			,.ps_reg_reset			        (ps_reg_reset		)
+			,.i_st_wr_en				    (ps_reg_we			)
+			,.i_st_wr_addr    		        (ps_reg_addr		)
+			,.i_st_wr_data    		        (ps_reg_wr_dat		)
+			,.i_st_rd_en      		        (ps_reg_re			)
+			,.i_st_rd_addr    		        (ps_reg_rd_addr		)
+			,.o_st_rd_data    		        (sub_comp_rd_dat[11])
+			,.o_st_rd_vld     		        (sub_comp_rd_vld[11])
+			,.i_pos1						()
+			,.i_pos2						()
+			,.i_poa							()
+			,.o_dri1						()
+			,.o_dri2						()
+			,.o_intr_irq			        (map_irq[11]		)
+		); 
+		
+		reg di_i_ec_1di_1do;
+		
+		ec_1di_1do#(
+			.REG_SPACE_BIAS 			(`ROLLER_3106_REG_BIAS		)
+			,.REG_SPACE_SIZE 			(512		)
+		)ec_1di_1do_u0(
+			.clk_i							(clk				)
+			,.rst							(reset				)
+			,.i_time_1ms_vld				(time_1ms_vld		)
+			,.i_time_1s_vld 				(time_1s_vld		)
+			,.ps_reg_clk					(ps_reg_clk			)
+			,.ps_reg_reset					(ps_reg_reset		)
+			,.i_st_wr_en					(ps_reg_we			)
+			,.i_st_wr_addr  				(ps_reg_addr		)
+			,.i_st_wr_data  				(ps_reg_wr_dat		)
+			,.i_st_rd_en    				(ps_reg_re			)
+			,.i_st_rd_addr  				(ps_reg_rd_addr		)
+			,.o_st_rd_data  				(sub_comp_rd_dat[12])
+			,.o_st_rd_vld   				(sub_comp_rd_vld[12])
+			,.i_pos							(di_i_ec_1di_1do)
+			,.o_dri							()
+			,.o_intr_irq					(map_irq[12])
+		);
+		
+		reg	[3:0]	di_i_ec_4di_2do;
+	
+			ec_4di_2do#(
+				.REG_SPACE_BIAS 				(`ROLLER_2009_REG_BIAS)
+				,.REG_SPACE_SIZE 				(512	)	
+			)ec_4di_2do_u0(
+				.clk_i							(clk				)
+				,.rst							(reset				)
+				,.i_time_1ms_vld				(time_1ms_vld		)
+				,.i_time_1s_vld 				(time_1s_vld		)
+				,.ps_reg_clk					(ps_reg_clk			)
+				,.ps_reg_reset					(ps_reg_reset		)
+				,.i_st_wr_en					(ps_reg_we			)
+				,.i_st_wr_addr  				(ps_reg_addr		)
+				,.i_st_wr_data  				(ps_reg_wr_dat		)
+				,.i_st_rd_en    				(ps_reg_re			)
+				,.i_st_rd_addr  				(ps_reg_rd_addr		)
+				,.o_st_rd_data  				(sub_comp_rd_dat[13])
+				,.o_st_rd_vld   				(sub_comp_rd_vld[13])
+				,.i_pos1_1			            ()
+				,.i_pos1_2			            ()
+				,.i_pos2_1			            ()
+				,.i_pos2_2			            ()
+				,.o_dri1				        ()
+				,.o_dri2				        ()
+				,.o_intr_irq					(map_irq[13])
+			);
+	*/
+		
+	//	ec_3led_buzzer#(
+	//		.REG_SPACE_BIAS 				(`ROLLER_2060_REG_BIAS				)
+	//		,.REG_SPACE_SIZE 				(512				)
+	//	)ec_3led_buzzer_u0(
+	//		.clk_i							(clk				)
+	//		,.rst							(reset				)
+	//		,.i_time_1ms_vld				(time_1ms_vld		)
+	//		,.i_time_1s_vld 				(time_1s_vld		)
+	//		,.ps_reg_clk					(ps_reg_clk			)
+	//		,.ps_reg_reset					(ps_reg_reset		)
+	//		,.i_st_wr_en					(ps_reg_we			)
+	//		,.i_st_wr_addr  				(ps_reg_addr		)
+	//		,.i_st_wr_data  				(ps_reg_wr_dat		)
+	//		,.i_st_rd_en    				(ps_reg_re			)
+	//		,.i_st_rd_addr  				(ps_reg_rd_addr		)
+	//		,.o_st_rd_data  				(sub_comp_rd_dat[14])
+	//		,.o_st_rd_vld   				(sub_comp_rd_vld[14])
+	//		,.o_led_r						()
+	//		,.o_led_g						()
+	//		,.o_led_y						()
+	//		,.o_bz							()
+	//		,.o_intr_irq					(map_irq[14])
+	//	);
+		
+	/*
+
+	reg	[1:0]	di_i_ec_2di;
+	
+			ec_2di#(
+				.REG_SPACE_BIAS 				(`ROLLER_2094_REG_BIAS			)
+				,.REG_SPACE_SIZE 				(512			)
+			)ec_2di_u0(
+				.clk_i							(clk				)
+				,.rst							(reset				)
+				,.i_time_1ms_vld				(time_1ms_vld		)
+				,.i_time_1s_vld 				(time_1s_vld		)
+				,.ps_reg_clk					(ps_reg_clk			)
+				,.ps_reg_reset					(ps_reg_reset		)
+				,.i_st_wr_en					(ps_reg_we			)
+				,.i_st_wr_addr  				(ps_reg_addr		)
+				,.i_st_wr_data  				(ps_reg_wr_dat		)
+				,.i_st_rd_en    				(ps_reg_re			)
+				,.i_st_rd_addr  				(ps_reg_rd_addr		)
+				,.o_st_rd_data  				(sub_comp_rd_dat[15]	)
+				,.o_st_rd_vld   				(sub_comp_rd_vld[15]	)
+				,.i_sign1_check					()
+				,.i_sign2_check					()
+				,.o_intr_irq					(map_irq[15]			)
+			);
+		
+		
+		reg		[1:0]	di_2di_3do;		
+	
+			ec_2di_3do#(
+				.REG_SPACE_BIAS 				(`ROLLER_3212_REG_BIAS	)
+				,.REG_SPACE_SIZE 				(512					)
+			)ec_2di_3do_u0(
+				.clk_i							(clk				)
+				,.rst							(reset				)
+				,.i_time_1ms_vld				(time_1ms_vld		)
+				,.i_time_1s_vld 				(time_1s_vld		)
+				,.ps_reg_clk					(ps_reg_clk			)
+				,.ps_reg_reset					(ps_reg_reset		)
+				,.i_st_wr_en					(ps_reg_we			)
+				,.i_st_wr_addr  				(ps_reg_addr		)
+				,.i_st_wr_data  				(ps_reg_wr_dat		)
+				,.i_st_rd_en    				(ps_reg_re			)
+				,.i_st_rd_addr  				(ps_reg_rd_addr		)
+				,.o_st_rd_data  				(sub_comp_rd_dat[16]	)
+				,.o_st_rd_vld   				(sub_comp_rd_vld[16]	)
+				,.i_pos			                ()
+				,.i_poa			                ()
+				,.o_dri			                ()
+				,.o_dri2			            ()
+				,.o_dri1			            ()
+				,.o_intr_irq					(map_irq[16])
+			);
+	*/	
+	
+	
+	//	ec_trayclaw#(
+	//		.REG_SPACE_BIAS 					(`ROLLER_3119_REG_BIAS	)
+	//		,.REG_SPACE_SIZE 					(512	)
+	//	)ec_trayclaw_u0(
+	//		.clk_i								(clk				)
+	//		,.rst								(reset				)
+	//		,.i_time_1ms_vld					(time_1ms_vld		)
+	//		,.i_time_1s_vld 					(time_1s_vld		)
+	//		,.ps_reg_clk						(ps_reg_clk			)
+	//		,.ps_reg_reset						(ps_reg_reset		)
+	//		,.i_st_wr_en						(ps_reg_we			)
+	//		,.i_st_wr_addr  					(ps_reg_addr		)
+	//		,.i_st_wr_data  					(ps_reg_wr_dat		)
+	//		,.i_st_rd_en    					(ps_reg_re			)
+	//		,.i_st_rd_addr  					(ps_reg_rd_addr		)
+	//		,.o_st_rd_data  					(sub_comp_rd_dat[17])
+	//		,.o_st_rd_vld   					(sub_comp_rd_vld[17])
+	//		,.i_close_arr						()
+	//		,.i_open_arr    					()
+	//		,.i_material_arr					()
+	//		,.i_airtight_arr					()
+	//		,.o_claw_unlock 					()
+	//		,.o_claw_press  					()
+	//		,.o_claw_blow   					()
+	//		,.o_intr_irq						(map_irq[17])
+	//	);
+	
+	
+		reg		[5:0]	signal_i;	
+		
+		ec_sys_sf#(
+			.REG_SPACE_BIAS 		(`ROLLER_3155_REG_BIAS	)
+			,.REG_SPACE_SIZE 		(512	)
+		)ec_sys_sf_u0(
+			.clk_i					(clk				)
+			,.rst					(reset				)
+			,.i_time_1ms_vld		(time_1ms_vld		)
+			,.i_time_1s_vld 		(time_1s_vld		)
+			,.ps_reg_clk			(ps_reg_clk			)
+			,.ps_reg_reset			(ps_reg_reset		)
+			,.i_st_wr_en			(ps_reg_we			)
+			,.i_st_wr_addr  		(ps_reg_addr		)
+			,.i_st_wr_data  		(ps_reg_wr_dat		)
+			,.i_st_rd_en    		(ps_reg_re			)
+			,.i_st_rd_addr  		(ps_reg_rd_addr		)
+			,.o_st_rd_data  		(sub_comp_rd_dat[18])
+			,.o_st_rd_vld   		(sub_comp_rd_vld[18])
+			,.i_start       		(signal_i[5]		)
+			,.i_stop        		(signal_i[4]		)
+			,.i_rst         		(signal_i[3]		)
+			,.i_estop       		(signal_i[2]		)
+			,.i_manul	   			(signal_i[1]		)
+			,.i_auto	 			(signal_i[0]		)
+			,.o_intr_irq			(map_irq[18]		)
+		);
+		
+	//	ec_pulmotor_handwheel#(
+	//		.REG_SPACE_BIAS 		(`ROLLER_2156_REG_BIAS	)
+	//		,.REG_SPACE_SIZE 		(512	)
+	//	)ec_pulmotor_handwheel_u0(
+	//	.clk_i						(clk				)
+	//	,.rst						(reset				)
+	//	,.i_time_1ms_vld			(time_1ms_vld		)
+	//	,.i_time_1s_vld 			(time_1s_vld		)
+	//	,.ps_reg_clk				(ps_reg_clk			)
+	//	,.ps_reg_reset				(ps_reg_reset		)
+	//	,.i_st_wr_en				(ps_reg_we			)
+	//	,.i_st_wr_addr  			(ps_reg_addr		)
+	//	,.i_st_wr_data  			(ps_reg_wr_dat		)
+	//	,.i_st_rd_en    			(ps_reg_re			)
+	//	,.i_st_rd_addr  			(ps_reg_rd_addr		)
+	//	,.o_st_rd_data  			(sub_comp_rd_dat[19])
+	//	,.o_st_rd_vld   			(sub_comp_rd_vld[19])
+	//	,.i_estop      				()
+	//	,.i_pulse_a    				()
+	//	,.i_pulse_b    				()
+	//	,.i_stp_x1     				()
+	//	,.i_stp_x10    				()
+	//	,.i_stp_x100   				()
+	//	,.i_axis_x     				()
+	//	,.i_axis_y     				()
+	//	,.i_axis_z     				()
+	//	,.i_axis_4     				()
+	//	,.i_axis_5     				()
+	//	,.i_axis_6     				()
+	//	,.i_axis_7     				()
+	//	,.o_wheel_prog 				()
+	//	,.o_pulse_cnt  				()
+	//	,.o_estop_sta  				()
+	//	,.o_axis_num   				()
+	//	,.o_wheel_dir  				()
+	//	,.o_intr_irq				(map_irq[19])
+	//	);
+
+	//	reg [4:0] di_i_ec_5di;
+	//	
+	//	ec_5di#(
+	//		.REG_SPACE_BIAS 				(`ROLLER_1037_REG_BIAS	)
+	//		,.REG_SPACE_SIZE 				(512	)
+	//	)ec_5di_u0(
+	//		.clk_i							(clk				)
+	//		,.rst							(reset				)
+	//		,.i_time_1ms_vld				(time_1ms_vld		)
+	//		,.i_time_1s_vld 				(time_1s_vld		)
+	//		,.ps_reg_clk					(ps_reg_clk			)
+	//		,.ps_reg_reset					(ps_reg_reset		)
+	//		,.i_st_wr_en					(ps_reg_we			)
+	//		,.i_st_wr_addr  				(ps_reg_addr		)
+	//		,.i_st_wr_data  				(ps_reg_wr_dat		)
+	//		,.i_st_rd_en    				(ps_reg_re			)
+	//		,.i_st_rd_addr  				(ps_reg_rd_addr		)
+	//		,.o_st_rd_data  				(sub_comp_rd_dat[20]	)
+	//		,.o_st_rd_vld   				(sub_comp_rd_vld[20]	)
+	//		,.i_sign1_check					()
+	//		,.i_sign2_check					()
+	//		,.i_sign3_check					()
+	//		,.i_sign4_check					()
+	//		,.i_sign5_check					()
+	//		,.o_intr_irq					(map_irq[20]			)
+	//	);
+	
+	//	reg	[2:0]	ctrl_signal	;
+	//			
+	//		ec_sf_door#(
+	//			.REG_SPACE_BIAS 				(`ROLLER_3060_REG_BIAS				)
+	//			,.REG_SPACE_SIZE 				(512				)
+	//		)ec_sf_door_u0(
+	//			.clk_i							(clk				)
+	//			,.rst							(reset				)
+	//			,.i_time_1ms_vld  				(time_1ms_vld		)
+	//			,.i_time_1s_vld   				(time_1s_vld		)
+	//			,.ps_reg_clk					(ps_reg_clk			)
+	//			,.ps_reg_reset					(ps_reg_reset		)
+	//			,.i_st_wr_en					(ps_reg_we			)
+	//			,.i_st_wr_addr    				(ps_reg_addr		)
+	//			,.i_st_wr_data    				(ps_reg_wr_dat		)
+	//			,.i_st_rd_en      				(ps_reg_re			)
+	//			,.i_st_rd_addr    				(ps_reg_rd_addr		)
+	//			,.o_st_rd_data    				(sub_comp_rd_dat[21]	)
+	//			,.o_st_rd_vld     				(sub_comp_rd_vld[21]	)
+	//			,.i_open_req_key				(ctrl_signal[2])
+	//			,.i_close_confirm_key 			(ctrl_signal[1])
+	//			,.i_lock_monitor  				(ctrl_signal[0])
+	//			,.o_lock_open    				()
+	//			,.o_intr_irq					( map_irq[21] )
+	//		);
+			
+			
+	//		ec_8do#(
+	//			.REG_SPACE_BIAS 				(`ROLLER_1052_REG_BIAS		)	//Component offset address
+	//			,.REG_SPACE_SIZE 				(512			)		//Component register size
+	//		)ec_8do_u0(
+	//			.clk_i							(clk				)
+	//			,.rst							(reset				)
+	//			,.i_time_1ms_vld				(time_1ms_vld		)
+	//			,.i_time_1s_vld 				(time_1s_vld		)
+	//			,.ps_reg_clk					(ps_reg_clk			)
+	//			,.ps_reg_reset					(ps_reg_reset		)
+	//			,.i_st_wr_en					(ps_reg_we			)
+	//			,.i_st_wr_addr  				(ps_reg_addr		)
+	//			,.i_st_wr_data  				(ps_reg_wr_dat		)
+	//			,.i_st_rd_en    				(ps_reg_re			)
+	//			,.i_st_rd_addr  				(ps_reg_rd_addr		)
+	//			,.o_st_rd_data  				(sub_comp_rd_dat[22]	)
+	//			,.o_st_rd_vld   				(sub_comp_rd_vld[22]	)
+	//			,.o_dri1						()
+	//			,.o_dri2						()
+	//			,.o_dri3						()
+	//			,.o_dri4						()
+	//			,.o_dri5						()
+	//			,.o_dri6						()
+	//			,.o_dri7						()
+	//			,.o_dri8						()
+	//			,.o_intr_irq					(map_irq[22])
+	//		);
+    //
+	//		
+	//
+	//		reg 	[15:0]	di_ec_16i_check;
+	//		
+	//		ec_16di#(
+	//			.REG_SPACE_BIAS 				(`ROLLER_2127_REG_BIAS				)	//Component offset address
+	//			,.REG_SPACE_SIZE 				(512				)		//Component register size
+	//		)ec_16di_u0(
+	//			.clk_i							(clk				)
+	//			,.rst							(reset				)
+	//			,.i_time_1ms_vld				(time_1ms_vld		)
+	//			,.i_time_1s_vld 				(time_1s_vld		)
+	//			,.ps_reg_clk					(ps_reg_clk			)
+	//			,.ps_reg_reset					(ps_reg_reset		)
+	//			,.i_st_wr_en					(ps_reg_we			)
+	//			,.i_st_wr_addr  				(ps_reg_addr		)
+	//			,.i_st_wr_data  				(ps_reg_wr_dat		)
+	//			,.i_st_rd_en    				(ps_reg_re			)
+	//			,.i_st_rd_addr  				(ps_reg_rd_addr		)
+	//			,.o_st_rd_data  				(sub_comp_rd_dat[23]	)
+	//			,.o_st_rd_vld   				(sub_comp_rd_vld[23]	)
+	//			,.i_sign1_check					()
+	//			,.i_sign2_check					()
+	//			,.i_sign3_check					()
+	//			,.i_sign4_check					()
+	//			,.i_sign5_check					()
+	//			,.i_sign6_check					()
+	//			,.i_sign7_check					()
+	//			,.i_sign8_check					()
+	//			,.i_sign9_check					()
+	//			,.i_sign10_check				()
+	//			,.i_sign11_check				()
+	//			,.i_sign12_check				()
+	//			,.i_sign13_check				()
+	//			,.i_sign14_check				()
+	//			,.i_sign15_check				()
+	//			,.i_sign16_check				()
+	//			,.o_intr_irq					(map_irq[23]		)
+	//		);
+			
+
+	//reg 	i_estop      ;
+	//reg 	i_pulse_a    ;
+	//reg 	i_pulse_b    ;
+	//reg 	i_stp_x1  	 ;
+	//reg 	i_stp_x10 	 ;
+	//reg 	i_stp_x100	 ;
+	//reg 	i_axis_x     ;
+	//reg 	i_axis_y     ;
+	//reg 	i_axis_z     ;
+	//reg 	i_axis_4     ;
+	//reg 	i_axis_5     ;
+	//reg 	i_axis_6     ;
+	//reg 	i_axis_7     ;
+	
+	//reg		[6:0] 	axis ;
+	//reg		[1:0]	gear;
+	//
+	//
+	//ec_pulmotor_handwheel#(
+	//	.REG_SPACE_BIAS 				(`ROLLER_1104_REG_BIAS	)
+	//	,.REG_SPACE_SIZE 				(512	)
+	//)ec_pulmotor_handwheel_u0(
+	//	.clk_i							(clk				)
+	//	,.rst							(reset				)
+	//	,.i_time_1ms_vld				(time_1ms_vld		)
+	//	,.i_time_1s_vld 				(time_1s_vld		)
+	//	,.ps_reg_clk					(ps_reg_clk			)
+	//	,.ps_reg_reset					(ps_reg_reset		)
+	//	,.i_st_wr_en					(ps_reg_we			)
+	//	,.i_st_wr_addr  				(ps_reg_addr		)
+	//	,.i_st_wr_data  				(ps_reg_wr_dat		)
+	//	,.i_st_rd_en    				(ps_reg_re			)
+	//	,.i_st_rd_addr  				(ps_reg_rd_addr		)
+	//	,.o_st_rd_data  				(sub_comp_rd_dat[18])
+	//	,.o_st_rd_vld   				(sub_comp_rd_vld[18])
+	//	,.i_estop     					(0   )
+	//	,.i_pulse_a   					(i_pulse_a )
+	//	,.i_pulse_b   					(i_pulse_b )
+	//	,.i_stp_x1    					(axis[0] 	)
+	//	,.i_stp_x10   					(axis[1] 	)
+	//	,.i_stp_x100  					(axis[2]	)
+	//	,.i_axis_x    					(axis[0]  )
+	//	,.i_axis_y    					(axis[1]  )
+	//	,.i_axis_z    					(axis[2]  )
+	//	,.i_axis_4    					(axis[3]  )
+	//	,.i_axis_5    					(axis[4]  )
+	//	,.i_axis_6    					(axis[5]  )
+	//	,.i_axis_7    					(axis[6]  )
+	//	,.o_intr_irq					(map_irq[18])
+    //);
+	
+
+
+	/*		
+
+		ec_3led_buzzer#(
+				.REG_SPACE_BIAS 			(`ROLLER_3168_REG_BIAS	)
+				,.REG_SPACE_SIZE 			(512	)
+			)ec_3led_buzzer_u0(
+				.clk_i						(clk				)
+				,.rst						(reset				)
+				,.i_time_1ms_vld			(time_1ms_vld		)
+				,.i_time_1s_vld 			(time_1s_vld		)
+				,.ps_reg_clk				(ps_reg_clk			)
+				,.ps_reg_reset				(ps_reg_reset		)
+				,.i_st_wr_en				(ps_reg_we			)
+				,.i_st_wr_addr  			(ps_reg_addr		)
+				,.i_st_wr_data  			(ps_reg_wr_dat		)
+				,.i_st_rd_en    			(ps_reg_re			)
+				,.i_st_rd_addr  			(ps_reg_rd_addr		)
+				,.o_st_rd_data  			(sub_comp_rd_dat[6]	)
+				,.o_st_rd_vld   			(sub_comp_rd_vld[6]	)
+				,.do_o						()
+				,.o_intr_irq				(map_irq[6]			)
+			);
+			
+			
+			
+			
+			reg		[1:0]	di_2di_3do;
+			wire	[2:0]	do_2di_3do;
+				
+	
+			ec_hw_sdcx#(
+				.REG_SPACE_BIAS 		(`ROLLER_2004_REG_BIAS	),
+				.REG_SPACE_SIZE 		(512					)
+			)ec_hw_sdcx_u0	(
+				.clk_i					(clk					)
+				,.rst					(reset					)
+				,.i_time_1ms_vld		(time_1ms_vld			)
+				,.i_time_1s_vld 		(time_1s_vld			)
+				,.ps_reg_clk			(ps_reg_clk				)
+				,.ps_reg_reset			(ps_reg_reset			)
+				,.i_st_wr_en			(ps_reg_we				)
+				,.i_st_wr_addr  		(ps_reg_addr			)
+				,.i_st_wr_data  		(ps_reg_wr_dat			)
+				,.i_st_rd_en    		(ps_reg_re				)
+				,.i_st_rd_addr  		(ps_reg_rd_addr			)
+				,.o_st_rd_data  		(sub_comp_rd_dat[3]		)
+				,.o_st_rd_vld   		(sub_comp_rd_vld[3]		)
+				,.di_i					(di_2di_3do				)
+				,.do_o					(do_2di_3do				)
+				,.o_intr_irq			(map_irq[3]				)
+			);
+	
+	reg 		i_close_arr	   ;
+	reg 		i_open_arr     ;
+	reg 		i_material_arr ;
+	reg 		i_airtight_arr ;
+	
+	ec_trayclaw#(
+		.REG_SPACE_BIAS 				(`ROLLER_3095_REG_BIAS	)
+		,.REG_SPACE_SIZE 				(512	)
+	)ec_trayclaw_u0(
+		.clk_i							(clk				)
+		,.rst							(reset				)
+		,.i_time_1ms_vld				(time_1ms_vld		)
+		,.i_time_1s_vld 				(time_1s_vld		)
+		,.ps_reg_clk					(ps_reg_clk			)
+		,.ps_reg_reset					(ps_reg_reset		)
+		,.i_st_wr_en					(ps_reg_we			)
+		,.i_st_wr_addr  				(ps_reg_addr		)
+		,.i_st_wr_data  				(ps_reg_wr_dat		)
+		,.i_st_rd_en    				(ps_reg_re			)
+		,.i_st_rd_addr  				(ps_reg_rd_addr		)
+		,.o_st_rd_data  				(sub_comp_rd_dat[17])
+		,.o_st_rd_vld   				(sub_comp_rd_vld[17])
+		,.i_close_arr					(i_close_arr	)
+		,.i_open_arr    				(i_open_arr    )
+		,.i_material_arr				(i_material_arr)
+		,.i_airtight_arr				(i_airtight_arr)
+		,.o_claw_unlock 				()
+		,.o_claw_press  				()
+		,.o_claw_blow   				()
+		,.o_intr_irq					()
+    );
+	
+	
+	reg 		i_start  ;
+	reg 		i_stop   ;
+	reg 		i_rst    ;
+	reg 		i_estop  ;
+	
+	
+	ec_sys_sf#(
+		.REG_SPACE_BIAS 				(`ROLLER_2041_REG_BIAS		)
+		,.REG_SPACE_SIZE 				(512		)
+)(	
+		.clk_i							(clk				)	
+		,.rst							(reset				)	
+		,.i_time_1ms_vld				(time_1ms_vld		)	
+		,.i_time_1s_vld 				(time_1s_vld		)	
+		,.ps_reg_clk					(ps_reg_clk			)	
+		,.ps_reg_reset					(ps_reg_reset		)	
+		,.i_st_wr_en					(ps_reg_we			)	
+		,.i_st_wr_addr  				(ps_reg_addr		)	
+		,.i_st_wr_data  				(ps_reg_wr_dat		)	
+		,.i_st_rd_en    				(ps_reg_re			)	
+		,.i_st_rd_addr  				(ps_reg_rd_addr		)	
+		,.o_st_rd_data  				(sub_comp_rd_dat[18])	
+		,.o_st_rd_vld   				(sub_comp_rd_vld[18])	
+		,.i_start						(i_start)
+		,.i_stop  				    	(i_stop )
+		,.i_rst  						(i_rst  )
+		,.i_estop				    	(i_estop)
+		,.o_led_r 				    	()
+		,.o_led_g 				    	()
+		,.o_led_y 				    	()
+		,.o_bz				        	()
+		,.o_intr_irq					()	
+    );
+	
+	
+	
+	
+	
+	
+	
+	
+		
+		reg 		i_req_entry_key ;
+		reg 		i_close_ok_key  ;
+		reg 		i_door_monitor  ;
+		wire 		o_key_light     ;
+		wire 		o_door_dirve    ;
+		wire 		o_close_light   ;
+	
+	ec_sf_door#(
+		.REG_SPACE_BIAS 				(`ROLLER_3138_REG_BIAS	)
+		,.REG_SPACE_SIZE				(512					)
+	)ec_sf_door_u0(
+		.clk_i							(clk				)
+		,.rst							(reset				)
+		,.i_time_1ms_vld				(time_1ms_vld		)
+		,.i_time_1s_vld 				(time_1s_vld		)
+		,.ps_reg_clk					(ps_reg_clk			)
+		,.ps_reg_reset					(ps_reg_reset		)
+		,.i_st_wr_en					(ps_reg_we			)
+		,.i_st_wr_addr  				(ps_reg_addr		)
+		,.i_st_wr_data  				(ps_reg_wr_dat		)
+		,.i_st_rd_en    				(ps_reg_re			)
+		,.i_st_rd_addr  				(ps_reg_rd_addr		)
+		,.o_st_rd_data  				(sub_comp_rd_dat[20])
+		,.o_st_rd_vld   				(sub_comp_rd_vld[20])
+		,.i_req_entry_key 				(i_req_entry_key 	)
+		,.i_close_ok_key  				(i_close_ok_key  	)
+		,.i_door_monitor  				(i_door_monitor  	)
+		,.o_key_light     				(o_key_light     	)
+		,.o_door_dirve    				(o_door_dirve    	)
+		,.o_close_light   				(o_close_light   	)
+		,.o_intr_irq					(map_irq[11]		)
+    );
+	
+	
+	
+	
+	*/
+		
+		
+	//==========================================================================================================//
+	// ----------------------------------- don't care next context----------------------------------------------//
+	//===========================================================================================================//
+	
+	
+	
+	
+	
+	// --- flow_comp_1 x_axis-----
+   
+/*
+
+   ec_ethercat_servo
+    #(
+         .REG_SPACE_BIAS     (20'd2048)
+        ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
+        ,.P_MODULE_ID        (8'd1                      )
+        ,.P_SEAT_NUM         (4'd0                      )
+    )
+    ec_ethercat_servo_1
+    (
+      .clk                   ( ps_reg_clk               ),
+      .reset                 ( ps_reg_reset             ),
+	  .aurora_clk            ( clk               ),
+      .aurora_reset          ( reset             ),
+	  
+	  .i_time_1ms_vld        (time_1ms_vld         ),
+	  .i_time_1s_vld         (time_1s_vld          ),
+
+	  .i_st_wr_en            ( ps_reg_we                ),
+	  .i_st_wr_addr          ( ps_reg_addr              ),
+      .i_st_wr_data          ( ps_reg_wr_dat            ),
+      .i_st_rd_en            ( ps_reg_re                ),
+      .i_st_rd_addr          ( ps_reg_rd_addr           ),
+	  .o_st_rd_vld           ( sub_comp_rd_vld[0]    ),
+      .o_st_rd_data          ( sub_comp_rd_dat[0]    ),
+	  .o_intr_irq            ( map_irq[0]       )
+	  
+      ,.i_servo_limb          (~di_mst_msg[0]  )                
+      ,.i_servo_limf          (~di_mst_msg[1]  )                
+      ,.i_servo_zero          (~di_mst_msg[2]  )                
+      
+//      ,.i_emerge_stop_signal  (di_mst_msg[9]    )
+//      ,.i_reset_signal        (~di_mst_msg[10]   )
+//      ,.i_stop_start_singal   (~di_mst_msg[11]   )
+//      ,.i_auto_manual_singal  (~di_mst_msg[12]   )
+
+        
+    );
+	*/
+	
+		//=================================================================================================================
+		// --- flow_comp_2 z_axis-----
+    /*
+	
+	ec_ethercat_servo
+    #(
+         .REG_SPACE_BIAS     (20'd2560)
+        ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
+        ,.P_MODULE_ID        (8'd2                      )
+        ,.P_SEAT_NUM         (4'd0                      )
+    )
+    ec_ethercat_servo_2
+    (
+      .clk                   ( ps_reg_clk               ),
+      .reset                 ( ps_reg_reset             ),
+	  .aurora_clk            ( clk               ),
+      .aurora_reset          ( reset             ),
+	  
+	  .i_time_1ms_vld        (time_1ms_vld         ),
+	  .i_time_1s_vld         (time_1s_vld          ),
+
+	  .i_st_wr_en            ( ps_reg_we                ),
+	  .i_st_wr_addr          ( ps_reg_addr              ),
+      .i_st_wr_data          ( ps_reg_wr_dat            ),
+      .i_st_rd_en            ( ps_reg_re                ),
+      .i_st_rd_addr          ( ps_reg_rd_addr           ),
+	  .o_st_rd_vld           ( sub_comp_rd_vld[1]    ),
+      .o_st_rd_data          ( sub_comp_rd_dat[1]    ),
+	  .o_intr_irq            ( map_irq[1]       )
+
+      ,.i_servo_limb          (~di_mst_msg[6]  )                
+      ,.i_servo_limf          (~di_mst_msg[7]  )                
+      ,.i_servo_zero          (~di_mst_msg[8]  )                
+      
+//      ,.i_emerge_stop_signal  (di_mst_msg[9]    )
+//      ,.i_reset_signal        (~di_mst_msg[10]   )
+//      ,.i_stop_start_singal   (~di_mst_msg[11]   )
+//      ,.i_auto_manual_singal  (~di_mst_msg[12]   )
+    );
+	
+		
+	
+	// --- flow_comp_3 y_axis-----
+    ec_ethercat_servo
+    #(
+         .REG_SPACE_BIAS     (20'd3072)
+        ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
+        ,.P_MODULE_ID        (8'd3                      )
+        ,.P_SEAT_NUM         (4'd0                      )
+    )
+    ec_ethercat_servo_3
+    (
+      .clk                   ( ps_reg_clk               ),
+      .reset                 ( ps_reg_reset             ),
+	  .aurora_clk            ( clk               ),
+      .aurora_reset          ( reset             ),
+	  
+	  .i_time_1ms_vld        (time_1ms_vld         ),
+	  .i_time_1s_vld         (time_1s_vld          ),
+
+	  .i_st_wr_en            ( ps_reg_we                ),
+	  .i_st_wr_addr          ( ps_reg_addr              ),
+      .i_st_wr_data          ( ps_reg_wr_dat            ),
+      .i_st_rd_en            ( ps_reg_re                ),
+      .i_st_rd_addr          ( ps_reg_rd_addr           ),
+	  .o_st_rd_vld           ( sub_comp_rd_vld[2]    ),
+      .o_st_rd_data          ( sub_comp_rd_dat[2]    ),
+	  .o_intr_irq            ( map_irq[2]       )
+
+      ,.i_servo_limb          (~di_mst_msg[3]  )               
+      ,.i_servo_limf          (~di_mst_msg[4]  )               
+      ,.i_servo_zero          (~di_mst_msg[5]  )             
+      
+//      ,.i_emerge_stop_signal  (di_mst_msg[9]    )
+//      ,.i_reset_signal        (~di_mst_msg[10]   )
+//      ,.i_stop_start_singal   (~di_mst_msg[11]   )
+//      ,.i_auto_manual_singal  (~di_mst_msg[12]   )
+    );
+
+	
+	
+	
+	// --- flow_comp_4 -----
+    ec_emcc60_board
+    #(
+         .REG_SPACE_BIAS     (20'd3584)
+        ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
+        ,.P_MODULE_ID        (8'd4                      )
+        ,.P_SEAT_NUM         (4'd0                      )
+    )
+    ec_emcc60_board_4
+    (
+      .clk                   ( ps_reg_clk               ),
+      .reset                 ( ps_reg_reset             ),
+	  .aurora_clk            ( clk               ),
+      .aurora_reset          ( reset             ),
+	  
+	  .i_time_1ms_vld        (time_1ms_vld         ),
+	  .i_time_1s_vld         (time_1s_vld          ),
+
+	  .i_st_wr_en            ( ps_reg_we                ),
+	  .i_st_wr_addr          ( ps_reg_addr              ),
+      .i_st_wr_data          ( ps_reg_wr_dat            ),
+      .i_st_rd_en            ( ps_reg_re                ),
+      .i_st_rd_addr          ( ps_reg_rd_addr           ),
+	  .o_st_rd_vld           ( sub_comp_rd_vld[3]    ),
+      .o_st_rd_data          ( sub_comp_rd_dat[3]    ),
+	  .o_intr_irq            ( map_irq[3]       )                   
+    ,.iv_do_mst_msg              (                 )
+    ,.iv_di_mst_msg              (!di_mst_msg       )
+    ,.iv_board_temperature       (                 )
+    ,.iv_adc_value               (                 )
+    ,.iv_dac_value               (                 )
+
+    );
+
+	
+	
+	wire   o_led_yellow_5;
+	wire   o_led_red_5;
+	wire   o_led_green_5;
+	wire   o_buzzer_5;
+	
+	// --- flow_comp_5 -----
+    ec_equipment
+    #(
+         .REG_SPACE_BIAS     (20'd4096)
+        ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
+        ,.P_MODULE_ID        (8'd5                      )
+        ,.P_SEAT_NUM         (4'd0                      )
+    )
+    ec_equipment_5
+    (
+      .clk                   ( ps_reg_clk               ),
+      .reset                 ( ps_reg_reset             ),
+	  .aurora_clk            ( clk               ),
+      .aurora_reset          ( reset             ),
+	  
+	  .i_time_1ms_vld        (time_1ms_vld         ),
+	  .i_time_1s_vld         (time_1s_vld          ),
+
+	  .i_st_wr_en            ( ps_reg_we                ),
+	  .i_st_wr_addr          ( ps_reg_addr              ),
+      .i_st_wr_data          ( ps_reg_wr_dat            ),
+      .i_st_rd_en            ( ps_reg_re                ),
+      .i_st_rd_addr          ( ps_reg_rd_addr           ),
+	  .o_st_rd_vld           ( sub_comp_rd_vld[4]    ),
+      .o_st_rd_data          ( sub_comp_rd_dat[4]    ),
+	  .o_intr_irq            ( map_irq[4]       )
+
+       ,.i_auto_manual_singal ( ~di_mst_msg[12]     )
+       ,.o_led_yellow         ( o_led_yellow_5      )
+       ,.i_emerge_stop_signal ( ~di_mst_msg[9]      )
+       ,.o_led_red            ( o_led_red_5         )
+       ,.i_reset_signal       ( ~di_mst_msg[10]     )
+       ,.o_led_green          ( o_led_green_5       )
+       ,.o_buzzer             ( o_buzzer_5          )
+       ,.i_stop_start_singal  ( ~di_mst_msg[11]     )
+    );
+
+    assign do_mst_msg[3]=~o_led_yellow_5;
+    assign do_mst_msg[2]=~o_led_red_5;
+    assign do_mst_msg[1]=~o_led_green_5;
+    assign do_mst_msg[0]=~o_buzzer_5;
+	
+	
+	wire   o_bp_speed_2_6;
+	wire   o_bp_start_6;
+	wire   o_estop_6;
+	wire   o_bp_speed_1_6;
+	wire   o_bp_dir_6;
+	
+	
+	// --- flow_comp_6 -----
+	ec_js_2p_bpss
+    #(
+         .REG_SPACE_BIAS     (20'd4608)
+        ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
+        ,.P_MODULE_ID        (8'd6                      )
+        ,.P_SEAT_NUM         (4'd0                      )
+    )
+    ec_js_2p_bpss_6
+    (
+      .clk                   ( ps_reg_clk               ),
+      .reset                 ( ps_reg_reset             ),
+	  .aurora_clk            ( clk               ),
+      .aurora_reset          ( reset             ),
+	  
+	  .i_time_1ms_vld        (time_1ms_vld         ),
+	  .i_time_1s_vld         (time_1s_vld          ),
+
+	  .i_st_wr_en            ( ps_reg_we                ),
+	  .i_st_wr_addr          ( ps_reg_addr              ),
+      .i_st_wr_data          ( ps_reg_wr_dat            ),
+      .i_st_rd_en            ( ps_reg_re                ),
+      .i_st_rd_addr          ( ps_reg_rd_addr           ),
+	  .o_st_rd_vld           ( sub_comp_rd_vld[5]    ),
+      .o_st_rd_data          ( sub_comp_rd_dat[5]    ),
+	  .o_intr_irq            ( map_irq[5]       )
+
+       ,.o_bp_start         ( o_bp_start_6      )
+       ,.o_estop            ( o_estop_6         )
+       ,.o_bp_speed_1       ( o_bp_speed_1_6    )
+       ,.o_bp_speed_2       ( o_bp_speed_2_6    )
+       ,.o_bp_dir           ( o_bp_dir_6        )
+       ,.i_spd_1_arr        ( ~di_mst_msg[14]   )
+       ,.i_pos_1_arr        ( ~di_mst_msg[14]   )
+       ,.i_spd_2_arr        ( ~di_mst_msg[16]   )
+       ,.i_pos_2_arr        ( ~di_mst_msg[13]   )
+       ,.i_bp_err           ( ~di_mst_msg[19]   )
+      
+      ,.i_emerge_stop_signal  (di_mst_msg[9]    )
+      ,.i_reset_signal        (~di_mst_msg[10]   )
+      ,.i_stop_start_singal   (~di_mst_msg[11]   )
+      ,.i_auto_manual_singal  (~di_mst_msg[12]   )
+       
+    );
+
+    assign do_mst_msg[7]=~o_bp_speed_2_6;
+    assign do_mst_msg[4]=~o_bp_dir_6;
+    assign do_mst_msg[8]=~o_estop_6;
+    assign do_mst_msg[6]=~o_bp_speed_1_6;
+    assign do_mst_msg[5]=~o_bp_start_6;
+	
+	
+	wire   o_bp_speed_1_7;
+	wire   o_bp_start_7;
+	wire   o_bp_speed_2_7;
+	wire   o_estop_7;
+	wire   o_bp_dir_7;
+	
+	// --- flow_comp_7 -----
+    ec_js_2p_bpss
+    #(
+         .REG_SPACE_BIAS     (20'd5120)
+        ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
+        ,.P_MODULE_ID        (8'd7                      )
+        ,.P_SEAT_NUM         (4'd0                      )
+    )
+    ec_js_2p_bpss_7
+    (
+      .clk                   ( ps_reg_clk               ),
+      .reset                 ( ps_reg_reset             ),
+	  .aurora_clk            ( clk               ),
+      .aurora_reset          ( reset             ),
+	  
+	  .i_time_1ms_vld        (time_1ms_vld         ),
+	  .i_time_1s_vld         (time_1s_vld          ),
+
+	  .i_st_wr_en            ( ps_reg_we                ),
+	  .i_st_wr_addr          ( ps_reg_addr              ),
+      .i_st_wr_data          ( ps_reg_wr_dat            ),
+      .i_st_rd_en            ( ps_reg_re                ),
+      .i_st_rd_addr          ( ps_reg_rd_addr           ),
+	  .o_st_rd_vld           ( sub_comp_rd_vld[6]    ),
+      .o_st_rd_data          ( sub_comp_rd_dat[6]    ),
+	  .o_intr_irq            ( map_irq[6]       )
+	  
+       ,.o_bp_speed_1       ( o_bp_speed_1_7    )
+       ,.o_bp_speed_2       ( o_bp_speed_2_7    )
+       ,.i_spd_1_arr        ( ~di_mst_msg[24]   )
+       ,.i_pos_1_arr        ( ~di_mst_msg[21]   )
+       ,.i_spd_2_arr        ( ~di_mst_msg[32]   )
+       ,.i_pos_2_arr        ( ~di_mst_msg[29]   )
+       ,.o_bp_start         ( o_bp_start_7      )
+       ,.o_estop            ( o_estop_7         )
+       ,.o_bp_dir           ( o_bp_dir_7        )
+       ,.i_bp_err           ( ~di_mst_msg[27]   )
+      
+      ,.i_emerge_stop_signal  (di_mst_msg[9]    )
+      ,.i_reset_signal        (~di_mst_msg[10]   )
+      ,.i_stop_start_singal   (~di_mst_msg[11]   )
+      ,.i_auto_manual_singal  (~di_mst_msg[12]   )
+    );
+
+    assign do_mst_msg[11]=~o_bp_speed_1_7;
+    assign do_mst_msg[9]=~o_bp_start_7;
+    assign do_mst_msg[12]=~o_bp_speed_2_7;
+    assign do_mst_msg[13]=~o_estop_7;
+    assign do_mst_msg[10]=~o_bp_dir_7;
+	
+	
+	wire   o_bp_speed_1_8;
+	wire   o_estop_8;
+	wire   o_bp_start_8;
+	wire   o_bp_dir_8;
+	wire   o_bp_speed_2_8;
+	wire   o_cylineder_ack_8;
+	wire   o_cylineder_rst_8;
+	
+	// --- flow_comp_8 -----
+    ec_js_2p_bpss
+    #(
+         .REG_SPACE_BIAS     (20'd5632)
+        ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
+        ,.P_MODULE_ID        (8'd8                      )
+        ,.P_SEAT_NUM         (4'd0                      )
+    )
+    ec_js_2p_bpss_8
+    (
+      .clk                   ( ps_reg_clk               ),
+      .reset                 ( ps_reg_reset             ),
+	  .aurora_clk            ( clk               ),
+      .aurora_reset          ( reset             ),
+	  
+	  .i_time_1ms_vld        (time_1ms_vld         ),
+	  .i_time_1s_vld         (time_1s_vld          ),
+
+	  .i_st_wr_en            ( ps_reg_we                ),
+	  .i_st_wr_addr          ( ps_reg_addr              ),
+      .i_st_wr_data          ( ps_reg_wr_dat            ),
+      .i_st_rd_en            ( ps_reg_re                ),
+      .i_st_rd_addr          ( ps_reg_rd_addr           ),
+	  .o_st_rd_vld           ( sub_comp_rd_vld[7]    ),
+      .o_st_rd_data          ( sub_comp_rd_dat[7]    ),
+	  .o_intr_irq            ( map_irq[7]       )
+	  
+       ,.o_bp_speed_1       ( o_bp_speed_1_8      )
+       ,.o_estop            ( o_estop_8           )
+       ,.o_bp_start         ( o_bp_start_8        )
+       ,.o_bp_dir           ( o_bp_dir_8          )
+       ,.o_bp_speed_2       ( o_bp_speed_2_8      )
+       ,.i_bp_err           ( ~di_mst_msg[35]     )
+       ,.i_pos_1_arr        ( ~di_mst_msg[29]     )
+       ,.i_spd_1_arr        ( ~di_mst_msg[32]    )
+       ,.i_pos_2_arr        ( ~di_mst_msg[37]     )
+       ,.i_spd_2_arr        ( ~di_mst_msg[40]    )
+       
+      
+      ,.i_emerge_stop_signal  (di_mst_msg[9]    )
+      ,.i_reset_signal        (~di_mst_msg[10]   )
+      ,.i_stop_start_singal   (~di_mst_msg[11]   )
+      ,.i_auto_manual_singal  (~di_mst_msg[12]   )
+
+    );
+
+    assign do_mst_msg[16]=~o_bp_speed_1_8;
+    assign do_mst_msg[18]=~o_estop_8;
+    assign do_mst_msg[14]=~o_bp_start_8;
+    assign do_mst_msg[15]=~o_bp_dir_8;
+    assign do_mst_msg[17]=~o_bp_speed_2_8;
+    
+		
+	
+	wire   o_bp_speed_1_9;
+	wire   o_bp_start_9;
+	wire   o_bp_speed_2_9;
+	wire   o_bp_dir_9;
+	wire   o_estop_9;
+	
+	// --- flow_comp_9 -----
+    ec_js_2p_bpss
+    #(
+         .REG_SPACE_BIAS     (20'd6144)
+        ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
+        ,.P_MODULE_ID        (8'd9                      )
+        ,.P_SEAT_NUM         (4'd0                      )
+    )
+    ec_js_2p_bpss_9
+    (
+      .clk                   ( ps_reg_clk               ),
+      .reset                 ( ps_reg_reset             ),
+	  .aurora_clk            ( clk               ),
+      .aurora_reset          ( reset             ),
+	  
+	  .i_time_1ms_vld        (time_1ms_vld         ),
+	  .i_time_1s_vld         (time_1s_vld          ),
+
+	  .i_st_wr_en            ( ps_reg_we                ),
+	  .i_st_wr_addr          ( ps_reg_addr              ),
+      .i_st_wr_data          ( ps_reg_wr_dat            ),
+      .i_st_rd_en            ( ps_reg_re                ),
+      .i_st_rd_addr          ( ps_reg_rd_addr           ),
+	  .o_st_rd_vld           ( sub_comp_rd_vld[8]    ),
+      .o_st_rd_data          ( sub_comp_rd_dat[8]    ),
+	  .o_intr_irq            ( map_irq[8]       )
+	  
+       ,.o_bp_speed_1       ( o_bp_speed_1_9        )
+       ,.o_bp_start         ( o_bp_start_9          )
+       
+       ,.i_pos_1_arr        ( ~di_mst_msg[29]       )
+       ,.i_spd_1_arr        ( ~di_mst_msg[32]       )
+       ,.i_pos_2_arr        ( ~di_mst_msg[37]       )
+       ,.i_spd_2_arr        ( ~di_mst_msg[40]       )
+       
+       ,.o_bp_speed_2       ( o_bp_speed_2_9        )
+       ,.i_bp_err           ( ~di_mst_msg[43]       )
+       ,.o_bp_dir           ( o_bp_dir_9            )
+       ,.o_estop            ( o_estop_9             )
+       
+      
+      ,.i_emerge_stop_signal  (di_mst_msg[9]    )
+      ,.i_reset_signal        (~di_mst_msg[10]   )
+      ,.i_stop_start_singal   (~di_mst_msg[11]   )
+      ,.i_auto_manual_singal  (~di_mst_msg[12]   )
+    );
+    assign do_mst_msg[21]=~o_bp_speed_1_9;
+    assign do_mst_msg[19]=~o_bp_start_9;
+    assign do_mst_msg[22]=~o_bp_speed_2_9;
+    assign do_mst_msg[20]=~o_bp_dir_9;
+    assign do_mst_msg[23]=~o_estop_9;
+	
+	
+	// --- flow_comp_10 -----
+    ec_1_in_button
+    #(
+         .REG_SPACE_BIAS     (20'd6656)
+        ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
+        ,.P_MODULE_ID        (8'd10                      )
+        ,.P_SEAT_NUM         (4'd0                      )
+    )
+    ec_1_in_button_10
+    (
+      .clk                   ( ps_reg_clk               ),
+      .reset                 ( ps_reg_reset             ),
+	  .aurora_clk            ( clk               ),
+      .aurora_reset          ( reset             ),
+	  
+	  .i_time_1ms_vld        (time_1ms_vld         ),
+	  .i_time_1s_vld         (time_1s_vld          ),
+
+	  .i_st_wr_en            ( ps_reg_we                ),
+	  .i_st_wr_addr          ( ps_reg_addr              ),
+      .i_st_wr_data          ( ps_reg_wr_dat            ),
+      .i_st_rd_en            ( ps_reg_re                ),
+      .i_st_rd_addr          ( ps_reg_rd_addr           ),
+	  .o_st_rd_vld           ( sub_comp_rd_vld[9]    ),
+      .o_st_rd_data          ( sub_comp_rd_dat[9]    ),
+	  .o_intr_irq            ( map_irq[9]       )
+
+   ,.  i_sign1_check         ()
+
+    );
+
+	
+	
+	
+	// --- flow_comp_11 -----
+    ec_1_in_button
+    #(
+         .REG_SPACE_BIAS     (20'd7168)
+        ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
+        ,.P_MODULE_ID        (8'd11                      )
+        ,.P_SEAT_NUM         (4'd0                      )
+    )
+    ec_1_in_button_11
+    (
+      .clk                   ( ps_reg_clk               ),
+      .reset                 ( ps_reg_reset             ),
+	  .aurora_clk            ( clk               ),
+      .aurora_reset          ( reset             ),
+	  
+	  .i_time_1ms_vld        (time_1ms_vld         ),
+	  .i_time_1s_vld         (time_1s_vld          ),
+
+	  .i_st_wr_en            ( ps_reg_we                ),
+	  .i_st_wr_addr          ( ps_reg_addr              ),
+      .i_st_wr_data          ( ps_reg_wr_dat            ),
+      .i_st_rd_en            ( ps_reg_re                ),
+      .i_st_rd_addr          ( ps_reg_rd_addr           ),
+	  .o_st_rd_vld           ( sub_comp_rd_vld[10]    ),
+      .o_st_rd_data          ( sub_comp_rd_dat[10]    ),
+	  .o_intr_irq            ( map_irq[10]       )
+
+   ,.  i_sign1_check         ()
+    );
+
+	
+	
+    wire [1:0]reg_execu_result_1;
+	// --- flow_comp_12 -----
+    ec_osm41_485_laser_distance
+    #(
+         .REG_SPACE_BIAS     (20'd7680)
+        ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
+        ,.P_MODULE_ID        (8'd12                      )
+        ,.P_SEAT_NUM         (4'd0                      )
+    )
+    ec_osm41_485_laser_distance_12
+    (
+      .clk                   ( ps_reg_clk               ),
+      .reset                 ( ps_reg_reset             ),
+	  .aurora_clk            ( clk               ),
+      .aurora_reset          ( reset             ),
+	  
+	  .i_time_1ms_vld        (time_1ms_vld         ),
+	  .i_time_1s_vld         (time_1s_vld          ),
+
+	  .i_st_wr_en            ( ps_reg_we                ),
+	  .i_st_wr_addr          ( ps_reg_addr              ),
+      .i_st_wr_data          ( ps_reg_wr_dat            ),
+      .i_st_rd_en            ( ps_reg_re                ),
+      .i_st_rd_addr          ( ps_reg_rd_addr           ),
+	  .o_st_rd_vld           ( sub_comp_rd_vld[11]    ),
+      .o_st_rd_data          ( sub_comp_rd_dat[11]    ),
+	  .o_intr_irq            ( map_irq[11]       )
+
+       ,.o_user_req     (rs485_2_user_req  [0])            
+       ,.i_user_grant   (rs485_2_user_grant[0])            
+       ,.o_uart_tx      (rs485_2_user_tx   [0])            
+       ,.i_uart_rx      (rs485_2_user_rx   [0])            
+       ,.o_uart_de      (rs485_2_user_de   [0])      
+       
+    );
+    
+    
+	// --- flow_comp_13 -----
+    ec_osm41_485_laser_distance
+    #(
+         .REG_SPACE_BIAS     (20'd12288)
+        ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
+        ,.P_MODULE_ID        (8'd13                      )
+        ,.P_SEAT_NUM         (4'd0                      )
+    )
+    ec_osm41_485_laser_distance_13
+    (
+      .clk                   ( ps_reg_clk               ),
+      .reset                 ( ps_reg_reset             ),
+	  .aurora_clk            ( clk               ),
+      .aurora_reset          ( reset             ),
+	  
+	  .i_time_1ms_vld        (time_1ms_vld         ),
+	  .i_time_1s_vld         (time_1s_vld          ),
+
+	  .i_st_wr_en            ( ps_reg_we                ),
+	  .i_st_wr_addr          ( ps_reg_addr              ),
+      .i_st_wr_data          ( ps_reg_wr_dat            ),
+      .i_st_rd_en            ( ps_reg_re                ),
+      .i_st_rd_addr          ( ps_reg_rd_addr           ),
+	  .o_st_rd_vld           ( sub_comp_rd_vld[20]    ),
+      .o_st_rd_data          ( sub_comp_rd_dat[20]    ),
+	  .o_intr_irq            ( map_irq[20]       )
+
+       ,.o_user_req     (rs485_2_user_req  [1])
+       ,.i_user_grant   (rs485_2_user_grant[1])
+       ,.o_uart_tx      (rs485_2_user_tx   [1])
+       ,.i_uart_rx      (rs485_2_user_rx   [1])
+       ,.o_uart_de      (rs485_2_user_de   [1])
+       
+    );
+
+
+
+	// --- flow_comp_20 -----
+    ec_1io_check
+    #(
+         .REG_SPACE_BIAS     (20'd8192)
+        ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
+        ,.P_MODULE_ID        (8'd20                      )
+        ,.P_SEAT_NUM         (4'd0                      )
+    )
+    ec_1io_check_20
+    (
+      .clk                   ( ps_reg_clk               ),
+      .reset                 ( ps_reg_reset             ),
+	  .aurora_clk            ( clk               ),
+      .aurora_reset          ( reset             ),
+	  
+	  .i_time_1ms_vld        (time_1ms_vld         ),
+	  .i_time_1s_vld         (time_1s_vld          ),
+
+	  .i_st_wr_en            ( ps_reg_we                ),
+	  .i_st_wr_addr          ( ps_reg_addr              ),
+      .i_st_wr_data          ( ps_reg_wr_dat            ),
+      .i_st_rd_en            ( ps_reg_re                ),
+      .i_st_rd_addr          ( ps_reg_rd_addr           ),
+	  .o_st_rd_vld           ( sub_comp_rd_vld[12]    ),
+      .o_st_rd_data          ( sub_comp_rd_dat[12]    ),
+	  .o_intr_irq            ( map_irq[12]       )
+
+       ,.i_sign1_check        ( di_mst_msg[48]           )
+    );
+
+	
+	
+	
+	// --- flow_comp_21 -----
+    ec_1io_check
+    #(
+         .REG_SPACE_BIAS     (20'd8704)
+        ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
+        ,.P_MODULE_ID        (8'd21                      )
+        ,.P_SEAT_NUM         (4'd0                      )
+    )
+    ec_1io_check_21
+    (
+      .clk                   ( ps_reg_clk               ),
+      .reset                 ( ps_reg_reset             ),
+	  .aurora_clk            ( clk               ),
+      .aurora_reset          ( reset             ),
+	  
+	  .i_time_1ms_vld        (time_1ms_vld         ),
+	  .i_time_1s_vld         (time_1s_vld          ),
+
+	  .i_st_wr_en            ( ps_reg_we                ),
+	  .i_st_wr_addr          ( ps_reg_addr              ),
+      .i_st_wr_data          ( ps_reg_wr_dat            ),
+      .i_st_rd_en            ( ps_reg_re                ),
+      .i_st_rd_addr          ( ps_reg_rd_addr           ),
+	  .o_st_rd_vld           ( sub_comp_rd_vld[13]    ),
+      .o_st_rd_data          ( sub_comp_rd_dat[13]    ),
+	  .o_intr_irq            ( map_irq[13]       )
+
+       ,.i_sign1_check        ( di_mst_msg[49]           )
+    );
+
+	
+	
+	
+	// --- flow_comp_22 -----
+    ec_1io_check
+    #(
+         .REG_SPACE_BIAS     (20'd9216)
+        ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
+        ,.P_MODULE_ID        (8'd22                      )
+        ,.P_SEAT_NUM         (4'd0                      )
+    )
+    ec_1io_check_22
+    (
+      .clk                   ( ps_reg_clk               ),
+      .reset                 ( ps_reg_reset             ),
+	  .aurora_clk            ( clk               ),
+      .aurora_reset          ( reset             ),
+	  
+	  .i_time_1ms_vld        (time_1ms_vld         ),
+	  .i_time_1s_vld         (time_1s_vld          ),
+
+	  .i_st_wr_en            ( ps_reg_we                ),
+	  .i_st_wr_addr          ( ps_reg_addr              ),
+      .i_st_wr_data          ( ps_reg_wr_dat            ),
+      .i_st_rd_en            ( ps_reg_re                ),
+      .i_st_rd_addr          ( ps_reg_rd_addr           ),
+	  .o_st_rd_vld           ( sub_comp_rd_vld[14]    ),
+      .o_st_rd_data          ( sub_comp_rd_dat[14]    ),
+	  .o_intr_irq            ( map_irq[14]       )
+
+       ,.i_sign1_check        ( di_mst_msg[50]           )
+    );
+
+	
+	
+	
+	// --- flow_comp_23 -----
+    ec_1io_check
+    #(
+         .REG_SPACE_BIAS     (20'd9728)
+        ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
+        ,.P_MODULE_ID        (8'd23                      )
+        ,.P_SEAT_NUM         (4'd0                      )
+    )
+    ec_1io_check_23
+    (
+      .clk                   ( ps_reg_clk               ),
+      .reset                 ( ps_reg_reset             ),
+	  .aurora_clk            ( clk               ),
+      .aurora_reset          ( reset             ),
+	  
+	  .i_time_1ms_vld        (time_1ms_vld         ),
+	  .i_time_1s_vld         (time_1s_vld          ),
+
+	  .i_st_wr_en            ( ps_reg_we                ),
+	  .i_st_wr_addr          ( ps_reg_addr              ),
+      .i_st_wr_data          ( ps_reg_wr_dat            ),
+      .i_st_rd_en            ( ps_reg_re                ),
+      .i_st_rd_addr          ( ps_reg_rd_addr           ),
+	  .o_st_rd_vld           ( sub_comp_rd_vld[15]    ),
+      .o_st_rd_data          ( sub_comp_rd_dat[15]    ),
+	  .o_intr_irq            ( map_irq[15]       )
+
+       ,.i_sign1_check        ( di_mst_msg[51]           )
+    );
+
+	
+	
+	
+	// --- flow_comp_24 -----
+    ec_1io_check
+    #(
+         .REG_SPACE_BIAS     (20'd10240)
+        ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
+        ,.P_MODULE_ID        (8'd24                      )
+        ,.P_SEAT_NUM         (4'd0                      )
+    )
+    ec_1io_check_24
+    (
+      .clk                   ( ps_reg_clk               ),
+      .reset                 ( ps_reg_reset             ),
+	  .aurora_clk            ( clk               ),
+      .aurora_reset          ( reset             ),
+	  
+	  .i_time_1ms_vld        (time_1ms_vld         ),
+	  .i_time_1s_vld         (time_1s_vld          ),
+
+	  .i_st_wr_en            ( ps_reg_we                ),
+	  .i_st_wr_addr          ( ps_reg_addr              ),
+      .i_st_wr_data          ( ps_reg_wr_dat            ),
+      .i_st_rd_en            ( ps_reg_re                ),
+      .i_st_rd_addr          ( ps_reg_rd_addr           ),
+	  .o_st_rd_vld           ( sub_comp_rd_vld[16]    ),
+      .o_st_rd_data          ( sub_comp_rd_dat[16]    ),
+	  .o_intr_irq            ( map_irq[16]       )
+
+       ,.i_sign1_check        ( di_mst_msg[52]           )
+    );
+
+	
+	
+	
+	// --- flow_comp_25 -----
+    ec_1io_check
+    #(
+         .REG_SPACE_BIAS     (20'd10752)
+        ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
+        ,.P_MODULE_ID        (8'd25                      )
+        ,.P_SEAT_NUM         (4'd0                      )
+    )
+    ec_1io_check_25
+    (
+      .clk                   ( ps_reg_clk               ),
+      .reset                 ( ps_reg_reset             ),
+	  .aurora_clk            ( clk               ),
+      .aurora_reset          ( reset             ),
+	  
+	  .i_time_1ms_vld        (time_1ms_vld         ),
+	  .i_time_1s_vld         (time_1s_vld          ),
+
+	  .i_st_wr_en            ( ps_reg_we                ),
+	  .i_st_wr_addr          ( ps_reg_addr              ),
+      .i_st_wr_data          ( ps_reg_wr_dat            ),
+      .i_st_rd_en            ( ps_reg_re                ),
+      .i_st_rd_addr          ( ps_reg_rd_addr           ),
+	  .o_st_rd_vld           ( sub_comp_rd_vld[17]    ),
+      .o_st_rd_data          ( sub_comp_rd_dat[17]    ),
+	  .o_intr_irq            ( map_irq[17]       )
+
+       ,.i_sign1_check        ( di_mst_msg[53]           )
+    );
+
+	
+	
+	
+	// --- flow_comp_26 -----
+    ec_1io_check
+    #(
+         .REG_SPACE_BIAS     (20'd11264)
+        ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
+        ,.P_MODULE_ID        (8'd26                      )
+        ,.P_SEAT_NUM         (4'd0                      )
+    )
+    ec_1io_check_26
+    (
+      .clk                   ( ps_reg_clk               ),
+      .reset                 ( ps_reg_reset             ),
+	  .aurora_clk            ( clk               ),
+      .aurora_reset          ( reset             ),
+	  
+	  .i_time_1ms_vld        (time_1ms_vld         ),
+	  .i_time_1s_vld         (time_1s_vld          ),
+
+	  .i_st_wr_en            ( ps_reg_we                ),
+	  .i_st_wr_addr          ( ps_reg_addr              ),
+      .i_st_wr_data          ( ps_reg_wr_dat            ),
+      .i_st_rd_en            ( ps_reg_re                ),
+      .i_st_rd_addr          ( ps_reg_rd_addr           ),
+	  .o_st_rd_vld           ( sub_comp_rd_vld[18]    ),
+      .o_st_rd_data          ( sub_comp_rd_dat[18]    ),
+	  .o_intr_irq            ( map_irq[18]       )
+>>>>>>> origin/cgliu
 
             wire [0:0] m_1di_1do_do;
 			ec_1di_1do#(
