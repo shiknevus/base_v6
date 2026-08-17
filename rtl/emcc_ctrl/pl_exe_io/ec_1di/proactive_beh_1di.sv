@@ -41,12 +41,7 @@ module proactive_beh_1di#(
     ,output reg [7:0]           a_tx_id
     ,output reg	[7:0]           a_alm_num
 
-<<<<<<< HEAD:rtl/emcc_ctrl/ctrl_1di/proactive_beh_1di.sv
-    ,input                      di
-
-=======
 	,output reg [7:0]      		a_bhv_id_r
->>>>>>> origin/cgliu:rtl/emcc_ctrl/pl_exe_io/ec_1di/proactive_beh_1di.sv
 	,output	reg	[31:0]			state_monitor_o
     ,output reg                 irq_o
     ,input                      irq_ack_i       //Interrupt response pulse
@@ -78,39 +73,15 @@ module proactive_beh_1di#(
 	localparam 	S_ALERT_40		= 8'd10;	//Alert
 	localparam 	S_ALERT_40_ACK	= 8'd11;	//Alert ack
 	
-<<<<<<< HEAD:rtl/emcc_ctrl/ctrl_1di/proactive_beh_1di.sv
-	localparam  S_IDLE          = 8'd0; 
-    localparam  S_BHA_PRE_DET	= 8'd1; 
-	localparam	S_READY_10		= 8'd2;
-    localparam  S_READY_10_ACK  = 8'd3; 
-    localparam  S_EXE_20     	= 8'd4; 
-    localparam  S_EXE_20_ACK	= 8'd5; 
-    localparam  S_BHA_POST_DET  = 8'd6; 
-    localparam  S_SUCC_30       = 8'd7; 
-    localparam  S_SUCC_30_ACK	= 8'd8; 
-	localparam 	S_ALERT_40		= 8'd9;
-	localparam 	S_ALERT_40_ACK	= 8'd10;
-	localparam	S_EXE			= 8'd11;
-
-    localparam  IRQ_OK          = 8'h51;
-    localparam  IRQ_NO_OK       = 8'h52;
-
-=======
     localparam  IRQ_OK          = 8'h51;	//ps ack:OK
     localparam  IRQ_NO_OK       = 8'h52;	//ps ack:NO OK
 	
->>>>>>> origin/cgliu:rtl/emcc_ctrl/pl_exe_io/ec_1di/proactive_beh_1di.sv
 	//state monitor
 	reg [7:0]	curr_state_m1;
 	reg [7:0]	curr_state_m2;
 	reg [7:0]	curr_state_m3;
-<<<<<<< HEAD:rtl/emcc_ctrl/ctrl_1di/proactive_beh_1di.sv
-
-    always @(posedge clk_i)
-=======
 	
     always @(posedge clk_i) 
->>>>>>> origin/cgliu:rtl/emcc_ctrl/pl_exe_io/ec_1di/proactive_beh_1di.sv
 	begin
         if (rst_i)begin
 			curr_state_m1 <= 8'b0;
@@ -125,11 +96,7 @@ module proactive_beh_1di#(
 			state_monitor_o <= {curr_state_m3,curr_state_m2,curr_state_m1, curr_state};
 		end
     end
-<<<<<<< HEAD:rtl/emcc_ctrl/ctrl_1di/proactive_beh_1di.sv
-
-=======
 	
->>>>>>> origin/cgliu:rtl/emcc_ctrl/pl_exe_io/ec_1di/proactive_beh_1di.sv
 	always@(posedge clk_i)begin
 	if(rst_i)begin
 		ack_beh_id 	 	<=	8'd0;

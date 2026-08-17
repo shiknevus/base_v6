@@ -22,10 +22,7 @@
 module irq_3i1o_arbitrator(
 	input                   clk_i              
 	,input                  rst_i             
-<<<<<<< HEAD:rtl/emcc_ctrl/ctrl_1di/irq_3i1o_arbitrator.sv
-=======
 	
->>>>>>> origin/cgliu:rtl/emcc_ctrl/pl_exe_io/ec_1di/irq_3i1o_arbitrator.sv
 	,input		[9:0]		sc_id              
 	,input		[13:0]		ec_id   
 		
@@ -308,16 +305,7 @@ end
 	else if(curr_state != curr_state_1d)
 		irq_cnt <= 8'd0;
 	else if(curr_state == S_WAIT_IRQ_ACK1) begin
-<<<<<<< HEAD:rtl/emcc_ctrl/ctrl_1di/irq_3i1o_arbitrator.sv
-		if(irq_cnt > 8'd31)
-			irq_cnt <= irq_cnt;
-		else
-			irq_cnt <= irq_cnt +1;
-	end else if(curr_state == S_WAIT_IRQ_ACK2) begin
-		if(irq_cnt > 8'd200)
-=======
 		if(irq_cnt >= 8'd31) 
->>>>>>> origin/cgliu:rtl/emcc_ctrl/pl_exe_io/ec_1di/irq_3i1o_arbitrator.sv
 			irq_cnt <= irq_cnt;
 		else
 			irq_cnt <= irq_cnt +1;
@@ -366,11 +354,7 @@ begin
         irq_reg1_o <= {ec_id,sc_id,c_bhv_id};
         irq_reg2_o <= {c_tx_id,c_alm_num,16'd0};
 	end else if(curr_state == S_END_DELAY)begin
-<<<<<<< HEAD:rtl/emcc_ctrl/ctrl_1di/irq_3i1o_arbitrator.sv
-        irq_reg1_o <= 32'd0;
-=======
 		irq_reg1_o <= 32'd0;
->>>>>>> origin/cgliu:rtl/emcc_ctrl/pl_exe_io/ec_1di/irq_3i1o_arbitrator.sv
         irq_reg2_o <= 32'd0;
 	end else begin
 		irq_reg1_o <= irq_reg1_o;

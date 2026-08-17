@@ -33,14 +33,19 @@ module status_beh_pul_axis#(
 
 	,input						b_en	
 	,output	reg [7:0]			b_bhv_id    
+	,output	reg	[31:0]			state_monitor_o
 	,input 		[31:0]			b_tx_ot         
 	,input 		[31:0]			b_tx_result_rpt 
 	,input						b_tx_result_vld
 	,output		 				ec_chb_st   
 	,output	reg [7:0]			b_tx_id     
 	,output	reg [7:0]			b_alm_num   
-	
-	,input						di				
+//----------------------------------------------------- user logic begin -----------------------------------------------------//
+	,output wire				o_dv_reset  	//servo reset
+	,output wire				o_dv_son    	//servo enable
+	,output reg					b_pause			//motor pause
+	,output wire				b_stop			//motor stop pulse (beh 103)
+//----------------------------------------------------- user logic end -------------------------------------------------------//
 	
 	,output	reg					irq_o			
 	,input						irq_ack_i	
@@ -88,14 +93,6 @@ module status_beh_pul_axis#(
 		curr_state_1d <= curr_state;
 	end
 	
-	//Current behavior number
-	always @(posedge clk_i) begin
-		if(rst_i)
-			b_bhv_id <= 8'd0;
-		else
-			b_bhv_id <= 8'd101;
-	end
-	
 	reg match_10;
 	reg match_20;
 	reg match_30;
@@ -115,20 +112,41 @@ module status_beh_pul_axis#(
     end
 	end
 	
-	localparam  S_IDLE          = 8'd0; 
-    localparam  S_BHA_PRE_DET	= 8'd1; 
-	localparam	S_READY_10		= 8'd2;
-    localparam  S_READY_10_ACK  = 8'd3; 
-    localparam  S_EXE_20     	= 8'd4; 
-    localparam  S_EXE_20_ACK	= 8'd5; 
-    localparam  S_BHA_POST_DET  = 8'd6; 
-    localparam  S_SUCC_30       = 8'd7; 
-    localparam  S_SUCC_30_ACK	= 8'd8; 
-	localparam 	S_ALERT_40		= 8'd9;
-	localparam 	S_ALERT_40_ACK	= 8'd10;
-	localparam	S_EXE			= 8'd11;
+	//State machine state
+	localparam  S_IDLE          = 8'd0; 	//idle
+    localparam  S_BHA_PRE_DET	= 8'd1; 	//Pre-condition check
+	localparam	S_READY_10		= 8'd2;		//ready
+    localparam  S_READY_10_ACK  = 8'd3; 	//ready ok/no ok
+    localparam  S_EXE_20     	= 8'd4; 	//Action begin
+	localparam	S_EXE			= 8'd5;		//Action execute
+    localparam  S_EXE_20_ACK	= 8'd6;		//Action end
+    localparam  S_BHA_POST_DET  = 8'd7; 	//Post-condition check
+    localparam  S_SUCC_30       = 8'd8; 	//success
+    localparam  S_SUCC_30_ACK	= 8'd9; 	//success ack
+	localparam 	S_ALERT_40		= 8'd10;	//Alert
+	localparam 	S_ALERT_40_ACK	= 8'd11;	//Alert ack
 
+	//state monitor
+	reg [7:0]	curr_state_m1;
+	reg [7:0]	curr_state_m2;
+	reg [7:0]	curr_state_m3;
 	
+    always @(posedge clk_i) 
+	begin
+        if (rst_i)begin
+			curr_state_m1 <= 8'b0;
+			curr_state_m2 <= 8'b0;
+			curr_state_m3 <= 8'b0;
+			state_monitor_o <= 32'b0;
+			end
+        else if (curr_state != curr_state_m1) begin
+            curr_state_m1 <= curr_state;
+            curr_state_m2 <= curr_state_m1;
+            curr_state_m3 <= curr_state_m2;
+			state_monitor_o <= {curr_state_m3,curr_state_m2,curr_state_m1, curr_state};
+		end
+    end
+
 	always @(posedge clk_i) begin
         if (rst_i)
             curr_state <= S_IDLE;
@@ -140,7 +158,7 @@ module status_beh_pul_axis#(
         next_state = curr_state;
         case (curr_state)
             S_IDLE: begin
-                if (b_en && pre_sta_allow != 0)
+                if (b_en && b_bhv_id != 8'd0 && pre_sta_allow[b_bhv_id - 1'b1])
                     next_state = S_READY_10;
                 else
                     next_state = S_IDLE;
@@ -177,7 +195,7 @@ module status_beh_pul_axis#(
 			end
 			
 			S_BHA_POST_DET: begin
-				if(post_sta_allow[0] && b_bhv_id == 8'd101)    //Behavior 1 + Post - sufficient condition satisfied
+				if(post_sta_allow[b_bhv_id - 1'b1])    //Behavior 1 + Post - sufficient condition satisfied
                     next_state = S_SUCC_30;
                 else if(timout)
                     next_state = S_ALERT_40;
@@ -221,9 +239,9 @@ module status_beh_pul_axis#(
 	
 	//Channel B transaction ID: 10 20 30 40
     always@(posedge clk_i)begin
-        if(rst_i)
+        if(rst_i||!b_en)
             b_tx_id <= 8'd0;
-		else if(!b_en)
+		else if(curr_state == S_IDLE)
 			b_tx_id <= 8'd0;
         else if(curr_state == S_READY_10)
             b_tx_id <= 8'd10;
@@ -258,9 +276,9 @@ module status_beh_pul_axis#(
 	
 
 	always@(posedge clk_i)begin
-        if(rst_i)
+        if(rst_i||!b_en)
             b_alm_num <= 8'd0;
-		else if(!b_en)
+		else if(curr_state == S_IDLE)
 			b_alm_num <= 8'd0;
         else if(curr_state == S_BHA_PRE_DET && timout)						//The pre - full inspection is not met.
             b_alm_num <= 8'd1;    
@@ -272,9 +290,9 @@ module status_beh_pul_axis#(
             b_alm_num <= ack_ps_alart_num;    
         else if(curr_state == S_EXE_20_ACK && timout)						//For Transaction 20, waiting for the ps response timed out.
             b_alm_num <= 8'd3;    
-		else if(curr_state_1d == S_EXE && curr_state == S_ALERT_40 && b_bhv_id == 8'd1)//The execution of Behavior 1 failed.
-			b_alm_num <= 8'd4; 
-		else if(curr_state_1d == S_EXE && curr_state == S_ALERT_40 && b_bhv_id == 8'd2)//The execution of Behavior 2 failed.
+		else if(curr_state_1d == S_EXE && curr_state == S_ALERT_40 && b_bhv_id == 8'd100)//The execution of Behavior 100 failed.
+			b_alm_num <= 8'd4;
+		else if(curr_state_1d == S_EXE && curr_state == S_ALERT_40 && b_bhv_id == 8'd101)//The execution of Behavior 101 failed.
 			b_alm_num <= 8'd5;
 		else if(curr_state == S_SUCC_30_ACK && ack_tx_result == IRQ_NO_OK)	//Transaction 30 has a ps response error.
 			b_alm_num <= ack_ps_alart_num;
@@ -308,6 +326,78 @@ module status_beh_pul_axis#(
         else
             timout <= 1'b0;
     end
-	
+//==============================================================================================================================//
+//----------------------------------------------------- user logic begin -----------------------------------------------------//
+//==============================================================================================================================//
+	always @(posedge clk_i) begin
+		if(rst_i || !b_en)
+			b_bhv_id <= 8'd0;
+		else if(curr_state == S_IDLE)
+			begin
+				if(pre_sta_allow[8'd100-1])       b_bhv_id <= 8'd100;//pause
+				else if(pre_sta_allow[8'd101-1])  b_bhv_id <= 8'd101;//resume
+				else if(pre_sta_allow[8'd102-1])  b_bhv_id <= 8'd102;//reset
+				else if(pre_sta_allow[8'd103-1])  b_bhv_id <= 8'd103;//stop
+				else if(pre_sta_allow[8'd104-1])  b_bhv_id <= 8'd104;//son
+				else if(pre_sta_allow[8'd105-1])  b_bhv_id <= 8'd105;//soff
+				else                              b_bhv_id <= 8'd0;
+			end
+	end
+
+	localparam P_EN_EFF  = 1'b0;
+	localparam P_RST_EFF = 1'b0;
+
+	reg bh_disable;
+	always@(posedge clk_i) begin
+		if(rst_i || !b_en)
+			bh_disable <= 1'b0;
+		else if(curr_state == S_EXE) begin
+			case(b_bhv_id)
+				8'd104: bh_disable <= 1'b0;   // son
+				8'd105: bh_disable <= 1'b1;   // soff
+				default: ;
+			endcase
+		end
+	end
+
+	assign o_dv_son   = bh_disable ? ~P_EN_EFF : P_EN_EFF;
+
+	// reset pulse 5ms
+	reg [2:0] rst_cnt;
+	reg o_dv_reset_r;
+	always@(posedge clk_i) begin
+		if(rst_i || !b_en) begin
+			o_dv_reset_r <= 1'b0;
+			rst_cnt      <= 3'd0;
+		end else if(curr_state == S_EXE && b_bhv_id == 8'd102) begin
+			o_dv_reset_r <= 1'b1;
+			rst_cnt      <= 3'd5;
+		end else if(o_dv_reset_r && i_time_1ms_vld) begin
+			if(rst_cnt <= 3'd1) begin
+				o_dv_reset_r <= 1'b0;
+				rst_cnt      <= 3'd0;
+			end else
+				rst_cnt <= rst_cnt - 1'b1;
+		end
+	end
+	assign o_dv_reset = o_dv_reset_r ? P_RST_EFF : ~P_RST_EFF;
+
+	always@(posedge clk_i) begin
+		if(rst_i || !b_en)
+			b_pause <= 1'b0;
+		else if(curr_state == S_EXE) begin
+			if(b_bhv_id == 8'd100)
+				b_pause <= 1'b1;
+			else if(b_bhv_id == 8'd101)
+				b_pause <= 1'b0;
+			else if(b_bhv_id == 8'd103)
+				b_pause <= 1'b0;   // stop: release pause too
+		end
+	end
+
+	assign b_stop = (curr_state == S_EXE && b_bhv_id == 8'd103);
+//==============================================================================================================================//
+//----------------------------------------------------- user logic end -------------------------------------------------------//
+//==============================================================================================================================//
 	
 endmodule

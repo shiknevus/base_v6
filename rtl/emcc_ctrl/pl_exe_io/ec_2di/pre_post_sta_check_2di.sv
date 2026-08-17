@@ -41,13 +41,8 @@ module pre_post_sta_check_2di#(
 		,input 							m_saf_st        
 		,input 							link_m_saf_st         
 		
-<<<<<<< HEAD:rtl/emcc_ctrl/ctrl_5di/pre_post_sta_check_5di.sv
-		,input		[4:0]				di_i
-		,input							do_i
-=======
 		,input		[1:0]				di_i
 		,input		[1:0]				signal_vld
->>>>>>> origin/cgliu:rtl/emcc_ctrl/pl_exe_io/ec_2di/pre_post_sta_check_2di.sv
 		
 		,input							valid_sig_1
 		,input							valid_sig_2
@@ -96,15 +91,8 @@ module pre_post_sta_check_2di#(
 	//post  status
 	wire [A_BHA_NUM-1:0]	a_post_sta	;
 
-<<<<<<< HEAD:rtl/emcc_ctrl/ctrl_5di/pre_post_sta_check_5di.sv
-	wire [A_BHA_NUM-1:0]	post_sta	;
-
-	assign	post_sta[0 ] = (a_bhv_id == 1 )&&(di_i ==5'b01);
-	assign	post_sta[1 ] = (a_bhv_id == 2 )&&(di_i ==5'b10);
-=======
 	assign	a_post_sta[0 ] = (a_bhv_id == 1 )&&(di_i != signal_vld);
 	assign	a_post_sta[1 ] = (a_bhv_id == 2 )&&(di_i == signal_vld);
->>>>>>> origin/cgliu:rtl/emcc_ctrl/pl_exe_io/ec_2di/pre_post_sta_check_2di.sv
 
 
 	always@(posedge clk_i) 

@@ -114,23 +114,6 @@ module pre_post_sta_check_slv_pul_axis#(
 	end
 	wire servo_limit_alarm = limf_alarm | limb_alarm | (i_axis_limf|i_axis_limb);  //level fallback
 
-<<<<<<< HEAD:rtl/emcc_ctrl/ctrl_3di2do/pre_post_sta_check_3di_2do.sv
-	wire [A_BHA_NUM-1:0]	post_sta	;
-
-	assign	post_sta[0 ] = (a_bhv_id == 1 )&&(di_i ==3'bx01);
-	assign	post_sta[1 ] = (a_bhv_id == 2 )&&(di_i ==3'bx10);
-	assign	post_sta[2 ] = (a_bhv_id == 3 )&&(di_i ==3'bxxx);
-	assign	post_sta[3 ] = (a_bhv_id == 4 )&&(di_i ==3'b001);
-	assign	post_sta[4 ] = (a_bhv_id == 5 )&&(di_i ==3'b010);
-	assign	post_sta[5 ] = (a_bhv_id == 6 )&&(di_i ==3'bxxx);
-	assign	post_sta[6 ] = (a_bhv_id == 7 )&&(di_i ==3'bxxx);
-	assign	post_sta[7 ] = (a_bhv_id == 8 )&&(di_i ==3'b1xx);
-	assign	post_sta[8 ] = (a_bhv_id == 9 )&&(di_i ==3'b0xx);
-	assign	post_sta[9 ] = (a_bhv_id == 10)&&(di_i ==3'bx01);
-	assign	post_sta[10] = (a_bhv_id == 11)&&(di_i ==3'bx10);
-	assign	post_sta[11] = (a_bhv_id == 12)&&(di_i ==3'bx01);
-	assign	post_sta[12] = (a_bhv_id == 13)&&(di_i ==3'bx10);
-=======
 	//home completed: beh1 (home) passes post-check -> set; beh7 (soff) clears
 	reg home_completed;
 	always@(posedge clk_i) begin
@@ -141,7 +124,6 @@ module pre_post_sta_check_slv_pul_axis#(
 		else if(a_bhv_id == 8'd7)
 			home_completed <= 1'b0;
 	end
->>>>>>> origin/cgliu:rtl/emcc_ctrl/pl_exe_io/ec_slv_pul_axis/pre_post_sta_check_slv_pul_axis.sv
 
 	//pre status per behavior (same as ctrl_ethercat_servo):
 	// beh1 home:                 axis ok (limit-exempt: home hits limit)
