@@ -689,7 +689,8 @@ module app_slv_rx_ctrl(
                 end
             end
             STM_DG_HD_PARSE:begin
-                cache_din   <=   {16'hedd8,//datagram_addr[15:0],  update slave station error flag
+//                cache_din   <=   {16'hedd8,//datagram_addr[15:0],  update slave station error flag
+                cache_din   <=   {16'h0000,//datagram_addr[15:0],  update slave station error flag
                                      datagram_index[7:0],
                                      datagram_cmd[7:0]};
             end

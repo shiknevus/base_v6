@@ -82,6 +82,7 @@
 `define PS_RD_DEPOT_FLAG_ADDR    {5'h07,4'h0}
 `define OPT_INTF_INIT_EN_ADDR    {5'h08,4'h0}
 `define CHECK_SYSTERM_ADDR       {5'h09,4'h0}
+`define HB_SCAN_REQ_ADDR         {5'h0A,4'h0}  // PS manual heartbeat scan trigger
 `define CACHE_SLV_ID_BIAS_ADDR   {5'h10,4'h0}
 
 //generater optical fiber data------------------

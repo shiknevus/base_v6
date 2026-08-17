@@ -25,8 +25,15 @@ module app_mst_tx_ctrl(
     ,output reg         app_err_flag    //the error type of slave station is valid
     ,output reg [15:0]  app_err_type    //the error type of slave station
 	,output reg			init_finish
-	,input wire         init_error
-	,input wire         run_en
+	,output reg         init_error  // Initialization error flag (generated internally)
+	,output reg [2:0]   err_code    // Error code for PS status monitoring
+
+    // Physical layer status signals (same clock domain)
+    ,input              downstream_lane_up
+    ,input              downstream_link
+    
+    // PS manual heartbeat scan trigger
+    ,input  wire        hb_scan_req  // PS request to trigger heartbeat scan
 
     ,output reg [15:0]  hb_err_slvsta   //indicate the index of the error station
     ,output reg         mst_prcs_hb_flag
@@ -74,26 +81,105 @@ module app_mst_tx_ctrl(
     localparam  STM_INIT_WAIT_ACK   = 'd2;//wait initial package ack
     localparam  STM_CK_SLV_HB       = 'd3;//check slave station heartbeat
     localparam  STM_HB_WAIT_ACK     = 'd4;//wait heartbeat ack
-    localparam  STM_CK_HB_SUCCES    = 'd5;//one heartbeat of slave stiation has rx successful
+    localparam  STM_CK_HB_SUCCES    = 'd5;//one heartbeat of slave station has rx successful
     localparam  STM_TX_HS           = 'd7;//handshake with depot
-    localparam  STM_TX_PKG          = 'd10;//normal package  been transfer
+    localparam  STM_TX_PKG          = 'd10;//normal package been transfer
     localparam  STM_WAIT_ACK        = 'd11;//wait datagram ack
     localparam  STM_RD_DAT          = 'd12;//no use
     localparam  STM_POST_PRCS_INIT  = 'd13;//initial package post process
     localparam  STM_POST_PRCS_HB    = 'd14;//heart beat package post process
     localparam  STM_POST_PRCS_DG    = 'd15;//datagram package post process
     localparam  STM_SLV_ERROR       = 'd16;//no use
-    localparam  STM_ALL_LINK_PASS   = 'd17;
+    localparam  STM_ALL_LINK_PASS   = 'd17;//all link pass after heartbeat scan
     localparam  STM_END             = 'd18;
     
     reg     [31:0]  timer_cnt;
     wire            timer_done;
     reg     [4:0]   wk_state  = 'd0;
-    reg     [7:0]   ck_hb_sta_cnt;  //the index of slate station during check heart beat
+    reg     [7:0]   ck_hb_sta_cnt;  // heartbeat scan counter
     wire            last_ck_hb_sta; 
     reg             mst_sta_restart_d1  =   'd0;//master station restart transfer
     reg             mst_sta_restart_r   =   'd0;
     reg             latch_sta_rs_flag;
+    reg             run_en;  // Local run enable signal
+
+	// init_error generation: set when initialization completes with errors
+	always @(posedge clk) begin
+        if(reset)begin
+            init_error <= 1'b0;
+        end else if((wk_state == STM_POST_PRCS_INIT) & (~app_trsf_en)) begin
+            // Init done with no transfer enable - this is an error
+            init_error <= 1'b1;
+        end else if((wk_state == STM_POST_PRCS_INIT) & 
+                   (app_err_type != 8'd0)) begin
+            // Init failed due to slave station error
+            init_error <= 1'b1;
+        end else if((wk_state == STM_POST_PRCS_INIT) & 
+                   (hb_err_slvsta != 8'd0)) begin
+            // Init failed due to heartbeat error
+            init_error <= 1'b1;
+        end else if(wk_state >= STM_TX_HS) begin
+            // Successfully entered running state - clear error
+            init_error <= 1'b0;
+        end
+    end
+
+	// err_code generation: error code for PS status monitoring
+	// 0: No error
+	// 1: Initialization error
+	// 2: Data transfer error
+	// 3: Both optical links down
+	always @(posedge clk) begin
+        if(reset)begin
+            err_code <= 3'd0;
+        end else if(wk_state < STM_TX_HS) begin
+            // Initialization phase
+            if(init_error)begin
+                err_code <= 3'd1;
+            end else begin
+                err_code <= 3'd0;
+            end
+        end else begin
+            // Running phase
+            if((downstream_lane_up == 1'b0) && (downstream_link == 1'b0)) begin
+                // Both optical links down
+                err_code <= 3'd3;
+            end else if((app_err_type == 8'd0) && (hb_err_slvsta == 8'd0)) begin
+                // No errors
+                err_code <= 3'd0;
+            end else if(downstream_link && !downstream_lane_up && 
+                       (app_err_type == 8'd0) && (hb_err_slvsta == 8'd1)) begin
+                // Degraded mode: link ok, lane up failed, but minimal error
+                err_code <= 3'd0;
+            end else if(downstream_lane_up && !downstream_link && 
+                       (app_err_type == slv_sta_num) && (hb_err_slvsta == 8'd0)) begin
+                // Degraded mode: lane up ok, link failed, but expected error
+                err_code <= 3'd0;
+            end else begin
+                // Data transfer error
+                err_code <= 3'd2;
+            end
+        end
+    end
+
+	// run_en generation: allow running when init finished, no errors, and at least one link is up
+	always @(posedge clk) begin
+        if(reset)begin
+            run_en <= 1'b0;
+        end else if(wk_state == STM_IDLE) begin
+            run_en <= 1'b0;
+        end else if(wk_state == STM_POST_PRCS_INIT) begin
+            // Allow running if no errors and at least one optical link is up
+            if((app_err_type == 8'd0) & (hb_err_slvsta == 8'd0) & 
+               (downstream_lane_up | downstream_link)) begin
+                run_en <= 1'b1;
+            end else begin
+                run_en <= 1'b0;
+            end
+        end else if(wk_state >= STM_TX_HS) begin
+            run_en <= 1'b1;  // Keep running once started
+        end
+    end
 
     always @(posedge clk)begin
         mst_sta_restart_d1  <=  mst_sta_restart;
@@ -121,6 +207,19 @@ module app_mst_tx_ctrl(
             latch_sta_rs_flag   <=  'd0;
         end else begin
             latch_sta_rs_flag   <=  latch_sta_rs_flag;
+        end
+    end
+	
+	// Heartbeat scan request edge detection
+	reg hb_scan_req_d1;
+	reg hb_scan_req_r;
+	always @(posedge clk) begin
+        if(reset)begin
+            hb_scan_req_d1 <= 1'b0;
+            hb_scan_req_r  <= 1'b0;
+        end else begin
+            hb_scan_req_d1 <= hb_scan_req;
+            hb_scan_req_r  <= hb_scan_req & !hb_scan_req_d1;  // Rising edge detect
         end
     end
 	
@@ -153,7 +252,7 @@ module app_mst_tx_ctrl(
         end else begin
             case(wk_state)
                 STM_IDLE: begin
-                    if(app_trsf_en & latch_sta_rs_flag)begin
+                    if(app_trsf_en)begin
                         wk_state  <=  STM_INIT_SLV_STA;
                     end else begin
                         wk_state  <=  wk_state;
@@ -163,10 +262,8 @@ module app_mst_tx_ctrl(
                     wk_state  <=  STM_INIT_WAIT_ACK;
                 end
                 STM_INIT_WAIT_ACK:begin
-                    if(timer_done)begin
-                        wk_state <= STM_END;
-                    end else if (one_ecat_frm_done & (ecat_frm_rslt == `ETHCAT_PRCS_CRC_FAIL))begin
-                        wk_state <= STM_CK_SLV_HB;
+					if((one_ecat_frm_done & (ecat_frm_rslt == `ETHCAT_PRCS_CRC_FAIL))|timer_done)begin
+						wk_state <= STM_END;
                     end else if (one_ecat_frm_done & (ecat_frm_rslt == `ETHCAT_PRCS_SUCCESS) & 
                                  (rx_eth_type == `ETHCAT_TYPE_INITIAL))begin
                         wk_state <= STM_POST_PRCS_INIT;
@@ -175,7 +272,10 @@ module app_mst_tx_ctrl(
                     end
                 end
                 STM_TX_HS:begin
-                    if(1)begin
+                    if(hb_scan_req_r)begin
+                        // PS requested manual heartbeat scan
+                        wk_state <= STM_CK_SLV_HB;
+                    end else if(1)begin
                         wk_state  <=  STM_TX_PKG;
                     end else begin
                         wk_state  <=  wk_state;
@@ -186,9 +286,9 @@ module app_mst_tx_ctrl(
                 end
                 STM_WAIT_ACK:begin
                     if(timer_done)begin
-                        wk_state <= STM_CK_SLV_HB;
+                        wk_state <= STM_POST_PRCS_DG;
                     end else if (one_ecat_frm_done & (ecat_frm_rslt == `ETHCAT_PRCS_CRC_FAIL))begin
-                        wk_state <= STM_CK_SLV_HB;
+                        wk_state <= STM_POST_PRCS_DG;
                     end else if (one_ecat_frm_done & (ecat_frm_rslt == `ETHCAT_PRCS_SUCCESS) & 
                                  (rx_eth_type == `ETHCAT_TYPE_DATAGRAM))begin
                         wk_state <= STM_POST_PRCS_DG;
@@ -197,6 +297,7 @@ module app_mst_tx_ctrl(
                     end
                 end
                 STM_CK_SLV_HB:begin
+                    // Start heartbeat scan
                     wk_state  <=  STM_HB_WAIT_ACK;
                 end
                 STM_HB_WAIT_ACK:begin
@@ -213,38 +314,51 @@ module app_mst_tx_ctrl(
                 end
                 STM_CK_HB_SUCCES:begin
                     if(last_ck_hb_sta)begin
+                        // All slaves scanned successfully
                         if(loop_link_success)begin
                             wk_state <= STM_ALL_LINK_PASS;
                         end else begin
                             wk_state <= STM_POST_PRCS_HB;
                         end
                     end else begin
+                        // Continue scanning next slave
                         wk_state <= STM_CK_SLV_HB;
-                    end
-                end
-                STM_POST_PRCS_INIT:begin
-                    if(~app_trsf_en)begin
-                        wk_state <= STM_END;
-                    end else begin
-                        wk_state <= STM_TX_HS;
-                    end
-                end
-                STM_POST_PRCS_DG:begin
-                    if(~app_trsf_en)begin
-                        wk_state <= STM_END;
-                    end else begin
-                        wk_state <= STM_TX_HS;
                     end
                 end
                 STM_POST_PRCS_HB:begin
                     if(~app_trsf_en)begin
                         wk_state <= STM_END;
                     end else begin
+                        // Heartbeat scan finished (with or without errors), continue to next slave or finish
                         wk_state <= STM_CK_SLV_HB;
                     end
                 end
                 STM_ALL_LINK_PASS:begin
+                    // All heartbeat done, enter normal data transfer
                     wk_state <= STM_TX_HS;
+                end
+                STM_POST_PRCS_INIT:begin
+                    if(~app_trsf_en)begin
+                        wk_state <= STM_END;
+					end else if(init_error)begin
+						wk_state <= STM_END;
+					end else if(run_en)begin
+						// After init, start heartbeat scan to verify all slaves
+						wk_state <= STM_CK_SLV_HB;
+//						wk_state <= STM_TX_HS;
+                    end else begin
+                        wk_state <= wk_state;
+                    end
+                end
+                STM_POST_PRCS_DG:begin
+                    if(~app_trsf_en)begin
+                        wk_state <= STM_END;
+                    end else if(hb_scan_req_r)begin
+                        // PS requested manual heartbeat scan
+                        wk_state <= STM_CK_SLV_HB;
+                    end else begin
+                        wk_state <= STM_TX_HS;
+                    end
                 end
                 STM_END:begin
                     wk_state <= STM_IDLE;
