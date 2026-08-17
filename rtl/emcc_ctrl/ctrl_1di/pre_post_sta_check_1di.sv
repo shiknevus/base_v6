@@ -36,8 +36,6 @@ module pre_post_sta_check_1di#(
 		,input 		[3:0]				m_wk_mod        
 		,input 							m_saf_st        
 		,input 							link_m_saf_st   
-		,input 		[7:0]				sc_id			
-		,input 		[7:0]				ec_id           
 		
 		,input							di				
 		

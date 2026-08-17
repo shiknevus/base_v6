@@ -277,9 +277,6 @@ module Positioner_std
                   if((r_pf_mode&MODE_S) == MODE_S) // S Wave Mode
                      if(r_pf_dec_act[P_DIV_WIDTH+31:P_DIV_WIDTH] < r_pf_dec_target)
                         r_pf_spd_next <= (spd_div_quo*r_pf_dec)<<1;
-`ifdef PF_SIM
-                        r_pf_spd_next <= r_pf_spd_next << 8;  // add by szzhang 20260729 
-`endif
                end
 
                if(r_div_ready) begin
@@ -537,7 +534,6 @@ module Positioner_std
 
                if(i_pf_stop) begin
                   fsm_st <= ST_POS_IDLE;
-                  r_pf_done <= 1'b1;
                end
             end
             ST_POS_DEC: begin

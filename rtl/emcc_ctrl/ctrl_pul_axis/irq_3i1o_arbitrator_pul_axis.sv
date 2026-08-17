@@ -22,8 +22,8 @@
 module irq_3i1o_arbitrator_pul_axis(
 	input                   clk_i              
 	,input                  rst_i             
-	,input		[7:0]		sc_id              
-	,input		[7:0]		ec_id   
+	,input		[9:0]		sc_id
+	,input		[13:0]		ec_id
 		
 	,input		[3:0]		chl_priority
 		
@@ -372,14 +372,14 @@ begin
         irq_reg1_o <= 32'd0;
         irq_reg2_o <= 32'd0;
     end else if(irq_a_grant_o)begin
-        irq_reg1_o <= {ec_id,sc_id,a_bhv_id,a_tx_id};
-        irq_reg2_o <= {a_alm_num,24'd0};
+        irq_reg1_o <= {ec_id,sc_id,a_bhv_id};
+        irq_reg2_o <= {a_tx_id,a_alm_num,16'd0};
 	end else if(irq_b_grant_o)begin
-        irq_reg1_o <= {ec_id,sc_id,b_bhv_id,b_tx_id};
-        irq_reg2_o <= {b_alm_num,24'd0};
+        irq_reg1_o <= {ec_id,sc_id,b_bhv_id};
+        irq_reg2_o <= {b_tx_id,b_alm_num,16'd0};
 	end else if(irq_c_grant_o)begin
-        irq_reg1_o <= {ec_id,sc_id,c_bhv_id,c_tx_id};
-        irq_reg2_o <= {c_alm_num,24'd0};	
+        irq_reg1_o <= {ec_id,sc_id,c_bhv_id};
+        irq_reg2_o <= {c_tx_id,c_alm_num,16'd0};
 	end else if(curr_state == S_END_DELAY)begin
         irq_reg1_o <= 32'd0;
         irq_reg2_o <= 32'd0;

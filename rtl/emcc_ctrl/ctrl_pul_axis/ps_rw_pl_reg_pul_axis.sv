@@ -37,8 +37,8 @@ module ps_rw_pl_reg_pul_axis#(
 	,output 	reg             o_st_rd_vld 	
 
 	,output		reg 	 		rst_en_n       	//General parameters
-	,output		reg [13:0]	 	ec_id          
-	,output		reg [11:0]	 	sc_id			
+	,output		reg [13:0]	 	ec_id
+	,output		reg [9:0]	 	sc_id
 	,output		reg [3:0]	 	chl_priority	
 	,output		reg [7:0]	 	unit_id      	
 	,output		reg [3:0]	 	unit_ectrl     
@@ -209,8 +209,8 @@ module ps_rw_pl_reg_pul_axis#(
 	always@(posedge clk_i) begin
 		if(rst_i) begin
 			rst_en_n        	<=	1'b0     		;
-			ec_id          		<=	14'd0	 		; 
-			sc_id				<=	12'd0	 		;
+			ec_id          		<=	14'd0	 		;
+			sc_id				<=	9'd0	 		;
 			chl_priority		<=	4'd0			;
 			unit_id      		<=	8'h00	 		; 
 			unit_ectrl     		<=	4'h0     		;
@@ -279,7 +279,7 @@ module ps_rw_pl_reg_pul_axis#(
 		end else begin
 			rst_en_n        <=	(wr_task_vld && wr_task_addr == `RST_EN        	) ? i_st_wr_data[0] 	: rst_en_n      ;
 			ec_id          	<=	(wr_task_vld && wr_task_addr == `EC_ID         	) ? i_st_wr_data[13:0] 	: ec_id         ;
-			sc_id			<=	(wr_task_vld && wr_task_addr == `SC_ID		 	) ? i_st_wr_data[11:0] 	: sc_id			;
+			sc_id			<=	(wr_task_vld && wr_task_addr == `SC_ID		 	) ? i_st_wr_data[9:0] 	: sc_id			;
 			chl_priority	<= 	(wr_task_vld && wr_task_addr == `BHV_PRIORITY	) ? i_st_wr_data[3:0] 	: chl_priority	;
 			unit_id      	<=	(wr_task_vld && wr_task_addr == `UNIT_ID       	) ? i_st_wr_data[7:0] 	: unit_id      	;
 			unit_ectrl     	<=	(wr_task_vld && wr_task_addr == `UNIT_ECTRL    	) ? i_st_wr_data[3:0] 	: unit_ectrl   	;
@@ -410,7 +410,7 @@ module ps_rw_pl_reg_pul_axis#(
 
 		`RST_EN        	      	:		o_st_rd_data <= {31'd0,rst_en_n		}   ;
 		`EC_ID         	      	:		o_st_rd_data <= {18'd0,ec_id		}   ;   
-		`SC_ID		 	      	:		o_st_rd_data <= {20'd0,sc_id		}	;
+		`SC_ID		 	      	:		o_st_rd_data <= {22'd0,sc_id		}	;
 		`BHV_PRIORITY	      	:		o_st_rd_data <= {28'd0,chl_priority	}	;
 		`UNIT_ID       	      	:		o_st_rd_data <= {24'd0,unit_id		}   ;  
 		`UNIT_ECTRL    	      	:		o_st_rd_data <= {28'd0,unit_ectrl	}  	;

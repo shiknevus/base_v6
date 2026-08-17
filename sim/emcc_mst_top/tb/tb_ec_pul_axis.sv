@@ -179,7 +179,7 @@ initial begin
     a_run(8'd1);            // org stimulus block below drives i_axis_org
     ps_read_word(EC_BIAS_ADDR + `PARAM51, rddata);
     $display("  [%0t] after HOME: abspos=%d (expect 0)", $time, $signed(rddata));
-
+    #50000;   
     //============================================  A: beh 30 GETPOS  ============================
     $display("== A channel: beh 30 GETPOS ==");
     a_run(8'd30);
@@ -189,19 +189,19 @@ initial begin
     a_run(8'd2);
     ps_read_word(EC_BIAS_ADDR + `PARAM51, rddata);
     $display("  [%0t] after JOG: abspos=%d (expect +100, +-1 profile tolerance)", $time, $signed(rddata));
-
+    #50000;   
     //============================================  A: beh 3 MOVE  ============================
     $display("== A channel: beh 3 MOVE to 100 ==");
     a_run(8'd3);
     ps_read_word(EC_BIAS_ADDR + `PARAM51, rddata);
     $display("  [%0t] after MOVE: abspos=%d (expect 100)", $time, $signed(rddata));
-
+    #50000;   
     //============================================  A: beh 20 safe JOG  ============================
     $display("== A channel: beh 20 safe JOG ==");
     a_run(8'd20);
     ps_read_word(EC_BIAS_ADDR + `PARAM51, rddata);
     $display("  [%0t] after safe JOG: abspos=%d (expect 200)", $time, $signed(rddata));
-
+    #50000;   
     //============================================  A: beh 21 safe MOVE  ============================
     $display("== A channel: beh 21 safe MOVE to 100 ==");
     a_run(8'd21);
@@ -283,7 +283,7 @@ initial begin
     wait(`EC_COMP_INST_PATH.a_bhv_id_r == 8'd1);
     #50000;
     force `EC_COMP_INST_PATH.i_axis_org = 1'b1;
-    #20000;
+    #100000;
     force `EC_COMP_INST_PATH.i_axis_org = 1'b0;
     $display("  [%0t] org released", $time);
 end
@@ -315,13 +315,13 @@ function string fsm_b_name(input [7:0] s);
         8'd2:  return "RDY_10";
         8'd3:  return "RDY_10_ACK";
         8'd4:  return "EXE_20";
-        8'd5:  return "EXE_20_ACK";
-        8'd6:  return "POST_DET";
-        8'd7:  return "SUCC_30";
-        8'd8:  return "SUCC_30_ACK";
-        8'd9:  return "ALERT_40";
-        8'd10: return "ALERT_40_ACK";
-        8'd11: return "EXE";
+        8'd5:  return "EXE";
+        8'd6:  return "EXE_20_ACK";
+        8'd7:  return "POST_DET";
+        8'd8:  return "SUCC_30";
+        8'd9:  return "SUCC_30_ACK";
+        8'd10: return "ALERT_40";
+        8'd11: return "ALERT_40_ACK";
         default: return "??";
     endcase
 endfunction
@@ -375,6 +375,33 @@ always @(`EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.move_u.fsm_st or
              `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.i_pf_pulse,
              `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.fsm_st,
              $signed(`EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.r_pf_abspos));
+end
+
+//positioner decel debug: fsm transitions
+reg [1:0] pos_fsm_dbg = 2'd0;
+always @(`EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.fsm_st) begin
+    $display("  [%0t] POS_DBG fsm %d->%d spd=%d act=%d pulse=%d cal=%d dec=%d first=%b inv=0x%h",
+             $time, pos_fsm_dbg,
+             `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.fsm_st,
+             `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.r_pf_spd,
+             `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.r_pf_pulse_act,
+             `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.r_pf_pulse,
+             `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.r_pf_pulse_cal,
+             `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.r_pf_pulse_dec,
+             `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.r_pf_pulse_first,
+             `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.r_pf_dec_inv);
+    pos_fsm_dbg = `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.fsm_st;
+end
+
+//positioner decel curve: spd/period every 50 pulses in DEC
+always @(`EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.r_pf_pulse_act) begin
+    if(`EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.fsm_st == 2'd3 &&
+       `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.r_pf_pulse_act % 32'd50 == 0)
+        $display("  [%0t] POS_CURVE act=%d spd=%d period=%d",
+                 $time,
+                 `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.r_pf_pulse_act,
+                 `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.r_pf_spd,
+                 `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.r_pf_pulse_period);
 end
 
 //IRQ responder: poll + ack by IRQ_REG1 content

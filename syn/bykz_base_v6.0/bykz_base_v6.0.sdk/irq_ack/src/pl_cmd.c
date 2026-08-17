@@ -46,13 +46,13 @@ void CmdInit(void)
     Xil_Out32(base + PARAM2,  (u32)(int)(200.0f   * f)); // max acc
     Xil_Out32(base + PARAM3,  (u32)(int)(200.0f   * f)); // max dec
     Xil_Out32(base + PARAM5,  (u32)(int)(g_acc    * f)); // acc
-    Xil_Out32(base + PARAM33, (u32)(int)(20.0f    * f)); // touch clamp spd
+    Xil_Out32(base + PARAM33, (u32)(int)(2.0f     * f)); // touch clamp spd
     Xil_Out32(base + PARAM34, (u32)(int)(g_dec    * f)); // dec
     Xil_Out32(base + PARAM35, (u32)(int)(g_spd    * f)); // spd
     Xil_Out32(base + PARAM36, (u32)(int)(g_target * f)); // target
     Xil_Out32(base + PARAM37, (u32)(int)(g_step   * f)); // step
     Xil_Out32(base + PARAM16, 0x00000001U);              // dir POS
-    Xil_Out32(base + PARAM30, 0x00000001U);              // drive on
+//    Xil_Out32(base + PARAM30, 0x00000001U);              // drive on
 }
 
 static int PollKey(void)
@@ -94,7 +94,7 @@ static void PrintParamMenu(void)
     xil_printf(" 5: step   (mm)    = ");
     PrintFp(g_step);
     xil_printf(" (PARAM37)\r\n");
-    xil_printf(" 6: factor (pulse/mm) = %u (PARAM4)\r\n", (unsigned)g_factor);
+    xil_printf(" 6: factor (pulse/mm) = %u \r\n", (unsigned)g_factor);
     xil_printf("Select (1~6, q cancel): ");
 }
 
@@ -154,8 +154,7 @@ static void ParamApply(void)
 
     if (sel == 6) {   // factor: integer, pulse/mm
         g_factor = ParseUint(g_val_buf);
-        Xil_Out32(EC_BASE + PARAM4, g_factor);
-        xil_printf("factor %u pulse/mm (PARAM4)\r\n", (unsigned)g_factor);
+        xil_printf("factor %u pulse/mm \r\n", (unsigned)g_factor);
         return;
     }
 

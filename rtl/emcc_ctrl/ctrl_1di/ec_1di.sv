@@ -57,8 +57,8 @@ module ec_1di#(
 	wire 	[3:0]	m_wk_mod        ;       
 	wire 			m_saf_st        ;       
 	wire 			link_m_saf_st   ;     
-	wire 	[7:0]	sc_id			;		
-	wire 	[7:0]	ec_id           ;       
+	wire 	[9:0]	sc_id			;		
+	wire 	[13:0]	ec_id           ;       
 	wire 			rst_en_n        ;	
 
 	wire	[7:0]	a_bhv_id        ;       
@@ -392,8 +392,6 @@ module ec_1di#(
 			.m_wk_mod        	(m_wk_mod       ),
 			.m_saf_st        	(m_saf_st       ),
 			.link_m_saf_st   	(link_m_saf_st  ),
-			.sc_id				(sc_id			),
-			.ec_id           	(ec_id          ),
 			.di					(di				),
 			.a_en				(a_en			),
 			.b_en				(b_en			),	

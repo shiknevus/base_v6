@@ -112,18 +112,19 @@ module status_beh_pul_axis#(
     end
 	end
 	
-	localparam  S_IDLE          = 8'd0; 
-    localparam  S_BHA_PRE_DET	= 8'd1; 
-	localparam	S_READY_10		= 8'd2;
-    localparam  S_READY_10_ACK  = 8'd3; 
-    localparam  S_EXE_20     	= 8'd4; 
-    localparam  S_EXE_20_ACK	= 8'd5; 
-    localparam  S_BHA_POST_DET  = 8'd6; 
-    localparam  S_SUCC_30       = 8'd7; 
-    localparam  S_SUCC_30_ACK	= 8'd8; 
-	localparam 	S_ALERT_40		= 8'd9;
-	localparam 	S_ALERT_40_ACK	= 8'd10;
-	localparam	S_EXE			= 8'd11;
+	//State machine state
+	localparam  S_IDLE          = 8'd0; 	//idle
+    localparam  S_BHA_PRE_DET	= 8'd1; 	//Pre-condition check
+	localparam	S_READY_10		= 8'd2;		//ready
+    localparam  S_READY_10_ACK  = 8'd3; 	//ready ok/no ok
+    localparam  S_EXE_20     	= 8'd4; 	//Action begin
+	localparam	S_EXE			= 8'd5;		//Action execute
+    localparam  S_EXE_20_ACK	= 8'd6;		//Action end
+    localparam  S_BHA_POST_DET  = 8'd7; 	//Post-condition check
+    localparam  S_SUCC_30       = 8'd8; 	//success
+    localparam  S_SUCC_30_ACK	= 8'd9; 	//success ack
+	localparam 	S_ALERT_40		= 8'd10;	//Alert
+	localparam 	S_ALERT_40_ACK	= 8'd11;	//Alert ack
 
 	//state monitor
 	reg [7:0]	curr_state_m1;
@@ -238,9 +239,9 @@ module status_beh_pul_axis#(
 	
 	//Channel B transaction ID: 10 20 30 40
     always@(posedge clk_i)begin
-        if(rst_i)
+        if(rst_i||!b_en)
             b_tx_id <= 8'd0;
-		else if(!b_en)
+		else if(curr_state == S_IDLE)
 			b_tx_id <= 8'd0;
         else if(curr_state == S_READY_10)
             b_tx_id <= 8'd10;
@@ -275,9 +276,9 @@ module status_beh_pul_axis#(
 	
 
 	always@(posedge clk_i)begin
-        if(rst_i)
+        if(rst_i||!b_en)
             b_alm_num <= 8'd0;
-		else if(!b_en)
+		else if(curr_state == S_IDLE)
 			b_alm_num <= 8'd0;
         else if(curr_state == S_BHA_PRE_DET && timout)						//The pre - full inspection is not met.
             b_alm_num <= 8'd1;    

@@ -43,6 +43,7 @@ module proactive_beh_1di#(
 
     ,input                      di
 
+	,output	reg	[31:0]			state_monitor_o
     ,output reg                 irq_o
     ,input                      irq_ack_i       //Interrupt response pulse
     );
@@ -77,7 +78,28 @@ module proactive_beh_1di#(
 
     localparam  IRQ_OK          = 8'h51;
     localparam  IRQ_NO_OK       = 8'h52;
-	
+
+	//state monitor
+	reg [7:0]	curr_state_m1;
+	reg [7:0]	curr_state_m2;
+	reg [7:0]	curr_state_m3;
+
+    always @(posedge clk_i)
+	begin
+        if (rst_i)begin
+			curr_state_m1 <= 8'b0;
+			curr_state_m2 <= 8'b0;
+			curr_state_m3 <= 8'b0;
+			state_monitor_o <= 32'b0;
+			end
+        else if (curr_state != curr_state_m1) begin
+            curr_state_m1 <= curr_state;
+            curr_state_m2 <= curr_state_m1;
+            curr_state_m3 <= curr_state_m2;
+			state_monitor_o <= {curr_state_m3,curr_state_m2,curr_state_m1, curr_state};
+		end
+    end
+
 	always@(posedge clk_i)begin
 	if(rst_i)begin
 		ack_beh_id 	 	<=	8'd0;
