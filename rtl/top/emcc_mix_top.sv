@@ -391,7 +391,7 @@ module emcc_mix_top
 	//==========================================================================================================//
 			wire m_1do_do;
 			ec_1do#(
-				.REG_SPACE_BIAS 		(20'h800	),//B010_10800
+				.REG_SPACE_BIAS 		(20'h800	            ),//B010_10800
 				.REG_SPACE_SIZE 		(`REG_SPACE_SIZE		)	
 			)ec_1do_u0(
 				.clk_i					(clk					)
@@ -407,15 +407,15 @@ module emcc_mix_top
 				,.i_st_rd_addr  		(ps_reg_rd_addr			)
 				,.o_st_rd_data  		(sub_comp_rd_dat[1]		)
 				,.o_st_rd_vld   		(sub_comp_rd_vld[1]		)
-				,.do_o					(m_1do_do			    )
+				,.o_sig_dri				(m_1do_do			    )
 				,.o_intr_irq			(map_irq[1]			    )
 			);
             assign   do_mst_msg[0] = ~m_1do_do;
             
             
 		    ec_pul_axis#(
-		    	.REG_SPACE_BIAS			(20'ha00  )	//B010_10A00
-		    	,.REG_SPACE_SIZE		(`REG_SPACE_SIZE    )
+		    	.REG_SPACE_BIAS			(20'ha00                )//B010_10A00
+		    	,.REG_SPACE_SIZE		(`REG_SPACE_SIZE        )
 		    )ec_pul_axis_u0(
 		    	.clk_i					(clk					)
 		    	,.rst					(reset					)

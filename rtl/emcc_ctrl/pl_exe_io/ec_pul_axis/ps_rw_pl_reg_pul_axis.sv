@@ -19,7 +19,7 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
-`include "./../../include_files/reg_addr_pl.vh"
+`include "reg_addr_pl.vh"
 
 module ps_rw_pl_reg_pul_axis#(
     parameter  					REG_SPACE_BIAS 	= 	200	,
