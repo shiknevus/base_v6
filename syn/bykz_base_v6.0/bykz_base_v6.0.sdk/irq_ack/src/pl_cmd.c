@@ -12,14 +12,15 @@
 #include "xuartps_hw.h"
 #include "xparameters.h"
 
-#define EC_BASE (PL_CFG_BASE + REG_BIAS_EC_PUL_AXIS)
+#define EC_BASE   (PL_CFG_BASE + REG_BIAS_EC_PUL_AXIS)
+#define EC1DO_BASE (PL_CFG_BASE + REG_BIAS_EC_1DO)
 #define INTC_BASE 0xA0000000U   // INTC #0
 
 // motion params (mm units)
 static float g_spd    = 20.0f;   // mm/s
-static float g_acc    = 50.0f;   // mm/s2
-static float g_dec    = 50.0f;   // mm/s2
-static float g_target = 500.0f;  // mm
+static float g_acc    = 20.0f;   // mm/s2
+static float g_dec    = 20.0f;   // mm/s2
+static float g_target = 300.0f;  // mm
 static float g_step   = 50.0f;   // mm
 static u32   g_factor = 50000U;  // pulse/mm
 
@@ -52,7 +53,7 @@ void CmdInit(void)
     Xil_Out32(base + PARAM36, (u32)(int)(g_target * f)); // target
     Xil_Out32(base + PARAM37, (u32)(int)(g_step   * f)); // step
     Xil_Out32(base + PARAM16, 0x00000001U);              // dir POS
-//    Xil_Out32(base + PARAM30, 0x00000001U);              // drive on
+    Xil_Out32(base + PARAM30, 0x00000001U);              // drive on
 }
 
 static int PollKey(void)
@@ -68,10 +69,11 @@ void PrintMenu(void)
 {
     xil_printf("\r\n");
     xil_printf("-------------------------------------------\r\n");
-    xil_printf(" ec_pul_axis  m: menu\r\n");
+    xil_printf(" ec_1do + ec_pul_axis  m: menu\r\n");
     xil_printf("-------------------------------------------\r\n");
     xil_printf(" A: 1/2/3/4/5/6 = home/jog/move/jog/move/getpos\r\n");
     xil_printf(" B: x/v/k/e/f/d = pause/resume/stop/son/soff/reset \r\n");
+    xil_printf(" 1DO: 7=do on  8=do off  9=st \r\n");
     xil_printf(" w: set params   r: regs   s: ch status   \r\n");
     xil_printf("-------------------------------------------\r\n");
 }
@@ -145,6 +147,27 @@ static void TrigSoff(void)
     xil_printf("B soff(105)\r\n");
 }
 
+// 1do A ch trigger: bhv 1=do on, 2=do off
+static void TrigDo(u8 id)
+{
+    if (Xil_In32(EC1DO_BASE + EC_CHA_ST))
+        xil_printf("[1DO] busy, bhv %u ignored\r\n", (unsigned)id);
+    else {
+        Xil_Out32(EC1DO_BASE + A_BHV_ID, (u32)id);
+        xil_printf("1DO bhv %u\r\n", (unsigned)id);
+    }
+}
+
+// 1do status + do level (PARAM66)
+static void Read1DoSt(void)
+{
+    u32 base = EC1DO_BASE;
+    xil_printf("1DO: busy=%u tx=%u alm=%u fsm=0x%08x do=%u\r\n",
+        (unsigned)Xil_In32(base + EC_CHA_ST), (unsigned)Xil_In32(base + A_TX_ID),
+        (unsigned)Xil_In32(base + A_ALM_NUM), (unsigned)Xil_In32(base + DEBUG_REG1),
+        (unsigned)Xil_In32(base + PARAM66));
+}
+
 // float -> pulses by factor, write to PL
 static void ParamApply(void)
 {
@@ -179,7 +202,7 @@ static void PrintMm(u32 pulses)
     PrintFp((float)(int)pulses / (float)g_factor);
 }
 
-// A/B channel status + FSM state (DEBUG_REG1/2)
+// A/B/C channel status + FSM state (DEBUG_REG1/2/3)
 static void ReadChSt(void)
 {
     u32 base = EC_BASE;
@@ -191,16 +214,16 @@ static void ReadChSt(void)
         (unsigned)Xil_In32(base + EC_CHB_ST), (unsigned)Xil_In32(base + B_TX_ID),
         (unsigned)Xil_In32(base + B_BHV_ID), (unsigned)Xil_In32(base + B_ALM_NUM),
         (unsigned)Xil_In32(base + DEBUG_REG2));
+    xil_printf("C: busy=%u tx=%u bhv=%u alm=%u fsm=0x%08x\r\n",
+        (unsigned)Xil_In32(base + EC_CHC_ST), (unsigned)Xil_In32(base + C_TX_ID),
+        (unsigned)Xil_In32(base + C_BHV_ID), (unsigned)Xil_In32(base + C_ALM_NUM),
+        (unsigned)Xil_In32(base + DEBUG_REG3));
 }
 
 // test view
 static void ReadRegs(void)
 {
     u32 base = EC_BASE;
-    xil_printf("A: st=%u tx=%u bhv=%u   B: st=%u tx=%u bhv=%u\r\n",
-        (unsigned)Xil_In32(base + EC_CHA_ST), (unsigned)Xil_In32(base + A_TX_ID),
-        (unsigned)Xil_In32(base + A_BHV_ID), (unsigned)Xil_In32(base + EC_CHB_ST),
-        (unsigned)Xil_In32(base + B_TX_ID), (unsigned)Xil_In32(base + B_BHV_ID));
     xil_printf("spd=");
     PrintMm(Xil_In32(base + PARAM35));
     xil_printf(" acc=");
@@ -287,6 +310,9 @@ static void HandleKey(char key)
     case '4': TrigBhv(20); break;
     case '5': TrigBhv(21); break;
     case '6': TrigBhv(30); break;
+    case '7': TrigDo(1); break;
+    case '8': TrigDo(2); break;
+    case '9': Read1DoSt(); break;
     case 'x': TrigPause();  break;
     case 'v': TrigResume(); break;
     case 'k': TrigStop();   break;

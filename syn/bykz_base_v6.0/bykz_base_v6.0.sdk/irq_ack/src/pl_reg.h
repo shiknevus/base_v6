@@ -8,7 +8,9 @@
 
 #define PL_CFG_BASE          XPAR_PLCFG_M_AXI_BASEADDR    // 0xB0100000
 
-#define REG_BIAS_EC_PUL_AXIS 0x1A00U
+// component space bias, same as emcc_mix_top instantiation
+#define REG_BIAS_EC_1DO      0x800U
+#define REG_BIAS_EC_PUL_AXIS 0xA00U
 
 // common register offsets
 #define IRQ_REG1             0x000U   // {ec_id,sc_id,bhv_id,tx_id}
@@ -92,36 +94,39 @@
 #define PARAM29              0x148U
 #define PARAM30              0x14CU
 
-// PARAM31-37
-#define PARAM31              0x1A0U
-#define PARAM32              0x1A4U
-#define PARAM33              0x1A8U
-#define PARAM34              0x1ACU
-#define PARAM35              0x1B0U
-#define PARAM36              0x1B4U
-#define PARAM37              0x1B8U
+// PARAM31-40 (PS write; pul_axis: 33 touch spd, 34 dec, 35 spd, 36 target, 37 step)
+#define PARAM31              0x150U
+#define PARAM32              0x154U
+#define PARAM33              0x158U
+#define PARAM34              0x15CU
+#define PARAM35              0x160U
+#define PARAM36              0x164U
+#define PARAM37              0x168U
+#define PARAM38              0x16CU
+#define PARAM39              0x170U
+#define PARAM40              0x174U
 
-// PARAM51-70
-#define PARAM51              0x150U
-#define PARAM52              0x154U
-#define PARAM53              0x158U
-#define PARAM54              0x15CU
-#define PARAM55              0x160U
-#define PARAM56              0x164U
-#define PARAM57              0x168U
-#define PARAM58              0x16CU
-#define PARAM59              0x170U
-#define PARAM60              0x174U
-#define PARAM61              0x178U
-#define PARAM62              0x17CU
-#define PARAM63              0x180U
-#define PARAM64              0x184U
-#define PARAM65              0x188U
-#define PARAM66              0x18CU
-#define PARAM67              0x190U
-#define PARAM68              0x194U
-#define PARAM69              0x198U
-#define PARAM70              0x19CU
+// PARAM51-70 (PL read; pul_axis pos fb @51, 1do do st @66)
+#define PARAM51              0x178U
+#define PARAM52              0x17CU
+#define PARAM53              0x180U
+#define PARAM54              0x184U
+#define PARAM55              0x188U
+#define PARAM56              0x18CU
+#define PARAM57              0x190U
+#define PARAM58              0x194U
+#define PARAM59              0x198U
+#define PARAM60              0x19CU
+#define PARAM61              0x1A0U
+#define PARAM62              0x1A4U
+#define PARAM63              0x1A8U
+#define PARAM64              0x1ACU
+#define PARAM65              0x1B0U
+#define PARAM66              0x1B4U
+#define PARAM67              0x1B8U
+#define PARAM68              0x1BCU
+#define PARAM69              0x1C0U
+#define PARAM70              0x1C4U
 
 // debug
 #define DEBUG_REG1           0x1ECU
