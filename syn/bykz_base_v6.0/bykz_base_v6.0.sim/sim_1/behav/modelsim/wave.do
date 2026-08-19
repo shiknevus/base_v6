@@ -127,176 +127,205 @@ add wave -noupdate -group RW_REG /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/e
 add wave -noupdate -group RW_REG /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/ps_rw_pl_reg_pul_axis_u0/rd_addr_d2
 add wave -noupdate -group RW_REG /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/ps_rw_pl_reg_pul_axis_u0/rd_task_addr
 add wave -noupdate -group RW_REG /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/ps_rw_pl_reg_pul_axis_u0/wr_task_addr
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/clk_i
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/rst_i
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/i_time_1ms_vld
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/i_time_1s_vld
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pre_sta_allow
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/post_sta_allow
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/a_en
-add wave -noupdate -expand -group A -radix decimal /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/a_bhv_id
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/a_bhv_vld
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/a_tx_ot
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/a_tx_result_rpt
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/a_tx_result_vld
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/ec_cha_st
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/a_tx_id
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/a_alm_num
-add wave -noupdate -expand -group A -color Violet /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/a_bhv_id_r
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/state_monitor_o
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/irq_o
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/irq_ack_i
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/i_servo_notok
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/i_servo_stop
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/i_axis_limf
-add wave -noupdate -expand -group A -color Cyan /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/i_axis_org
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/i_axis_limb
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/i_emerge_stop_signal
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/i_safe_status
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/i_axis_point
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/i_axis_reset
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/i_dv_alarm
-add wave -noupdate -expand -group A -color Magenta /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/i_pause
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/i_stop
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/o_dv_pulse
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/o_dv_dir
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/action_busy
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/action_done
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/action_error
-add wave -noupdate -expand -group A -color Violet /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/rctrl_drive_on
-add wave -noupdate -expand -group A -color Violet /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/rctrl_drive_reset
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/rctrl_resume
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/rctrl_pause
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/rctrl_stop
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/rserv_dir
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/rserv_step_pulse
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/rserv_target_pulse
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/rcfg_home_spd
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/rcfg_home_acc
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/rcfg_home_dec
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/rcfg_jog_spd
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/rcfg_jog_acc
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/rcfg_jog_dec
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/rcfg_move_spd
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/rcfg_move_acc
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/rcfg_move_dec
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/rcfg_spd_max
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/rcfg_acc_max
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/rcfg_dec_max
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/rcfg_touch_spd
-add wave -noupdate -expand -group A -color Violet -radix decimal /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/r_pf_abspos
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/curr_state
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/curr_state_1d
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/next_state
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/timout
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/timout_cnt
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/ack_beh_id
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/ack_tx_id
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/ack_tx_result
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/ack_ps_alart_num
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/curr_state_m1
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/curr_state_m2
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/curr_state_m3
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/a_bhv_vld_r
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/match_10
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/match_30
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/match_40
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/action_start
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/get_postion_flag
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_start
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/jog_start
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/move_start
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/axis_org
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_stop
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_busy
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_done
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_error
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_pf_spd
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_pf_acc
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_pf_dec
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_pf_pulse
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_pf_dir
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_pf_start
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_pf_stop
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_pf_quickstop
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_pf_busy
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_pf_done
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_pf_error
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/jog_stop
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/jog_busy
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/jog_done
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/jog_error
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/jog_pf_spd
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/jog_pf_acc
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/jog_pf_dec
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/jog_pf_pulse
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/jog_pf_dir
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/jog_pf_start
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/jog_pf_stop
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/jog_pf_quickstop
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/move_stop
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/move_busy
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/move_done
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/move_error
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/move_pf_spd
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/move_pf_acc
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/move_pf_dec
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/move_pf_pulse
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/move_pf_dir
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/move_pf_start
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/move_pf_stop
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/move_pf_quickstop
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_pf_spd
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_pf_acc
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_pf_dec
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_quickstop_dec
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_quickstop
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_pf_mode
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_pf_start
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_pf_stop
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_pf_dir
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_pf_pulse
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/o_rc_pulse_start
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/o_rc_pulse_period
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/o_rc_pulse_number
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/o_rc_pulse_dir
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/i_rc_pulse_done
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/action_alarm
-add wave -noupdate -expand -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_pos_reset
-add wave -noupdate -expand -group B /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/clk_i
-add wave -noupdate -expand -group B /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/rst_i
-add wave -noupdate -expand -group B /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/i_time_1ms_vld
-add wave -noupdate -expand -group B /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/i_time_1s_vld
-add wave -noupdate -expand -group B /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/pre_sta_allow
-add wave -noupdate -expand -group B /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/post_sta_allow
-add wave -noupdate -expand -group B -color Violet -radix decimal /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/b_bhv_id
-add wave -noupdate -expand -group B /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/b_tx_ot
-add wave -noupdate -expand -group B /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/b_en
-add wave -noupdate -expand -group B /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/b_tx_result_rpt
-add wave -noupdate -expand -group B /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/b_tx_result_vld
-add wave -noupdate -expand -group B /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/ec_chb_st
-add wave -noupdate -expand -group B /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/b_tx_id
-add wave -noupdate -expand -group B /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/b_alm_num
-add wave -noupdate -expand -group B -color Magenta /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/o_dv_reset
-add wave -noupdate -expand -group B -color Magenta /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/o_dv_son
-add wave -noupdate -expand -group B /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/b_pause
-add wave -noupdate -expand -group B /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/b_stop
-add wave -noupdate -expand -group B /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/irq_o
-add wave -noupdate -expand -group B /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/irq_ack_i
-add wave -noupdate -expand -group B /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/curr_state
-add wave -noupdate -expand -group B /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/curr_state_1d
-add wave -noupdate -expand -group B /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/next_state
-add wave -noupdate -expand -group B /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/timout
-add wave -noupdate -expand -group B /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/timout_cnt
-add wave -noupdate -expand -group B /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/ack_beh_id
-add wave -noupdate -expand -group B /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/ack_tx_id
-add wave -noupdate -expand -group B /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/ack_tx_result
-add wave -noupdate -expand -group B /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/ack_ps_alart_num
-add wave -noupdate -expand -group B /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/match_10
-add wave -noupdate -expand -group B /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/match_20
-add wave -noupdate -expand -group B /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/match_30
-add wave -noupdate -expand -group B /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/match_40
-add wave -noupdate -expand -group B /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/bh_disable
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/clk_i
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/rst_i
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/i_time_1ms_vld
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/i_time_1s_vld
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pre_sta_allow
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/post_sta_allow
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/a_en
+add wave -noupdate -group A -radix decimal /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/a_bhv_id
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/a_bhv_vld
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/a_tx_ot
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/a_tx_result_rpt
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/a_tx_result_vld
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/ec_cha_st
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/a_tx_id
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/a_alm_num
+add wave -noupdate -group A -color Violet /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/a_bhv_id_r
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/state_monitor_o
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/irq_o
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/irq_ack_i
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/i_servo_notok
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/i_servo_stop
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/i_axis_limf
+add wave -noupdate -group A -color Cyan /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/i_axis_org
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/i_axis_limb
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/i_emerge_stop_signal
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/i_safe_status
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/i_axis_point
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/i_axis_reset
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/i_dv_alarm
+add wave -noupdate -group A -color Magenta /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/i_pause
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/i_stop
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/o_dv_pulse
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/o_dv_dir
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/action_busy
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/action_done
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/action_error
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/rserv_dir
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/rserv_step_pulse
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/rserv_target_pulse
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/rcfg_home_spd
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/rcfg_home_acc
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/rcfg_home_dec
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/rcfg_jog_spd
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/rcfg_jog_acc
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/rcfg_jog_dec
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/rcfg_move_spd
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/rcfg_move_acc
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/rcfg_move_dec
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/rcfg_spd_max
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/rcfg_acc_max
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/rcfg_dec_max
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/rcfg_touch_spd
+add wave -noupdate -group A -color Violet -radix decimal /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/r_pf_abspos
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/curr_state
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/curr_state_1d
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/next_state
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/timout
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/timout_cnt
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/ack_beh_id
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/ack_tx_id
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/ack_tx_result
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/ack_ps_alart_num
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/curr_state_m1
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/curr_state_m2
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/curr_state_m3
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/a_bhv_vld_r
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/match_10
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/match_30
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/match_40
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/action_start
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/get_postion_flag
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_start
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/jog_start
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/move_start
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/axis_org
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_stop
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_busy
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_done
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_error
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_pf_spd
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_pf_acc
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_pf_dec
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_pf_pulse
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_pf_dir
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_pf_start
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_pf_stop
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_pf_quickstop
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_pf_busy
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_pf_done
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_pf_error
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/jog_stop
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/jog_busy
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/jog_done
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/jog_error
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/jog_pf_spd
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/jog_pf_acc
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/jog_pf_dec
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/jog_pf_pulse
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/jog_pf_dir
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/jog_pf_start
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/jog_pf_stop
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/jog_pf_quickstop
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/move_stop
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/move_busy
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/move_done
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/move_error
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/move_pf_spd
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/move_pf_acc
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/move_pf_dec
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/move_pf_pulse
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/move_pf_dir
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/move_pf_start
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/move_pf_stop
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/move_pf_quickstop
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_pf_spd
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_pf_acc
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_pf_dec
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_quickstop_dec
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_quickstop
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_pf_mode
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_pf_start
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_pf_stop
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_pf_dir
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_pf_pulse
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/o_rc_pulse_start
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/o_rc_pulse_period
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/o_rc_pulse_number
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/o_rc_pulse_dir
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/i_rc_pulse_done
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/action_alarm
+add wave -noupdate -group A /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_pos_reset
+add wave -noupdate -group B /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/clk_i
+add wave -noupdate -group B /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/rst_i
+add wave -noupdate -group B /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/i_time_1ms_vld
+add wave -noupdate -group B /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/i_time_1s_vld
+add wave -noupdate -group B /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/pre_sta_allow
+add wave -noupdate -group B /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/post_sta_allow
+add wave -noupdate -group B -color Violet -radix decimal /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/b_bhv_id
+add wave -noupdate -group B /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/b_tx_ot
+add wave -noupdate -group B /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/b_en
+add wave -noupdate -group B /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/b_tx_result_rpt
+add wave -noupdate -group B /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/b_tx_result_vld
+add wave -noupdate -group B /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/ec_chb_st
+add wave -noupdate -group B /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/b_tx_id
+add wave -noupdate -group B /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/b_alm_num
+add wave -noupdate -group B -color Magenta /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/o_dv_reset
+add wave -noupdate -group B -color Magenta /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/o_dv_son
+add wave -noupdate -group B /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/b_pause
+add wave -noupdate -group B /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/b_stop
+add wave -noupdate -group B /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/irq_o
+add wave -noupdate -group B /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/irq_ack_i
+add wave -noupdate -group B /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/curr_state
+add wave -noupdate -group B /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/curr_state_1d
+add wave -noupdate -group B /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/next_state
+add wave -noupdate -group B /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/timout
+add wave -noupdate -group B /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/timout_cnt
+add wave -noupdate -group B /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/ack_beh_id
+add wave -noupdate -group B /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/ack_tx_id
+add wave -noupdate -group B /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/ack_tx_result
+add wave -noupdate -group B /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/ack_ps_alart_num
+add wave -noupdate -group B /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/match_10
+add wave -noupdate -group B /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/match_30
+add wave -noupdate -group B /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/match_40
+add wave -noupdate -group B /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/status_beh_pul_axis_u0/bh_disable
+add wave -noupdate -group C /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/tim_beh_pul_axis_u0/clk_i
+add wave -noupdate -group C /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/tim_beh_pul_axis_u0/rst_i
+add wave -noupdate -group C /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/tim_beh_pul_axis_u0/i_time_1ms_vld
+add wave -noupdate -group C /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/tim_beh_pul_axis_u0/i_time_1s_vld
+add wave -noupdate -group C /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/tim_beh_pul_axis_u0/task_time_cnt
+add wave -noupdate -group C /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/tim_beh_pul_axis_u0/pre_sta_allow
+add wave -noupdate -group C /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/tim_beh_pul_axis_u0/post_sta_allow
+add wave -noupdate -group C /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/tim_beh_pul_axis_u0/c_en
+add wave -noupdate -group C /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/tim_beh_pul_axis_u0/c_bhv_id
+add wave -noupdate -group C /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/tim_beh_pul_axis_u0/c_tx_ot
+add wave -noupdate -group C /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/tim_beh_pul_axis_u0/c_tx_result_rpt
+add wave -noupdate -group C /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/tim_beh_pul_axis_u0/c_tx_result_vld
+add wave -noupdate -group C /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/tim_beh_pul_axis_u0/ec_chc_st
+add wave -noupdate -group C /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/tim_beh_pul_axis_u0/c_tx_id
+add wave -noupdate -group C /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/tim_beh_pul_axis_u0/c_alm_num
+add wave -noupdate -group C /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/tim_beh_pul_axis_u0/c_gap_crl
+add wave -noupdate -group C /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/tim_beh_pul_axis_u0/state_monitor_o
+add wave -noupdate -group C /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/tim_beh_pul_axis_u0/irq_o
+add wave -noupdate -group C /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/tim_beh_pul_axis_u0/irq_ack_i
+add wave -noupdate -group C /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/tim_beh_pul_axis_u0/curr_state
+add wave -noupdate -group C /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/tim_beh_pul_axis_u0/curr_state_1d
+add wave -noupdate -group C /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/tim_beh_pul_axis_u0/next_state
+add wave -noupdate -group C /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/tim_beh_pul_axis_u0/timout
+add wave -noupdate -group C /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/tim_beh_pul_axis_u0/timout_cnt
+add wave -noupdate -group C /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/tim_beh_pul_axis_u0/ack_beh_id
+add wave -noupdate -group C /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/tim_beh_pul_axis_u0/ack_tx_id
+add wave -noupdate -group C /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/tim_beh_pul_axis_u0/ack_tx_result
+add wave -noupdate -group C /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/tim_beh_pul_axis_u0/ack_ps_alart_num
+add wave -noupdate -group C /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/tim_beh_pul_axis_u0/curr_state_m1
+add wave -noupdate -group C /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/tim_beh_pul_axis_u0/curr_state_m2
+add wave -noupdate -group C /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/tim_beh_pul_axis_u0/curr_state_m3
+add wave -noupdate -group C /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/tim_beh_pul_axis_u0/match_10
+add wave -noupdate -group C /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/tim_beh_pul_axis_u0/match_30
+add wave -noupdate -group C /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/tim_beh_pul_axis_u0/match_40
+add wave -noupdate -group C /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/tim_beh_pul_axis_u0/sample_vld
 add wave -noupdate -group PP /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/pre_post_sta_check_pul_axis_u0/clk_i
 add wave -noupdate -group PP /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/pre_post_sta_check_pul_axis_u0/rst_i
 add wave -noupdate -group PP /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/pre_post_sta_check_pul_axis_u0/unit_id
@@ -340,8 +369,6 @@ add wave -noupdate -group PP /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pu
 add wave -noupdate -group PP /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/pre_post_sta_check_pul_axis_u0/home_completed
 add wave -noupdate -group PP -expand /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/pre_post_sta_check_pul_axis_u0/a_pre_sta
 add wave -noupdate -group PP /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/pre_post_sta_check_pul_axis_u0/a_post_sta
-add wave -noupdate -group PP /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/pre_post_sta_check_pul_axis_u0/action_busy_d1
-add wave -noupdate -group PP /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/pre_post_sta_check_pul_axis_u0/action_busy_rise
 add wave -noupdate -group PP /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/pre_post_sta_check_pul_axis_u0/b_pre_sta
 add wave -noupdate -group PP /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/pre_post_sta_check_pul_axis_u0/ec_chb_st_d1
 add wave -noupdate -group PP /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/pre_post_sta_check_pul_axis_u0/b_executed
@@ -370,7 +397,6 @@ add wave -noupdate -group IRQ /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_p
 add wave -noupdate -group IRQ /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/irq_3i1o_arbitrator_u0/irq_reg2_o
 add wave -noupdate -group IRQ /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/irq_3i1o_arbitrator_u0/irq_o
 add wave -noupdate -group IRQ /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/irq_3i1o_arbitrator_u0/irq_busy_o
-add wave -noupdate -group IRQ /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/irq_3i1o_arbitrator_u0/irq_receive_ack_i
 add wave -noupdate -group IRQ /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/irq_3i1o_arbitrator_u0/curr_state
 add wave -noupdate -group IRQ /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/irq_3i1o_arbitrator_u0/curr_state_1d
 add wave -noupdate -group IRQ /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/irq_3i1o_arbitrator_u0/next_state
@@ -383,8 +409,212 @@ add wave -noupdate -group IRQ /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_p
 add wave -noupdate -group IRQ /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/irq_3i1o_arbitrator_u0/sel_irq_a_d
 add wave -noupdate -group IRQ /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/irq_3i1o_arbitrator_u0/sel_irq_b_d
 add wave -noupdate -group IRQ /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/irq_3i1o_arbitrator_u0/sel_irq_c_d
+add wave -noupdate -group home /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_u/clk
+add wave -noupdate -group home /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_u/reset
+add wave -noupdate -group home /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_u/i_drv_son
+add wave -noupdate -group home /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_u/i_pf_spd
+add wave -noupdate -group home /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_u/i_pf_acc
+add wave -noupdate -group home /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_u/i_pf_dec
+add wave -noupdate -group home /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_u/i_pf_dir
+add wave -noupdate -group home /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_u/i_lim_f
+add wave -noupdate -group home /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_u/i_lim_b
+add wave -noupdate -group home /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_u/i_org
+add wave -noupdate -group home /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_u/i_start
+add wave -noupdate -group home /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_u/i_stop
+add wave -noupdate -group home /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_u/o_busy
+add wave -noupdate -group home /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_u/o_done
+add wave -noupdate -group home /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_u/o_error
+add wave -noupdate -group home /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_u/o_pf_spd
+add wave -noupdate -group home /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_u/o_pf_acc
+add wave -noupdate -group home /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_u/o_pf_dec
+add wave -noupdate -group home /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_u/o_pf_pulse
+add wave -noupdate -group home /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_u/o_pf_dir
+add wave -noupdate -group home /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_u/o_pf_start
+add wave -noupdate -group home /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_u/o_pf_stop
+add wave -noupdate -group home /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_u/o_pf_quickstop
+add wave -noupdate -group home /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_u/i_pf_busy
+add wave -noupdate -group home /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_u/i_pf_done
+add wave -noupdate -group home /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_u/i_spd_min
+add wave -noupdate -group home /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_u/fsm_st
+add wave -noupdate -group home /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_u/r_pf_status_lim_f
+add wave -noupdate -group home /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_u/r_pf_status_lim_b
+add wave -noupdate -group home /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_u/r_pf_status_org
+add wave -noupdate -group home /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_u/r_st_error
+add wave -noupdate -group home /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_u/r_lim_f
+add wave -noupdate -group home /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_u/r_lim_b
+add wave -noupdate -group home /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_u/r_org
+add wave -noupdate -group home /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_u/posedge_lim_f
+add wave -noupdate -group home /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_u/negedge_lim_f
+add wave -noupdate -group home /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_u/posedge_lim_b
+add wave -noupdate -group home /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_u/negedge_lim_b
+add wave -noupdate -group home /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_u/posedge_org
+add wave -noupdate -group home /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/home_u/negedge_org
+add wave -noupdate -group jog /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/jog_u/clk
+add wave -noupdate -group jog /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/jog_u/reset
+add wave -noupdate -group jog /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/jog_u/i_drv_son
+add wave -noupdate -group jog /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/jog_u/i_pf_spd
+add wave -noupdate -group jog /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/jog_u/i_pf_acc
+add wave -noupdate -group jog /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/jog_u/i_pf_dec
+add wave -noupdate -group jog /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/jog_u/i_pf_pulse
+add wave -noupdate -group jog /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/jog_u/i_pf_dir
+add wave -noupdate -group jog /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/jog_u/i_lim_f
+add wave -noupdate -group jog /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/jog_u/i_lim_b
+add wave -noupdate -group jog /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/jog_u/i_org
+add wave -noupdate -group jog /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/jog_u/i_start
+add wave -noupdate -group jog /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/jog_u/i_stop
+add wave -noupdate -group jog /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/jog_u/o_busy
+add wave -noupdate -group jog /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/jog_u/o_done
+add wave -noupdate -group jog /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/jog_u/o_error
+add wave -noupdate -group jog /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/jog_u/o_pf_spd
+add wave -noupdate -group jog /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/jog_u/o_pf_acc
+add wave -noupdate -group jog /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/jog_u/o_pf_dec
+add wave -noupdate -group jog /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/jog_u/o_pf_pulse
+add wave -noupdate -group jog /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/jog_u/o_pf_dir
+add wave -noupdate -group jog /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/jog_u/o_pf_start
+add wave -noupdate -group jog /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/jog_u/o_pf_stop
+add wave -noupdate -group jog /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/jog_u/o_pf_quickstop
+add wave -noupdate -group jog /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/jog_u/i_pf_busy
+add wave -noupdate -group jog /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/jog_u/i_pf_done
+add wave -noupdate -group jog /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/jog_u/fsm_st
+add wave -noupdate -group jog /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/jog_u/r_pf_start
+add wave -noupdate -group jog /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/jog_u/r_pf_stop
+add wave -noupdate -group jog /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/jog_u/r_pf_quickstop
+add wave -noupdate -group jog /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/jog_u/r_st_error
+add wave -noupdate -group move /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/move_u/clk
+add wave -noupdate -group move /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/move_u/reset
+add wave -noupdate -group move /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/move_u/i_drv_son
+add wave -noupdate -group move /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/move_u/i_pf_spd
+add wave -noupdate -group move /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/move_u/i_pf_acc
+add wave -noupdate -group move /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/move_u/i_pf_dec
+add wave -noupdate -group move /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/move_u/i_pf_pulse
+add wave -noupdate -group move /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/move_u/i_lim_f
+add wave -noupdate -group move /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/move_u/i_lim_b
+add wave -noupdate -group move /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/move_u/i_org
+add wave -noupdate -group move /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/move_u/i_abspos
+add wave -noupdate -group move /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/move_u/i_start
+add wave -noupdate -group move /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/move_u/i_stop
+add wave -noupdate -group move /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/move_u/o_busy
+add wave -noupdate -group move /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/move_u/o_done
+add wave -noupdate -group move /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/move_u/o_error
+add wave -noupdate -group move /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/move_u/o_pf_spd
+add wave -noupdate -group move /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/move_u/o_pf_acc
+add wave -noupdate -group move /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/move_u/o_pf_dec
+add wave -noupdate -group move /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/move_u/o_pf_pulse
+add wave -noupdate -group move /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/move_u/o_pf_dir
+add wave -noupdate -group move /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/move_u/o_pf_start
+add wave -noupdate -group move /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/move_u/o_pf_stop
+add wave -noupdate -group move /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/move_u/o_pf_quickstop
+add wave -noupdate -group move /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/move_u/i_pf_busy
+add wave -noupdate -group move /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/move_u/i_pf_done
+add wave -noupdate -group move /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/move_u/fsm_st
+add wave -noupdate -group move /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/move_u/r_pf_start
+add wave -noupdate -group move /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/move_u/r_pf_stop
+add wave -noupdate -group move /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/move_u/r_pf_quickstop
+add wave -noupdate -group move /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/move_u/r_st_error
+add wave -noupdate -group move /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/move_u/r_pf_pulse
+add wave -noupdate -group move /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/move_u/r_pf_dir
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/clk
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/reset
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/i_pf_spd
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/i_pf_acc
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/i_pf_dec
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/i_pf_mode
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/i_pf_start
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/i_pf_stop
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/i_pf_dir
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/i_pf_pulse
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/i_quickstop
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/i_quickstop_dec
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/i_pause
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/o_pf_done
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/o_pf_error
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/o_pf_busy
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/o_pulse_start
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/o_pulse_period
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/o_pulse_number
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/o_pulse_dir
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/i_pulse_done
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/spd_div_start
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/spd_div_nom
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/spd_div_den
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/spd_div_quo
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/spd_div_ready
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/period_div_start
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/period_div_nom
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/period_div_den
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/period_div_quo
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/period_div_ready
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/fsm_st
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/r_pf_dir
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/r_pf_mode
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/r_pf_quickstop
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/r_div_ready
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/p_div_ready
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/r_pf_pulse_first
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/r_pf_pulse_count
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/r_pf_spd_target
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/r_pf_spd_next
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/r_pf_spd_act
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/r_pf_spd
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/r_pf_acc
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/r_pf_acc_act
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/r_pf_acc_next
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/r_pf_acc_target
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/r_pf_dec
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/r_pf_dec_act
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/r_pf_dec_next
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/r_pf_dec_target
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/r_pf_jerk_spd_dec
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/r_pf_jerk_state
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/r_pf_jerk_acc
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/r_pf_jerk_dec
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/r_pf_pulse
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/r_pf_spd_red
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/r_pf_spd_p2
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/r_pf_dec_inv
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/r_pf_acc_inv
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/r_pf_pulse_acc_red_in
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/r_pf_pulse_acc_red_out
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/r_pf_pulse_acc_next
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/r_pf_pulse_acc
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/r_pf_pulse_dec_red_in
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/r_pf_pulse_dec_red_out
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/r_pf_pulse_dec_next
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/r_pf_pulse_dec
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/r_pf_pulse_cal
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/r_pf_pulse_act
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/r_pf_pulse_dif
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/r_pf_pulse_period
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/r_pf_pulse_done
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/r_pf_error
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/r_pf_busy
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/r_pf_done
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/r_pulse_start
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/r_pulse_period
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/r_pulse_number
+add wave -noupdate -group pos /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/pos_u/r_pulse_dir
+add wave -noupdate -group pul /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/Pulmot_fd00/clk
+add wave -noupdate -group pul /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/Pulmot_fd00/reset
+add wave -noupdate -group pul /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/Pulmot_fd00/i_bv_pulse_start
+add wave -noupdate -group pul /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/Pulmot_fd00/i_bv_pulse_period
+add wave -noupdate -group pul /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/Pulmot_fd00/i_bv_pulse_number
+add wave -noupdate -group pul /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/Pulmot_fd00/i_bv_pulse_dir
+add wave -noupdate -group pul /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/Pulmot_fd00/o_bv_pulse_done
+add wave -noupdate -group pul /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/Pulmot_fd00/i_dv_ready
+add wave -noupdate -group pul /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/Pulmot_fd00/i_dv_inp
+add wave -noupdate -group pul /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/Pulmot_fd00/i_dv_phase_a
+add wave -noupdate -group pul /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/Pulmot_fd00/i_dv_phase_b
+add wave -noupdate -group pul /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/Pulmot_fd00/i_dv_phase_z
+add wave -noupdate -group pul /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/Pulmot_fd00/o_dv_pulse_p
+add wave -noupdate -group pul /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/Pulmot_fd00/o_dv_pulse_n
+add wave -noupdate -group pul /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/Pulmot_fd00/r_pulse_period
+add wave -noupdate -group pul /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/Pulmot_fd00/r_pulse_number
+add wave -noupdate -group pul /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/Pulmot_fd00/r_pulse_dir
+add wave -noupdate -group pul /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/Pulmot_fd00/r_pulse_count
+add wave -noupdate -group pul /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/Pulmot_fd00/r_pulse_idx
+add wave -noupdate -group pul /tb_ec_pul_axis/emcc_mst_top_u/emcc_mix_top_u/ec_pul_axis_u0/proactive_beh_pul_axis_u0/Pulmot_fd00/r_pulse_pn
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {696704491375 fs} 0}
+WaveRestoreCursors {{Cursor 1} {72481987616 fs} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 150
 configure wave -valuecolwidth 100
@@ -400,4 +630,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
 update
-WaveRestoreZoom {0 fs} {975486750 ps}
+WaveRestoreZoom {0 fs} {1266050625 ps}
