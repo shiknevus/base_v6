@@ -6,6 +6,7 @@
 module tb_ec_pul_axis;
 //********************************Defines*********************************
 `define EC_COMP_INST_PATH tb_ec_pul_axis.emcc_mst_top_u.emcc_mix_top_u.ec_pul_axis_u0
+`define TIMEDELAY 50000
 //*************************Parameter Declarations**************************
 parameter       CLOCKPERIOD_1 = 6.4	;
 parameter       CLOCKPERIOD_2 = 6.4	;
@@ -63,7 +64,7 @@ always  #(CLOCKPERIOD_2 / 2) reference_clk_2_n_r = !reference_clk_2_n_r;
 assign reference_clk_2_p_r = !reference_clk_2_n_r;
 
 initial init_clk_p = 1'b0;
-always #(INIT_CLOCKPERIOD / 2) init_clk_p = !init_clk_p;
+always #(INIT_CLOCKPERIOD / 2.0) init_clk_p = !init_clk_p;
 assign init_clk_n =  !init_clk_p;
 
 //____________________________Resets____________________________
@@ -89,7 +90,7 @@ emcc_mst_top emcc_mst_top_u
     .TXN_1(txn_11_i)
 );
 
-localparam EC_BIAS_ADDR = `PL_CFG_BASE_ADDR + {20'h1a00};
+localparam EC_BIAS_ADDR = `PL_CFG_BASE_ADDR + {20'ha00};
 
 reg tb_ACLK;
 reg tb_ARESETn;
@@ -97,7 +98,8 @@ reg [1:0] resp1;
 reg [31:0] rddata;
 reg [31:0] rddata2;
 reg [7:0] a_done_bhv;   // set by responder on A result
-reg       b_done;       // set by responder on B result
+// reg       b_done;       // set by responder on B result
+// reg       c_done;       // set by responder on C result
 reg       bus_read_busy = 1'b0;   // AXI read mutex
 
 initial begin
@@ -125,6 +127,7 @@ initial begin
     #2000;
 
     //PS RX PORT
+     wait (tb_ec_pul_axis.emcc_mst_top_u.prot_clk_rst == 0)                                                                                                           //
     fork
         begin
             wait (tb_ec_pul_axis.emcc_mst_top_u.axi_clk_0 === 1'b1);
@@ -144,20 +147,20 @@ initial begin
     join_none
 
     //---- init: common regs ----
-    ps_write_word(EC_BIAS_ADDR + `RST_EN,      32'h0000_0001, resp1);
-    ps_write_word(EC_BIAS_ADDR + `SC_ID,        32'h0000_0066, resp1);
-    ps_write_word(EC_BIAS_ADDR + `EC_ID,        32'h0000_0088, resp1);
-    ps_write_word(EC_BIAS_ADDR + `BHV_PRIORITY,  32'h0000_0000, resp1);
+    ps_write_word(EC_BIAS_ADDR + `RST_EN,       32'h0000_0001, resp1);
+    ps_write_word(EC_BIAS_ADDR + `EC_ID,        32'h0000_3FFF, resp1);
+    ps_write_word(EC_BIAS_ADDR + `SC_ID,        32'h0000_0004, resp1);
+    ps_write_word(EC_BIAS_ADDR + `BHV_PRIORITY, 32'h0000_0000, resp1);
 
     //---- motion params (new register map) ----
     ps_write_word(EC_BIAS_ADDR + `PARAM1,       32'h001E_8480, resp1);  // spd_max 2M pps
     ps_write_word(EC_BIAS_ADDR + `PARAM2,       32'h001E_8480, resp1);  // acc_max
     ps_write_word(EC_BIAS_ADDR + `PARAM3,       32'h001E_8480, resp1);  // dec_max
     ps_write_word(EC_BIAS_ADDR + `PARAM5,       32'h001E_8480, resp1);  // acc 2M
-    ps_write_word(EC_BIAS_ADDR + `PARAM33,      32'h000F_4240, resp1);  // touch_spd 1M
+    ps_write_word(EC_BIAS_ADDR + `PARAM33,      32'h0000_1388, resp1);  // touch_spd 5k
     ps_write_word(EC_BIAS_ADDR + `PARAM34,      32'h001E_8480, resp1);  // dec 2M
     ps_write_word(EC_BIAS_ADDR + `PARAM35,      32'h0001_86A0, resp1);  // spd 100k pps
-    ps_write_word(EC_BIAS_ADDR + `PARAM36,      32'h0000_0064, resp1);  // move target 100 pulses
+    ps_write_word(EC_BIAS_ADDR + `PARAM36,      32'h0000_0BB8, resp1);  // move target 3k pulses
     ps_write_word(EC_BIAS_ADDR + `PARAM37,      32'h0000_0064, resp1);  // jog step 100 pulses
     ps_write_word(EC_BIAS_ADDR + `PARAM16,      32'h0000_0001, resp1);  // rserv_dir = POS
     ps_write_word(EC_BIAS_ADDR + `PARAM26,      32'h0000_0000, resp1);  // pause req = 0
@@ -167,59 +170,175 @@ initial begin
     ps_write_word(EC_BIAS_ADDR + `PARAM30,      32'h0000_0001, resp1);  // drive on = 1
 
     ps_write_word(EC_BIAS_ADDR + `A_TX_OT,      32'hFFFF_0000, resp1);  // A: no timeout
-    ps_write_word(EC_BIAS_ADDR + `B_TX_OT,      32'h0000_0064, resp1);  // B: 100s
+    ps_write_word(EC_BIAS_ADDR + `B_TX_OT,      32'h0000_0032, resp1);  // B
+    ps_write_word(EC_BIAS_ADDR + `C_TX_OT,      32'h0000_0016, resp1);  // C
     ps_write_word(EC_BIAS_ADDR + `A_EN,         32'h0000_0001, resp1);
     ps_write_word(EC_BIAS_ADDR + `B_EN,         32'h0000_0001, resp1);
-    ps_write_word(EC_BIAS_ADDR + `C_EN,         32'h0000_0000, resp1);
+    ps_write_word(EC_BIAS_ADDR + `C_EN,         32'h0000_0001, resp1);
+    ps_write_word(EC_BIAS_ADDR + `C_GAP_CRL,    32'h0000_0001, resp1);  // C gap 1ms (1ms tick count)
 
     #5000;   // init son consumed by responder
 
-    //============================================  A: beh 1 HOME  ============================
+    //--------------------------------------------  B: beh 102 drive reset  ----------------------------
+    $display("== B channel: beh 102 drive reset ==");
+    ps_write_word(EC_BIAS_ADDR + `PARAM29, 32'h0000_0001, resp1);
+    $display("INFO: beh102 done, drive reset");
+    ps_write_word(EC_BIAS_ADDR + `PARAM29, 32'h0000_0000, resp1);
+    #`TIMEDELAY;
+    //--------------------------------------------  B: beh 105 SOFF  ----------------------------
+    $display("== B channel: beh 105 soff  ==");
+    ps_write_word(EC_BIAS_ADDR + `PARAM30, 32'h0000_0000, resp1);  // drive off -> one-shot 105
+    $display("  [%0t] beh105 done, o_dv_son=%b (expect 1=disabled)", $time, `EC_COMP_INST_PATH.o_dv_son);
+    #`TIMEDELAY;
+    //--------------------------------------------  B: beh 104 SON  ----------------------------
+    $display("== B channel:  beh 104 son ==");
+    ps_write_word(EC_BIAS_ADDR + `PARAM30, 32'h0000_0001, resp1);  // drive on -> one-shot 104
+    $display("  [%0t] beh104 done, o_dv_son=%b (expect 0=enabled)", $time, `EC_COMP_INST_PATH.o_dv_son);
+    #`TIMEDELAY;   
+    //--------------------------------------------  B: beh 102 drive reset  ----------------------------
+    $display("== B channel: beh 102 drive reset ==");
+    ps_write_word(EC_BIAS_ADDR + `PARAM29, 32'h0000_0001, resp1);
+    $display("INFO: beh102 done, drive reset");
+    ps_write_word(EC_BIAS_ADDR + `PARAM29, 32'h0000_0000, resp1);
+    #`TIMEDELAY;   
+    //--------------------------------------------  A: beh 1 HOME  ----------------------------
     $display("== A channel: beh 1 HOME ==");
-    a_run(8'd1);            // org stimulus block below drives i_axis_org
+    fork
+        begin
+            wait(`EC_COMP_INST_PATH.a_bhv_id_r == 8'd1);
+            #50000;
+            force `EC_COMP_INST_PATH.i_axis_org = 1'b0;
+            #50000;
+            force `EC_COMP_INST_PATH.i_axis_org = 1'b1;
+            #500000;
+            force `EC_COMP_INST_PATH.i_axis_org = 1'b0;
+            #`TIMEDELAY;   
+            release `EC_COMP_INST_PATH.i_axis_org;  
+            $display("  [%0t] org released", $time);
+        end
+    join_none
+    a_run(8'd1);           
     ps_read_word(EC_BIAS_ADDR + `PARAM51, rddata);
     $display("  [%0t] after HOME: abspos=%d (expect 0)", $time, $signed(rddata));
-    #50000;   
-    //============================================  A: beh 30 GETPOS  ============================
+    #`TIMEDELAY;
+    //--------------------------------------------  A: beh 30 GETPOS  ----------------------------
     $display("== A channel: beh 30 GETPOS ==");
     a_run(8'd30);
-
-    //============================================  A: beh 2 JOG (+step)  ============================
+    ps_read_word(EC_BIAS_ADDR + `PARAM51, rddata);
+    $display("  [%0t] GETPOS: abspos=%d ", $time, $signed(rddata));
+    #`TIMEDELAY;   
+    //--------------------------------------------  A: beh 2 JOG (default)  ----------------------------
     $display("== A channel: beh 2 JOG ==");
     a_run(8'd2);
     ps_read_word(EC_BIAS_ADDR + `PARAM51, rddata);
     $display("  [%0t] after JOG: abspos=%d (expect +100, +-1 profile tolerance)", $time, $signed(rddata));
-    #50000;   
-    //============================================  A: beh 3 MOVE  ============================
+    #`TIMEDELAY;
+    //--------------------------------------------  A: beh 30 GETPOS  ----------------------------
+    $display("== A channel: beh 30 GETPOS ==");
+    a_run(8'd30);
+    ps_read_word(EC_BIAS_ADDR + `PARAM51, rddata);
+    $display("  [%0t] GETPOS: abspos=%d ", $time, $signed(rddata));
+    #`TIMEDELAY;   
+
+    //--------------------------------------------  A: beh 2 JOG (+step)  ----------------------------
+    $display("== A channel: beh 2 JOG+ ==");
+    ps_write_word(EC_BIAS_ADDR + `PARAM16,      32'h0000_0001, resp1);  // rserv_dir = POS
+    ps_write_word(EC_BIAS_ADDR + `PARAM37,      32'd100, resp1);  // jog step 100 pulses
+    a_run(8'd2);
+    ps_read_word(EC_BIAS_ADDR + `PARAM51, rddata);
+    $display("  [%0t] after JOG: abspos=%d ( jog+100,+-1 profile tolerance)", $time, $signed(rddata));
+    #`TIMEDELAY;   
+    //--------------------------------------------  A: beh 30 GETPOS  ----------------------------
+    $display("== A channel: beh 30 GETPOS ==");
+    a_run(8'd30);
+    ps_read_word(EC_BIAS_ADDR + `PARAM51, rddata);
+    $display("  [%0t] GETPOS: abspos=%d ", $time, $signed(rddata));
+    #`TIMEDELAY;   
+    //--------------------------------------------  A: beh 2 JOG (-step)  ----------------------------
+    $display("== A channel: beh 2 JOG- ==");
+    ps_write_word(EC_BIAS_ADDR + `PARAM16,      32'h0000_0000, resp1);  // rserv_dir = NEG
+    ps_write_word(EC_BIAS_ADDR + `PARAM37,      32'd400, resp1);  // jog step 100 pulses
+    a_run(8'd2);
+    ps_read_word(EC_BIAS_ADDR + `PARAM51, rddata);
+    $display("  [%0t] after JOG: abspos=%d ( jog-400 ,+-1 profile tolerance)", $time, $signed(rddata));
+    #`TIMEDELAY;   
+    //--------------------------------------------  A: beh 30 GETPOS  ----------------------------
+    $display("== A channel: beh 30 GETPOS ==");
+    a_run(8'd30);
+    ps_read_word(EC_BIAS_ADDR + `PARAM51, rddata);
+    $display("  [%0t] GETPOS: abspos=%d ", $time, $signed(rddata));
+    #`TIMEDELAY;   
+   //--------------------------------------------  A: beh 3 MOVE (default) ----------------------------
     $display("== A channel: beh 3 MOVE to 100 ==");
     a_run(8'd3);
     ps_read_word(EC_BIAS_ADDR + `PARAM51, rddata);
     $display("  [%0t] after MOVE: abspos=%d (expect 100)", $time, $signed(rddata));
-    #50000;   
-    //============================================  A: beh 20 safe JOG  ============================
+    #`TIMEDELAY;   
+    //--------------------------------------------  A: beh 30 GETPOS  ----------------------------
+    $display("== A channel: beh 30 GETPOS ==");
+    a_run(8'd30);
+    ps_read_word(EC_BIAS_ADDR + `PARAM51, rddata);
+    $display("  [%0t] GETPOS: abspos=%d ", $time, $signed(rddata));
+    #`TIMEDELAY;   
+   //--------------------------------------------  A: beh 3 MOVE (233) ----------------------------
+    $display("== A channel: beh 3 MOVE to 233 ==");
+    ps_write_word(EC_BIAS_ADDR + `PARAM36,      32'd233, resp1);  // move target 233 pulses
+    a_run(8'd3);
+    ps_read_word(EC_BIAS_ADDR + `PARAM51, rddata);
+    $display("  [%0t] after MOVE: abspos=%d (expect 233)", $time, $signed(rddata));
+    #`TIMEDELAY;   
+    //--------------------------------------------  A: beh 30 GETPOS  ----------------------------
+    $display("== A channel: beh 30 GETPOS ==");
+    a_run(8'd30);
+    ps_read_word(EC_BIAS_ADDR + `PARAM51, rddata);
+    $display("  [%0t] GETPOS: abspos=%d ", $time, $signed(rddata));
+    #`TIMEDELAY;   
+   //--------------------------------------------  A: beh 3 MOVE (-133) ----------------------------
+    $display("== A channel: beh 3 MOVE to -133 ==");
+    ps_write_word(EC_BIAS_ADDR + `PARAM36,      -32'd133, resp1);  // move target -133 pulses
+    a_run(8'd3);
+    ps_read_word(EC_BIAS_ADDR + `PARAM51, rddata);
+    $display("  [%0t] after MOVE: abspos=%d (expect -133)", $time, $signed(rddata));
+    #`TIMEDELAY;   
+    //--------------------------------------------  A: beh 30 GETPOS  ----------------------------
+    $display("== A channel: beh 30 GETPOS ==");
+    a_run(8'd30);
+    ps_read_word(EC_BIAS_ADDR + `PARAM51, rddata);
+    $display("  [%0t] GETPOS: abspos=%d ", $time, $signed(rddata));
+    #`TIMEDELAY;   
+    //--------------------------------------------  A: beh 20 safe JOG  ----------------------------
     $display("== A channel: beh 20 safe JOG ==");
     a_run(8'd20);
     ps_read_word(EC_BIAS_ADDR + `PARAM51, rddata);
     $display("  [%0t] after safe JOG: abspos=%d (expect 200)", $time, $signed(rddata));
-    #50000;   
-    //============================================  A: beh 21 safe MOVE  ============================
+    #`TIMEDELAY;   
+    //--------------------------------------------  A: beh 30 GETPOS  ----------------------------
+    $display("== A channel: beh 30 GETPOS ==");
+    a_run(8'd30);
+    ps_read_word(EC_BIAS_ADDR + `PARAM51, rddata);
+    $display("  [%0t] GETPOS: abspos=%d ", $time, $signed(rddata));
+    #`TIMEDELAY;   
+    //--------------------------------------------  A: beh 21 safe MOVE  ----------------------------
     $display("== A channel: beh 21 safe MOVE to 100 ==");
     a_run(8'd21);
     ps_read_word(EC_BIAS_ADDR + `PARAM51, rddata);
     $display("  [%0t] after safe MOVE: abspos=%d (expect 100)", $time, $signed(rddata));
-
-    //============================================  B: beh 100/101 pause+resume during real MOVE  ============================
+    #`TIMEDELAY;   
+    //--------------------------------------------  A: beh 30 GETPOS  ----------------------------
+    $display("== A channel: beh 30 GETPOS ==");
+    a_run(8'd30);
+    ps_read_word(EC_BIAS_ADDR + `PARAM51, rddata);
+    $display("  [%0t] GETPOS: abspos=%d ", $time, $signed(rddata));
+    #`TIMEDELAY;   
+    //--------------------------------------------  B: beh 100/101 pause+resume during  MOVE  ----------------------------
     $display("== B channel: beh 100 pause / 101 resume during MOVE ==");
-    ps_write_word(EC_BIAS_ADDR + `PARAM36, 32'h0000_07D0, resp1);  // target 2000 (1900 pulses to go)
-    a_done_bhv = 8'd0;
-    ps_write_word(EC_BIAS_ADDR + `A_BHV_ID, {24'd0, 8'd3}, resp1);  // MOVE background
-    wait(`EC_COMP_INST_PATH.ec_cha_st == 1'b1);                     // A busy
-    @(`EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.r_pf_abspos);    // motion started
-    b_done = 1'b0;
-    ps_write_word(EC_BIAS_ADDR + `PARAM26, 32'h0000_0001, resp1);
-    wait(b_done);                                                   // pause
-    $display("  [%0t] after beh100: b_pause=%b", $time,
-             `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.i_pause);
+    ps_write_word(EC_BIAS_ADDR + `PARAM36, 32'd2000, resp1);  // target 2000 (1900 pulses to go)
+    a_run(8'd3);
+    wait(`EC_COMP_INST_PATH.ec_cha_st == 1'b1);  // A busy
+    #`TIMEDELAY;
+    ps_write_word(EC_BIAS_ADDR + `PARAM26, 32'h0000_0001, resp1);      // pause
+    $display("  [%0t] during beh3 move: b_pause=%b", $time,`EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.i_pause);
+
     // freeze check
     ps_read_word(EC_BIAS_ADDR + `PARAM51, rddata);
     #20000;
@@ -228,65 +347,18 @@ initial begin
         $display("PASS: abspos frozen during pause (%d)", $signed(rddata));
     else
         $display("FAIL: abspos moved during pause (%d -> %d)", $signed(rddata), $signed(rddata2));
-    b_done = 1'b0;
-    ps_write_word(EC_BIAS_ADDR + `PARAM28, 32'h0000_0001, resp1);  // P28 first: else 100 steals P26
-    ps_write_word(EC_BIAS_ADDR + `PARAM26, 32'h0000_0001, resp1);
-    wait(b_done);                                                   // resume
-    $display("  [%0t] after beh101: b_pause=%b", $time,
-             `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.i_pause);
-    wait(a_done_bhv == 8'd3);                                       // MOVE completes
+
+    ps_write_word(EC_BIAS_ADDR + `PARAM28, 32'h0000_0001, resp1);
+    $display("  [%0t] during beh3 move: b_pause=%b", $time,`EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.i_pause);
+
+
     ps_read_word(EC_BIAS_ADDR + `PARAM51, rddata);
-    $display("  [%0t] after resume+move: abspos=%d (expect 2000)", $time, $signed(rddata));
-
-    //============================================  B: beh 103 stop during real MOVE  ============================
-    $display("== B channel: beh 103 stop during MOVE ==");
-    ps_write_word(EC_BIAS_ADDR + `PARAM36, 32'h0000_0BB8, resp1);  // target 3000 (1000 pulses to go)
-    a_done_bhv = 8'd0;
-    ps_write_word(EC_BIAS_ADDR + `A_BHV_ID, {24'd0, 8'd3}, resp1);
-    wait(`EC_COMP_INST_PATH.ec_cha_st == 1'b1);                     // A busy
-    @(`EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.r_pf_abspos);    // motion started
-    b_done = 1'b0;
-    ps_write_word(EC_BIAS_ADDR + `PARAM27, 32'h0000_0001, resp1);  // P27 first: else 100 steals P26
-    ps_write_word(EC_BIAS_ADDR + `PARAM26, 32'h0000_0001, resp1);
-    wait(b_done);            // stop (A's aborted result acked by responder)
-    #3000;                                                          // let the stop take effect
-    ps_read_word(EC_BIAS_ADDR + `PARAM51, rddata);
-    $display("  [%0t] after beh103 stop: abspos=%d (partial move, real pulses)", $time, $signed(rddata));
-    $display("  [%0t] RTL r_pf_abspos=%d (read cross check)", $time,
-             $signed(`EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.r_pf_abspos));
-
-    //============================================  B: beh 102 drive reset  ============================
-    $display("== B channel: beh 102 drive reset ==");
-    b_done = 1'b0;
-    ps_write_word(EC_BIAS_ADDR + `PARAM29, 32'h0000_0001, resp1);
-    wait(b_done);
-    ps_write_word(EC_BIAS_ADDR + `PARAM29, 32'h0000_0000, resp1);  // no auto-clear: PS re-arms
-    $display("INFO: beh102 done, PARAM29 cleared by PS");
-
-    //============================================  B: beh 105 soff / beh 104 son  ============================
-    $display("== B channel: beh 105 soff / beh 104 son ==");
-    b_done = 1'b0;
-    ps_write_word(EC_BIAS_ADDR + `PARAM30, 32'h0000_0000, resp1);  // drive off -> one-shot 105
-    wait(b_done);
-    $display("  [%0t] beh105 done, o_dv_son=%b (expect 1=disabled)", $time, `EC_COMP_INST_PATH.o_dv_son);
-    b_done = 1'b0;
-    ps_write_word(EC_BIAS_ADDR + `PARAM30, 32'h0000_0001, resp1);  // drive on -> one-shot 104
-    wait(b_done);
-    $display("  [%0t] beh104 done, o_dv_son=%b (expect 0=enabled)", $time, `EC_COMP_INST_PATH.o_dv_son);
+    $display("  [%0t] after pause+resume during move: abspos=%d (expect 2000)", $time, $signed(rddata));
 
     #2000;
     $finish;
 end
 
-//HOME org stimulus: hold org=1, falling edge finishes the search
-initial begin
-    wait(`EC_COMP_INST_PATH.a_bhv_id_r == 8'd1);
-    #50000;
-    force `EC_COMP_INST_PATH.i_axis_org = 1'b1;
-    #100000;
-    force `EC_COMP_INST_PATH.i_axis_org = 1'b0;
-    $display("  [%0t] org released", $time);
-end
 
 //A FSM state name
 function string fsm_a_name(input [7:0] s);
@@ -326,11 +398,31 @@ function string fsm_b_name(input [7:0] s);
     endcase
 endfunction
 
-//A/B FSM current state
+//C FSM state name
+function string fsm_c_name(input [7:0] s);
+    case(s)
+        8'd0:  return "IDLE";
+        8'd1:  return "PRE_DET";
+        8'd2:  return "RDY_10";
+        8'd3:  return "RDY_10_ACK";
+        8'd4:  return "EXE_20";
+        8'd5:  return "EXE";
+        8'd6:  return "EXE_20_ACK";
+        8'd7:  return "POST_DET";
+        8'd8:  return "SUCC_30";
+        8'd9:  return "SUCC_30_ACK";
+        8'd10: return "ALERT_40";
+        8'd11: return "ALERT_40_ACK";
+        default: return "??";
+    endcase
+endfunction
+
+//A/B/C FSM current state
 initial begin
-    $monitor("  [%0t] FSM_A %s | FSM_B %s", $time,
+    $monitor("  [%0t] FSM_A %s | FSM_B %s | FSM_C %s", $time,
              fsm_a_name(`EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.state_monitor_o[7:0]),
-             fsm_b_name(`EC_COMP_INST_PATH.status_beh_pul_axis_u0.state_monitor_o[7:0]));
+             fsm_b_name(`EC_COMP_INST_PATH.status_beh_pul_axis_u0.state_monitor_o[7:0]),
+             fsm_c_name(`EC_COMP_INST_PATH.tim_beh_pul_axis_u0.state_monitor_o[7:0]));
 end
 
 //abspos abnormal jump catcher
@@ -349,48 +441,59 @@ end
 
 //IRQ latch catcher
 always @(`EC_COMP_INST_PATH.irq_3i1o_arbitrator_u0.irq_reg1_o) begin
-    $display("  [%0t] IRQ_LATCH 0x%08x | ga=%b gb=%b | a_irq=%b a_bhv=%d a_tx=0x%02x | b_irq=%b b_bhv=%d b_tx=0x%02x",
+    $display("  [%0t] IRQ_LATCH 0x%08x | ga=%b gb=%b gc=%b | a_irq=%b a_bhv=%d a_tx=0x%02x | b_irq=%b b_bhv=%d b_tx=0x%02x | c_irq=%b c_bhv=%d c_tx=0x%02x",
              $time, `EC_COMP_INST_PATH.irq_3i1o_arbitrator_u0.irq_reg1_o,
              `EC_COMP_INST_PATH.irq_3i1o_arbitrator_u0.irq_a_grant_o,
              `EC_COMP_INST_PATH.irq_3i1o_arbitrator_u0.irq_b_grant_o,
+             `EC_COMP_INST_PATH.irq_3i1o_arbitrator_u0.irq_c_grant_o,
              `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.irq_o,
              `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.a_bhv_id_r,
              `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.a_tx_id,
              `EC_COMP_INST_PATH.status_beh_pul_axis_u0.irq_o,
              `EC_COMP_INST_PATH.status_beh_pul_axis_u0.b_bhv_id,
-             `EC_COMP_INST_PATH.status_beh_pul_axis_u0.b_tx_id);
+             `EC_COMP_INST_PATH.status_beh_pul_axis_u0.b_tx_id,
+             `EC_COMP_INST_PATH.tim_beh_pul_axis_u0.irq_o,
+             `EC_COMP_INST_PATH.tim_beh_pul_axis_u0.c_bhv_id,
+             `EC_COMP_INST_PATH.tim_beh_pul_axis_u0.c_tx_id);
 end
 
-//MOVE path debug
+//MOVE path debug: print on fsm state change only
+reg [3:0] dbg_mfsm = 4'd15;
+reg [3:0] dbg_pfsm = 4'd15;
 always @(`EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.move_u.fsm_st or
-         `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.fsm_st or
-         `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.move_u.o_pf_start or
-         `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.i_pf_start) begin
-    $display("  [%0t] MOVE_DBG mstart=%b mfsm=%d mpulse=%d | pstart=%b ppulse=%d pfsm=%d | abspos=%d",
-             $time,
-             `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.move_start,
-             `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.move_u.fsm_st,
-             `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.move_u.r_pf_pulse,
-             `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.i_pf_start,
-             `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.i_pf_pulse,
-             `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.fsm_st,
-             $signed(`EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.r_pf_abspos));
+         `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.fsm_st) begin
+    if(`EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.move_u.fsm_st != dbg_mfsm ||
+       `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.fsm_st  != dbg_pfsm) begin
+        $display("  [%0t] MOVE_DBG mstart=%b mfsm=%d mpulse=%d | pstart=%b ppulse=%d pfsm=%d | abspos=%d",
+                 $time,
+                 `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.move_start,
+                 `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.move_u.fsm_st,
+                 `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.move_u.r_pf_pulse,
+                 `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.i_pf_start,
+                 `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.i_pf_pulse,
+                 `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.fsm_st,
+                 $signed(`EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.r_pf_abspos));
+        dbg_mfsm = `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.move_u.fsm_st;
+        dbg_pfsm = `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.fsm_st;
+    end
 end
 
 //positioner decel debug: fsm transitions
 reg [1:0] pos_fsm_dbg = 2'd0;
 always @(`EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.fsm_st) begin
-    $display("  [%0t] POS_DBG fsm %d->%d spd=%d act=%d pulse=%d cal=%d dec=%d first=%b inv=0x%h",
-             $time, pos_fsm_dbg,
-             `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.fsm_st,
-             `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.r_pf_spd,
-             `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.r_pf_pulse_act,
-             `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.r_pf_pulse,
-             `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.r_pf_pulse_cal,
-             `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.r_pf_pulse_dec,
-             `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.r_pf_pulse_first,
-             `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.r_pf_dec_inv);
-    pos_fsm_dbg = `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.fsm_st;
+    if(`EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.fsm_st != pos_fsm_dbg) begin
+        $display("  [%0t] POS_DBG fsm %d->%d spd=%d act=%d pulse=%d cal=%d dec=%d first=%b inv=0x%h",
+                 $time, pos_fsm_dbg,
+                 `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.fsm_st,
+                 `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.r_pf_spd,
+                 `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.r_pf_pulse_act,
+                 `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.r_pf_pulse,
+                 `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.r_pf_pulse_cal,
+                 `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.r_pf_pulse_dec,
+                 `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.r_pf_pulse_first,
+                 `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.r_pf_dec_inv);
+        pos_fsm_dbg = `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.fsm_st;
+    end
 end
 
 //positioner decel curve: spd/period every 50 pulses in DEC
@@ -404,32 +507,51 @@ always @(`EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.r_pf_pulse_act) begi
                  `EC_COMP_INST_PATH.proactive_beh_pul_axis_u0.pos_u.r_pf_pulse_period);
 end
 
-//IRQ responder: poll + ack by IRQ_REG1 content
+//IRQ responder: IRQ_REG1/2 driven, ack after FSM-state cross-check
+// irq1={ec_id,sc_id,bhv[7:0]} irq2={tx[31:24],alarm[23:16]}; 
 task automatic irq_responder;
     reg [31:0] irq1;
-    reg [31:0] handled;
+    reg [31:0] irq2;
+    reg [31:0] sta;
+    reg [31:0] bhv_r;
+    reg [7:0]  bhv;
     reg [7:0]  tx;
+    reg [7:0]  exp_tx;
     forever begin
         #500;
         ps_read_word(EC_BIAS_ADDR + `IRQ_REG1, irq1);
-        if(irq1 == handled || irq1 == 32'd0) begin
-            // nothing new
-        end else begin
-            tx = irq1[7:0];
-            if(irq1[15:8] >= 8'd100) begin
-                ps_write_word(EC_BIAS_ADDR + `B_TX_RSULT_RPT,
-                              {irq1[15:8], tx, (tx == 8'd30) ? 16'h5100 : 16'h5101}, resp1);
-                if(tx == 8'd30 || tx == 8'd40) b_done = 1'b1;
-                $display("  [%0t] IRQ B bhv=%0d tx=0x%02x ACK", $time, irq1[15:8], tx);
-            end else begin
-                ps_write_word(EC_BIAS_ADDR + `A_TX_RSULT_RPT,
-                              {irq1[15:8], tx, (tx == 8'd30) ? 16'h5100 : 16'h5101}, resp1);
-                if(tx == 8'd30 || tx == 8'd40) a_done_bhv = irq1[15:8];
-                $display("  [%0t] IRQ A bhv=%0d tx=0x%02x ACK", $time, irq1[15:8], tx);
+        if(irq1 != 32'd0) begin
+            if(irq1[31:18] !== 14'h3FFF || irq1[17:8] !== 10'h4)
+                $display("  [%0t] WARN IRQ_REG1 packing mismatch: 0x%08x", $time, irq1);
+            bhv = irq1[7:0];
+            ps_read_word(EC_BIAS_ADDR + `IRQ_REG2, irq2);
+            tx  = irq2[31:24];
+            ps_read_word(EC_BIAS_ADDR + (bhv >= 8'd150 ? `DEBUG_REG3 :bhv < 8'd150 && bhv >= 8'd100 ? `DEBUG_REG2 : `DEBUG_REG1), sta);
+            exp_tx = (sta[7:0] == 8'd3)  ? 8'd10 :
+                     (sta[7:0] == 8'd9)  ? 8'd30 :
+                     (sta[7:0] == 8'd11) ? 8'd40 : 8'd0;
+            if(exp_tx != 8'd0 && tx == exp_tx) begin
+                ps_read_word(EC_BIAS_ADDR + (bhv >= 8'd150 ? `C_BHV_ID : bhv < 8'd150 && bhv >= 8'd100 ? `B_BHV_ID : `A_BHV_ID), bhv_r);
+                if(bhv_r[7:0] == bhv) begin
+                    if(bhv >= 8'd150) begin
+                        ps_write_word(EC_BIAS_ADDR + `C_TX_RSULT_RPT,{bhv, tx, (tx == 8'd30) ? 16'h5100 : 16'h51f3}, resp1);
+                        // if(tx == 8'd30 || tx == 8'd40) c_done = 1'b1;
+                        $display("  [%0t] IRQ C bhv=%0d tx=0x%02x ACK", $time, bhv, tx);
+                        end
+                    else if (bhv < 8'd150 && bhv >= 8'd100) begin
+                        ps_write_word(EC_BIAS_ADDR + `B_TX_RSULT_RPT,{bhv, tx, (tx == 8'd30) ? 16'h5100 : 16'h51f2}, resp1);
+                        // if(tx == 8'd30 || tx == 8'd40) b_done = 1'b1;
+                        $display("  [%0t] IRQ B bhv=%0d tx=0x%02x ACK", $time, bhv, tx); 
+                        end 
+                    else begin
+                        ps_write_word(EC_BIAS_ADDR + `A_TX_RSULT_RPT,{bhv, tx, (tx == 8'd30) ? 16'h5100 : 16'h51f1}, resp1);
+                        if(tx == 8'd30 || tx == 8'd40) a_done_bhv = bhv;
+                        $display("  [%0t] IRQ A bhv=%0d tx=0x%02x ACK", $time, bhv, tx);
+                        end
+                    end
+                end
             end
-            handled = irq1;
         end
-    end
 endtask
 
 //A: trigger + wait result

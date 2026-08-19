@@ -58,8 +58,8 @@ module pre_post_sta_check_pul_axis#(
 		,output	reg	[A_BHA_NUM-1:0]		a_post_sta_allow
 		,output	reg	[B_BHA_NUM-1:0]		b_pre_sta_allow	
 		,output	reg	[B_BHA_NUM-1:0]		b_post_sta_allow
-		,output	reg						c_pre_sta_allow	
-		,output	reg						c_post_sta_allow
+		,output	reg	[C_BHA_NUM-1:0]		c_pre_sta_allow	
+		,output	reg	[C_BHA_NUM-1:0]		c_post_sta_allow
 
 //----------------------------------------------------- user logic begin -----------------------------------------------------//
 		,input							action_busy

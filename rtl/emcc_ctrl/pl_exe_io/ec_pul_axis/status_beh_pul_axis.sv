@@ -62,10 +62,45 @@ module status_beh_pul_axis#(
 	reg [7:0]		ack_tx_id;
 	reg [7:0]		ack_tx_result;
 	reg	[7:0]		ack_ps_alart_num;
+
 	
+	//State machine state
+	localparam  S_IDLE          = 8'd0; 	//idle
+    localparam  S_BHA_PRE_DET	= 8'd1; 	//Pre-condition check
+	localparam	S_READY_10		= 8'd2;		//ready
+    localparam  S_READY_10_ACK  = 8'd3; 	//ready ok/no ok
+    localparam  S_EXE_20     	= 8'd4; 	//Action begin
+	localparam	S_EXE			= 8'd5;		//Action execute
+    localparam  S_EXE_20_ACK	= 8'd6;		//Action end
+    localparam  S_BHA_POST_DET  = 8'd7; 	//Post-condition check
+    localparam  S_SUCC_30       = 8'd8; 	//success
+    localparam  S_SUCC_30_ACK	= 8'd9; 	//success ack
+	localparam 	S_ALERT_40		= 8'd10;	//Alert
+	localparam 	S_ALERT_40_ACK	= 8'd11;	//Alert ack
 	
-	localparam  IRQ_OK          = 8'h51;
-    localparam  IRQ_NO_OK       = 8'h52;
+    localparam  IRQ_OK          = 8'h51;	//ps ack:OK
+    localparam  IRQ_NO_OK       = 8'h52;	//ps ack:NO OK
+	
+	//state monitor
+		reg [7:0]	curr_state_m1;
+		reg [7:0]	curr_state_m2;
+		reg [7:0]	curr_state_m3;
+		
+    	always @(posedge clk_i) 
+		begin
+    	    if (rst_i)begin
+				curr_state_m1 <= 8'b0;
+				curr_state_m2 <= 8'b0;
+				curr_state_m3 <= 8'b0;
+				state_monitor_o <= 32'b0;
+				end
+    	    else if (curr_state != curr_state_m1) begin
+    	        curr_state_m1 <= curr_state;
+    	        curr_state_m2 <= curr_state_m1;
+    	        curr_state_m3 <= curr_state_m2;
+				state_monitor_o <= {curr_state_m3,curr_state_m2,curr_state_m1, curr_state};
+			end
+    	end
 	
 	always@(posedge clk_i)begin
 	if(rst_i)begin
@@ -78,6 +113,11 @@ module status_beh_pul_axis#(
 		ack_tx_id		<= 	b_tx_result_rpt[23:16];
 		ack_tx_result	<= 	b_tx_result_rpt[15:8];
 		ack_ps_alart_num<=	b_tx_result_rpt[7:0];
+	end else if(curr_state == S_IDLE)begin
+		ack_beh_id 		<= 	8'd0;
+		ack_tx_id		<= 	8'd0;
+		ack_tx_result	<= 	8'd0;
+		ack_ps_alart_num<=	8'd0;
 	end else begin
 		ack_beh_id 		<= 	ack_beh_id 	  ;
 		ack_tx_id		<= 	ack_tx_id	  ;
@@ -94,58 +134,26 @@ module status_beh_pul_axis#(
 	end
 	
 	reg match_10;
-	reg match_20;
 	reg match_30;
 	reg match_40;
 	
 	always @(posedge clk_i) begin
     if(rst_i) begin
         match_10 <= 1'b0;
-		match_20 <= 1'b0;
 		match_30 <= 1'b0;
 		match_40 <= 1'b0;
-    end else begin
+    end else if(curr_state == S_READY_10_ACK)
         match_10 <= (ack_tx_result == IRQ_OK && ack_tx_id == 8'd10 && ack_beh_id == b_bhv_id);
-		match_20 <= (ack_tx_result == IRQ_OK && ack_tx_id == 8'd20 && ack_beh_id == b_bhv_id);
+	else if(curr_state == S_SUCC_30_ACK)
 		match_30 <= (ack_tx_result == IRQ_OK && ack_tx_id == 8'd30 && ack_beh_id == b_bhv_id);
-		match_40 <= (ack_tx_result == IRQ_OK && ack_tx_id == 8'd40 && ack_beh_id == b_bhv_id);
-    end
+	else if(curr_state == S_ALERT_40_ACK)
+		match_40 <= (ack_tx_id == 8'd40 && ack_beh_id == b_bhv_id);
+	else begin
+		match_10 <= 1'b0;
+		match_30 <= 1'b0;
+		match_40 <= 1'b0;
 	end
-	
-	//State machine state
-	localparam  S_IDLE          = 8'd0; 	//idle
-    localparam  S_BHA_PRE_DET	= 8'd1; 	//Pre-condition check
-	localparam	S_READY_10		= 8'd2;		//ready
-    localparam  S_READY_10_ACK  = 8'd3; 	//ready ok/no ok
-    localparam  S_EXE_20     	= 8'd4; 	//Action begin
-	localparam	S_EXE			= 8'd5;		//Action execute
-    localparam  S_EXE_20_ACK	= 8'd6;		//Action end
-    localparam  S_BHA_POST_DET  = 8'd7; 	//Post-condition check
-    localparam  S_SUCC_30       = 8'd8; 	//success
-    localparam  S_SUCC_30_ACK	= 8'd9; 	//success ack
-	localparam 	S_ALERT_40		= 8'd10;	//Alert
-	localparam 	S_ALERT_40_ACK	= 8'd11;	//Alert ack
-
-	//state monitor
-	reg [7:0]	curr_state_m1;
-	reg [7:0]	curr_state_m2;
-	reg [7:0]	curr_state_m3;
-	
-    always @(posedge clk_i) 
-	begin
-        if (rst_i)begin
-			curr_state_m1 <= 8'b0;
-			curr_state_m2 <= 8'b0;
-			curr_state_m3 <= 8'b0;
-			state_monitor_o <= 32'b0;
-			end
-        else if (curr_state != curr_state_m1) begin
-            curr_state_m1 <= curr_state;
-            curr_state_m2 <= curr_state_m1;
-            curr_state_m3 <= curr_state_m2;
-			state_monitor_o <= {curr_state_m3,curr_state_m2,curr_state_m1, curr_state};
-		end
-    end
+	end
 
 	always @(posedge clk_i) begin
         if (rst_i)
@@ -178,17 +186,17 @@ module status_beh_pul_axis#(
 			end
 			
 			S_EXE_20: begin	//Send 20 interrupt
-				next_state = S_EXE_20_ACK;
+				next_state = S_EXE;
             end
 			
-			S_EXE_20_ACK: begin
-				if(match_20) 	//Transaction 20 Acknowledged OK
-                    next_state = S_EXE;
-                else if(ack_tx_result == IRQ_NO_OK || timout)
-                    next_state = S_ALERT_40;
-                else
-                    next_state = S_EXE_20_ACK;
-			end
+			//S_EXE_20_ACK: begin
+			//	if(match_20) 	//Transaction 20 Acknowledged OK
+            //        next_state = S_EXE;
+            //    else if(ack_tx_result == IRQ_NO_OK || timout)
+            //        next_state = S_ALERT_40;
+            //    else
+            //        next_state = S_EXE_20_ACK;
+			//end
 			
 			S_EXE:begin
 				next_state = S_BHA_POST_DET;	//Behavior 1/Behavior 2 failed
@@ -326,9 +334,11 @@ module status_beh_pul_axis#(
         else
             timout <= 1'b0;
     end
-//==============================================================================================================================//
-//----------------------------------------------------- user logic begin -----------------------------------------------------//
-//==============================================================================================================================//
+	
+	
+	//===============================================================================================================
+	//------------------------------------------------ user logic start ---------------------------------------------
+	//===============================================================================================================
 	always @(posedge clk_i) begin
 		if(rst_i || !b_en)
 			b_bhv_id <= 8'd0;
@@ -396,8 +406,10 @@ module status_beh_pul_axis#(
 	end
 
 	assign b_stop = (curr_state == S_EXE && b_bhv_id == 8'd103);
-//==============================================================================================================================//
-//----------------------------------------------------- user logic end -------------------------------------------------------//
-//==============================================================================================================================//
+	//===============================================================================================================
+	//------------------------------------------------ user logic start ---------------------------------------------
+	//===============================================================================================================
+
+	
 	
 endmodule

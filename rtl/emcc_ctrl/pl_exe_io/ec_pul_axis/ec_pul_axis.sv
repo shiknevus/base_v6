@@ -175,8 +175,8 @@ module ec_pul_axis#(
 	wire 	[A_BHA_NUM-1:0]	a_post_sta_allow  ;
 	wire 	[B_BHA_NUM-1:0]	b_pre_sta_allow   ;
 	wire 	[B_BHA_NUM-1:0]	b_post_sta_allow  ;
-	wire 					c_pre_sta_allow   ;
-	wire 					c_post_sta_allow  ;
+	wire 	[B_BHA_NUM-1:0] c_pre_sta_allow   ;
+	wire 	[B_BHA_NUM-1:0] c_post_sta_allow  ;
 	
 	wire	irq_a  ;
 	wire	irq_b  ;
@@ -386,13 +386,7 @@ module ec_pul_axis#(
 	,.action_done			(action_done)
 	,.action_error			(action_error)
 
-    ,.rctrl_drive_on		(param30				)
-    ,.rctrl_drive_reset		(param29			    )
-    ,.rctrl_resume			(param28			    )
-    ,.rctrl_pause			(param26				)
-    ,.rctrl_stop			(param27			    )
     ,.rserv_dir				(param16[0]			    )
-
     ,.rserv_step_pulse		(param37				)
     ,.rserv_target_pulse	(param36				)
     ,.rcfg_home_spd			(param35				)
@@ -444,8 +438,9 @@ module ec_pul_axis#(
 //----------------------------------------------------- user logic end -------------------------------------------------------//
     );
 	 
-	tim_beh_pul_axis 
-	tim_beh_pul_axis_u0(
+	tim_beh_pul_axis#(
+		.BHA_NUM(C_BHA_NUM	)
+	) tim_beh_pul_axis_u0(
     .clk_i                      (clk_i          	)
 	,.rst_i              	    (rst_i         		)
 	,.i_time_1ms_vld   	        (i_time_1ms_vld 	)
@@ -455,6 +450,7 @@ module ec_pul_axis#(
 	,.post_sta_allow	        (c_post_sta_allow	)
 	,.c_en				        (c_en				)
 	,.c_bhv_id                  (c_bhv_id			)
+	,.state_monitor_o			(debug_reg3			)
 	,.c_tx_ot          	        (c_tx_ot			)
 	,.c_tx_result_rpt  	        (c_tx_result_rpt	)
 	,.c_tx_result_vld           (c_tx_result_vld	)

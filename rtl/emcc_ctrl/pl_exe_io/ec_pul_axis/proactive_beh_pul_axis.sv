@@ -69,11 +69,6 @@ module proactive_beh_pul_axis#(
     ,output reg                 action_error
     //for post check start end
 	//register start
-	,input		[ 0:0]			rctrl_drive_on    	//enable servo
-	,input		[ 0:0]			rctrl_drive_reset 	//reset servo
-	,input		[ 0:0]			rctrl_resume      	//resume servo
-	,input		[ 0:0]			rctrl_pause       	//pause servo
-	,input		[ 0:0]			rctrl_stop   	    //stop
 	,input		[ 0:0]			rserv_dir         	//servo direction
 	,input		[31:0]			rserv_step_pulse 	//servo step pulse
 	,input		[31:0]			rserv_target_pulse	//servo target pulse
@@ -325,6 +320,9 @@ module proactive_beh_pul_axis#(
             end
 
         endcase
+        // interrupt: i_stop forces A FSM to ALERT_40 (reported with alarm)
+        if(i_stop && curr_state != S_IDLE)
+            next_state = S_ALERT_40;
     end
 	
 //----------------------------------------------------------- FSM end ------------------------------------------------------//
@@ -370,8 +368,10 @@ module proactive_beh_pul_axis#(
     always@(posedge clk_i)begin
         if(rst_i || !a_en)
             a_alm_num <= 8'd0;
-        else if(curr_state == S_BHA_PRE_DET && timout)			
-            a_alm_num <= 8'd151;     
+        else if(i_stop && curr_state != S_IDLE)
+            a_alm_num <= 8'd156;   // stop 
+        else if(curr_state == S_BHA_PRE_DET && timout)
+            a_alm_num <= 8'd151;
         else if(curr_state == S_READY_10_ACK && ack_tx_result == IRQ_NO_OK)				
             a_alm_num <= ack_ps_alart_num;    
         else if(curr_state == S_READY_10_ACK && timout)									
