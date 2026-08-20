@@ -114,11 +114,12 @@ if !xpr_count! equ 1 (
 )
 
 echo Found !xpr_count! project(s):
+echo   0. Open ALL projects
 for /L %%i in (1,1,!xpr_count!) do (
     echo   %%i. !xpr_%%i!
 )
 echo.
-set /p choice="Select project to open [1-!xpr_count!]: "
+set /p choice="Select project to open [0-!xpr_count!], 0=ALL: "
 if not defined choice (
     echo No selection made.
     pause
@@ -126,6 +127,7 @@ if not defined choice (
 )
 
 :launch
+if "!choice!" equ "0" goto :launch_all
 set "sel_xpr=!xpr_%choice%!"
 set "sel_dir=!xpr_dir_%choice%!"
 
@@ -149,4 +151,17 @@ echo Tailing vivado.log
 echo ========================================
 powershell -NoProfile -Command "Get-Content -Path 'vivado.log' -Wait | ForEach-Object { Write-Host $_; if ($_ -match 'open_project') { Write-Host ''; Write-Host 'Detected open_project - closing terminal...'; exit } }"
 popd
+exit
+
+:launch_all
+echo Opening ALL !xpr_count! project(s)...
+for /L %%i in (1,1,!xpr_count!) do (
+    echo   [%%i/!xpr_count!] !xpr_%%i!
+    pushd "!xpr_dir_%%i!"
+    start "" "!xpr_%%i!"
+    popd
+)
+echo.
+echo All projects started at %date% %time%
+echo Skipping vivado.log tail (multiple projects)
 exit
