@@ -18,8 +18,8 @@
 !/ip/**/
 !/ip/**/*.xci
 /ip/**/ip_*/**/*.xci
-!/ip/mststa_mpsoc_v2/mststa_mpsoc_v2.bd
-/ip/mststa_mpsoc_v2/**/*.xci
+!/ip/**/mststa_mpsoc_v2/mststa_mpsoc_v2.bd
+/ip/**/mststa_mpsoc_v2/**/*.xci
 
 .Xil
 /syn/**/**.runs

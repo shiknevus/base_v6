@@ -446,6 +446,55 @@ module emcc_mix_top
 		    	,.o_dv_son				(o_dv_son[0]		    )
 		    	,.o_intr_irq			(map_irq[9]		        )
 		    );
+            
+			wire s_1do_do;
+			ec_1do#(
+				.REG_SPACE_BIAS 		(20'hc00	            ),//B010_10C00
+				.REG_SPACE_SIZE 		(`REG_SPACE_SIZE		)
+			)ec_1do_u1(
+				.clk_i					(clk					)
+				,.rst					(reset					)
+				,.i_time_1ms_vld		(time_1ms_vld			)
+				,.i_time_1s_vld 		(time_1s_vld			)
+				,.ps_reg_clk			(ps_reg_clk				)
+				,.ps_reg_reset			(ps_reg_reset			)
+				,.i_st_wr_en			(ps_reg_we				)
+				,.i_st_wr_addr  		(ps_reg_addr			)
+				,.i_st_wr_data  		(ps_reg_wr_dat			)
+				,.i_st_rd_en    		(ps_reg_re				)
+				,.i_st_rd_addr  		(ps_reg_rd_addr			)
+				,.o_st_rd_data  		(sub_comp_rd_dat[2]		)
+				,.o_st_rd_vld   		(sub_comp_rd_vld[2]		)
+				,.o_sig_dri				(s_1do_do			    )
+				,.o_intr_irq			(map_irq[2]			    )
+			);
+            assign   do_regoin_r_msg[0][0] = ~s_1do_do;  // slave DO bit0
+
+            ec_can_servo
+            #(
+                 .REG_SPACE_BIAS     (20'h1c00                    )//B010_11C00
+                ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
+            )
+            ec_can_servo_11
+            (
+              .ps_reg_clk                   ( ps_reg_clk               ),
+              .ps_reg_reset                 ( ps_reg_reset             ),
+	          .clk_i                        ( clk               ),
+              .rst                          ( reset             ),
+
+	          .i_time_1ms_vld        (time_1ms_vld         ),
+	          .i_time_1s_vld         (time_1s_vld          ),
+
+	          .i_st_wr_en            ( ps_reg_we                ),
+	          .i_st_wr_addr          ( ps_reg_addr              ),
+              .i_st_wr_data          ( ps_reg_wr_dat            ),
+              .i_st_rd_en            ( ps_reg_re                ),
+              .i_st_rd_addr          ( ps_reg_rd_addr           ),
+	          .o_st_rd_vld           ( sub_comp_rd_vld[10]    ),
+              .o_st_rd_data          ( sub_comp_rd_dat[10]    ),
+	          .o_intr_irq            ( map_irq[10]       )
+
+            );
 
 	//==========================================================================================================//
 	// ----------------------------------- don't care next context----------------------------------------------//
