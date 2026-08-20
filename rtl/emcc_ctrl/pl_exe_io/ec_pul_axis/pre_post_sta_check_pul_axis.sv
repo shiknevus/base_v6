@@ -83,6 +83,8 @@ module pre_post_sta_check_pul_axis#(
 	//========================================================================================//
 	
 	//pre status
+	wire device_safe;
+	assign device_safe =(~unit_st && ~m_st && ~m_saf_st && ~link_m_saf_st);
 	reg home_completed;
 	always@(posedge clk_i) begin
 		if(rst_i || !a_en)
@@ -98,8 +100,8 @@ module pre_post_sta_check_pul_axis#(
 	assign	a_pre_sta[0 ] = (a_bhv_id == 1 );    // HOME: always allowed
 	assign	a_pre_sta[1 ] = (a_bhv_id == 2 );
 	assign	a_pre_sta[2 ] = (a_bhv_id == 3 ) && home_completed;
-	assign	a_pre_sta[19] = (a_bhv_id == 20) && (~unit_st && ~m_st && ~m_saf_st && ~link_m_saf_st);//[safe]
-	assign	a_pre_sta[20] = (a_bhv_id == 21) && home_completed && (~unit_st && ~m_st && ~m_saf_st && ~link_m_saf_st);//[safe]
+	assign	a_pre_sta[19] = (a_bhv_id == 20) && device_safe;//[safe]
+	assign	a_pre_sta[20] = (a_bhv_id == 21) && home_completed && device_safe;//[safe]
 	assign	a_pre_sta[29] = (a_bhv_id == 30);   // GETPOS: always allowed
 
 	always@(posedge clk_i)
