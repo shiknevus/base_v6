@@ -105,6 +105,12 @@ module slv_app_send
     reg                     rx_wr_txbuf_wen_d1;
     reg                     rx_wr_txbuf_wen_f;
     reg                     latch_intf_tst_flag;
+    (* ASYNC_REG = "TRUE" *) reg [15:0] each_dg_len_d1; //cdc sync from prot domain
+    reg [15:0] each_dg_len_d2;
+    always @(posedge clk)begin
+        each_dg_len_d1  <=  each_dg_len;
+        each_dg_len_d2  <=  each_dg_len_d1;
+    end
     always @(posedge clk)begin
         rx_wr_txbuf_wen_d1  <=  rx_wr_txbuf_wen;
         rx_wr_txbuf_wen_f   <=  (~rx_wr_txbuf_wen) & rx_wr_txbuf_wen_d1;
@@ -231,7 +237,7 @@ module slv_app_send
                 work_cnt_done <= (work_cnt == 5 - 1) ? 1'b1 : 1'b0;
             end
             STM_RD_DAT:begin
-                work_cnt_done <= (work_cnt == (each_dg_len>>3) - 1) ? 1'b1 : 1'b0;
+                work_cnt_done <= (work_cnt == (each_dg_len_d2>>3) - 1) ? 1'b1 : 1'b0;
 //                work_cnt_done <= (work_cnt == 511) ? 1'b1 : 1'b0;
             end
             default: begin

@@ -69,7 +69,7 @@ module sys_signal_gen
                     ,.reset             (fpga_reset             )       // input reset
                     ,.locked            (aurora_clk_gen_locked  )       // output locked
                // Clock in ports
-                //    ,.clk_in1           (sys_clk_in_p           )       // input clk_in1_p
+                    ,.clk_in1           (sys_clk_in_p           )       // input clk_in1, single-ended 50MHz
                 );
         end
     endgenerate
