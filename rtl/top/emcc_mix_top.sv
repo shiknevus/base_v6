@@ -358,40 +358,13 @@ module emcc_mix_top
     // ------------------------------------------------------------------------------------------------------------------------------------
     // -------------------------------- The following is the flow components --------------------------------------------------------------
     // ------------------------------------------------------------------------------------------------------------------------------------
-    assign  emcc_irq[0]   	= map_irq[0];
-    assign  emcc_irq[1]   	= map_irq[1];
-    assign  emcc_irq[2]   	= map_irq[2];
-    assign  emcc_irq[3]   	= map_irq[3];
-    assign  emcc_irq[4]   	= map_irq[4];
-    assign  emcc_irq[5]   	= map_irq[5];
-    assign  emcc_irq[6]   	= map_irq[6];
-    assign  emcc_irq[7]   	= map_irq[7];
-    assign  emcc_irq[8]   	= map_irq[8];
-    assign  emcc_irq[9]   	= map_irq[9];
-    assign  emcc_irq[10]   	= map_irq[10];
-    assign  emcc_irq[11]   	= map_irq[11];
-    assign  emcc_irq[12]   	= map_irq[12];
-    assign  emcc_irq[13]   	= map_irq[13];
-    assign  emcc_irq[14]   	= map_irq[14];
-    assign  emcc_irq[15]   	= map_irq[15];
-    assign  emcc_irq[16]   	= map_irq[16];
-    assign  emcc_irq[17]   	= map_irq[17];
-    assign  emcc_irq[18]   	= map_irq[18];
-    assign  emcc_irq[19]   	= map_irq[19];
-    assign  emcc_irq[20]   	= map_irq[20];
-    assign  emcc_irq[21]   	= map_irq[21];
-    assign  emcc_irq[22]   	= map_irq[22];
-    assign  emcc_irq[23]   	= map_irq[23];
-    assign  emcc_irq[25]   	= map_irq[25];
-    assign  emcc_irq[26]   	= map_irq[26];
-	assign  emcc_irq[27]   	= map_irq[27];
-	
+    assign  emcc_irq   	= map_irq;
 	//==========================================================================================================//
 	// --------------------------------------------user component_v6_inst---------------------------------------//
 	//==========================================================================================================//
 			wire m_1do_do;
 			ec_1do#(
-				.REG_SPACE_BIAS 		(20'h800	            ),//B010_10800
+				.REG_SPACE_BIAS 		(20'h800	            ),//B010_0800
 				.REG_SPACE_SIZE 		(`REG_SPACE_SIZE		)	
 			)ec_1do_u0(
 				.clk_i					(clk					)
@@ -413,43 +386,43 @@ module emcc_mix_top
             assign   do_mst_msg[0] = ~m_1do_do;
             
             
-		    ec_pul_axis#(
-		    	.REG_SPACE_BIAS			(20'ha00                )//B010_10A00
-		    	,.REG_SPACE_SIZE		(`REG_SPACE_SIZE        )
-		    )ec_pul_axis_u0(
-		    	.clk_i					(clk					)
-		    	,.rst					(reset					)
-		    	,.i_time_1ms_vld		(time_1ms_vld			)
-		    	,.i_time_1s_vld 		(time_1s_vld			)
-		    	,.ps_reg_clk			(ps_reg_clk				)
-		    	,.ps_reg_reset			(ps_reg_reset			)
-		    	,.i_st_wr_en			(ps_reg_we				)
-		    	,.i_st_wr_addr  		(ps_reg_addr			)
-		    	,.i_st_wr_data  		(ps_reg_wr_dat			)
-		    	,.i_st_rd_en    		(ps_reg_re				)
-		    	,.i_st_rd_addr  		(ps_reg_rd_addr			)
-		    	,.o_st_rd_data  		(sub_comp_rd_dat[9]		)
-		    	,.o_st_rd_vld   		(sub_comp_rd_vld[9]		)
-		    	,.i_servo_notok			(~di_mst_msg[19]	    )
-		    	,.i_servo_stop			(~di_mst_msg[20]	    )
-		    	,.i_axis_limf			(~di_mst_msg[21]	    )
-		    	,.i_axis_org			(~di_mst_msg[22]	    )
-		    	,.i_axis_limb			(~di_mst_msg[23]	    )
-		    	,.i_emerge_stop_signal	(~di_mst_msg[24]	    )
-		    	,.i_safe_status			(~di_mst_msg[25]	    )
-		    	,.i_axis_point			(~di_mst_msg[26]	    )
-		    	,.i_axis_reset			(~di_mst_msg[27]	    )
-		    	,.i_dv_alarm			(~di_mst_msg[28]	    )
-		    	,.o_dv_pulse			(o_dv_pulse[0]		    )
-		    	,.o_dv_dir				(o_dv_dir[0]		    )
-		    	,.o_dv_reset			(o_dv_reset[0]		    )
-		    	,.o_dv_son				(o_dv_son[0]		    )
-		    	,.o_intr_irq			(map_irq[9]		        )
-		    );
+//		    ec_pul_axis#(
+//		    	.REG_SPACE_BIAS			(20'ha00                )//B010_0A00
+//		    	,.REG_SPACE_SIZE		(`REG_SPACE_SIZE        )
+//		    )ec_pul_axis_u0(
+//		    	.clk_i					(clk					)
+//		    	,.rst					(reset					)
+//		    	,.i_time_1ms_vld		(time_1ms_vld			)
+//		    	,.i_time_1s_vld 		(time_1s_vld			)
+//		    	,.ps_reg_clk			(ps_reg_clk				)
+//		    	,.ps_reg_reset			(ps_reg_reset			)
+//		    	,.i_st_wr_en			(ps_reg_we				)
+//		    	,.i_st_wr_addr  		(ps_reg_addr			)
+//		    	,.i_st_wr_data  		(ps_reg_wr_dat			)
+//		    	,.i_st_rd_en    		(ps_reg_re				)
+//		    	,.i_st_rd_addr  		(ps_reg_rd_addr			)
+//		    	,.o_st_rd_data  		(sub_comp_rd_dat[9]		)
+//		    	,.o_st_rd_vld   		(sub_comp_rd_vld[9]		)
+//		    	,.i_servo_notok			(~di_mst_msg[19]	    )
+//		    	,.i_servo_stop			(~di_mst_msg[20]	    )
+//		    	,.i_axis_limf			(~di_mst_msg[21]	    )
+//		    	,.i_axis_org			(~di_mst_msg[22]	    )
+//		    	,.i_axis_limb			(~di_mst_msg[23]	    )
+//		    	,.i_emerge_stop_signal	(~di_mst_msg[24]	    )
+//		    	,.i_safe_status			(~di_mst_msg[25]	    )
+//		    	,.i_axis_point			(~di_mst_msg[26]	    )
+//		    	,.i_axis_reset			(~di_mst_msg[27]	    )
+//		    	,.i_dv_alarm			(~di_mst_msg[28]	    )
+//		    	,.o_dv_pulse			(o_dv_pulse[0]		    )
+//		    	,.o_dv_dir				(o_dv_dir[0]		    )
+//		    	,.o_dv_reset			(o_dv_reset[0]		    )
+//		    	,.o_dv_son				(o_dv_son[0]		    )
+//		    	,.o_intr_irq			(map_irq[9]		        )
+//		    );
             
 			wire s_1do_do;
 			ec_1do#(
-				.REG_SPACE_BIAS 		(20'hc00	            ),//B010_10C00
+				.REG_SPACE_BIAS 		(20'hc00	            ),//B010_0C00
 				.REG_SPACE_SIZE 		(`REG_SPACE_SIZE		)
 			)ec_1do_u1(
 				.clk_i					(clk					)
@@ -472,28 +445,25 @@ module emcc_mix_top
 
             ec_can_servo
             #(
-                 .REG_SPACE_BIAS     (20'h1c00                    )//B010_11C00
-                ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
+                 .REG_SPACE_BIAS        (20'h3000               )//B010_3000
+                ,.REG_SPACE_SIZE        (`REG_SPACE_SIZE        )
             )
             ec_can_servo_11
             (
-              .ps_reg_clk                   ( ps_reg_clk               ),
-              .ps_reg_reset                 ( ps_reg_reset             ),
-	          .clk_i                        ( clk               ),
-              .rst                          ( reset             ),
-
-	          .i_time_1ms_vld        (time_1ms_vld         ),
-	          .i_time_1s_vld         (time_1s_vld          ),
-
-	          .i_st_wr_en            ( ps_reg_we                ),
-	          .i_st_wr_addr          ( ps_reg_addr              ),
-              .i_st_wr_data          ( ps_reg_wr_dat            ),
-              .i_st_rd_en            ( ps_reg_re                ),
-              .i_st_rd_addr          ( ps_reg_rd_addr           ),
-	          .o_st_rd_vld           ( sub_comp_rd_vld[10]    ),
-              .o_st_rd_data          ( sub_comp_rd_dat[10]    ),
-	          .o_intr_irq            ( map_irq[10]       )
-
+                .ps_reg_clk            ( ps_reg_clk            )
+                ,.ps_reg_reset          ( ps_reg_reset          )
+	            ,.clk_i                 ( clk                   )
+                ,.rst                   ( reset                 )
+	            ,.i_time_1ms_vld        (time_1ms_vld           )
+	            ,.i_time_1s_vld         (time_1s_vld            )
+	            ,.i_st_wr_en            ( ps_reg_we             )
+	            ,.i_st_wr_addr          ( ps_reg_addr           )
+                ,.i_st_wr_data          ( ps_reg_wr_dat         )
+                ,.i_st_rd_en            ( ps_reg_re             )
+                ,.i_st_rd_addr          ( ps_reg_rd_addr        )
+	            ,.o_st_rd_vld           ( sub_comp_rd_vld[75]   )
+                ,.o_st_rd_data          ( sub_comp_rd_dat[75]   )
+	            ,.o_intr_irq            ( map_irq[75]           )
             );
 
 	//==========================================================================================================//
