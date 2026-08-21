@@ -25,7 +25,7 @@ module app_mst_rx_ctrl(
 
     ,output reg     [7:0]   app_err_type 
     ,output reg     [7:0]   hb_err_slvsta      
-    ,output reg             prot_rcv_req
+	,output reg             prot_rcv_req
     ,input                  prot_rcv_ack
     
     //ll cache interface which is used between app layer and ethcat layer
@@ -340,7 +340,7 @@ module app_mst_rx_ctrl(
                 end
             end
             default: begin
-                latency_cnt_done <= (latency_cnt == CACHE_L_NUM - 1) ? 1'd1 : 1'd0;
+                    latency_cnt_done <= (latency_cnt == CACHE_L_NUM - 1) ? 1'd1 : 1'd0;
             end
         endcase
     end
@@ -578,6 +578,44 @@ module app_mst_rx_ctrl(
         endcase
     end
 
+
+//reg [31:0]slv_fpga_version; //add by qsj 2022/10/06
+////    always @( * ) begin
+//    always @(posedge clk) begin
+//        case(wk_state)
+//            STM_IDLE:begin
+//                slv_id_we               <=  4'h0;
+//                slv_id_addr             <=  'd0;
+//                slv_id_din              <=  'd0;
+//                slv_fpga_version        <=  'd0; //add by qsj 2022/10/06
+//            end
+//            STM_RD_DATAGRAM_L:begin
+//                if((ethcat_type == `ETHCAT_TYPE_INITIAL) & latency_cnt_done)begin
+//                    slv_id_we               <=  4'hf;
+//                    slv_id_addr             <=  data_buf[2-1][23:16];//从站地址
+//                    slv_id_din              <=  data_buf[2-2][31:0];//slave station id
+////                    slv_id_we               <=  4'hf;
+////                    slv_id_addr             <=  data_buf[2-0][23:16];//从站地址 
+////                    slv_id_din              <=  data_buf[2-1][31:0];//slave station id
+////                    slv_fpga_version        <=  data_buf[2-2][31:0];//slave station id  //add by qsj 2022/10/06
+//                end else begin
+//                    slv_id_we               <=  4'h0;
+//                    slv_id_addr             <=  'd0;
+//                    slv_id_din              <=  'd0;
+//                    slv_fpga_version        <=  'd0; //add by qsj 2022/10/06
+//                end
+//            end
+//            default: begin
+//                slv_id_we               <=  4'h0;
+//                slv_id_addr             <=  slv_id_addr;
+//                slv_id_din              <=  slv_id_din;
+//                slv_fpga_version        <=  slv_fpga_version; //add by qsj 2022/10/06
+//            end
+//        endcase
+//    end
+
+
+
 //    always @( * ) begin
     always @(posedge clk) begin
         if(reset)begin
@@ -589,14 +627,20 @@ module app_mst_rx_ctrl(
         case(wk_state)
             STM_IDLE:begin
                 slv_id_we               <=  4'h0;
+//                slv_id_addr             <=  'd0;
+//                slv_id_din              <=  'd0;
+//                slv_fpga_version        <=  'd0; //add by qsj 2022/10/06
                 slv_id_addr             <=  slv_id_addr;
                 slv_id_din              <=  slv_id_din;
                 slv_fpga_version        <=  slv_fpga_version; //add by qsj 2022/10/06
             end
             STM_RD_DATAGRAM_L:begin
                 if((ethcat_type == `ETHCAT_TYPE_INITIAL) & latency_cnt_done)begin
+//                    slv_id_we               <=  4'hf;
+//                    slv_id_addr             <=  data_buf[2-1][23:16];//从站地址
+//                    slv_id_din              <=  data_buf[2-2][31:0];//slave station id
                     slv_id_we               <=  4'hf;
-                    slv_id_addr             <=  data_buf[2-0][23:16];//从站地址
+                    slv_id_addr             <=  data_buf[2-0][23:16];//从站地址 
                     slv_id_din              <=  data_buf[2-1][31:0];//slave station id
                     slv_fpga_version        <=  data_buf[2-2][31:0];//slave fpga version  //add by qsj 2022/10/06
                 end else begin
@@ -604,6 +648,9 @@ module app_mst_rx_ctrl(
                     slv_id_addr             <=  slv_id_addr;
                     slv_id_din              <=  slv_id_din;
                     slv_fpga_version        <=  slv_fpga_version; //add by qsj 2022/10/06
+//                    slv_id_addr             <=  'd0;
+//                    slv_id_din              <=  'd0;
+//                    slv_fpga_version        <=  'd0; //add by qsj 2022/10/06
                 end
             end
             default: begin
@@ -615,9 +662,20 @@ module app_mst_rx_ctrl(
         endcase
         end
     end
+    
+//    ila_version U_ila_version(
+//    .clk(clk),
+//    .probe0(slv_id_addr),
+//    .probe1(slv_id_din),
+//    .probe2(slv_fpga_version),
+//    .probe3(cache_dout),
+//    .probe4(rd_cache_cnt),
+//    .probe5(datagram_len),
+//    .probe6({slv_id_we[0],latency_cnt,wk_state,ethcat_type,cache_rd_en_d2,rd_cache_done})
+//    );
 
 //    always @( * ) begin
-    always @(posedge clk) begin
+    always @(posedge clk) begin 
         case(wk_state)
             STM_IDLE:begin
                 ck_slv_hb_vld           <=  4'h0;

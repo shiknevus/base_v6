@@ -27,8 +27,8 @@ module app_ctrl_top
     ,input                  mst_sta_restart //master station transfer restart,only active on rise edge
     ,input  wire    [15:0]  each_dg_length  //PS config each datagram length
     ,output wire            app_err_flag    //the error type of slave station is valid
-    ,output wire    [7:0]   app_err_type    //the error type of slave station
-    ,output wire    [7:0]   hb_err_slvsta       //indicate the index of the error station
+    ,output wire    [7:0]  	app_err_type    //the error type of slave station
+    ,output wire    [7:0]  	hb_err_slvsta       //indicate the index of the error station
     ,output wire            mst_prcs_hb_flag
     ,output reg             mst_sta_trsf_flag
     ,output wire    [7:0]   slv_sta_num         //this signals only update during first initial datagram.It indicate the number of slave station
@@ -42,14 +42,7 @@ module app_ctrl_top
     ,input  wire            prot_send_ack
 	
 	,input wire             init_error
-	,output wire    [2:0]   err_code      // Error code from master TX control
-
-    // Physical layer status signals
-    ,input                  downstream_lane_up
-    ,input                  downstream_link
-    
-    // PS manual heartbeat scan trigger
-    ,input                  hb_scan_req
+	,input wire             run_en
 
     //slave mode systerm signal
     ,output         [1:0]   slvsta_rcv_hb_flag  //indicate heartbeat type
@@ -127,12 +120,7 @@ module app_ctrl_top
                     ,.app_err_flag      (app_err_flag)
                     ,.app_err_type      ()
 					,.init_error		(init_error			)
-					,.err_code          (err_code          )
-					
-					,.downstream_lane_up  (downstream_lane_up)
-					,.downstream_link     (downstream_link)
-					
-					,.hb_scan_req         (hb_scan_req)
+					,.run_en			(run_en				)
 					
 					,.init_err_clr		(init_err_clr)
 					,.init_err			(init_err)
@@ -165,8 +153,8 @@ module app_ctrl_top
                 ,.rx_eth_type       (rx_eth_type        )
                 ,.prot_rcv_req      (prot_rcv_req       )
                 ,.prot_rcv_ack      (prot_rcv_ack       )
-                ,.hb_err_slvsta     (hb_err_slvsta      )
-                ,.app_err_type      (app_err_type       )
+				,.hb_err_slvsta     (hb_err_slvsta		)
+				,.app_err_type      (app_err_type		)
 
                 ,.depot_we          (depot_we           )
                 ,.depot_addr        (depot_addr         )

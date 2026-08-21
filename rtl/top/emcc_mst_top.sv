@@ -15,14 +15,7 @@
 `timescale 1 ns / 1 ps
 (* core_generation_info = "aurora_8b10b_0,aurora_8b10b_v11_1_6,{user_interface=AXI_4_Streaming,backchannel_mode=Sidebands,c_aurora_lanes=1,c_column_used=left,c_gt_clock_1=GTHQ0,c_gt_clock_2=None,c_gt_loc_1=1,c_gt_loc_10=X,c_gt_loc_11=X,c_gt_loc_12=X,c_gt_loc_13=X,c_gt_loc_14=X,c_gt_loc_15=X,c_gt_loc_16=X,c_gt_loc_17=X,c_gt_loc_18=X,c_gt_loc_19=X,c_gt_loc_2=X,c_gt_loc_20=X,c_gt_loc_21=X,c_gt_loc_22=X,c_gt_loc_23=X,c_gt_loc_24=X,c_gt_loc_25=X,c_gt_loc_26=X,c_gt_loc_27=X,c_gt_loc_28=X,c_gt_loc_29=X,c_gt_loc_3=X,c_gt_loc_30=X,c_gt_loc_31=X,c_gt_loc_32=X,c_gt_loc_33=X,c_gt_loc_34=X,c_gt_loc_35=X,c_gt_loc_36=X,c_gt_loc_37=X,c_gt_loc_38=X,c_gt_loc_39=X,c_gt_loc_4=X,c_gt_loc_40=X,c_gt_loc_41=X,c_gt_loc_42=X,c_gt_loc_43=X,c_gt_loc_44=X,c_gt_loc_45=X,c_gt_loc_46=X,c_gt_loc_47=X,c_gt_loc_48=X,c_gt_loc_5=X,c_gt_loc_6=X,c_gt_loc_7=X,c_gt_loc_8=X,c_gt_loc_9=X,c_lane_width=4,c_line_rate=31250,c_nfc=false,c_nfc_mode=IMM,c_refclk_frequency=125000,c_simplex=false,c_simplex_mode=TX,c_stream=false,c_ufc=false,flow_mode=None,interface_mode=Framing,dataflow_config=Duplex}" *)
 (* DowngradeIPIdentifiedWarnings="yes" *)
-
-`include "./../include_files/base_addr.vh"
-`include "./../include_files/para_reg_addr.vh"
-`include "./../include_files/depot_addr_map.vh"
-`include "./../include_files/reg_addr_pl.vh"
-`include "./../include_files/globe_includes.vh"
-`include "./../include_files/components_param.vh"
-
+`include  "base_addr.vh"
 module emcc_mst_top #
 (
     parameter   STATION_ID = 0
@@ -218,6 +211,7 @@ module emcc_mst_top #
     wire                        rcv_intf_tst_dg_done;//interrupt
     reg                         axi_clk_rst_0_d1;
     reg                         aurora_ip_rst_release;
+    wire    [2:0]               stu;
     wire                        clk_10m;
 
      ///////////////////////////////////////////////////////////////////////
@@ -226,7 +220,7 @@ module emcc_mst_top #
         (
              .sys_clk_in_p          (INIT_CLK_P         )
             ,.sys_clk_in_n          (INIT_CLK_N         )
-            ,.rst_fpga_n            (1'b1                  )
+            ,.rst_fpga_n            (1                  )
             ,.clk_10m               (clk_10m            )
             ,.aurora_ref_clk        (aurora_ref_clk     )
             ,.aurora_ref_clk_rst    (aurora_ref_clk_rst )
@@ -321,7 +315,6 @@ module emcc_mst_top #
     assign adc_sdin   = o_spi_mosi ;
     assign i_spi_miso = adc_dout   ;
     
-
     
 //    max31820_driver #(
 //    .CLK_FREQUENCE(100)
@@ -376,43 +369,43 @@ localparam DO_BIT_WIDTH = 32;
     wire USER_UART3_DE ;
     
     wire debug_mode;
-//    debug_uart_arbitor U_debug_uart_arbitor(
-//         .ps_reg_clk        (ps_reg_clk              )
-//        ,.ps_reg_reset      (ps_reg_reset            )
-//        ,.i_time_1ms_vld    (time_1ms_vld          )
+    debug_uart_arbitor U_debug_uart_arbitor(
+         .ps_reg_clk        (ps_reg_clk              )
+        ,.ps_reg_reset      (ps_reg_reset            )
+        ,.i_time_1ms_vld    (time_1ms_vld          )
         
-////        ,.i_uart1_rx          (rs485_1_rx      )
-////        ,.o_uart1_tx          (rs485_1_tx      )
-////        ,.o_uart1_de          (rs485_1_de      )
+        ,.i_uart1_rx          (rs485_1_rx      )
+        ,.o_uart1_tx          (rs485_1_tx      )
+        ,.o_uart1_de          (rs485_1_de      )
         
-////        ,.i_uart2_rx          (rs485_2_rx      )
-////        ,.o_uart2_tx          (rs485_2_tx      )
-////        ,.o_uart2_de          (rs485_2_de      )
+        ,.i_uart2_rx          (rs485_2_rx      )
+        ,.o_uart2_tx          (rs485_2_tx      )
+        ,.o_uart2_de          (rs485_2_de      )
         
-//        ,.i_uart3_rx          (main_232_rxd      )
-//        ,.o_uart3_tx          (main_232_txd      )
-//        ,.o_uart3_de          (      )
+        ,.i_uart3_rx          (main_232_rxd      )
+        ,.o_uart3_tx          (main_232_txd      )
+        ,.o_uart3_de          (      )
         
-//        ,.o_debug_uart_rx     ( DEBUG_UART_RX  )
-//        ,.i_debug_uart_tx     ( DEBUG_UART_TX  )
-//        ,.i_debug_uart_de     ( DEBUG_UART_DE  )
+        ,.o_debug_uart_rx     ( DEBUG_UART_RX  )
+        ,.i_debug_uart_tx     ( DEBUG_UART_TX  )
+        ,.i_debug_uart_de     ( DEBUG_UART_DE  )
         
         
-//        ,.o_user_uart1_rx     ( USER_UART1_RX  )
-//        ,.i_user_uart1_tx     ( USER_UART1_TX  )
-//        ,.i_user_uart1_de     ( USER_UART1_DE  )
+        ,.o_user_uart1_rx     ( USER_UART1_RX  )
+        ,.i_user_uart1_tx     ( USER_UART1_TX  )
+        ,.i_user_uart1_de     ( USER_UART1_DE  )
         
-//        ,.o_user_uart2_rx     ( USER_UART2_RX  )
-//        ,.i_user_uart2_tx     ( USER_UART2_TX  )
-//        ,.i_user_uart2_de     ( USER_UART2_DE  )
+        ,.o_user_uart2_rx     ( USER_UART2_RX  )
+        ,.i_user_uart2_tx     ( USER_UART2_TX  )
+        ,.i_user_uart2_de     ( USER_UART2_DE  )
         
-//        ,.o_user_uart3_rx     ( USER_UART3_RX  )
-//        ,.i_user_uart3_tx     ( USER_UART3_TX  )
-//        ,.i_user_uart3_de     ( USER_UART3_DE  )
+        ,.o_user_uart3_rx     ( USER_UART3_RX  )
+        ,.i_user_uart3_tx     ( USER_UART3_TX  )
+        ,.i_user_uart3_de     ( USER_UART3_DE  )
         
-//        ,.o_debug_mode        (  debug_mode  )
+        ,.o_debug_mode        (  debug_mode  )
         
-//    );
+    );
     // ---------------------------------- I/O debug -----------------------------
     wire di_debug;
     wire do_debug;
@@ -428,36 +421,36 @@ localparam DO_BIT_WIDTH = 32;
     wire  [RAM_DWIDTH-1:0]   dbg_ov_di_debug                  ; 
     wire  [RAM_DWIDTH-1:0]   dbg_ov_do_debug                  ;  
     
-    //ebug_send_top U_debug_send_top(
-    //    .ps_reg_clk      (ps_reg_clk              )
-    //   ,.ps_reg_reset    (ps_reg_reset            )
-    //   ,.i_time_1ms_vld    (time_1ms_vld            )
-    //   
-    //   ,.o_user_req      (     )
-    //   ,.i_user_grant    (1'b1   )
-    //   ,.i_uart_rx       (DEBUG_UART_RX      )
-    //   ,.o_uart_tx       (DEBUG_UART_TX      )
-    //   ,.o_uart_de       (DEBUG_UART_DE      )
-    //   
-    //  ,.o_di_debug        ( di_debug          )
-    //  ,.o_do_debug        ( do_debug           )
-    //   
-    //  ,.iv_do_mst_msg        ( emcc_main_outio          )
-    //  ,.iv_di_mst_msg        ( main_board_inio          )
-    //  
-    //  ,.ov_do_mst_msg        ( dbg_main_board_out_io          )
-    //  ,.ov_di_mst_msg        ( dbg_main_board_in_io           )
-    //  ,.iv_slv_sta_num       ( slv_sta_num           )
-    //  
-    //  ,.i_debug_mode         (  debug_mode  )
-    //  
-    //  ,.iv_di_slv_msg        ( dbg_iv_di_slv_msg  )
-    //  ,.iv_do_slv_msg        ( dbg_iv_do_slv_msg  )
-    //  ,.ov_di_slv_msg        ( dbg_ov_di_slv_msg  )
-    //  ,.ov_do_slv_msg        ( dbg_ov_do_slv_msg  )
-    //  ,.ov_di_debug          ( dbg_ov_di_debug    )
-    //  ,.ov_do_debug          ( dbg_ov_do_debug    )
-    //;
+    debug_send_top U_debug_send_top(
+         .ps_reg_clk      (ps_reg_clk              )
+        ,.ps_reg_reset    (ps_reg_reset            )
+        ,.i_time_1ms_vld    (time_1ms_vld            )
+        
+        ,.o_user_req      (     )
+        ,.i_user_grant    (1'b1   )
+        ,.i_uart_rx       (DEBUG_UART_RX      )
+        ,.o_uart_tx       (DEBUG_UART_TX      )
+        ,.o_uart_de       (DEBUG_UART_DE      )
+        
+       ,.o_di_debug        ( di_debug          )
+       ,.o_do_debug        ( do_debug           )
+        
+       ,.iv_do_mst_msg        ( emcc_main_outio          )
+       ,.iv_di_mst_msg        ( main_board_inio          )
+       
+       ,.ov_do_mst_msg        ( dbg_main_board_out_io          )
+       ,.ov_di_mst_msg        ( dbg_main_board_in_io           )
+       ,.iv_slv_sta_num       ( slv_sta_num           )
+       
+       ,.i_debug_mode         (  debug_mode  )
+       
+       ,.iv_di_slv_msg        ( dbg_iv_di_slv_msg  )
+       ,.iv_do_slv_msg        ( dbg_iv_do_slv_msg  )
+       ,.ov_di_slv_msg        ( dbg_ov_di_slv_msg  )
+       ,.ov_do_slv_msg        ( dbg_ov_do_slv_msg  )
+       ,.ov_di_debug          ( dbg_ov_di_debug    )
+       ,.ov_do_debug          ( dbg_ov_do_debug    )
+    );
     assign  main_board_outio = do_debug ? dbg_main_board_out_io : emcc_main_outio; 
     assign emcc_main_inio = di_debug ? dbg_main_board_in_io : emcc_main_inio_debounce; 
 `else
@@ -542,13 +535,14 @@ localparam DO_BIT_WIDTH = 32;
         );
     assign  sfp0_disable = 1;
     assign  sfp1_disable = 1;
-    
-	ethcat_axi_rout_mststa ethcat_axi_rout_u
+		
+	ethcat_axi_rout ethcat_axi_rout_u
     (
          .clk                   (prot_clk       )
         ,.rst                   (prot_clk_rst   )
         ,.downstream_lane_up    (LANE_UP_0 &  CHANNEL_UP_0)//assert level base on heartbeat result downstream_lane_up-->LANE_UP_1 &  CHANNEL_UP_1
         ,.downstream_link       (LANE_UP_1 &  CHANNEL_UP_1)
+        ,.stu			        (stu	        )
         //from app interface
         ,.s_app_tx_tvalid       (m_app_tx_tvalid)
         ,.s_app_tx_tready       (m_app_tx_tready)
@@ -645,7 +639,7 @@ localparam DO_BIT_WIDTH = 32;
         end
     `endif
 
-    localparam RS485_1_USER_NUMBER = 16;
+    localparam RS485_1_USER_NUMBER = 32;
     wire [RS485_1_USER_NUMBER-1:0] rs485_1_user_req;
     wire [RS485_1_USER_NUMBER-1:0] rs485_1_user_grant;
     wire [RS485_1_USER_NUMBER-1:0] rs485_1_user_tx;
@@ -657,9 +651,9 @@ localparam DO_BIT_WIDTH = 32;
           .clk                   ( ps_reg_clk        ),
           .reset                 ( ps_reg_reset      ),
           
-          .o_uart_tx             (rs485_1_tx        ),
-          .i_uart_rx             (rs485_1_rx        ),
-          .o_uart_de             (rs485_1_de        ),
+          .o_uart_tx             (USER_UART1_TX        ),
+          .i_uart_rx             (USER_UART1_RX        ),
+          .o_uart_de             (USER_UART1_DE        ),
           
           .i_user_req            (rs485_1_user_req       ),
           .o_user_grant          (rs485_1_user_grant     ),
@@ -670,7 +664,7 @@ localparam DO_BIT_WIDTH = 32;
 
 
 
-    localparam RS485_2_USER_NUMBER =16;
+    localparam RS485_2_USER_NUMBER = 8;
     wire [RS485_2_USER_NUMBER-1:0] rs485_2_user_req;
     wire [RS485_2_USER_NUMBER-1:0] rs485_2_user_grant;
     wire [RS485_2_USER_NUMBER-1:0] rs485_2_user_tx;
@@ -682,9 +676,9 @@ localparam DO_BIT_WIDTH = 32;
           .clk                   ( ps_reg_clk        ),
           .reset                 ( ps_reg_reset      ),
           
-          .o_uart_tx             (rs485_2_tx        ),
-          .i_uart_rx             (rs485_2_rx        ),
-          .o_uart_de             (rs485_2_de        ),
+          .o_uart_tx             (USER_UART2_TX        ),
+          .i_uart_rx             (USER_UART2_RX        ),
+          .o_uart_de             (USER_UART2_DE        ),
           
           .i_user_req            (rs485_2_user_req       ),
           .o_user_grant          (rs485_2_user_grant     ),
@@ -706,27 +700,21 @@ localparam DO_BIT_WIDTH = 32;
     wire                        flow_reg_rd_vld;
     wire    [PS_REG_DWIDTH-1:0] flow_reg_rd_dat;
     
-    
-//ila_0 ila (
-//	.clk(ps_reg_clk), // input wire clk
-//	.probe0({rs485_1_rx,rs485_1_tx,rs485_1_de,rs485_2_rx,rs485_2_tx,rs485_2_de})
-//);          
-
     `ifdef SIM_PLATFORM_MST
-    emcc_mix_top
+    emcc_comp_top_sim
     #(
          .PS_REG_AWIDTH     (PS_REG_AWIDTH  )
         ,.PS_REG_DWIDTH     (PS_REG_DWIDTH  )
         ,.RAM_DEPTH         (RAM_DEPTH      )
         ,.RAM_DWIDTH        (RAM_DWIDTH     )
     )
-        emcc_mix_top_u
+        emcc_comp_top_u
         (
              .clk                       (prot_clk        )
             ,.reset                     (prot_clk_rst    )
 
             ,.di_mst_msg                (main_board_inio )
-            ,.do_relay_mst_msg          (main_board_outio)
+            ,.do_mst_msg                (main_board_outio)
 
        //component interface
             ,.slv_cfg_msg_rden  (slv_cfg_msg_rden   )
@@ -746,12 +734,9 @@ localparam DO_BIT_WIDTH = 32;
             ,.ps_reg_wr_dat             (ps_reg_wr_dat )
             ,.ps_reg_re                 (ps_reg_re     )
             ,.ps_reg_rd_addr            (ps_reg_rd_addr)
-            ,.ps_comp_rd_vld            (comp_reg_rd_vld )
-            ,.ps_comp_rd_dat            (comp_reg_rd_dat )
-            ,.ps_flow_rd_vld            (flow_reg_rd_vld )
-            ,.ps_flow_rd_dat            (flow_reg_rd_dat )
-            ,.emcc_irq                  (emcc_irq        )
-            ,.flow_irq                  (flow_irq        )
+            ,.ps_reg_rd_vld             (comp_reg_rd_vld )
+            ,.ps_reg_rd_dat             (comp_reg_rd_dat )
+            ,.comp_irq                  (emcc_comp_irq   )
         );
     `else
         emcc_mix_top
@@ -809,20 +794,17 @@ localparam DO_BIT_WIDTH = 32;
             ,.iv_do_dbg_data        (do_dbg_data          )
             ,.i_wr_cfg_data_done    (wr_cfg_data_done     )
             
-           ,.rs485_1_user_req       (rs485_1_user_req    )                  //rs485_1_user_req   
-           ,.rs485_1_user_grant     (rs485_1_user_grant  )                  //rs485_1_user_grant 
-           ,.rs485_1_user_tx        (rs485_1_user_tx     )
-           ,.rs485_1_user_rx        (rs485_1_user_rx     )
-           ,.rs485_1_user_de        (rs485_1_user_de     )
-           
-           
-           
-           ,.rs485_2_user_req       (rs485_2_user_req    )
-           ,.rs485_2_user_grant     (rs485_2_user_grant  )
-           ,.rs485_2_user_tx        (rs485_2_user_tx     )
-           ,.rs485_2_user_rx        (rs485_2_user_rx     )
-           ,.rs485_2_user_de        (rs485_2_user_de     )
-
+           ,.rs485_1_user_req       (rs485_1_user_req     )
+           ,.rs485_1_user_grant     (rs485_1_user_grant   )
+           ,.rs485_1_user_tx        (rs485_1_user_tx      )
+           ,.rs485_1_user_rx        (rs485_1_user_rx      )
+           ,.rs485_1_user_de        (rs485_1_user_de      )
+          
+           ,.rs485_2_user_req       (rs485_2_user_req     )
+           ,.rs485_2_user_grant     (rs485_2_user_grant   )
+           ,.rs485_2_user_tx        (rs485_2_user_tx      )
+           ,.rs485_2_user_rx        (rs485_2_user_rx      )
+           ,.rs485_2_user_de        (rs485_2_user_de      )
            
            ,.main_232_rxd           (USER_UART3_RX      )
            ,.main_232_txd           (USER_UART3_TX      )
@@ -843,27 +825,13 @@ localparam DO_BIT_WIDTH = 32;
             ,.o_spi_clk   ( o_spi_clk  )
             ,.o_spi_mosi  ( o_spi_mosi )
             ,.i_spi_miso  ( i_spi_miso )
-			
-			,.o_dac_syn  	(o_dac_syn )
-			,.o_dac_sclk 	(o_dac_sclk)
-			,.o_dac_din  	(o_dac_din )
-			,.o_dac_load 	(o_dac_load)
-			,.o_dac_clr  	(o_dac_clr)
-			,.i_dac_dout 	(i_dac_dout)
-			
-            //	,.ov_di_slv_msg        ( dbg_iv_di_slv_msg  )
-            //	,.ov_do_slv_msg        ( dbg_iv_do_slv_msg  )
-            //	,.iv_di_slv_msg        ( dbg_ov_di_slv_msg  )
-            //	,.iv_do_slv_msg        ( dbg_ov_do_slv_msg  )
-            //	,.iv_di_debug          ( dbg_ov_di_debug    )
-            //	,.iv_do_debug          ( dbg_ov_do_debug    )
-			
-			,.ov_di_slv_msg        (   )
-            ,.ov_do_slv_msg        (   )
-            ,.iv_di_slv_msg        (   )
-            ,.iv_do_slv_msg        (   )
-            ,.iv_di_debug          (   )
-            ,.iv_do_debug          (   )
+            
+            ,.ov_di_slv_msg        ( dbg_iv_di_slv_msg  )
+            ,.ov_do_slv_msg        ( dbg_iv_do_slv_msg  )
+            ,.iv_di_slv_msg        ( dbg_ov_di_slv_msg  )
+            ,.iv_do_slv_msg        ( dbg_ov_do_slv_msg  )
+            ,.iv_di_debug          ( dbg_ov_di_debug    )
+            ,.iv_do_debug          ( dbg_ov_do_debug    )
        
         );
     `endif
@@ -900,7 +868,8 @@ localparam DO_BIT_WIDTH = 32;
             ,.loop_link_success (1            )
 			,.downstream_lane_up(LANE_UP_0 &  CHANNEL_UP_0)
 			,.downstream_link   (LANE_UP_1 &  CHANNEL_UP_1)
-/*            ,.mst_prcs_hb_flag  (mst_prcs_hb_flag)*/
+            ,.mst_prcs_hb_flag  (mst_prcs_hb_flag)
+            ,.stu				(stu	       )
 
        //component interface
             ,.slv_cfg_msg_rden  (slv_cfg_msg_rden   )
@@ -920,7 +889,7 @@ localparam DO_BIT_WIDTH = 32;
             //ps tx depot
             ,.ps_tx_depot_addr  (ps_tx_depot_addr   )
             ,.ps_tx_depot_dout  (ps_tx_depot_dout   )
-//			,.debug_data (debug_data   )
+			,.debug_data (debug_data   )
         //  ps  config  port    //
             ,.ps_reg_clk                (ps_reg_clk     )
             ,.ps_reg_reset              (ps_reg_reset   )
@@ -944,7 +913,7 @@ localparam DO_BIT_WIDTH = 32;
             ,.s_aurora_rx_tkeep (s_app_rx_tkeep )
             ,.s_aurora_rx_tlast (s_app_rx_tlast )
             ,.s_aurora_rx_tdata (s_app_rx_tdata )
- /*           
+            
             ,.board_temp_82130  (board_temp_82130   )
             
             ,.o_do_dbg_data_vld  (do_dbg_data_vld      )
@@ -953,11 +922,11 @@ localparam DO_BIT_WIDTH = 32;
             ,.ov_do_dbg_data     (do_dbg_data          )
             ,.o_read_dbg_data_done(read_dbg_data_done          )
             ,.o_wr_cfg_data_done(wr_cfg_data_done          )
-*/
+
 //---JTAG interface---//
             ,.jtag_slv_cfg_msg_addr (jtag_slv_cfg_msg_addr  )
             ,.jtag_slv_cfg_msg_dat  (jtag_slv_cfg_msg_dat   )
-//            ,.slv_sta_num  (slv_sta_num   )
+            ,.slv_sta_num  (slv_sta_num   )
         );
 
     ps_rd_dat_route

@@ -40,13 +40,16 @@ module mst_app_cfg
 	
 	,output reg  [31:0] debug_data
 	
-	,input  wire             			init_error    // From prot_clk domain
+	,output reg             			init_error
+	,output reg             			run_en
+	,(* MARK_DEBUG="true" *)output	reg		[2:0]				stu	
 	,output reg             			init_err_clr
 	,input wire            				init_err
 	,output reg             			cnt_err_clr
 	,input wire	[31:0]  				cnt_err
 	,input wire            				init_finish
-	,input  wire    [2:0]               err_code      // From prot_clk domain (synchronized)
+	,input              				downstream_lane_up
+    ,input              				downstream_link
     
     ,input  wire    [15:0]              board_temp_82130
     
@@ -60,8 +63,8 @@ module mst_app_cfg
     ,input                              link_success
     ,input  wire                        loop_link_success
     ,input  wire                        app_err_flag        //the error type of slave station is valid
-    ,input  wire    [7:0]               app_err_type        //the error type of slave station
-    ,input  wire    [7:0]               hb_err_slvsta       //indicate the index of the error station //指示产生链接错误的从站
+    ,input  wire    [7:0]              	app_err_type        //the error type of slave station
+    ,input  wire    [7:0]              	hb_err_slvsta       //indicate the index of the error station //指示产生链接错误的从站
     ,input  wire    [7:0]               slv_sta_num     //this signals only update during first initial datagram.It indicate the number of slave station
 
     ,output wire                        ps_tst_trsf_port
@@ -71,7 +74,6 @@ module mst_app_cfg
     ,output reg                         ps_tx_req
     ,output reg                         ps_rd_depot_flag
     ,output reg                         opt_intf_init_en
-    ,output reg                         hb_scan_req  // PS manual heartbeat scan trigger
 );
     
     localparam  STM_IDLE        = 'd0;
@@ -79,7 +81,12 @@ module mst_app_cfg
     localparam  STM_INI_DONE    = 'd2;
     localparam  STM_RUN     	= 'd3;
 	
-    reg     ps_reg_re_d1;
+	localparam  STM_IDLE_F      = 'd0;
+    localparam  STM_INIT        = 'd1;
+    localparam  STM_JUDGE    	= 'd2;
+    localparam  STM_END     	= 'd3;
+	
+	reg     ps_reg_re_d1;
     reg     ps_reg_re_d2;
     reg     ps_reg_re_d3;
     reg     ps_reg_re_d4;
@@ -94,16 +101,15 @@ module mst_app_cfg
 	
 	reg							init_finish_d1;
 	reg							init_finish_d2;
-	
-	// Synchronized versions of signals from prot_clk domain
-	reg                         init_error_d1;
-	reg                         init_error_d2;
-	reg     [2:0]               err_code_d1;
-	reg     [2:0]               err_code_d2;
-	reg     [7:0]               app_err_type_d1;
-	reg     [7:0]               app_err_type_d2;
-	reg     [7:0]               hb_err_slvsta_d1;
-	reg     [7:0]               hb_err_slvsta_d2;
+	reg		[1:0]				wk_state;
+	reg		[1:0]				nstate;
+	reg		[23:0]				cycle;
+	reg		[7:0]				data_reg;
+	reg		[7:0]				data_reg1;
+	reg		[7:0]				data_reg2;
+	reg		[2:0]				err_code;
+	(* MARK_DEBUG="true" *)reg		[1:0]				f_wk_state;
+	(* MARK_DEBUG="true" *)reg		[1:0]				f_nstate;
 	
     assign  wr_space_select =   ((ps_reg_addr >= REG_SPACE_BIAS) & (ps_reg_addr < (REG_SPACE_BIAS + REG_SPACE_SIZE))) ? 1'd1 : 1'd0;
     assign  rd_space_select =   ((ps_reg_rd_addr >= REG_SPACE_BIAS) & (ps_reg_rd_addr < (REG_SPACE_BIAS + REG_SPACE_SIZE))) ? 1'd1 : 1'd0;
@@ -141,17 +147,6 @@ module mst_app_cfg
             opt_intf_init_en   <=  ps_reg_wr_dat[0];
         end else begin
             opt_intf_init_en   <=  opt_intf_init_en;
-        end
-    end
-    
-    // Heartbeat scan trigger: pulse when PS writes to HB_SCAN_REQ_ADDR
-    always @(posedge ps_reg_clk)begin
-        if(ps_reg_reset)begin
-            hb_scan_req   <=  'd0;
-        end else if((wr_reg_addr == `HB_SCAN_REQ_ADDR) & ps_reg_we)begin
-            hb_scan_req   <=  ps_reg_wr_dat[0];  // Pulse high when written
-        end else begin
-            hb_scan_req   <=  'd0;  // Auto-clear to generate pulse
         end
     end
     
@@ -265,22 +260,261 @@ module mst_app_cfg
 
 
 /////////////////////////////////////////
+	always @(posedge ps_reg_clk)begin
+        if(ps_reg_reset)begin
+            wk_state	<=  STM_IDLE; 
+		end else begin
+			wk_state	<=	nstate;
+		end
+	end
 	
-	// err_code and init_error are now inputs from prot_clk domain
-	// They are generated in app_mst_tx_ctrl.v
-
-	// Double-register synchronization for prot_clk domain signals
+	always @ (*)begin
+		nstate <= STM_IDLE;
+		case(wk_state)
+		STM_IDLE:begin
+			if(opt_intf_init_en)begin
+				nstate <= STM_INI;
+			end	else begin
+				nstate <= STM_IDLE;
+			end
+		end 
+		STM_INI:begin
+			if((~init_finish_d2)&init_finish_d1)begin
+				nstate <= STM_INI_DONE;
+			end	else begin
+				nstate <= STM_INI;
+			end
+		end
+		STM_INI_DONE:begin
+			if((app_err_type==0)&(hb_err_slvsta==0)&downstream_lane_up&downstream_link)begin
+				nstate <= STM_RUN;
+			end else begin
+				nstate <= STM_IDLE;
+			end
+		end
+		STM_RUN:begin
+			if(ps_reg_reset)begin
+				nstate <= STM_IDLE;
+			end else begin
+				nstate <= STM_RUN;
+			end
+		end			
+		default:nstate <= STM_IDLE;
+		endcase
+	end
+	
+	always @(posedge ps_reg_clk)begin
+        if(ps_reg_reset)begin
+			err_code	<=  'd0; 
+		end else begin
+			case(wk_state)
+			STM_IDLE:begin
+				err_code	<=  err_code;
+			end 
+			STM_INI:begin
+				if((downstream_lane_up&downstream_link)==0)begin
+					err_code    <=  'd1;
+				end else begin
+					err_code	<=  err_code;
+				end	
+			end
+			STM_INI_DONE:begin
+				if((downstream_lane_up&downstream_link)==0)begin
+					err_code    	<=  'd1;
+				end	else begin
+					if((app_err_type==0)&(hb_err_slvsta==0))begin
+						err_code    <=  'd0;
+					end else begin
+						err_code    <=  'd1;
+					end
+				end
+			end
+			STM_RUN:begin
+				if((downstream_lane_up==0)&(downstream_link==0))begin
+					err_code    <=  'd3;			
+				end else if((app_err_type==0)&(hb_err_slvsta==0))begin
+					err_code    <=  'd0;
+				end else begin
+					if((downstream_link&(downstream_lane_up==0)&(app_err_type==0)&(hb_err_slvsta==1))
+					||(downstream_lane_up&(downstream_link==0)&(app_err_type==slv_sta_num)&(hb_err_slvsta==0))
+					||(data_reg1-data_reg2==1))
+					begin
+						err_code    <=  'd0;
+					end else begin
+						err_code    <=  'd2;
+					end
+				end
+			end	
+			default:err_code	<=  'd0;
+		endcase
+		end
+	end
+	
+	always @(posedge ps_reg_clk) begin
+        if(ps_reg_reset)begin
+			cycle  	<=  'h0;
+        end else begin
+			if((~downstream_link)|(~downstream_lane_up))begin
+				cycle	<= cycle + 1;
+			end else begin
+				cycle  	<=  'h0;
+			end	
+		end
+	end	
+	
+	/*always @(posedge ps_reg_clk) begin
+        if(ps_reg_reset)begin
+			stu  	<=  'h0;
+        end else begin
+			if(((~downstream_link)|(~downstream_lane_up))&&(cycle=='hffffff))begin
+				stu <= 'h0;
+			end else if((wk_state==STM_RUN)&(data_reg1-data_reg2==1))begin
+				stu	<= 'h1;
+			end else begin
+				stu <= 'h0;
+			end	
+		end
+	end*/	
+	
+	always @(posedge ps_reg_clk)begin
+        if(ps_reg_reset)begin
+			stu	<=  'd0; 
+		end else begin
+			case(f_wk_state)
+			STM_IDLE_F:begin
+				if(downstream_link&downstream_lane_up)begin
+					stu <= 'd1;
+				end	else begin
+					stu <= stu;
+				end
+			end	
+			STM_INIT:begin
+				if(downstream_link&downstream_lane_up)begin
+					stu <= 'd1;
+				end else if(((~downstream_link)|(~downstream_lane_up))&&(cycle=='hffffff))begin
+					stu <= 'h0;
+				end else begin
+					stu <= stu;
+				end	
+			end
+			STM_JUDGE:begin
+				stu <= stu;
+			end
+			STM_END:begin
+				stu <= stu;
+			end
+			default:stu	<=  'd0;
+		endcase
+		end
+	end	
+	
+	always @(posedge ps_reg_clk)begin
+        if(ps_reg_reset)begin
+            f_wk_state	<=  STM_IDLE_F; 
+		end else begin
+			f_wk_state	<=	f_nstate;
+		end
+	end
+	
+	always @ (*)begin
+		f_nstate <= STM_IDLE_F;
+		case(f_wk_state)
+		STM_IDLE_F:begin
+			if((~downstream_link)|(~downstream_lane_up))begin
+				f_nstate <= STM_INIT;
+			end	else begin
+				f_nstate <= STM_IDLE_F;
+			end
+		end 
+		STM_INIT:begin
+			if(downstream_link&downstream_lane_up)begin
+				f_nstate <= STM_END;
+			end else if(((~downstream_link)|(~downstream_lane_up))&&(cycle=='hffffff))begin
+				f_nstate <= STM_JUDGE;
+			end	else begin
+				f_nstate <= STM_INIT;
+			end
+		end
+		STM_JUDGE:begin
+			if(downstream_link&downstream_lane_up)begin
+				f_nstate <= STM_END;
+			end else begin
+				f_nstate <= STM_JUDGE;
+			end
+		end
+		STM_END:begin
+			f_nstate <= STM_IDLE_F;
+		end			
+		default:f_nstate <= STM_IDLE_F;
+		endcase
+	end	
+	
+	always @(posedge ps_reg_clk) begin
+        if(ps_reg_reset)begin
+			data_reg  	<=  'h0;
+			data_reg1  	<=  'h0;
+			data_reg2  	<=  'h0;
+        end else begin
+			if(hb_err_slvsta>=app_err_type)begin
+				data_reg1  	<=  hb_err_slvsta;
+				data_reg2  	<=  app_err_type;
+			end else begin
+				data_reg1  	<=  app_err_type;
+				data_reg2  	<=  hb_err_slvsta;
+			end	
+		end
+	end	
+	
+	always @(posedge ps_reg_clk)begin
+        if(ps_reg_reset)begin
+            run_en		<=  1'b0; 
+		end else begin
+			case(wk_state)
+			STM_INI_DONE:begin
+				if((app_err_type==0)&(hb_err_slvsta==0)&downstream_lane_up&downstream_link)begin
+					run_en		<= 'h1;
+				end else begin
+					run_en		<= 'h0;
+				end	
+			end
+			STM_RUN:begin
+				run_en			<= 'h1;
+			end	
+			default:run_en		<=  1'b0;
+		endcase
+		end
+	end
+	
+	always @(posedge ps_reg_clk)begin
+        if(ps_reg_reset)begin
+            init_error		<=  1'b0; 
+		end else begin
+			case(wk_state)
+			STM_IDLE,STM_INI:begin
+				if((downstream_lane_up&downstream_link)==0)begin
+					init_error		<= 'h1;
+				end else begin
+					init_error		<= init_error;
+				end
+			end
+			STM_INI_DONE:begin
+				if((app_err_type==0)&(hb_err_slvsta==0)&downstream_lane_up&downstream_link)begin
+					init_error		<= 'h0;
+				end else begin
+					init_error		<= 'h1;
+				end	
+			end
+			STM_RUN:begin
+				init_error		<=  1'b0;
+			end
+			default:init_error	<=  1'b0;
+		endcase
+		end
+	end
+	
 	always @(posedge ps_reg_clk)begin
         init_finish_d1    <=  init_finish;
         init_finish_d2    <=  init_finish_d1;
-        init_error_d1     <=  init_error;
-        init_error_d2     <=  init_error_d1;
-        err_code_d1       <=  err_code;
-        err_code_d2       <=  err_code_d1;
-        app_err_type_d1   <=  app_err_type;
-        app_err_type_d2   <=  app_err_type_d1;
-        hb_err_slvsta_d1  <=  hb_err_slvsta;
-        hb_err_slvsta_d2  <=  hb_err_slvsta_d1;
     end
 
 /////////////////////////////////////////    
@@ -305,7 +539,7 @@ module mst_app_cfg
         case ( rd_reg_addr_d2[PS_REG_AWIDTH-1:0] )
             `SLV_STA_NUM_ADDR:  ps_reg_rd_dat   <=  slv_sta_num;
 //            `LINK_STATUS_ADDR:  ps_reg_rd_dat   <=  {8'd0,app_err_type[7:0],hb_err_slvsta[7:0],{6'd0,link_success,loop_link_success}};
-            `LINK_STATUS_ADDR:  ps_reg_rd_dat   <=  {slv_sta_num[7:0],hb_err_slvsta_d2[7:0],app_err_type_d2[7:0],err_code_d2[2:0],{3'd0,link_success,loop_link_success}};
+            `LINK_STATUS_ADDR:  ps_reg_rd_dat   <=  {slv_sta_num,hb_err_slvsta,app_err_type,{err_code,3'd0,downstream_lane_up,downstream_link}};
             `STAT_TIME_ADDR  :  ps_reg_rd_dat   <=  stat_rslt;
             `CHECK_SYSTERM_ADDR :  ps_reg_rd_dat   <=  32'hdeadbeaf;
             `BOARD_TEMPERATURE_ADDR:  ps_reg_rd_dat   <=  {16'b0,board_temp_82130};

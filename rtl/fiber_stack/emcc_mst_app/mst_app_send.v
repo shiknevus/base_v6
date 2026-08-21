@@ -59,7 +59,6 @@ module mst_app_send
     ,output reg                         tx_dg_done
     ,input                              rx_dg_done
     ,output reg [31:0]                  stat_rslt
-    ,output reg         tst_sig
 );
 
     reg [31:0]  work_cnt = 0;
@@ -95,7 +94,6 @@ module mst_app_send
     reg ps_tx_req_d1;
     reg ps_tx_req_d2;
     reg ps_tx_req_r;
-    reg ps_tx_req_latch;
     reg ps_trsf_port_en_d1;
     reg ps_trsf_port_en_d2;
     reg ps_tst_trsf_port_d1;
@@ -142,18 +140,6 @@ module mst_app_send
     end
 
     always @(posedge clk)begin
-        if(reset)begin
-            ps_tx_req_latch <=  'd0;
-        end else if(ps_tx_req_r)begin
-            ps_tx_req_latch <=  'd1;
-        end else if(wk_state == STM_WAIT_PS_REQ)begin
-            ps_tx_req_latch <=  'd0;
-        end else begin
-            ps_tx_req_latch <=  ps_tx_req_latch;
-        end
-    end
-
-    always @(posedge clk)begin
         ps_trsf_port_en_d1  <=  ps_trsf_port_en;
         ps_trsf_port_en_d2  <=  ps_trsf_port_en_d1;
         ps_tst_trsf_port_d1 <=  ps_tst_trsf_port;
@@ -180,7 +166,7 @@ module mst_app_send
                     end
                 end
                 STM_WAIT_PS_REQ:begin
-                    if(ps_tx_req_latch)begin
+                    if(ps_tx_req_r)begin
                         wk_state  <=  STM_TX_HS_TST;
                     end else if (~ps_tst_trsf_port_d2) begin//while ps configure pl to exit the test mode
                         wk_state  <=  STM_TX_HS;
@@ -210,7 +196,7 @@ module mst_app_send
                     end
                 end
                 STM_GEN_ONCE_END:begin
-                    if(((slv_sta_num_d2 ==0)) || (slv_dg_index == (slv_sta_num_d2 - 1)))begin
+                    if(slv_dg_index == (slv_sta_num_d2 - 1))begin
                         wk_state  <=  STM_GEN_FINISH;
                     end else begin
                         wk_state  <=  STM_GEN_DAT;
@@ -498,10 +484,6 @@ module mst_app_send
         end else begin
             stat_rslt   <=  stat_rslt;
         end
-    end
-
-    always @(posedge clk)begin
-        tst_sig <=  & (frm_cnt);
     end
 
     always @(posedge clk)begin

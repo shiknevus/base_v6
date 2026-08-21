@@ -11,8 +11,8 @@ module app_protocal_top
     ,input                  mst_sta_restart     //master station restart control signal.
     ,input  wire    [15:0]  each_dg_length      //indicate that each datagram length
     ,output wire            app_err_flag        //the error type of slave station is valid
-    ,output wire    [7:0]   app_err_type        //the error type of slave station
-    ,output wire    [7:0]   hb_err_slvsta       //no use
+    ,output wire    [7:0]  	app_err_type        //the error type of slave station
+    ,output wire    [7:0]  	hb_err_slvsta       //no use
     ,output wire            mst_prcs_hb_flag
     ,output wire            mst_sta_trsf_flag
     ,output wire    [7:0]   slv_sta_num         //this signals only update during first initial datagram.It indicate the number of slave station
@@ -25,15 +25,7 @@ module app_protocal_top
     ,input  wire            prot_rcv_ack
 	
 	,input wire             init_error
-	,output wire    [2:0]   err_code      // Error code from master TX control
-
-    // Physical layer status signals
-    ,input                  downstream_lane_up
-    ,input                  downstream_link
-    
-    // PS manual heartbeat scan trigger
-    ,input                  hb_scan_req
-
+	,input wire             run_en
     //slave mode systerm signal
     ,output         [1:0]   slvsta_rcv_hb_flag  //slave station receive heartbeat flag[1:0]
                                                     //[1bit]: receive hb fram; [0]:check slave station address is match
@@ -151,13 +143,6 @@ module app_protocal_top
             ,.loop_link_success     (loop_link_success  )
             ,.ping_pong_flag        (ping_pong_flag     )
             
-            // Physical layer status signals
-            ,.downstream_lane_up    (downstream_lane_up )
-            ,.downstream_link       (downstream_link    )
-            
-            // PS manual heartbeat scan trigger
-            ,.hb_scan_req           (hb_scan_req        )
-            
             ,.prot_rcv_req      (prot_rcv_req       )
             ,.prot_rcv_ack      (prot_rcv_ack       )
 			
@@ -191,7 +176,7 @@ module app_protocal_top
                 //what is dst_addr message in heartbeat datagram layer.
             ,.dg_hb_dst_addr        (dg_hb_dst_addr     )
 			,.init_error		(init_error			)
-			,.err_code          (err_code          )
+			,.run_en			(run_en				)
             
                 //app layer ll interface with application depot
             ,.depot_rden        (depot_rden_slv)

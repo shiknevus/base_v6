@@ -50,8 +50,6 @@ module mst_app_rcv
     ,output reg     [3:0]               ps_depot_we     //slave station status message
     ,output reg     [RAM_AWIDTH-1:0]    ps_depot_addr
     ,output reg     [RAM_DWIDTH-1:0]    ps_depot_din
-
-    ,output reg         tst_sig
 );
 
     reg [31:0]  work_cnt = 0;
@@ -71,7 +69,7 @@ module mst_app_rcv
     reg [4:0] wk_state_d1 = 'd0;
     reg [4:0] wk_state_d2 = 'd0;
     reg         gen_dat_done;
-    reg [RAM_DWIDTH-1:0]    rcv_buf_douta_d1;
+	reg [RAM_DWIDTH-1:0]    rcv_buf_douta_d1;
     reg [15:0]  slv_dg_index;
     reg [7:0]   slv_sta_num_d1;
     reg [7:0]   slv_sta_num_d2;
@@ -86,7 +84,6 @@ module mst_app_rcv
     reg [RAM_AWIDTH-1:0]    app_rslt_addra;
     reg [RAM_DWIDTH-1:0]    app_rslt_dina;
     reg                     intf_tst_flag;
-    reg [15:0]  frm_cnt;
 
     always @(posedge clk)begin
         slv_sta_num_d1  <=  slv_sta_num;
@@ -184,15 +181,6 @@ module mst_app_rcv
         end
     end
 
-    always @(posedge clk) begin
-        if(reset)begin
-            frm_cnt <=  'd0;
-        end else if(wk_state == STM_RD_FINISH)begin
-            frm_cnt <=  frm_cnt + 'd1;
-        end else begin
-            frm_cnt <=  frm_cnt;
-        end
-    end
 
     always @(posedge clk) begin
         case(wk_state)
@@ -347,10 +335,6 @@ module mst_app_rcv
             ps_depot_we     <=  (rcv_buf_rden_d2) ? 4'hf : 4'h0;
             ps_depot_addr   <=  (rcv_buf_rden_d2) ? rcv_buf_addra_d2 : 'd0;
             ps_depot_din    <=  (rcv_buf_rden_d2) ? rcv_buf_douta : 'd0;
-    end
-
-    always @(posedge clk)begin
-        tst_sig <=  | frm_cnt;
     end
 
 endmodule

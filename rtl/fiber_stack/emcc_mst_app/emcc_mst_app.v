@@ -30,8 +30,8 @@ module emcc_mst_app
     ,input  wire                       loop_link_success
 	,input                              downstream_lane_up
     ,input                              downstream_link
-            //  ps  config  port    //
     ,output reg                         rcv_intf_tst_dg_done
+    ,output wire    [2:0]              stu
     
     //component interface
     ,output wire                        slv_cfg_msg_rden
@@ -62,8 +62,6 @@ module emcc_mst_app
     ,output reg     [RAM_AWIDTH-1:0]    ps_depot_addr
     ,output reg     [RAM_DWIDTH-1:0]    ps_depot_din
 
-    ,output wire                        tst_sig
-//////////////////////////////////
     ,output wire            mst_prcs_hb_flag
     ,output wire   [31:0]         debug_data
     
@@ -100,7 +98,6 @@ module emcc_mst_app
     wire            ps_tx_req;
     wire            ps_tx_ack;
     wire            opt_intf_init_en;
-    wire            hb_scan_req_int;  // Internal heartbeat scan trigger
     wire    [31:0]  cur_tx_trsf_pkg_id;
     wire            tx_dg_done;
     wire            rx_dg_done;
@@ -138,20 +135,20 @@ module emcc_mst_app
 ///////////////////
 
     // master mode systerm signal
-    wire            app_trsf_en;
+    wire           	app_trsf_en;
     wire            app_err_flag;        //the error type of slave station is valid
-    wire    [7:0]   app_err_type;        //the error type of slave station
+    wire    [7:0]  	app_err_type;        //the error type of slave station
     wire    [15:0]  each_dg_len;
 //    wire    [7:0]   slv_sta_num;         //this signals only update during first initial datagram.It indicate the number of slave station
-    wire    [7:0]       hb_err_slvsta;       //indicate the index of the error station //指示产生链接错误的从站
+    wire    [7:0]  	hb_err_slvsta;       //indicate the index of the error station //指示产生链接错误的从站
 
     wire    [3:0]   slv_id_we;
     wire    [15:0]  slv_id_addr;
     wire    [31:0]  slv_id_din;
     wire    [31:0]  slv_fpga_version;
     wire            ping_pong_flag;//0:aurora link is success;1:aurora link is fail
-    wire            mst_sta_trsf_flag;
-    reg [31:0]  wk_cnt  =   'd0;
+	wire            mst_sta_trsf_flag;
+	reg [31:0]  	wk_cnt  =   'd0;
 	
 	wire            init_err_clr;
 	wire            init_err;
@@ -159,7 +156,7 @@ module emcc_mst_app
 	wire	[31:0]  cnt_err;
 	wire			init_finish;
 	wire			init_error;
-	wire    [2:0]   err_code;
+	wire			run_en;
 
     always @(posedge clk)begin
         if(reset)begin
@@ -192,20 +189,20 @@ module emcc_mst_app
     #(
          .REG_SPACE_BIAS    (`MST_APP_REG_BIAS  )
         ,.REG_SPACE_SIZE    (`MST_APP_REG_SIZE  )
-        ,.PS_REG_AWIDTH     (PS_REG_AWIDTH      )
-        ,.PS_REG_DWIDTH     (PS_REG_DWIDTH      )
+        ,.PS_REG_AWIDTH     (PS_REG_AWIDTH  	)
+        ,.PS_REG_DWIDTH     (PS_REG_DWIDTH  	)
     )
     mst_app_cfg_u
     (
-         .ps_reg_clk        (ps_reg_clk     )
-        ,.ps_reg_reset      (ps_reg_reset   )
-        ,.ps_reg_we         (ps_reg_we      )
-        ,.ps_reg_addr       (ps_reg_addr    )
-        ,.ps_reg_wr_dat     (ps_reg_wr_dat  )
-        ,.ps_reg_re         (ps_reg_re      )
-        ,.ps_reg_rd_addr    (ps_reg_rd_addr )
-        ,.ps_reg_rd_vld     (ps_reg_rd_vld  )
-        ,.ps_reg_rd_dat     (ps_reg_rd_dat  )
+         .ps_reg_clk        (ps_reg_clk     	)
+        ,.ps_reg_reset      (ps_reg_reset   	)
+        ,.ps_reg_we         (ps_reg_we      	)
+        ,.ps_reg_addr       (ps_reg_addr    	)
+        ,.ps_reg_wr_dat     (ps_reg_wr_dat  	)
+        ,.ps_reg_re         (ps_reg_re      	)
+        ,.ps_reg_rd_addr    (ps_reg_rd_addr 	)
+        ,.ps_reg_rd_vld     (ps_reg_rd_vld  	)
+        ,.ps_reg_rd_dat     (ps_reg_rd_dat  	)
 
         ,.prot_clk          (clk                )
         ,.slv_id_we         (slv_id_we          )
@@ -224,12 +221,15 @@ module emcc_mst_app
 		,.o_wr_cfg_data_done    (o_wr_cfg_data_done     )
 		
 		,.init_error		(init_error			)
+		,.run_en			(run_en				)
+		,.stu				(stu				)		
 		,.init_err_clr		(init_err_clr		)
 		,.init_err			(init_err			)
 		,.cnt_err_clr		(cnt_err_clr		)
 		,.cnt_err			(cnt_err			)
 		,.init_finish		(init_finish		)
-		,.err_code          (err_code        )
+		,.downstream_lane_up(downstream_lane_up	)
+		,.downstream_link   (downstream_link	)
 
         ,.link_success      (link_success       )
         ,.loop_link_success (loop_link_success  )
@@ -244,7 +244,6 @@ module emcc_mst_app
         ,.ps_tx_req         (ps_tx_req          )
         ,.ps_rd_depot_flag  (ps_rd_depot_flag   )
         ,.opt_intf_init_en  (opt_intf_init_en   )
-        ,.hb_scan_req       (hb_scan_req_int    )
     );
 
     mst_app_send
@@ -290,7 +289,6 @@ module emcc_mst_app
             ,.cur_tx_trsf_pkg_id   (cur_tx_trsf_pkg_id)
             ,.tx_dg_done        (tx_dg_done     )
             ,.rx_dg_done        (rx_dg_done_pl)
-            ,.tst_sig           (        )
         );
 
     mst_app_rcv
@@ -327,8 +325,6 @@ module emcc_mst_app
             ,.slv_sta_msg_vld   (slv_sta_msg_vld    ) //slave station status message
             ,.slv_sta_msg_addr  (slv_sta_msg_addr   )
             ,.slv_sta_msg_dat   (slv_sta_msg_dat    )
-
-            ,.tst_sig       (tst_sig)
         );
 
     app_depot_top
@@ -371,6 +367,22 @@ module emcc_mst_app
             ,.rcv_buf_addra     (rcv_buf_addra  )
             ,.rcv_buf_douta     (rcv_buf_douta  )
         );
+    
+    
+    // ------------- Debug Start  -----------------------
+//    ila_app_depot_top U_ila_app_depot_top(
+//        .clk(clk)
+//       ,.probe0({prot_wr_en[0],prot_rd_en,send_buf_ena,send_buf_wea[0],app_rcv_req,app_rcv_ack,prot_rcv_req,prot_rcv_ack})
+//       ,.probe1({prot_send_req,prot_send_ack,app_send_req,app_send_ack,ping_pong_flag})
+//       ,.probe2(prot_rd_addr)
+//       ,.probe3(prot_rd_data)
+//       ,.probe4(prot_wr_data)
+//       ,.probe5(send_buf_addra)
+//       ,.probe6(send_buf_dina)
+//       ,.probe7(rcv_buf_addra)
+//       ,.probe8(rcv_buf_douta)
+//    );
+    // ------------- Debug End  -----------------------
 
     app_protocal_top
     #(
@@ -393,13 +405,6 @@ module emcc_mst_app
             ,.loop_link_success (loop_link_success   )
             ,.ping_pong_flag    (ping_pong_flag             )
 
-            // Physical layer status signals
-            ,.downstream_lane_up(downstream_lane_up  )
-            ,.downstream_link   (downstream_link    )
-            
-            // PS manual heartbeat scan trigger
-            ,.hb_scan_req       (hb_scan_req_int    )
-
             ,.prot_send_req     (prot_send_req  )
             ,.prot_send_ack     (prot_send_ack  )
             ,.prot_rcv_req      (prot_rcv_req   )
@@ -418,7 +423,7 @@ module emcc_mst_app
             ,.slv_fpga_version  (slv_fpga_version   )
 			
 			,.init_error		(init_error			)
-			,.err_code          (err_code           )
+			,.run_en			(run_en				)
 			,.init_err_clr		(init_err_clr)
 			,.init_err			(init_err)
 			,.cnt_err_clr		(cnt_err_clr)
