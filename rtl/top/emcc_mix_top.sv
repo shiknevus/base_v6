@@ -461,9 +461,9 @@ module emcc_mix_top
                 ,.i_st_wr_data          ( ps_reg_wr_dat         )
                 ,.i_st_rd_en            ( ps_reg_re             )
                 ,.i_st_rd_addr          ( ps_reg_rd_addr        )
-	            ,.o_st_rd_vld           ( sub_comp_rd_vld[75]   )
-                ,.o_st_rd_data          ( sub_comp_rd_dat[75]   )
-	            ,.o_intr_irq            ( map_irq[75]           )
+	            ,.o_st_rd_vld           ( sub_comp_rd_vld[20]   )
+                ,.o_st_rd_data          ( sub_comp_rd_dat[20]   )
+	            ,.o_intr_irq            ( map_irq[20]           )
             );
 
 	//==========================================================================================================//
