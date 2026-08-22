@@ -17,12 +17,18 @@
 #include "xparameters.h"
 #include "xstatus.h"
 
-// PL INTC #0 -> GIC
+// PL INTC -> GIC
 #define INTC_DEV_ID     0
-#define INTC_BASE       0xA0000000U
+#define INTC_BASE       0xA0000000U      // INTC #0 (1do/axis)
 #define GIC_SPI         121
-#define INTC_BIT_1DO   1       // ec_1do
+#define INTC_BIT_1DO   1       // ec_1do_u0 (mst DO)
+#define INTC_BIT_1DO_S 2       // ec_1do_u1 (slave DO)
 #define INTC_BIT_AXIS  9       // ec_pul_axis
+
+#define INTC_DEV_SRV    2
+#define INTC_BASE_SRV   0xA0002000U      // INTC #2 (can servo)
+#define GIC_SPI_SRV     123
+#define INTC_BIT_SERVO  11      // ec_can_servo_11: map_irq[75] -> INTC#2 bit11
 
 // INTC regs
 #define INTC_ISR        0x00U
@@ -31,13 +37,16 @@
 
 #define EC_BASE        (PL_CFG_BASE + REG_BIAS_EC_PUL_AXIS)
 #define EC1DO_BASE     (PL_CFG_BASE + REG_BIAS_EC_1DO)
+#define EC_S1DO_BASE   (PL_CFG_BASE + REG_BIAS_EC_1DO_SLV)
+#define EC_SRV_BASE    (PL_CFG_BASE + REG_BIAS_EC_CAN_SERVO)
 
 // ps ack result, must match RTL IRQ_OK
 #define RES_OK          0x51U
 #define RES_NG          0x52U
 
 static XScuGic Gic;
-static XIntc   Intc;
+static XIntc   Intc;      // INTC #0
+static XIntc   IntcSrv;   // INTC #2
 
 // ISR hit count, shown by 'g'
 static volatile u32 g_isr_cnt;
@@ -103,6 +112,17 @@ static u32 AckIrq(u32 base, u32 reg1, u32 reg2)
     return resp;
 }
 
+static const char *IrqTag(u32 base)
+{
+    if (base == EC1DO_BASE)
+        return "1do";
+    if (base == EC_S1DO_BASE)
+        return "1doS";
+    if (base == EC_SRV_BASE)
+        return "srv";
+    return "axis";
+}
+
 static void PrintAck(const char *tag, u32 reg1, u32 reg2, u32 resp)
 {
     xil_printf("[%u] %s raw=0x%08x tx=%u alm=%u resp=0x%08x\r\n",
@@ -120,6 +140,7 @@ static void PrintStale(const char *tag, u32 reg1)
 static void HandleIrq(u32 base)
 {
     u32 reg1, reg2, resp;
+    const char *tag = IrqTag(base);
 
     reg1 = ReadReg1(base);
     if (reg1 == 0U)
@@ -127,35 +148,45 @@ static void HandleIrq(u32 base)
     reg2 = Xil_In32(base + IRQ_REG2);
     resp = AckIrq(base, reg1, reg2);
     if (resp)
-        PrintAck(base == EC1DO_BASE ? "1do" : "axis", reg1, reg2, resp);
+        PrintAck(tag, reg1, reg2, resp);
     else
-        PrintStale(base == EC1DO_BASE ? "1do" : "axis", reg1);
+        PrintStale(tag, reg1);
 }
 
 static void EcIsr(void *ref)
 {
-    u32 base = ((int)(intptr_t)ref == INTC_BIT_1DO) ? EC1DO_BASE : EC_BASE;
+    int id = (int)(intptr_t)ref;
+    u32 base = (id == INTC_BIT_1DO)   ? EC1DO_BASE :
+               (id == INTC_BIT_1DO_S) ? EC_S1DO_BASE : EC_BASE;
 
     g_isr_cnt++;
     HandleIrq(base);
 }
 
+static void ServoIsr(void *ref)
+{
+    g_isr_cnt++;
+    HandleIrq(EC_SRV_BASE);
+}
+
 // poll INTC directly: works even if the GIC path is broken
 void PollIrqFallback(void)
 {
-    const struct { int bit; u32 base; } irqs[] = {
-        { INTC_BIT_1DO,  EC1DO_BASE },
-        { INTC_BIT_AXIS, EC_BASE },
+    const struct { u32 intc; int bit; u32 base; } irqs[] = {
+        { INTC_BASE,     INTC_BIT_1DO,   EC1DO_BASE },
+        { INTC_BASE,     INTC_BIT_1DO_S, EC_S1DO_BASE },
+        { INTC_BASE,     INTC_BIT_AXIS,  EC_BASE },
+        { INTC_BASE_SRV, INTC_BIT_SERVO, EC_SRV_BASE },
     };
     int i;
 
-    for (i = 0; i < 2; i++) {
+    for (i = 0; i < 4; i++) {
         u32 bit = 1U << irqs[i].bit;
-        u32 pending = Xil_In32(INTC_BASE + INTC_ISR) & Xil_In32(INTC_BASE + INTC_IER);
+        u32 pending = Xil_In32(irqs[i].intc + INTC_ISR) & Xil_In32(irqs[i].intc + INTC_IER);
 
         if (!(pending & bit))
             continue;
-        Xil_Out32(INTC_BASE + INTC_IAR, bit);   // clear first
+        Xil_Out32(irqs[i].intc + INTC_IAR, bit);   // clear first
         HandleIrq(irqs[i].base);
     }
 }
@@ -179,19 +210,38 @@ int SetupInterruptSystem(void)
 
     XIntc_Connect(&Intc, INTC_BIT_1DO,
                   (XInterruptHandler)EcIsr, (void *)(intptr_t)INTC_BIT_1DO);
+    XIntc_Connect(&Intc, INTC_BIT_1DO_S,
+                  (XInterruptHandler)EcIsr, (void *)(intptr_t)INTC_BIT_1DO_S);
     XIntc_Connect(&Intc, INTC_BIT_AXIS,
                   (XInterruptHandler)EcIsr, (void *)(intptr_t)INTC_BIT_AXIS);
     XIntc_Start(&Intc, XIN_REAL_MODE);
     XIntc_Enable(&Intc, INTC_BIT_1DO);
+    XIntc_Enable(&Intc, INTC_BIT_1DO_S);
     XIntc_Enable(&Intc, INTC_BIT_AXIS);
 
-    // INTC -> GIC; XIntc driver acks IAR after EcIsr returns
+    // INTC #0 -> GIC; XIntc driver acks IAR after EcIsr returns
     XScuGic_SetPriorityTriggerType(&Gic, GIC_SPI, 0xA0U, 0x1U);  // active-high level
     Status = XScuGic_Connect(&Gic, GIC_SPI,
                      (Xil_ExceptionHandler)XIntc_InterruptHandler, &Intc);
     if (Status != XST_SUCCESS)
         return XST_FAILURE;
     XScuGic_Enable(&Gic, GIC_SPI);
+
+    // INTC #2 -> GIC (can servo, map_irq[75])
+    Status = XIntc_Initialize(&IntcSrv, INTC_DEV_SRV);
+    if (Status != XST_SUCCESS)
+        return XST_FAILURE;
+    XIntc_Connect(&IntcSrv, INTC_BIT_SERVO,
+                  (XInterruptHandler)ServoIsr, NULL);
+    XIntc_Start(&IntcSrv, XIN_REAL_MODE);
+    XIntc_Enable(&IntcSrv, INTC_BIT_SERVO);
+
+    XScuGic_SetPriorityTriggerType(&Gic, GIC_SPI_SRV, 0xA0U, 0x1U);  // active-high level
+    Status = XScuGic_Connect(&Gic, GIC_SPI_SRV,
+                     (Xil_ExceptionHandler)XIntc_InterruptHandler, &IntcSrv);
+    if (Status != XST_SUCCESS)
+        return XST_FAILURE;
+    XScuGic_Enable(&Gic, GIC_SPI_SRV);
 
     Xil_ExceptionInit();
     Xil_ExceptionRegisterHandler(XIL_EXCEPTION_ID_INT,

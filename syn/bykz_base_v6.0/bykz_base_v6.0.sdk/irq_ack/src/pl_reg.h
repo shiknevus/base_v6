@@ -9,8 +9,17 @@
 #define PL_CFG_BASE          XPAR_PLCFG_M_AXI_BASEADDR    // 0xB0100000
 
 // component space bias, same as emcc_mix_top instantiation
-#define REG_BIAS_EC_1DO      0x800U
-#define REG_BIAS_EC_PUL_AXIS 0xA00U
+#define REG_BIAS_EC_1DO      0x800U   // ec_1do_u0 (mst DO)
+#define REG_BIAS_EC_1DO_SLV  0xC00U   // ec_1do_u1 (slave DO)
+#define REG_BIAS_EC_PUL_AXIS 0xA00U   // ec_pul_axis_u0 (commented in emcc_mix_top)
+#define REG_BIAS_EC_CAN_SERVO 0x3000U // ec_can_servo_11
+
+// mst_app registers (rtl/include_files/components_param.vh)
+#define MST_APP_BASE         PL_CFG_BASE                   // MST_APP_REG_BIAS=0
+#define LINK_STATUS          0x050U
+#define OPT_INTF_INIT_EN     0x080U
+#define MST_APP_MODE         0x030U
+#define SLV_STA_NUM          0x020U
 
 // common register offsets
 #define IRQ_REG1             0x000U   // {ec_id,sc_id,bhv_id,tx_id}

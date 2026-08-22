@@ -14,6 +14,8 @@
 
 #define EC_BASE   (PL_CFG_BASE + REG_BIAS_EC_PUL_AXIS)
 #define EC1DO_BASE (PL_CFG_BASE + REG_BIAS_EC_1DO)
+#define EC_S1DO_BASE (PL_CFG_BASE + REG_BIAS_EC_1DO_SLV)
+#define EC_SRV_BASE (PL_CFG_BASE + REG_BIAS_EC_CAN_SERVO)
 #define INTC_BASE 0xA0000000U   // INTC #0
 
 // motion params (mm units)
@@ -73,7 +75,8 @@ void PrintMenu(void)
     xil_printf("-------------------------------------------\r\n");
     xil_printf(" A: 1/2/3/4/5/6 = home/jog/move/jog/move/getpos\r\n");
     xil_printf(" B: x/v/k/e/f/d = pause/resume/stop/son/soff/reset \r\n");
-    xil_printf(" 1DO: 7=do on  8=do off  9=st \r\n");
+    xil_printf(" 1DO: 7/8/9=do on/off/st   t/y/u=slv on/off/st \r\n");
+    xil_printf(" SRV: h/z/p=home/zero/pos  b/c=stop/read  o=st \r\n");
     xil_printf(" w: set params   r: regs   s: ch status   \r\n");
     xil_printf("-------------------------------------------\r\n");
 }
@@ -148,24 +151,47 @@ static void TrigSoff(void)
 }
 
 // 1do A ch trigger: bhv 1=do on, 2=do off
-static void TrigDo(u8 id)
+static void TrigDoAt(u32 base, u8 id)
 {
-    if (Xil_In32(EC1DO_BASE + EC_CHA_ST))
+    if (Xil_In32(base + EC_CHA_ST))
         xil_printf("[1DO] busy, bhv %u ignored\r\n", (unsigned)id);
     else {
-        Xil_Out32(EC1DO_BASE + A_BHV_ID, (u32)id);
+        Xil_Out32(base + A_BHV_ID, (u32)id);
         xil_printf("1DO bhv %u\r\n", (unsigned)id);
     }
 }
+static void TrigDo(u8 id)    { TrigDoAt(EC1DO_BASE, id); }
+static void TrigDoS(u8 id)   { TrigDoAt(EC_S1DO_BASE, id); }
 
 // 1do status + do level (PARAM66)
-static void Read1DoSt(void)
+static void Read1DoStAt(u32 base)
 {
-    u32 base = EC1DO_BASE;
     xil_printf("1DO: busy=%u tx=%u alm=%u fsm=0x%08x do=%u\r\n",
         (unsigned)Xil_In32(base + EC_CHA_ST), (unsigned)Xil_In32(base + A_TX_ID),
         (unsigned)Xil_In32(base + A_ALM_NUM), (unsigned)Xil_In32(base + DEBUG_REG1),
         (unsigned)Xil_In32(base + PARAM66));
+}
+static void Read1DoSt(void)  { Read1DoStAt(EC1DO_BASE); }
+static void Read1DoStS(void) { Read1DoStAt(EC_S1DO_BASE); }
+
+// can servo A ch trigger (bhv: 1home 2zero 3pos 7vstop 8vread)
+static void TrigSrvBhv(u8 id)
+{
+    if (Xil_In32(EC_SRV_BASE + EC_CHA_ST))
+        xil_printf("[SRV] busy, bhv %u ignored\r\n", (unsigned)id);
+    else {
+        Xil_Out32(EC_SRV_BASE + A_BHV_ID, (u32)id);
+        xil_printf("SRV bhv %u\r\n", (unsigned)id);
+    }
+}
+
+static void ReadSrvSt(void)
+{
+    u32 base = EC_SRV_BASE;
+    xil_printf("SRV: busy=%u tx=%u bhv=%u alm=%u fsm=0x%08x\r\n",
+        (unsigned)Xil_In32(base + EC_CHA_ST), (unsigned)Xil_In32(base + A_TX_ID),
+        (unsigned)Xil_In32(base + A_BHV_ID), (unsigned)Xil_In32(base + A_ALM_NUM),
+        (unsigned)Xil_In32(base + DEBUG_REG1));
 }
 
 // float -> pulses by factor, write to PL
@@ -313,6 +339,15 @@ static void HandleKey(char key)
     case '7': TrigDo(1); break;
     case '8': TrigDo(2); break;
     case '9': Read1DoSt(); break;
+    case 't': TrigDoS(1); break;
+    case 'y': TrigDoS(2); break;
+    case 'u': Read1DoStS(); break;
+    case 'h': TrigSrvBhv(1); break;   // home
+    case 'z': TrigSrvBhv(2); break;   // zero
+    case 'p': TrigSrvBhv(3); break;   // pos
+    case 'b': TrigSrvBhv(7); break;   // vstop
+    case 'c': TrigSrvBhv(8); break;   // vread
+    case 'o': ReadSrvSt(); break;
     case 'x': TrigPause();  break;
     case 'v': TrigResume(); break;
     case 'k': TrigStop();   break;
