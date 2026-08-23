@@ -21,9 +21,10 @@
 #define INTC_DEV_ID     0
 #define INTC_BASE       0xA0000000U      // INTC #0 (1do/axis)
 #define GIC_SPI         121
-#define INTC_BIT_1DO   1       // ec_1do_u0 (mst DO)
-#define INTC_BIT_1DO_S 2       // ec_1do_u1 (slave DO)
-#define INTC_BIT_AXIS  9       // ec_pul_axis
+#define INTC_BIT_1DO      1       // ec_1do_u0 (mst DO)
+#define INTC_BIT_1DO_S    2       // ec_1do_u1 (slave DO)
+#define INTC_BIT_AXIS     9       // ec_pul_axis
+#define INTC_BIT_SLV_AXIS 10      // ec_slv_pul_axis
 
 #define INTC_DEV_SRV    2
 #define INTC_BASE_SRV   0xA0002000U      // INTC #2 (can servo)
@@ -36,6 +37,7 @@
 #define INTC_IAR        0x0CU
 
 #define EC_BASE        (PL_CFG_BASE + REG_BIAS_EC_PUL_AXIS)
+#define EC_SLV_BASE    (PL_CFG_BASE + REG_BIAS_EC_SLV_PUL_AXIS)
 #define EC1DO_BASE     (PL_CFG_BASE + REG_BIAS_EC_1DO)
 #define EC_S1DO_BASE   (PL_CFG_BASE + REG_BIAS_EC_1DO_SLV)
 #define EC_SRV_BASE    (PL_CFG_BASE + REG_BIAS_EC_CAN_SERVO)
@@ -120,6 +122,8 @@ static const char *IrqTag(u32 base)
         return "1doS";
     if (base == EC_SRV_BASE)
         return "srv";
+    if (base == EC_SLV_BASE)
+        return "slvaxis";
     return "axis";
 }
 
@@ -156,8 +160,9 @@ static void HandleIrq(u32 base)
 static void EcIsr(void *ref)
 {
     int id = (int)(intptr_t)ref;
-    u32 base = (id == INTC_BIT_1DO)   ? EC1DO_BASE :
-               (id == INTC_BIT_1DO_S) ? EC_S1DO_BASE : EC_BASE;
+    u32 base = (id == INTC_BIT_1DO)      ? EC1DO_BASE :
+               (id == INTC_BIT_1DO_S)    ? EC_S1DO_BASE :
+               (id == INTC_BIT_SLV_AXIS) ? EC_SLV_BASE : EC_BASE;
 
     g_isr_cnt++;
     HandleIrq(base);
@@ -173,14 +178,15 @@ static void ServoIsr(void *ref)
 void PollIrqFallback(void)
 {
     const struct { u32 intc; int bit; u32 base; } irqs[] = {
-        { INTC_BASE,     INTC_BIT_1DO,   EC1DO_BASE },
-        { INTC_BASE,     INTC_BIT_1DO_S, EC_S1DO_BASE },
-        { INTC_BASE,     INTC_BIT_AXIS,  EC_BASE },
+        { INTC_BASE, INTC_BIT_1DO,       EC1DO_BASE },
+        { INTC_BASE, INTC_BIT_1DO_S,     EC_S1DO_BASE },
+        { INTC_BASE, INTC_BIT_AXIS,      EC_BASE },
+        { INTC_BASE, INTC_BIT_SLV_AXIS,  EC_SLV_BASE },
         { INTC_BASE_SRV, INTC_BIT_SERVO, EC_SRV_BASE },
     };
     int i;
 
-    for (i = 0; i < 4; i++) {
+    for (i = 0; i < 5; i++) {
         u32 bit = 1U << irqs[i].bit;
         u32 pending = Xil_In32(irqs[i].intc + INTC_ISR) & Xil_In32(irqs[i].intc + INTC_IER);
 
@@ -214,10 +220,13 @@ int SetupInterruptSystem(void)
                   (XInterruptHandler)EcIsr, (void *)(intptr_t)INTC_BIT_1DO_S);
     XIntc_Connect(&Intc, INTC_BIT_AXIS,
                   (XInterruptHandler)EcIsr, (void *)(intptr_t)INTC_BIT_AXIS);
+    XIntc_Connect(&Intc, INTC_BIT_SLV_AXIS,
+                  (XInterruptHandler)EcIsr, (void *)(intptr_t)INTC_BIT_SLV_AXIS);
     XIntc_Start(&Intc, XIN_REAL_MODE);
     XIntc_Enable(&Intc, INTC_BIT_1DO);
     XIntc_Enable(&Intc, INTC_BIT_1DO_S);
     XIntc_Enable(&Intc, INTC_BIT_AXIS);
+    XIntc_Enable(&Intc, INTC_BIT_SLV_AXIS);
 
     // INTC #0 -> GIC; XIntc driver acks IAR after EcIsr returns
     XScuGic_SetPriorityTriggerType(&Gic, GIC_SPI, 0xA0U, 0x1U);  // active-high level

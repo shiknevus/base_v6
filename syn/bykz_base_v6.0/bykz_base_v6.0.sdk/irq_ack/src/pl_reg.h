@@ -11,8 +11,9 @@
 // component space bias, same as emcc_mix_top instantiation
 #define REG_BIAS_EC_1DO      0x800U   // ec_1do_u0 (mst DO)
 #define REG_BIAS_EC_1DO_SLV  0xC00U   // ec_1do_u1 (slave DO)
-#define REG_BIAS_EC_PUL_AXIS 0xA00U   // ec_pul_axis_u0 (commented in emcc_mix_top)
-#define REG_BIAS_EC_CAN_SERVO 0x3000U // ec_can_servo_11
+#define REG_BIAS_EC_PUL_AXIS     0xA00U   // ec_pul_axis_u0
+#define REG_BIAS_EC_SLV_PUL_AXIS 0xE00U   // ec_slv_pul_axis_u0
+#define REG_BIAS_EC_CAN_SERVO    0x3000U // ec_can_servo_11
 
 // mst_app registers (rtl/include_files/components_param.vh)
 #define MST_APP_BASE         PL_CFG_BASE                   // MST_APP_REG_BIAS=0

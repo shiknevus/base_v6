@@ -16,6 +16,7 @@
 #define EC1DO_BASE (PL_CFG_BASE + REG_BIAS_EC_1DO)
 #define EC_S1DO_BASE (PL_CFG_BASE + REG_BIAS_EC_1DO_SLV)
 #define EC_SRV_BASE (PL_CFG_BASE + REG_BIAS_EC_CAN_SERVO)
+#define EC_SLV_BASE (PL_CFG_BASE + REG_BIAS_EC_SLV_PUL_AXIS)
 #define INTC_BASE 0xA0000000U   // INTC #0
 
 // motion params (mm units)
@@ -56,6 +57,20 @@ void CmdInit(void)
     Xil_Out32(base + PARAM37, (u32)(int)(g_step   * f)); // step
     Xil_Out32(base + PARAM16, 0x00000001U);              // dir POS
     Xil_Out32(base + PARAM30, 0x00000001U);              // drive on
+
+    // slv pulse axis defaults (same params as mst axis)
+    base = EC_SLV_BASE;
+    Xil_Out32(base + PARAM1,  (u32)(int)(80.0f    * f));  // max spd
+    Xil_Out32(base + PARAM2,  (u32)(int)(200.0f   * f));  // max acc
+    Xil_Out32(base + PARAM3,  (u32)(int)(200.0f   * f));  // max dec
+    Xil_Out32(base + PARAM5,  (u32)(int)(g_acc    * f));  // acc
+    Xil_Out32(base + PARAM33, (u32)(int)(2.0f     * f));  // touch clamp spd
+    Xil_Out32(base + PARAM34, (u32)(int)(g_dec    * f));  // dec
+    Xil_Out32(base + PARAM35, (u32)(int)(g_spd    * f));  // spd
+    Xil_Out32(base + PARAM36, (u32)(int)(g_target * f));  // target
+    Xil_Out32(base + PARAM37, (u32)(int)(g_step   * f));  // step
+    Xil_Out32(base + PARAM16, 0x00000001U);               // dir POS
+    Xil_Out32(base + PARAM30, 0x00000001U);               // drive on
 }
 
 static int PollKey(void)
@@ -71,12 +86,14 @@ void PrintMenu(void)
 {
     xil_printf("\r\n");
     xil_printf("-------------------------------------------\r\n");
-    xil_printf(" ec_1do + ec_pul_axis  m: menu\r\n");
+    xil_printf(" ec_1do + ec_pul_axis + ec_slv_pul_axis  m: menu\r\n");
     xil_printf("-------------------------------------------\r\n");
     xil_printf(" A: 1/2/3/4/5/6 = home/jog/move/jog/move/getpos\r\n");
     xil_printf(" B: x/v/k/e/f/d = pause/resume/stop/son/soff/reset \r\n");
     xil_printf(" 1DO: 7/8/9=do on/off/st   t/y/u=slv on/off/st \r\n");
     xil_printf(" SRV: h/z/p=home/zero/pos  b/c=stop/read  o=st \r\n");
+    xil_printf(" SLV: a/j/l=home/jog/move  i=st  n/q/U=pause/resume/stop\r\n");
+    xil_printf("      D/E/F=reset/son/soff\r\n");
     xil_printf(" w: set params   r: regs   s: ch status   \r\n");
     xil_printf("-------------------------------------------\r\n");
 }
@@ -150,6 +167,53 @@ static void TrigSoff(void)
     xil_printf("B soff(105)\r\n");
 }
 
+// --- slv pulse axis A ch ---
+static void TrigSlvBhv(u8 id)
+{
+    if (Xil_In32(EC_SLV_BASE + EC_CHA_ST))
+        xil_printf("[SLV_A] busy, bhv %u ignored\r\n", (unsigned)id);
+    else {
+        Xil_Out32(EC_SLV_BASE + A_BHV_ID, (u32)id);
+        xil_printf("SLV A bhv %u\r\n", (unsigned)id);
+    }
+}
+
+// --- slv pulse axis B ch ---
+static void TrigSlvPause(void)
+{
+    Xil_Out32(EC_SLV_BASE + PARAM26, 1U);
+    xil_printf("SLV B pause(100)\r\n");
+}
+static void TrigSlvResume(void)
+{
+    Xil_Out32(EC_SLV_BASE + PARAM28, 1U);
+    Xil_Out32(EC_SLV_BASE + PARAM26, 1U);
+    xil_printf("SLV B resume(101)\r\n");
+}
+static void TrigSlvStop(void)
+{
+    Xil_Out32(EC_SLV_BASE + PARAM27, 1U);
+    Xil_Out32(EC_SLV_BASE + PARAM26, 1U);
+    xil_printf("SLV B stop(103)\r\n");
+}
+static void TrigSlvReset(void)
+{
+    Xil_Out32(EC_SLV_BASE + PARAM29, 1U);
+    usleep(10000);
+    Xil_Out32(EC_SLV_BASE + PARAM29, 0U);
+    xil_printf("SLV B reset(102)\r\n");
+}
+static void TrigSlvSon(void)
+{
+    Xil_Out32(EC_SLV_BASE + PARAM30, 1U);
+    xil_printf("SLV B son(104)\r\n");
+}
+static void TrigSlvSoff(void)
+{
+    Xil_Out32(EC_SLV_BASE + PARAM30, 0U);
+    xil_printf("SLV B soff(105)\r\n");
+}
+
 // 1do A ch trigger: bhv 1=do on, 2=do off
 static void TrigDoAt(u32 base, u8 id)
 {
@@ -192,6 +256,23 @@ static void ReadSrvSt(void)
         (unsigned)Xil_In32(base + EC_CHA_ST), (unsigned)Xil_In32(base + A_TX_ID),
         (unsigned)Xil_In32(base + A_BHV_ID), (unsigned)Xil_In32(base + A_ALM_NUM),
         (unsigned)Xil_In32(base + DEBUG_REG1));
+}
+
+static void ReadSlvChSt(void)
+{
+    u32 base = EC_SLV_BASE;
+    xil_printf("SLV A: busy=%u tx=%u bhv=%u alm=%u fsm=0x%08x\r\n",
+        (unsigned)Xil_In32(base + EC_CHA_ST), (unsigned)Xil_In32(base + A_TX_ID),
+        (unsigned)Xil_In32(base + A_BHV_ID), (unsigned)Xil_In32(base + A_ALM_NUM),
+        (unsigned)Xil_In32(base + DEBUG_REG1));
+    xil_printf("SLV B: busy=%u tx=%u bhv=%u alm=%u fsm=0x%08x\r\n",
+        (unsigned)Xil_In32(base + EC_CHB_ST), (unsigned)Xil_In32(base + B_TX_ID),
+        (unsigned)Xil_In32(base + B_BHV_ID), (unsigned)Xil_In32(base + B_ALM_NUM),
+        (unsigned)Xil_In32(base + DEBUG_REG2));
+    xil_printf("SLV C: busy=%u tx=%u bhv=%u alm=%u fsm=0x%08x\r\n",
+        (unsigned)Xil_In32(base + EC_CHC_ST), (unsigned)Xil_In32(base + C_TX_ID),
+        (unsigned)Xil_In32(base + C_BHV_ID), (unsigned)Xil_In32(base + C_ALM_NUM),
+        (unsigned)Xil_In32(base + DEBUG_REG3));
 }
 
 // float -> pulses by factor, write to PL
@@ -348,6 +429,16 @@ static void HandleKey(char key)
     case 'b': TrigSrvBhv(7); break;   // vstop
     case 'c': TrigSrvBhv(8); break;   // vread
     case 'o': ReadSrvSt(); break;
+    case 'a': TrigSlvBhv(1); break;   // home
+    case 'j': TrigSlvBhv(2); break;   // jog
+    case 'l': TrigSlvBhv(3); break;   // move
+    case 'i': ReadSlvChSt(); break;
+    case 'n': TrigSlvPause(); break;
+    case 'q': TrigSlvResume(); break;
+    case 'U': TrigSlvStop(); break;
+    case 'D': TrigSlvReset(); break;
+    case 'E': TrigSlvSon(); break;
+    case 'F': TrigSlvSoff(); break;
     case 'x': TrigPause();  break;
     case 'v': TrigResume(); break;
     case 'k': TrigStop();   break;
