@@ -536,7 +536,7 @@ localparam DO_BIT_WIDTH = 32;
     assign  sfp0_disable = 1;
     assign  sfp1_disable = 1;
 		
-	ethcat_axi_rout ethcat_axi_rout_u
+	ethcat_axi_rout_mststa ethcat_axi_rout_u
     (
          .clk                   (prot_clk       )
         ,.rst                   (prot_clk_rst   )

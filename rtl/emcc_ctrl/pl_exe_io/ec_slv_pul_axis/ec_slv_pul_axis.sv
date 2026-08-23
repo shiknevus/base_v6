@@ -38,73 +38,76 @@ module ec_slv_pul_axis#(
 		input  		 [19:0]     i_st_rd_addr    ,
 		output 		 [31:0]     o_st_rd_data    ,
 		output 		            o_st_rd_vld     ,
+//----------------------------------------------------- user logic begin -----------------------------------------------------//
+    	input					i_servo_notok       //servo not ok
+    	,input					i_servo_stop        //servo stop
+    	,input					i_axis_limf         //axis limit forward
+    	,input					i_axis_org          //axis origin
+    	,input					i_axis_limb         //axis limit backward
+    	,input					i_emerge_stop_signal//emergency stop signal
 
-    	input						i_servo_notok       //servo not ok
-    	,input						i_servo_stop        //servo stop
-    	,input						i_axis_limf         //axis limit forward
-    	,input						i_axis_org          //axis origin
-    	,input						i_axis_limb         //axis limit backward
-    	,input						i_emerge_stop_signal//emergency stop signal
-    	,input						i_safe_status       //safe status
-    	,input						i_axis_point        //axis in position
-    	,input						i_axis_reset        //axis reset
+   		,input  	            i_safe_status 		//safe status
+   		,input  	            i_axis_point		//axis point
+   		,input  	            i_axis_reset		//axis reset
 
-    	,input						cur_slv_board_id    //current slave board id
-    	,input						slv_board_id        //slave board id
-    	,input						pul_motor_r_flag    //pul motor ready flag
-    	,input						pul_motor_flag      //pul motor flag
-    	,output 	[31:0] 			m2s_pulm_msg        //message  master to slave
-    	,input 		[31:0] 			s2m_pulm_msg       	//message  slave to master
+		//slave board interface
+		,input					cur_slv_board_id    //current slave board id
+		,input					slv_board_id        //slave board id
+		,input					pul_motor_r_flag    //pul motor ready flag
+		,input					pul_motor_flag      //pul motor flag
+		,output 	[31:0] 		m2s_pulm_msg        //message  master to slave
+		,input 		[31:0] 		s2m_pulm_msg       	//message  slave to master
+//----------------------------------------------------- user logic end -------------------------------------------------------//
 
-
-		,output 	            	o_intr_irq
+		,output 	            o_intr_irq
     );
-	
-	
-	localparam		A_BHA_NUM		=	8;	// 1home 2move0 3jog 4move 5getpoint 6son 7soff 8reset
-	localparam		B_BHA_NUM		=	1;
-	
-	//PS-PL    
-	wire 	[7:0]	unit_id         ;     	
-	wire 	[3:0]	unit_ectrl      ;       
-	wire 	[3:0]	unit_st         ;       
-	wire 	[7:0]	m_id            ;     	
-	wire 	[3:0]	m_ectrl         ;       
-	wire 	[3:0]	m_st            ;       
-	wire 	[3:0]	m_wk_mod        ;       
-	wire 			m_saf_st        ;       
-	wire 			link_m_saf_st   ;     
-	wire 	[7:0]	sc_id			;		
-	wire 	[7:0]	ec_id           ;       
-	wire 			rst_en_n        ;	
 
-	wire	[7:0]	a_bhv_id        ;       
-	wire			a_bhv_vld        ;       
-	wire	[31:0]	a_task_id       ;       
-	wire	[19:0]	a_tx_ot         ;       
-	wire	[31:0]	a_tx_result_rpt ;       
-	wire	[19:0]	b_tx_ot         ;       
-	wire	[31:0]	b_tx_result_rpt ;       
+//----------------------------------------------------- user logic begin -----------------------------------------------------//
+	localparam		A_BHA_NUM	=	200;	// 1home 2jog 3move 20jog[safe] 21move[safe] 30getpos
+	localparam		B_BHA_NUM	=	200;
+	localparam		C_BHA_NUM	=	200;
+//----------------------------------------------------- user logic end -------------------------------------------------------//
+	//PS-PL
+	wire 	[7:0]	unit_id         ;
+	wire 	[3:0]	unit_ectrl      ;
+	wire 	[3:0]	unit_st         ;
+	wire 	[7:0]	m_id            ;
+	wire 	[3:0]	m_ectrl         ;
+	wire 	[3:0]	m_st            ;
+	wire 	[3:0]	m_wk_mod        ;
+	wire 			m_saf_st        ;
+	wire 			link_m_saf_st   ;
+	wire 	[9:0]	sc_id			;
+	wire 	[13:0]	ec_id           ;
+	wire 			rst_en_n        ;
+
+	wire	[7:0]	a_bhv_id        ;
+	wire			a_bhv_vld        ;
+	wire	[31:0]	a_task_id       ;
+	wire	[19:0]	a_tx_ot         ;
+	wire	[31:0]	a_tx_result_rpt ;
+	wire	[19:0]	b_tx_ot         ;
+	wire	[31:0]	b_tx_result_rpt ;
 	wire			b_en			;
-	wire	[19:0]	c_tx_ot         ;       
-	wire	[19:0]	c_gap_crl       ;       
-	wire	[31:0]	c_tx_result_rpt ;    
+	wire	[19:0]	c_tx_ot         ;
+	wire	[19:0]	c_gap_crl       ;
+	wire	[31:0]	c_tx_result_rpt ;
 	wire			c_en			;
-	
+
 	//PL-PS
-	wire 			ec_cha_st     ;		
-	wire 			ec_chb_st     ;     
-	wire 			ec_chc_st     ;     
-	wire	[7:0]	a_bhv_typ     ;       
-	wire	[7:0]	a_tx_id       ;     
-	wire	[7:0]	a_alm_num     ;     
-	wire	[7:0]	b_bhv_id      ;            
-	wire	[7:0]	b_tx_id       ;     
-	wire	[7:0]	b_alm_num     ;     
-	wire	[7:0]	c_bhv_id      ;        
-	wire	[7:0]	c_tx_id       ;     
-	wire	[7:0]	c_alm_num     ;  
-	
+	wire 			ec_cha_st     ;
+	wire 			ec_chb_st     ;
+	wire 			ec_chc_st     ;
+	wire	[7:0]	a_bhv_typ     ;
+	wire	[7:0]	a_tx_id       ;
+	wire	[7:0]	a_alm_num     ;
+	wire	[7:0]	b_bhv_id      ;
+	wire	[7:0]	b_tx_id       ;
+	wire	[7:0]	b_alm_num     ;
+	wire	[7:0]	c_bhv_id      ;
+	wire	[7:0]	c_tx_id       ;
+	wire	[7:0]	c_alm_num     ;
+
 	//PS-PL
 	wire [31:0]		param1			;
 	wire [31:0]		param2			;
@@ -136,7 +139,7 @@ module ec_slv_pul_axis#(
 	wire 			param28			;
 	wire 			param29			;
 	wire 			param30			;
-	
+
 	//PL-PS
 	wire 	[31:0]	param51 ;
 	wire 	[31:0]	param52 ;
@@ -159,70 +162,69 @@ module ec_slv_pul_axis#(
 	wire 			param69 ;
 	wire 			param70 ;
 
+	wire	[31:0]	debug_reg1 ;
+	wire	[31:0]	debug_reg2 ;
+	wire	[31:0]	debug_reg3 ;
+	wire	[31:0]	debug_reg4 ;
+	wire	[31:0]	debug_reg5 ;
 
 	wire	[31:0]	task_time_cnt	;
-	
+
 	wire			a_tx_result_vld;
 	wire			b_tx_result_vld;
 	wire			c_tx_result_vld;
-
-	//CDC sync (ps_reg_clk -> clk_i): 2-stage sync + edge detect.
-	reg			a_bhv_vld_r1, a_bhv_vld_r2;
-	reg			a_tx_result_vld_r1, a_tx_result_vld_r2;
-	reg			b_tx_result_vld_r1, b_tx_result_vld_r2;
-	reg			c_tx_result_vld_r1, c_tx_result_vld_r2;
-
-	wire		a_bhv_vld_sync		= a_bhv_vld_r2 & ~a_bhv_vld_r1;
-	wire		a_tx_result_vld_sync	= a_tx_result_vld_r2 & ~a_tx_result_vld_r1;
-	wire		b_tx_result_vld_sync	= b_tx_result_vld_r2 & ~b_tx_result_vld_r1;
-	wire		c_tx_result_vld_sync	= c_tx_result_vld_r2 & ~c_tx_result_vld_r1;
-
-	always @(posedge clk_i) begin
-		a_bhv_vld_r1			<= a_bhv_vld;
-		a_bhv_vld_r2			<= a_bhv_vld_r1;
-		a_tx_result_vld_r1		<= a_tx_result_vld;
-		a_tx_result_vld_r2		<= a_tx_result_vld_r1;
-		b_tx_result_vld_r1		<= b_tx_result_vld;
-		b_tx_result_vld_r2		<= b_tx_result_vld_r1;
-		c_tx_result_vld_r1		<= c_tx_result_vld;
-		c_tx_result_vld_r2		<= c_tx_result_vld_r1;
-	end
 
 	wire 	[A_BHA_NUM-1:0]	a_pre_sta_allow   ;
 	wire 	[A_BHA_NUM-1:0]	a_post_sta_allow  ;
 	wire 	[B_BHA_NUM-1:0]	b_pre_sta_allow   ;
 	wire 	[B_BHA_NUM-1:0]	b_post_sta_allow  ;
-	wire 					c_pre_sta_allow   ;
-	wire 					c_post_sta_allow  ;
-	
+	wire 	[C_BHA_NUM-1:0] c_pre_sta_allow   ;
+	wire 	[C_BHA_NUM-1:0] c_post_sta_allow  ;
+
 	wire	irq_a  ;
 	wire	irq_b  ;
 	wire	irq_c  ;
-	
+
 	wire 	irq_a_grant;
 	wire 	irq_b_grant;
 	wire 	irq_c_grant;
-	
+
 	wire	irq_busy_o	;
-	
+
 	wire 	[31:0]	irq_reg1 ;
 	wire 	[31:0]	irq_reg2 ;
-	
+
 	wire	rst_i;
 	assign	rst_i = !rst_en_n;
-	
+
 	wire	[3:0]	chl_priority;
 	wire	[31:0]	a_task_bhv_id;
 	wire			a_en;
 	wire 	[31:0]	bhv_en;
 
-	wire	[7:0]	a_bhv_id_r;	//driven by proactive_beh output (latched on a_bhv_vld_sync)
+	wire	[7:0]	a_bhv_id_r;
+//----------------------------------------------------- user logic begin -----------------------------------------------------//
+	wire 	[31:0]	param31		;
+	wire 	[31:0]	param32		;
+	wire 	[31:0]	param33		;
+	wire 	[31:0]	param34		;
+	wire 	[31:0]	param35		;
+	wire 	[31:0]	param36		;
+	wire 	[31:0]	param37		;
+	wire 	[0:0]	action_busy	;
+	wire 	[0:0]	action_done	;
+	wire 	[0:0]	action_error;
+	wire 			b_clr_pause	;
+	wire 			b_clr_resume;
+	wire 			b_clr_stop	;
+	wire 			b_pause		;
+	wire 			b_stop		;
+//----------------------------------------------------- user logic end -------------------------------------------------------//
 
-
-	ps_rw_pl_reg#(
+	ps_rw_pl_reg_pul_axis#(
 		.REG_SPACE_BIAS 	(REG_SPACE_BIAS		),
 		.REG_SPACE_SIZE 	(REG_SPACE_SIZE		)
-)ps_rw_pl_reg_u0(
+)ps_rw_pl_reg_pul_axis_u0(
 	.clk_i			        (ps_reg_clk		)
 	,.rst_i			        (ps_reg_reset	)
 	,.i_st_wr_en		    (i_st_wr_en		)
@@ -293,6 +295,18 @@ module ec_slv_pul_axis#(
 	,.param28			    (param28		)
 	,.param29			    (param29		)
 	,.param30				(param30		)
+//----------------------------------------------------- user logic begin -----------------------------------------------------//
+	,.param31				(param31		)
+	,.param32				(param32		)
+	,.param33				(param33		)
+	,.param34				(param34		)
+	,.param35				(param35		)
+	,.param36				(param36		)
+	,.param37				(param37		)
+	,.clr_pause				(b_clr_pause	)
+	,.clr_resume			(b_clr_resume	)
+	,.clr_stop				(b_clr_stop		)
+//----------------------------------------------------- user logic end -------------------------------------------------------//
 	,.irq_reg1	            (irq_reg1		)
 	,.irq_reg2	            (irq_reg2		)
 	,.a_st                  (ec_cha_st		)
@@ -326,6 +340,11 @@ module ec_slv_pul_axis#(
 	,.param68               (param68		)
 	,.param69               (param69		)
 	,.param70               (param70		)
+	,.debug_reg1			(debug_reg1		)
+	,.debug_reg2			(debug_reg2		)
+	,.debug_reg3			(debug_reg3		)
+	,.debug_reg4			(debug_reg4		)
+	,.debug_reg5			(debug_reg5		)
 	);
 
 	proactive_beh_slv_pul_axis#(
@@ -339,19 +358,19 @@ module ec_slv_pul_axis#(
     ,.post_sta_allow       	(a_post_sta_allow	)
 	,.a_en			       	(a_en				)
     ,.a_bhv_id             	(a_bhv_id       	)
-    ,.a_bhv_vld            	(a_bhv_vld_sync 	)
+    ,.a_bhv_vld            	(a_bhv_vld 	    	)
     ,.a_tx_ot              	(a_tx_ot        	)
     ,.a_tx_result_rpt	   	(a_tx_result_rpt	)
-	,.a_tx_result_vld      	(a_tx_result_vld_sync)
+	,.a_tx_result_vld      	(a_tx_result_vld	)
     ,.ec_cha_st            	(ec_cha_st			)
     ,.a_tx_id              	(a_tx_id        	)
     ,.a_alm_num            	(a_alm_num      	)
-    ,.ec_id					(ec_id				)
+	,.ec_id					(ec_id				)
     ,.i_servo_notok			(i_servo_notok		)
     ,.i_servo_stop			(i_servo_stop		)
     ,.i_axis_limf			(i_axis_limf		)
     ,.i_axis_org			(i_axis_org			)
-    ,.i_axis_limb			(i_axis_limb		)	
+    ,.i_axis_limb			(i_axis_limb		)
     ,.i_emerge_stop_signal	(i_emerge_stop_signal)
     ,.i_safe_status			(i_safe_status		)
     ,.i_axis_point			(i_axis_point		)
@@ -366,33 +385,43 @@ module ec_slv_pul_axis#(
     ,.rctrl_drive_on		(param30				)
     ,.rctrl_drive_reset		(param29			    )
     ,.rctrl_resume			(param28			    )
-    ,.rctrl_pause			(				    	)
+    ,.rctrl_pause			(param26			    )
     ,.rctrl_quickstop		(param26			    )
     ,.rcfg_pf_mode			(param16[0]			    )
-    ,.rserv_dir				(param27			    )
-    ,.rserv_step_pulse		({12'd0, param9}		)
-    ,.rserv_target_pulse	({12'd0, param8}		)
-    ,.rcfg_home_spd			(param4[15:0]			)
-    ,.rcfg_home_acc			(param5[15:0]			)
-    ,.rcfg_home_dec			(param6[15:0]			)
-    ,.rcfg_jog_spd			(param4[15:0]			)
-    ,.rcfg_jog_acc			(param5[15:0]			)
-    ,.rcfg_jog_dec			(param6[15:0]			)
-    ,.rcfg_move_spd			(param4[15:0]			)
-    ,.rcfg_move_acc			(param5[15:0]			)
-    ,.rcfg_move_dec			(param6[15:0]			)
-    ,.rcfg_spd_max			(param1[15:0]			)
-    ,.rcfg_acc_max			(param2[15:0]			)
-    ,.rcfg_dec_max			(param3[15:0]			)
-    ,.rcfg_qs_dec			(param7[15:0]			)
-    ,.rcfg_timedly			(					)
-	
-    ,.irq_o                	(irq_a				)
-    ,.irq_ack_i       		(irq_a_grant		)
-	,.state_monitor_o		(param51			)
+    ,.rserv_dir				(param16[0]			    )
+    ,.rserv_step_pulse		(param37				)
+    ,.rserv_target_pulse	(param36				)
+    ,.rcfg_home_spd			(param35				)
+    ,.rcfg_home_acc			(param5					)
+    ,.rcfg_home_dec			(param34				)
+    ,.rcfg_jog_spd			(param35				)
+    ,.rcfg_jog_acc			(param5					)
+    ,.rcfg_jog_dec			(param34				)
+    ,.rcfg_move_spd			(param35				)
+    ,.rcfg_move_acc			(param5					)
+    ,.rcfg_move_dec			(param34				)
+    ,.rcfg_spd_max			(param1					)
+    ,.rcfg_acc_max			(param2					)
+    ,.rcfg_dec_max			(param3					)
+    ,.rcfg_touch_spd		(param33				)
+    ,.rcfg_qs_dec			(param7				    )
+    ,.rcfg_timedly			(param31			    )
+
+//	,.r_pf_abspos			(param51				)
+
+    ,.i_pause				(b_pause				)
+    ,.i_stop				(b_stop					)
+    ,.action_busy			(action_busy			)
+    ,.action_done			(action_done			)
+    ,.action_error			(action_error			)
+    ,.a_bhv_id_r			(a_bhv_id_r				)
+
+    ,.irq_o                	(irq_a					)
+    ,.irq_ack_i       		(irq_a_grant			)
+	,.state_monitor_o		(debug_reg1				)
     );
 
-	 
+
 	status_beh_slv_pul_axis#(
 		.BHA_NUM(B_BHA_NUM	)
 )status_beh_slv_pul_axis_u0(
@@ -404,6 +433,7 @@ module ec_slv_pul_axis#(
 	,.post_sta_allow	    (b_post_sta_allow	)
 	,.b_en	                (b_en				)
 	,.b_bhv_id              (b_bhv_id			)
+	,.state_monitor_o		(debug_reg2			)
 	,.b_tx_ot               (b_tx_ot			)
 	,.b_tx_result_rpt       (b_tx_result_rpt	)
 	,.b_tx_result_vld       (b_tx_result_vld	)
@@ -412,10 +442,19 @@ module ec_slv_pul_axis#(
 	,.b_alm_num             (b_alm_num			)
 	,.di				    ( 					)
 	,.irq_o			        (irq_b				)
-	,.irq_ack_i	            (irq_b_grant		)	
+	,.irq_ack_i	            (irq_b_grant		)
+
+//----------------------------------------------------- user logic begin -----------------------------------------------------//
+    ,.o_dv_reset			(					)
+    ,.o_dv_son				(					)
+    ,.b_pause				(b_pause			)
+    ,.b_stop				(b_stop				)
+//----------------------------------------------------- user logic end -------------------------------------------------------//
     );
-	 
-	tim_beh_slv_pul_axis tim_beh_slv_pul_axis_u0(
+
+	tim_beh_slv_pul_axis#(
+		.BHA_NUM(C_BHA_NUM	)
+	) tim_beh_slv_pul_axis_u0(
     .clk_i                      (clk_i          	)
 	,.rst_i              	    (rst_i         		)
 	,.i_time_1ms_vld   	        (i_time_1ms_vld 	)
@@ -425,6 +464,7 @@ module ec_slv_pul_axis#(
 	,.post_sta_allow	        (c_post_sta_allow	)
 	,.c_en				        (c_en				)
 	,.c_bhv_id                  (c_bhv_id			)
+	,.state_monitor_o			(debug_reg3			)
 	,.c_tx_ot          	        (c_tx_ot			)
 	,.c_tx_result_rpt  	        (c_tx_result_rpt	)
 	,.c_tx_result_vld           (c_tx_result_vld	)
@@ -435,10 +475,11 @@ module ec_slv_pul_axis#(
 	,.irq_o 					(irq_c				)
 	,.irq_ack_i                 (irq_c_grant		)
    );
-	
-		pre_post_sta_check_slv_pul_axis#(
-			.A_BHA_NUM			(A_BHA_NUM	 		)    ,	
-			.B_BHA_NUM			(B_BHA_NUM	 		)  
+
+	pre_post_sta_check_slv_pul_axis#(
+			.A_BHA_NUM			(A_BHA_NUM	 		)    ,
+			.B_BHA_NUM			(B_BHA_NUM	 		),
+			.C_BHA_NUM			(C_BHA_NUM	 		)
 	)pre_post_sta_check_slv_pul_axis_u0(
 			.clk_i				(clk_i			),
 			.rst_i				(rst_i			),
@@ -456,23 +497,23 @@ module ec_slv_pul_axis#(
 			.sc_id				(sc_id			),
 			.ec_id           	(ec_id          ),
 			.a_en				(a_en			),
-			.b_en				(b_en			),	
-			.c_en				(c_en			),	
+			.b_en				(b_en			),
+			.c_en				(c_en			),
 			.a_bhv_id			(a_bhv_id_r		),
 			.b_bhv_id			(b_bhv_id		),
 			.c_bhv_id			(c_bhv_id		),
 			.ec_cha_st			(ec_cha_st		),
 			.ec_chb_st       	(ec_chb_st		),
 			.ec_chc_st       	(ec_chc_st		),
-			.c_circle_time		(c_gap_crl		),	
-			.task_time_cnt		(task_time_cnt	),	
-			.a_pre_sta_allow	(a_pre_sta_allow),	
-			.a_post_sta_allow	(a_post_sta_allow),	
-			.b_pre_sta_allow	(b_pre_sta_allow),	
-			.b_post_sta_allow	(b_post_sta_allow),	
-			.c_pre_sta_allow	(c_pre_sta_allow),	
-			.c_post_sta_allow	(c_post_sta_allow)	
-			
+			.c_circle_time		(c_gap_crl		),
+			.task_time_cnt		(task_time_cnt	),
+			.a_pre_sta_allow	(a_pre_sta_allow),
+			.a_post_sta_allow	(a_post_sta_allow),
+			.b_pre_sta_allow	(b_pre_sta_allow),
+			.b_post_sta_allow	(b_post_sta_allow),
+			.c_pre_sta_allow	(c_pre_sta_allow),
+			.c_post_sta_allow	(c_post_sta_allow)
+
 		,.i_servo_notok			(i_servo_notok		)
 		,.i_servo_stop			(i_servo_stop		)
 		,.i_axis_limf			(i_axis_limf		)
@@ -482,10 +523,25 @@ module ec_slv_pul_axis#(
 		,.i_safe_status			(i_safe_status		)
 		,.i_axis_point			(i_axis_point		)
 		,.i_axis_reset			(i_axis_reset		)
-		,.a_bhv_vld				(a_bhv_vld_sync		)
+		,.a_bhv_vld				(a_bhv_vld			)
+//----------------------------------------------------- user logic begin -----------------------------------------------------//
+		,.action_busy			(action_busy		)
+		,.action_done			(action_done		)
+		,.action_error			(action_error		)
+
+		,.rctrl_drive_on		(param30			)
+		,.rctrl_drive_reset		(param29			)
+		,.rctrl_resume			(param28			)
+		,.rctrl_pause			(param26			)
+		,.rctrl_stop			(param27			)
+		,.rserv_dir				(param27			)
+		,.b_clr_pause			(b_clr_pause		)
+		,.b_clr_resume			(b_clr_resume		)
+		,.b_clr_stop			(b_clr_stop			)
+//----------------------------------------------------- user logic end -------------------------------------------------------//
     );
-		
-	irq_3i1o_arbitrator irq_3i1o_arbitrator_u0(
+
+	irq_3i1o_arbitrator_pul_axis irq_3i1o_arbitrator_u0(
 		.clk_i              (clk_i            	)
 		,.rst_i             (rst_i           	)
 		,.sc_id             (sc_id            	)
@@ -510,12 +566,9 @@ module ec_slv_pul_axis#(
 		,.irq_reg2_o		(irq_reg2			)
 		,.irq_o				(o_intr_irq			)
 		,.irq_busy_o		(irq_busy_o			)
-		,.irq_receive_ack_i (a_tx_result_vld_sync || b_tx_result_vld_sync || c_tx_result_vld_sync)
+		,.irq_ack_a_i		(a_tx_result_vld	)
+		,.irq_ack_b_i		(b_tx_result_vld	)
+		,.irq_ack_c_i		(c_tx_result_vld	)
     );
-	
-	
-	
-	
-	
-	
+
 endmodule

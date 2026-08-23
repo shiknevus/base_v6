@@ -20,7 +20,11 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module combine(
+module combine
+#(
+ parameter  YUZHI   = 1000
+)
+(
     input clock,
     input reset,
     input c_w_en,
@@ -39,37 +43,33 @@ module combine(
     output reg [31:0] com_id_data,
     output reg com_id_f
     );
-   (* MARK_DEBUG="true" *) reg[5:0]state;
-  
+
+    localparam  STM_D_IDLE       = 'd0;    // state_data/addr_distribution
+    localparam  STM_D_STARE      = 'd1;    // state_data/addr_distribution
+    localparam  STM_D_W_0_7      = 'd2;    //data_w 0_7bit
+    localparam  STM_D_Wait0      = 'd3;    //data_w 0_7bit   
+    localparam  STM_D_W_8_15     = 'd4;    //data_w 8_15bit
+    localparam  STM_D_Wait1      = 'd5;    //data_w 0_7bit 
+    localparam  STM_D_W_16_23    = 'd6;    //data_w 16_23bit
+    localparam  STM_D_Wait2      = 'd7;    //data_w 0_7bit 
+    localparam  STM_D_W_24_31    = 'd8;    //data_w 24_31bit 
+    localparam  STM_D_Wait3      = 'd9;    //data_w 0_7bit 
+    localparam  STM_D_END        = 'd10;    //state_data/connect
+    
+    localparam  STM_D_R_0_7      = 'd11;    //data_r 0_7bit
+    localparam  STM_D_R_8_15     = 'd12;    //data_r 8_15bit
+    localparam  STM_D_R_16_23    = 'd13;    //data_r 16_23bit
+    localparam  STM_D_R_24_31    = 'd14;    //data_r 24_31bit 
+    
+    (* MARK_DEBUG="true" *) reg[7:0]state;
     reg iic_rd_end_d1;
     reg iic_wd_end_d1;
    (* MARK_DEBUG="true" *) reg iic_rd_end_r;
    (* MARK_DEBUG="true" *) reg iic_wd_end_r;
 
    reg[31:0]data_D=0;
-   reg[7:0]jishu=0;
+   reg[32:0]count=0;
    reg[15:0]addr_D=0;
-  //(* MARK_DEBUG="true" *)  reg[7:0]iic_com_data_1=0;
-  //(* MARK_DEBUG="true" *)  reg[7:0]iic_com_data_2=0;
-  //(* MARK_DEBUG="true" *)  reg[7:0]iic_com_data_3=0;
-  //(* MARK_DEBUG="true" *)  reg[7:0]iic_com_data_4=0;
-   
-    //reg[15:0]addr_1=0;
-    //reg[15:0]addr_2=0;
-    //reg[15:0]addr_3=0;
-    //reg[15:0]addr_4=0;
-    
-    parameter  STM_D_D          = 'd0;    // state_data/addr_distribution
-    parameter  STM_D_W_0_7      = 'd1;    //data_w 0_7bit
-    parameter  STM_D_W_8_15     = 'd2;    //data_w 8_15bit
-    parameter  STM_D_W_16_23    = 'd3;    //data_w 16_23bit
-    parameter  STM_D_W_24_31    = 'd4;    //data_w 24_31bit 
-    parameter  STM_D_C          = 'd5;    //state_data/connect
-    
-    parameter  STM_D_R_0_7      = 'd6;    //data_r 0_7bit
-    parameter  STM_D_R_8_15     = 'd7;    //data_r 8_15bit
-    parameter  STM_D_R_16_23    = 'd8;    //data_r 16_23bit
-    parameter  STM_D_R_24_31    = 'd9;    //data_r 24_31bit 
     
 //iic_rd_end_r
   always@(posedge clock)begin
@@ -84,7 +84,7 @@ module combine(
 //com_iic_data--iic_com_data--
   always@(posedge clock)begin
           case(state)
-            STM_D_D:begin
+            STM_D_IDLE:begin
                 data_D[31:0]<=data[31:0];
             end
             STM_D_W_0_7:begin
@@ -119,7 +119,7 @@ module combine(
                     //iic_com_data_4<=iic_com_data;
                 end    
             end
-            STM_D_C:begin
+            STM_D_END:begin
                     com_id_data<=com_id_data;
             end
             STM_D_R_0_7:begin
@@ -168,10 +168,6 @@ module combine(
                     addr_l<=addr_l;
                 end
             end
-            STM_D_C:begin
-                    addr_u<=addr_u;
-                    addr_l<=addr_l;
-            end
             STM_D_R_0_7,STM_D_R_8_15,STM_D_R_16_23,STM_D_R_24_31:begin
                 if(iic_rd_end_r==0)begin
                     addr_u<=addr_D[15:8];
@@ -181,12 +177,16 @@ module combine(
                     addr_l<=addr_l;
                 end
             end
+            default:begin
+                    addr_u<=addr_u;
+                    addr_l<=addr_l;
+            end
           endcase
   end  
 //addr_D  
   always@(posedge clock)begin
           case(state)
-            STM_D_D:begin
+            STM_D_IDLE:begin
                 addr_D<=addr;
             end
             STM_D_W_0_7,STM_D_W_8_15,STM_D_W_16_23,STM_D_W_24_31:begin
@@ -196,10 +196,6 @@ module combine(
                     addr_D<=addr_D+1;
                 end
             end
-            
-            STM_D_C:begin
-                    addr_D<=addr_D;
-            end
             STM_D_R_0_7,STM_D_R_8_15,STM_D_R_16_23,STM_D_R_24_31:begin
                 if(iic_rd_end_r==0)begin
                     addr_D<=addr_D;
@@ -207,53 +203,106 @@ module combine(
                     addr_D<=addr_D+1;
                 end
             end
+            default:begin
+                addr_D<=addr_D;
+            end
           endcase
-  end      
+  end 
+  /////count  
+ always@(posedge clock)begin
+        if(!reset||(c_w_en==0&&c_r_en==0))begin
+            count<=0;  
+        end else begin
+          case(state)
+              STM_D_Wait0,STM_D_Wait1,STM_D_Wait2,STM_D_Wait3:begin
+                if(count==YUZHI)begin
+                    count<=0;
+                end else begin
+                    count<=count+1;
+                end
+              end
+              default:begin
+                    count<=0;
+              end
+          endcase  
+        end       
+  end     
 //state
   always@(posedge clock)begin
         if(!reset||(c_w_en==0&&c_r_en==0))begin
-            state<=STM_D_D;
+            state<=STM_D_IDLE;
         end else begin
           case(state) 
-              STM_D_D:begin
+              STM_D_IDLE:begin
+                   state<=STM_D_STARE;
+              end
+              STM_D_STARE:begin
                    if(c_w_en==1&&c_r_en==0)begin
                       state<=STM_D_W_0_7;
                    end else if(c_w_en==0&&c_r_en==1)begin
                       state<=STM_D_R_0_7;
                    end else begin
-                      state<=STM_D_D;
+                      state<=STM_D_STARE;
                    end
               end
               STM_D_W_0_7:begin
                     if(iic_wd_end_r==1)begin
-                        state<=STM_D_W_8_15;
+                        state<=STM_D_Wait0;
                     end else begin
                         state<=STM_D_W_0_7;
                     end    
               end
+              STM_D_Wait0:begin
+                    if(count==YUZHI)begin
+                        state<=STM_D_W_8_15;
+                    end else begin
+                        state<=STM_D_Wait0;
+                    end    
+              end
               STM_D_W_8_15:begin
                     if(iic_wd_end_r==1)begin
-                        state<=STM_D_W_16_23;
+                        state<=STM_D_Wait1;
                     end else begin
                         state<=STM_D_W_8_15;
                     end    
               end
+              STM_D_Wait1:begin
+                    if(count==YUZHI)begin
+                        state<=STM_D_W_16_23;
+                    end else begin
+                        state<=STM_D_Wait1;
+                    end    
+              end
               STM_D_W_16_23:begin
                     if(iic_wd_end_r==1)begin
-                        state<=STM_D_W_24_31;
+                        state<=STM_D_Wait2;
                     end else begin
                         state<=STM_D_W_16_23;
                     end    
               end
+              STM_D_Wait2:begin
+                    if(count==YUZHI)begin
+                        state<=STM_D_W_24_31;
+                    end else begin
+                        state<=STM_D_Wait2;
+                    end    
+              end
               STM_D_W_24_31:begin
                     if(iic_wd_end_r==1)begin
-                        state<=STM_D_D;
+                        state<=STM_D_Wait3;
                     end else begin
                         state<=STM_D_W_24_31;
                     end    
               end
-              STM_D_C:begin
-                        state<=STM_D_D;
+              STM_D_Wait3:begin
+                     if(count==YUZHI)begin
+                        state<=STM_D_END;
+                    end else begin
+                        state<=STM_D_Wait3;
+                    end    
+              end
+              STM_D_END:begin
+                    state<=STM_D_IDLE;
               end
               
               STM_D_R_0_7:begin
@@ -279,10 +328,13 @@ module combine(
               end
               STM_D_R_24_31:begin
                     if(iic_rd_end_r==1)begin
-                        state<=STM_D_C;
+                        state<=STM_D_END;
                     end else begin
                         state<=STM_D_R_24_31;
                     end    
+              end
+              default:begin
+                    state<=STM_D_IDLE;
               end
           endcase
         end
@@ -293,10 +345,6 @@ module combine(
             com_id_f<=0;
         end else begin
           case(state) 
-              STM_D_D,STM_D_W_0_7,STM_D_W_8_15,STM_D_W_16_23,STM_D_C,
-              STM_D_R_0_7,STM_D_R_8_15,STM_D_R_16_23:begin
-                      com_id_f<=0;
-              end
               STM_D_W_24_31:begin
                     if(iic_wd_end_r==1)begin
                         com_id_f<=1;
@@ -311,84 +359,53 @@ module combine(
                         com_id_f<=0;
                     end    
               end
+              default:begin
+                    com_id_f<=0;
+              end
           endcase
         end
   end
-  //w_en----r_en
+  //w_en
   always@(posedge clock)begin
-   if(c_w_en==1&&c_r_en==0)begin  
-        if(jishu==0)begin
+        if(!reset||(c_w_en==0&&c_r_en==0))begin
             w_en<=0;
+        end else begin
+          case(state) 
+              STM_D_Wait0,STM_D_Wait1,STM_D_Wait2,STM_D_Wait3:begin
+                    if(count==YUZHI)begin
+                        w_en<=0;
+                    end else begin
+                        w_en<=1;
+                    end    
+              end
+              STM_D_W_0_7,STM_D_W_8_15,STM_D_W_16_23,STM_D_W_24_31:begin
+                    w_en<=1;  
+              end
+              default:begin
+                    w_en<=0;
+              end
+          endcase
+        end
+  end 
+//r_en
+  always@(posedge clock)begin
+        if(!reset||(c_w_en==0&&c_r_en==0))begin
             r_en<=0;
-            jishu<=jishu+1;
-        end else if(jishu==1)begin
-            w_en<=1;
-            r_en<=0;
-            jishu<=jishu+1;
-        end else if(jishu==2)begin
-            w_en<=0;
-            r_en<=0;
-            jishu<=jishu+1;
-        end else if(jishu==3)begin
-            w_en<=1;
-            r_en<=0;
-            jishu<=jishu+1;
-        end else if(jishu==4)begin
-            w_en<=0;
-            r_en<=0;
-            jishu<=jishu+1;
-        end else if(jishu==5)begin
-            w_en<=1;
-            r_en<=0;
-            jishu<=jishu+1;
-        end else if(jishu==6)begin
-            w_en<=0;
-            r_en<=0;
-            jishu<=jishu+1;
-        end else if(jishu==7)begin
-            w_en<=1;
-            r_en<=0;
-            jishu<=0;
-        end   
-   end else if(c_w_en==0&&c_r_en==1)begin  
-        if(jishu==0)begin
-            w_en<=0;
-            r_en<=0;
-            jishu<=jishu+1;
-        end else if(jishu==1)begin
-            w_en<=0;
-            r_en<=1;
-            jishu<=jishu+1;
-        end else if(jishu==2)begin
-            w_en<=0;
-            r_en<=0;
-            jishu<=jishu+1;
-        end else if(jishu==3)begin
-            w_en<=0;
-            r_en<=1;
-            jishu<=jishu+1;
-        end else if(jishu==4)begin
-            w_en<=0;
-            r_en<=0;
-            jishu<=jishu+1;
-        end else if(jishu==5)begin
-            w_en<=0;
-            r_en<=1;
-            jishu<=jishu+1;
-        end else if(jishu==6)begin
-            w_en<=0;
-            r_en<=0;
-            jishu<=jishu+1;
-        end else if(jishu==7)begin
-            w_en<=0;
-            r_en<=1;
-            jishu<=0;
-        end   
-   end else begin
-            w_en<=0;
-            r_en<=0;
-            jishu<=0;      
-   end
+        end else begin
+          case(state) 
+              STM_D_R_0_7,STM_D_R_8_15,STM_D_R_16_23,STM_D_R_24_31:begin
+                    if(iic_rd_end_r==1)begin
+                        r_en<=0;
+                    end else begin
+                        r_en<=1;
+                    end    
+              end
+              default:begin
+                    r_en<=0;
+              end
+          endcase
+        end
   end
-
 endmodule
+        
+        

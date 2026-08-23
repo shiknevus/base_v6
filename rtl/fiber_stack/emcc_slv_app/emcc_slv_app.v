@@ -29,10 +29,9 @@ module emcc_slv_app
     ,input      [15:0]  each_dg_len
 
     ,output wire        app_send_req
-    ,input              app_send_ack
-
+    ,input               app_send_ack
     ,output wire        app_rcv_req
-    ,input              app_rcv_ack
+    ,input               app_rcv_ack
     
     //send buffer
     ,output wire                        send_buf_ena
@@ -49,19 +48,25 @@ module emcc_slv_app
     ,output wire    [RAM_DWIDTH-1:0]    app_cfg_dina
     ,output wire                        driver_cfg_msg_wr_req
     ,input  wire                        driver_cfg_msg_wr_ack
-
     ,output wire                        rd_msg_addr_en
     ,output wire    [RAM_AWIDTH-1:0]    rd_msg_addr
 
     ,input  wire    [31:0]              do_regoin_msg
     ,input  wire    [31:0]              di_regoin_msg
-
     ,input  wire    [31:0]              ai_regoin_msg
-
-
-    ,input  wire    [31:0]              rs232_1st_msg
-    ,input  wire    [31:0]              rs232_2nd_msg
-    ,output reg         tst_sig
+    ,input  wire    [31:0]              rs232_ch0_msg
+    ,input  wire    [31:0]              rs232_ch1_msg
+    ,input  wire    [31:0]              rs232_ch2_msg
+    ,input  wire    [31:0]              rs232_ch3_msg
+    ,input  wire    [31:0]              rs232_ch4_msg
+    ,input  wire    [31:0]              rs232_ch5_msg
+    ,input  wire    [31:0]              rs232_ch6_msg
+    ,input  wire    [31:0]              rs232_ch7_msg
+    ,input  wire    [31:0]              rs485_ch8_msg
+    ,input  wire    [31:0]              pul_motor0_msg
+    ,input  wire    [31:0]              pul_motor1_msg
+    ,input  wire    [31:0]              pul_motor2_msg
+    ,input  wire    [31:0]              pul_motor3_msg
 );
     reg     [31:0]  tst_cnt;
     wire            app_tx_pulse;
@@ -102,7 +107,6 @@ module emcc_slv_app
             
             //to tx module
             ,.intf_tst_flag         (intf_tst_flag          )
-            ,.tst_sig       ()
         );
 
     slv_app_send
@@ -118,10 +122,8 @@ module emcc_slv_app
             ,.app_tx_pulse  (app_tx_pulse   )
             ,.pre_uuid      (pre_uuid       )
             ,.cur_uuid      (cur_uuid       )
-            
             ,.slv_sta_num   (slv_sta_num    )
             ,.each_dg_len   (each_dg_len    )
-
             ,.app_send_req  (app_send_req   )
             ,.app_send_ack  (app_send_ack   )
 
@@ -136,21 +138,26 @@ module emcc_slv_app
             ,.id_regoin_msg (id_regoin_msg  )
             ,.do_regoin_msg (do_regoin_msg  )
             ,.di_regoin_msg (di_regoin_msg  )
-
             ,.ai_regoin_msg (ai_regoin_msg  )
+            ,.rs232_ch0_msg (rs232_ch0_msg  )
+            ,.rs232_ch1_msg (rs232_ch1_msg  )
+            ,.rs232_ch2_msg (rs232_ch2_msg  )
+            ,.rs232_ch3_msg (rs232_ch3_msg  )
+            ,.rs232_ch4_msg (rs232_ch4_msg  )
+            ,.rs232_ch5_msg (rs232_ch5_msg  )
+            ,.rs232_ch6_msg (rs232_ch6_msg  )
+            ,.rs232_ch7_msg (rs232_ch7_msg  )
+            ,.rs485_ch8_msg (rs485_ch8_msg  )
+            ,.pul_motor0_msg (pul_motor0_msg  )
+            ,.pul_motor1_msg (pul_motor1_msg  )
+            ,.pul_motor2_msg (pul_motor2_msg  )
+            ,.pul_motor3_msg (pul_motor3_msg  )
 
-            ,.rs232_1st_msg (rs232_1st_msg  )
-            ,.rs232_2nd_msg (rs232_2nd_msg  )
-           
             ,.intf_tst_flag     (intf_tst_flag)
             ,.rx_wr_txbuf_wen   (app_cfg_wea    )
             ,.rx_wr_txbuf_addr  (app_cfg_addra  )
             ,.rx_wr_txbuf_data  (app_cfg_dina   )
-
         );
 
-//    always @(posedge clk)begin
-//        tst_cnt <=  `DEPOT_BIAS_RS485_1ST;
-//    end
 endmodule
 

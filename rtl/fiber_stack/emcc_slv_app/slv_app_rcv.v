@@ -45,16 +45,13 @@ module slv_app_rcv
     ,input  wire                        driver_cfg_msg_wr_ack
     
     ,output reg                         app_tx_pulse
-    ,   (* MARK_DEBUG="true" *) output reg     [31:0]              pre_uuid
-    ,   (* MARK_DEBUG="true" *)output reg     [31:0]              cur_uuid
+    ,output reg     [31:0]              pre_uuid
+    ,output reg     [31:0]              cur_uuid
     ,output reg                         ping_pong_flag          //operation buffer:0 ping buffer,1 pong buffer
 
     ,output reg                         intf_tst_flag
-    ,output reg                         tst_sig
 );
 
-(* MARK_DEBUG="true" *)    reg [31:0]  work_cnt = 0;
-    
     localparam  STM_IDLE        = 'd0;
     localparam  STM_RD_RCV_UID  = 'd1;
     localparam  STM_CK_RCV_UID  = 'd2;
@@ -67,9 +64,9 @@ module slv_app_rcv
     localparam  STM_DRIVER_HS   = 'd11;//handshake with driver module
     localparam  STM_DRIVER_CFG  = 'd12;//config driver module
     localparam  STM_END         = 'd13;
-   (* MARK_DEBUG="true" *)    reg [4:0] wk_state  = 'd0;
-    reg [4:0] wk_state_d1 = 'd0;
-    reg [4:0] wk_state_d2 = 'd0;
+    reg [4:0]   wk_state  = 'd0;
+    reg [4:0]   wk_state_d1 = 'd0;
+    reg [4:0]   wk_state_d2 = 'd0;
     reg         work_cnt_done;
     reg [RAM_DWIDTH-1:0]    rcv_buf_douta_d1;
     reg [15:0]  slv_dg_index;
@@ -88,11 +85,12 @@ module slv_app_rcv
     reg [RAM_AWIDTH-1:0]    cfg_msg_rd_addr_d2;
     wire[RAM_DWIDTH-1:0]    cfg_msg_rd_dat;
 
-    reg     [3:0]               app_rslt_wea;
-    reg     [RAM_AWIDTH-1:0]    app_rslt_addra;
-    reg     [RAM_DWIDTH-1:0]    app_rslt_dina;
-    reg     [31:0]              cur_uuid_d1;
-   (* MARK_DEBUG="true" *)        reg                         err_flag  =   'd0;
+    reg [3:0]               app_rslt_wea;
+    reg [RAM_AWIDTH-1:0]    app_rslt_addra;
+    reg [RAM_DWIDTH-1:0]    app_rslt_dina;
+    reg [31:0]              cur_uuid_d1;
+    reg                     err_flag  =   'd0;
+    reg [31:0]              work_cnt = 0;
     
     always @(posedge clk)begin
         cur_uuid_d1 <=  cur_uuid;
@@ -215,7 +213,7 @@ module slv_app_rcv
                 slv_dg_index    <=  'd0;
             end
             STM_RD_ONCE_END:begin
-                slv_dg_index    <=  slv_dg_index    +   1;
+                slv_dg_index    <=  slv_dg_index + 1;
             end
             default: begin
                 slv_dg_index    <=  slv_dg_index;
@@ -388,39 +386,32 @@ module slv_app_rcv
     #(
          .RAM_DWIDTH    (RAM_DWIDTH  )
         ,.RAM_DEPTH     (RAM_DEPTH   )
-        ,.TYPE          ("TRUE"      )
+        ,.TYPE          ("TRUE"     )
     )
-        app_depot_u
-        (
-             .clka  (clk                )
-            ,.ena   (1                  )
-            ,.wea   (app_rslt_wea       )
-            ,.addra (app_rslt_addra     )
-            ,.dina  (app_rslt_dina      )
-            ,.douta (                   )
-            ,.clkb  (clk        )
-            ,.enb   (1                  )
-            ,.web   (0                  )
-            ,.addrb (cfg_msg_rd_addr    )
-            ,.dinb  (                   )
-            ,.doutb (cfg_msg_rd_dat     )
-        );
+    app_depot_u
+    (
+         .clka  (clk                )
+        ,.ena   (1                  )
+        ,.wea   (app_rslt_wea       )
+        ,.addra (app_rslt_addra     )
+        ,.dina  (app_rslt_dina      )
+        ,.douta (                   )
+        ,.clkb  (clk                )
+        ,.enb   (1                  )
+        ,.web   (0                  )
+        ,.addrb (cfg_msg_rd_addr    )
+        ,.dinb  (                   )
+        ,.doutb (cfg_msg_rd_dat     )
+    );
 
     always @(posedge clk)begin
         cfg_msg_rd_addr_d1  <=  cfg_msg_rd_addr;
         cfg_msg_rd_addr_d2  <=  cfg_msg_rd_addr_d1;
-        
         cfg_msg_rd_en_d1    <=  cfg_msg_rd_en;
         cfg_msg_rd_en_d2    <=  cfg_msg_rd_en_d1;
-        
-        
         app_cfg_wea         <=  cfg_msg_rd_en_d2;
         app_cfg_addra       <=  cfg_msg_rd_addr_d2;
         app_cfg_dina        <=  cfg_msg_rd_dat;
-    end
-
-    always @(posedge clk)begin
-        tst_sig <=  1;
     end
 
 endmodule

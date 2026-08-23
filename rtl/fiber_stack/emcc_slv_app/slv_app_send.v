@@ -30,11 +30,9 @@ module slv_app_send
     ,input  [31:0]      cur_uuid
     
     ,input  wire[7:0]   slv_sta_num     //this signals only update during first initial datagram.It indicate the number of slave station
-    
-    ,input      [15:0]  each_dg_len
-
+    ,input  [15:0]       each_dg_len
     ,output reg         app_send_req
-    ,input              app_send_ack
+    ,input               app_send_ack
     
     //receive buffer
     ,output wire                        send_buf_ena
@@ -43,43 +41,32 @@ module slv_app_send
     ,output reg     [RAM_DWIDTH-1:0]    send_buf_dina
     
     ,input  wire    [31:0]              id_regoin_msg
-
     ,input  wire    [31:0]              do_regoin_msg
     ,input  wire    [31:0]              di_regoin_msg
-
-   // ,input  wire    [31:0]              ao_regoin_msg
     ,input  wire    [31:0]              ai_regoin_msg
+    ,input  wire    [31:0]              rs232_ch0_msg
+    ,input  wire    [31:0]              rs232_ch1_msg
+    ,input  wire    [31:0]              rs232_ch2_msg
+    ,input  wire    [31:0]              rs232_ch3_msg
+    ,input  wire    [31:0]              rs232_ch4_msg
+    ,input  wire    [31:0]              rs232_ch5_msg
+    ,input  wire    [31:0]              rs232_ch6_msg
+    ,input  wire    [31:0]              rs232_ch7_msg
+    ,input  wire    [31:0]              rs485_ch8_msg
+    ,input  wire    [31:0]              pul_motor0_msg
+    ,input  wire    [31:0]              pul_motor1_msg
+    ,input  wire    [31:0]              pul_motor2_msg
+    ,input  wire    [31:0]              pul_motor3_msg
 
     ,output reg                         rd_msg_addr_en
     ,output reg     [RAM_AWIDTH-1:0]    rd_msg_addr
-
-//    ,input  wire    [31:0]              axis_1st_msg
-//    ,input  wire    [31:0]              axis_2nd_msg
-//    ,input  wire    [31:0]              axis_3rd_msg
-//    ,input  wire    [31:0]              axis_4th_msg
-    
-    ,input  wire    [31:0]              rs232_1st_msg
-    ,input  wire    [31:0]              rs232_2nd_msg
-//    ,input  wire    [31:0]              rs232_3rd_msg
-//    ,input  wire    [31:0]              rs232_4th_msg
-//    ,input  wire    [31:0]              rs232_5th_msg
-//    ,input  wire    [31:0]              rs232_6th_msg
-//    ,input  wire    [31:0]              rs232_7th_msg
-//    ,input  wire    [31:0]              rs232_8th_msg
-
-//    ,input  wire    [31:0]              rs485_1st_msg
 
 //rx module
     ,input  wire                        intf_tst_flag
     ,input  wire                        rx_wr_txbuf_wen
     ,input  wire    [RAM_AWIDTH-1:0]    rx_wr_txbuf_addr
     ,input  wire    [RAM_DWIDTH-1:0]    rx_wr_txbuf_data
-
-    ,output reg         tst_sig
 );
-
-(* MARK_DEBUG="true" *)    reg [31:0]  work_cnt = 0;
-
     localparam  STM_IDLE        = 'd0;
     localparam  STM_TX_HS       = 'd3;//this state check that the portocol buffer is busying now?
     localparam  STM_RD_DAT      = 'd7;//read data from protocol buffer to application buffer
@@ -87,9 +74,10 @@ module slv_app_send
     localparam  STM_RD_FINISH   = 'd9;
     localparam  STM_CHECK_RSLT  = 'd10;//this state is no use in slave station mode
     localparam  STM_END         = 'd13;
-   (* MARK_DEBUG="true" *)    reg [4:0] wk_state  = 'd0;
-    reg [4:0] wk_state_d1 = 'd0;
-    reg [4:0] wk_state_d2 = 'd0;
+    reg [4:0]   wk_state  = 'd0;
+    reg [31:0]  work_cnt = 0;
+    reg [4:0]   wk_state_d1 = 'd0;
+    reg [4:0]   wk_state_d2 = 'd0;
     reg         work_cnt_done;
     reg [15:0]  slv_dg_index;
     reg [7:0]   slv_sta_num_d1;
@@ -192,7 +180,7 @@ module slv_app_send
                 slv_dg_index    <=  'd0;
             end
             STM_RD_ONCE_END:begin
-                slv_dg_index    <=  slv_dg_index    +   1;
+                slv_dg_index    <=  slv_dg_index + 1;
             end
             default: begin
                 slv_dg_index    <=  slv_dg_index;
@@ -278,21 +266,20 @@ module slv_app_send
     assign  msg_array[0]    =   cur_uuid;
     assign  msg_array[1]    =   do_regoin_msg;
     assign  msg_array[2]    =   di_regoin_msg;
-//    assign  msg_array[3]    =   ao_regoin_msg;
-    assign  msg_array[4]    =   ai_regoin_msg;
-//    assign  msg_array[5]    =   axis_1st_msg;
-//    assign  msg_array[6]    =   axis_2nd_msg;
-//    assign  msg_array[7]    =   axis_3rd_msg;
-//    assign  msg_array[8]    =   axis_4th_msg;
-    assign  msg_array[9]    =   rs232_1st_msg;
-    assign  msg_array[10]   =   rs232_2nd_msg;
-//    assign  msg_array[11]   =   rs232_3rd_msg;
-//    assign  msg_array[12]   =   rs232_4th_msg;
-//    assign  msg_array[13]   =   rs232_5th_msg;
-//    assign  msg_array[14]   =   rs232_6th_msg;
-//    assign  msg_array[15]   =   rs232_7th_msg;
-//    assign  msg_array[16]   =   rs232_8th_msg;
-//    assign  msg_array[17]   =   rs485_1st_msg;
+    assign  msg_array[3]    =   ai_regoin_msg;
+    assign  msg_array[4]    =   rs232_ch0_msg;
+    assign  msg_array[5]    =   rs232_ch1_msg;
+    assign  msg_array[6]    =   rs232_ch2_msg;
+    assign  msg_array[7]    =   rs232_ch3_msg;
+    assign  msg_array[8]    =   rs232_ch4_msg;
+    assign  msg_array[9]    =   rs232_ch5_msg;
+    assign  msg_array[10]   =   rs232_ch6_msg;
+    assign  msg_array[11]   =   rs232_ch7_msg;
+    assign  msg_array[12]   =   rs485_ch8_msg;
+    assign  msg_array[13]   =   pul_motor0_msg;
+    assign  msg_array[14]   =   pul_motor1_msg;
+    assign  msg_array[15]   =   pul_motor2_msg;
+    assign  msg_array[16]   =   pul_motor3_msg;
 
     always @(posedge clk)begin
         if(reset)begin
@@ -305,36 +292,34 @@ module slv_app_send
             rd_msg_data <=  msg_array[1];
         end else if ((rd_msg_addr_d2 >= `DEPOT_BIAS_DI) & (rd_msg_addr_d2 < `DEPOT_BIAS_AI))begin
             rd_msg_data <=  msg_array[2];
-    //    end else if ((rd_msg_addr_d2 >= `DEPOT_BIAS_AO) & (rd_msg_addr_d2 < `DEPOT_BIAS_AI))begin
-    //        rd_msg_data <=  msg_array[3];
-        end else if ((rd_msg_addr_d2 >= `DEPOT_BIAS_AI) & (rd_msg_addr_d2 < `DEPOT_BIAS_RS232_1ST))begin
+        end else if ((rd_msg_addr_d2 >= `DEPOT_BIAS_AI) & (rd_msg_addr_d2 < `DEPOT_BIAS_RS232_CH0))begin
+            rd_msg_data <=  msg_array[3];
+        end else if ((rd_msg_addr_d2 >= `DEPOT_BIAS_RS232_CH0) & (rd_msg_addr_d2 < `DEPOT_BIAS_RS232_CH1))begin
             rd_msg_data <=  msg_array[4];
-//        end else if ((rd_msg_addr_d2 >= `DEPOT_BIAS_AXIS_1ST) & (rd_msg_addr_d2 < `DEPOT_BIAS_AXIS_2ND))begin
-//            rd_msg_data <=  msg_array[5];
-//        end else if ((rd_msg_addr_d2 >= `DEPOT_BIAS_AXIS_2ND) & (rd_msg_addr_d2 < `DEPOT_BIAS_AXIS_3RD))begin
-//            rd_msg_data <=  msg_array[6];
-//        end else if ((rd_msg_addr_d2 >= `DEPOT_BIAS_AXIS_3RD) & (rd_msg_addr_d2 < `DEPOT_BIAS_AXIS_4TH))begin
-//            rd_msg_data <=  msg_array[7];
-//        end else if ((rd_msg_addr_d2 >= `DEPOT_BIAS_AXIS_4TH) & (rd_msg_addr_d2 < `DEPOT_BIAS_RS232_1ST))begin
-//           rd_msg_data <=  msg_array[8];
-        end else if ((rd_msg_addr_d2 >= `DEPOT_BIAS_RS232_1ST) & (rd_msg_addr_d2 < `DEPOT_BIAS_RS232_2ND))begin
-            rd_msg_data <=  msg_array[9];
-        end else if ((rd_msg_addr_d2 >= `DEPOT_BIAS_RS232_2ND) & (rd_msg_addr_d2 < `DEPOT_BIAS_RS232_2ND+`DEPOT_SIZE_RS232_2ND))begin
-            rd_msg_data <=  msg_array[10];
-//        end else if ((rd_msg_addr_d2 >= `DEPOT_BIAS_RS232_3RD) & (rd_msg_addr_d2 < `DEPOT_BIAS_RS232_4TH))begin
-//            rd_msg_data <=  msg_array[11];
-//        end else if ((rd_msg_addr_d2 >= `DEPOT_BIAS_RS232_4TH) & (rd_msg_addr_d2 < `DEPOT_BIAS_RS232_5TH))begin
-//            rd_msg_data <=  msg_array[12];
-//        end else if ((rd_msg_addr_d2 >= `DEPOT_BIAS_RS232_5TH) & (rd_msg_addr_d2 < `DEPOT_BIAS_RS232_6TH))begin
-//            rd_msg_data <=  msg_array[13];
-//        end else if ((rd_msg_addr_d2 >= `DEPOT_BIAS_RS232_6TH) & (rd_msg_addr_d2 < `DEPOT_BIAS_RS232_7TH))begin
-//            rd_msg_data <=  msg_array[14];//d
-//        end else if ((rd_msg_addr_d2 >= `DEPOT_BIAS_RS232_7TH) & (rd_msg_addr_d2 < `DEPOT_BIAS_RS232_8TH))begin
-//            rd_msg_data <=  msg_array[15];//e
-//        end else if ((rd_msg_addr_d2 >= `DEPOT_BIAS_RS232_8TH) & (rd_msg_addr_d2 < `DEPOT_BIAS_RS485_1ST))begin
-//            rd_msg_data <=  msg_array[16];
-//        end else if ((rd_msg_addr_d2 >= `DEPOT_BIAS_RS485_1ST) & (rd_msg_addr_d2 < (`DEPOT_BIAS_RS485_1ST + `DEPOT_SIZE_RS485_1ST)))begin
-//            rd_msg_data <=  msg_array[17];
+        end else if ((rd_msg_addr_d2 >= `DEPOT_BIAS_RS232_CH1) & (rd_msg_addr_d2 < `DEPOT_BIAS_RS232_CH2))begin
+            rd_msg_data <=  msg_array[5];
+        end else if ((rd_msg_addr_d2 >= `DEPOT_BIAS_RS232_CH2) & (rd_msg_addr_d2 < `DEPOT_BIAS_RS232_CH3))begin
+            rd_msg_data <=  msg_array[6]; 
+        end else if ((rd_msg_addr_d2 >= `DEPOT_BIAS_RS232_CH3) & (rd_msg_addr_d2 < `DEPOT_BIAS_RS232_CH4))begin
+            rd_msg_data <=  msg_array[7];    
+        end else if ((rd_msg_addr_d2 >= `DEPOT_BIAS_RS232_CH4) & (rd_msg_addr_d2 < `DEPOT_BIAS_RS232_CH5))begin
+            rd_msg_data <=  msg_array[8]; 
+        end else if ((rd_msg_addr_d2 >= `DEPOT_BIAS_RS232_CH5) & (rd_msg_addr_d2 < `DEPOT_BIAS_RS232_CH6))begin
+            rd_msg_data <=  msg_array[9];    
+        end else if ((rd_msg_addr_d2 >= `DEPOT_BIAS_RS232_CH6) & (rd_msg_addr_d2 < `DEPOT_BIAS_RS232_CH7))begin
+            rd_msg_data <=  msg_array[10];    
+        end else if ((rd_msg_addr_d2 >= `DEPOT_BIAS_RS232_CH7) & (rd_msg_addr_d2 < `DEPOT_BIAS_RS485_CH8))begin
+            rd_msg_data <=  msg_array[11];     
+        end else if ((rd_msg_addr_d2 >= `DEPOT_BIAS_RS485_CH8) & (rd_msg_addr_d2 < `DEPOT_BIAS_PUL_MOTOR0))begin
+            rd_msg_data <=  msg_array[12]; 
+        end else if ((rd_msg_addr_d2 >= `DEPOT_BIAS_PUL_MOTOR0) & (rd_msg_addr_d2 < `DEPOT_BIAS_PUL_MOTOR1))begin
+            rd_msg_data <=  msg_array[13];    
+        end else if ((rd_msg_addr_d2 >= `DEPOT_BIAS_PUL_MOTOR1) & (rd_msg_addr_d2 < `DEPOT_BIAS_PUL_MOTOR2))begin
+            rd_msg_data <=  msg_array[14];    
+        end else if ((rd_msg_addr_d2 >= `DEPOT_BIAS_PUL_MOTOR2) & (rd_msg_addr_d2 < `DEPOT_BIAS_PUL_MOTOR3))begin
+            rd_msg_data <=  msg_array[15];
+        end else if ((rd_msg_addr_d2 >= `DEPOT_BIAS_PUL_MOTOR3) & (rd_msg_addr_d2 < (`DEPOT_BIAS_PUL_MOTOR3+`DEPOT_SIZE_PUL_MOTOR3)))begin
+            rd_msg_data <=  msg_array[16];
         end else begin
             rd_msg_data <=  0;
         end
@@ -347,7 +332,4 @@ module slv_app_send
     end
     assign  send_buf_ena =   1;
     
-    always @(posedge clk)begin
-        tst_sig <=  1;
-    end
 endmodule

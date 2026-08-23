@@ -60,42 +60,14 @@
   <FileSets Version="1" Minor="31">
     <FileSet Name="sources_1" Type="DesignSrcs" RelSrcDir="$PSRCDIR/sources_1">
       <Filter Type="Srcs"/>
-      <File Path="$PPRDIR/../src/rtl/include_files/reg_addr_pl.vh">
+      <File Path="$PPRDIR/../src/rtl/include_files/slv_global_cfg/global_includes.vh">
         <FileInfo>
           <Attr Name="IsGlobalInclude" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/rtl/include_files/para_reg_addr.vh">
-        <FileInfo>
-          <Attr Name="IsGlobalInclude" Val="1"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/include_files/globe_includes.vh">
-        <FileInfo>
-          <Attr Name="IsGlobalInclude" Val="1"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/include_files/depot_addr_map.vh">
-        <FileInfo>
-          <Attr Name="IsGlobalInclude" Val="1"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/include_files/components_param.vh">
-        <FileInfo>
-          <Attr Name="IsGlobalInclude" Val="1"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/include_files/base_addr.vh">
+      <File Path="$PPRDIR/../src/rtl/include_files/slv_global_cfg/depot_addr_map.vh">
         <FileInfo>
           <Attr Name="IsGlobalInclude" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -207,7 +179,7 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/rtl/fiber_stack/protocal_top/app_ctrl_top/app_ctrl_top.v">
+      <File Path="$PPRDIR/../src/rtl/fiber_stack/protocal_top/slv_protocal/app_ctrl_top/app_ctrl_top.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
@@ -221,28 +193,28 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/rtl/fiber_stack/protocal_top/app_ctrl_top/app_mst_rx_ctrl.v">
+      <File Path="$PPRDIR/../src/rtl/fiber_stack/protocal_top/slv_protocal/app_ctrl_top/app_mst_rx_ctrl.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/rtl/fiber_stack/protocal_top/app_ctrl_top/app_mst_tx_ctrl.v">
+      <File Path="$PPRDIR/../src/rtl/fiber_stack/protocal_top/slv_protocal/app_ctrl_top/app_mst_tx_ctrl.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/rtl/fiber_stack/protocal_top/app_protocal_top.v">
+      <File Path="$PPRDIR/../src/rtl/fiber_stack/protocal_top/slv_protocal/app_protocal_top.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/rtl/fiber_stack/protocal_top/app_ctrl_top/app_slv_rx_ctrl.v">
+      <File Path="$PPRDIR/../src/rtl/fiber_stack/protocal_top/slv_protocal/app_ctrl_top/app_slv_rx_ctrl.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
@@ -263,7 +235,7 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/rtl/fiber_stack/protocal_top/ethcat_top/axi_to_ll.v">
+      <File Path="$PPRDIR/../src/rtl/fiber_stack/protocal_top/slv_protocal/ethcat_top/axi_to_ll.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
@@ -284,35 +256,35 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/rtl/fiber_stack/protocal_top/ethcat_top/tx_crc_top/crc_top.v">
+      <File Path="$PPRDIR/../src/rtl/fiber_stack/protocal_top/slv_protocal/ethcat_top/tx_crc_top/crc_top.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/rtl/fiber_stack/protocal_top/datagram_top/datagram_top.v">
+      <File Path="$PPRDIR/../src/rtl/fiber_stack/protocal_top/slv_protocal/datagram_top/datagram_top.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/rtl/fiber_stack/protocal_top/datagram_top/datagram_tx.v">
+      <File Path="$PPRDIR/../src/rtl/fiber_stack/protocal_top/slv_protocal/datagram_top/datagram_tx.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/rtl/fiber_stack/protocal_top/datagram_top/datagram_tx_ctrl.v">
+      <File Path="$PPRDIR/../src/rtl/fiber_stack/protocal_top/slv_protocal/datagram_top/datagram_tx_ctrl.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/rtl/fiber_stack/protocal_top/datagram_top/datagram_tx_rd.v">
+      <File Path="$PPRDIR/../src/rtl/fiber_stack/protocal_top/slv_protocal/datagram_top/datagram_tx_rd.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
@@ -340,49 +312,49 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/rtl/fiber_stack/protocal_top/ethcat_top/ethcat_rcv.v">
+      <File Path="$PPRDIR/../src/rtl/fiber_stack/protocal_top/slv_protocal/ethcat_top/ethcat_rcv.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/rtl/fiber_stack/protocal_top/ethcat_top/ethcat_rcv_top.v">
+      <File Path="$PPRDIR/../src/rtl/fiber_stack/protocal_top/slv_protocal/ethcat_top/ethcat_rcv_top.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/rtl/fiber_stack/protocal_top/ethcat_top/ethcat_rx_crc_top.v">
+      <File Path="$PPRDIR/../src/rtl/fiber_stack/protocal_top/slv_protocal/ethcat_top/ethcat_rx_crc_top.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/rtl/fiber_stack/protocal_top/ethcat_top/ethcat_send.v">
+      <File Path="$PPRDIR/../src/rtl/fiber_stack/protocal_top/slv_protocal/ethcat_top/ethcat_send.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/rtl/fiber_stack/protocal_top/ethcat_top/ethcat_send_cache.v">
+      <File Path="$PPRDIR/../src/rtl/fiber_stack/protocal_top/slv_protocal/ethcat_top/ethcat_send_cache.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/rtl/fiber_stack/protocal_top/ethcat_top/ethcat_send_top.v">
+      <File Path="$PPRDIR/../src/rtl/fiber_stack/protocal_top/slv_protocal/ethcat_top/ethcat_send_top.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/rtl/fiber_stack/protocal_top/ethcat_top/ethcat_top.v">
+      <File Path="$PPRDIR/../src/rtl/fiber_stack/protocal_top/slv_protocal/ethcat_top/ethcat_top.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
@@ -424,7 +396,7 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/rtl/peri/id_top/id.v">
+      <File Path="$PPRDIR/../src/rtl/peri/id_top/slv_id_top/id.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
@@ -466,7 +438,7 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/rtl/fiber_stack/protocal_top/ethcat_top/rx_crc_top/rx_crc.v">
+      <File Path="$PPRDIR/../src/rtl/fiber_stack/protocal_top/slv_protocal/ethcat_top/rx_crc_top/rx_crc.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
@@ -501,7 +473,7 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/rtl/fiber_stack/protocal_top/ethcat_top/tx_crc_top/tx_crc.v">
+      <File Path="$PPRDIR/../src/rtl/fiber_stack/protocal_top/slv_protocal/ethcat_top/tx_crc_top/tx_crc.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
@@ -623,7 +595,7 @@
       <File Path="$PSRCDIR/utils_1/imports/slv_impl/emcc_slv_top_routed.dcp">
         <FileInfo>
           <Attr Name="ImportPath" Val="$PRUNDIR/slv_impl/emcc_slv_top_routed.dcp"/>
-          <Attr Name="ImportTime" Val="1787364721"/>
+          <Attr Name="ImportTime" Val="1787449113"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedInSteps" Val="slv_impl"/>

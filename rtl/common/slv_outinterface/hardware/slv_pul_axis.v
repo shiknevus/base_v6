@@ -8,18 +8,24 @@
 //  Date    : 2023/01/13
 //
 ////////////////////////////////////////////////////////////////
-// 
+//
 //  Description:
-//     action1 : 	ST_HOME
-//	   action2 : 	ST_JOG
-//	   action3 :	ST_MOVE
-//	   action4 :	ST_MSIG
+//     behavior mapping (aligned with master ec_pul_axis):
+//       1 = HOME
+//       2 = JOG
+//       3 = MOVE
+//      20 = JOG [safe]
+//      21 = MOVE [safe]
+//      30 = GETPOS
+//
+//     Receives cur_beha from m2s message (proactive_beh_slv_pul_axis)
+//     and executes the corresponding motion.
 //
 ////////////////////////////////////////////////////////////////
-// 
-//  Revision: 1.0
+//
+//  Revision: 1.1 — behavior numbering aligned with ec_pul_axis
 
-/////////////////////////// DEFINE /////////////////////////////                         
+/////////////////////////// DEFINE /////////////////////////////
 
 /////////////////////////// MODULE //////////////////////////////
 module slv_pul_axis
@@ -64,8 +70,8 @@ module slv_pul_axis
    ,input  wire [15:0]      rcfg_qs_dec
    ,input  wire [31:0]      rcfg_timedly
 
-   ,input  wire             i_axis_limf     //����λ
-   ,input  wire             i_axis_limb     //����λ
+   ,input  wire             i_axis_limf     //forward limit
+   ,input  wire             i_axis_limb     //backward limit
    ,input  wire             i_axis_org
    ,input  wire             i_axis_point
    ,input  wire             i_axis_abspos0
@@ -319,28 +325,13 @@ module slv_pul_axis
       .i_pf_busy      ( pos_pf_busy        ),
       .i_pf_done      ( pos_pf_done        )
    );
-   
-   ////////////////// MSIG
-   wire         msig_start;
-   reg          msig_stop;
-   wire         msig_busy;
-   wire         msig_done;
-   wire         msig_error;
-   wire [31:0]  msig_pf_spd;
-   wire [31:0]  msig_pf_acc;
-   wire [31:0]  msig_pf_dec;  
-   wire [31:0]  msig_pf_pulse;   
-   wire         msig_pf_dir;
-   wire         msig_pf_start;
-   wire         msig_pf_stop;
-   wire         msig_pf_quickstop;
 
-  //behavior mapping (new master protocol): 1=HOME 2=MOVE0 3=JOG 4=MOVE abs 5=GET POINT 6=S-on 7=S-off 8=RESET
+  //behavior mapping (aligned with master ec_pul_axis):
+  //  1=HOME  2=JOG  3=MOVE  20=JOG[safe]  21=MOVE[safe]  30=GETPOS
   assign home_start = (action_son & action_start & cur_beha==1) ? 1'b1 : 1'b0;
-  assign jog_start  = (action_son & action_start & cur_beha==3) ? 1'b1 : 1'b0;
-  assign move_start = ((action_son & action_start) & ((cur_beha==2)||(cur_beha==4))) ? 1'b1 : 1'b0;
-  assign msig_start = 1'b0;   // unused (old framework)
-   
+  assign jog_start  = (action_son & action_start & ((cur_beha==2)||(cur_beha==20))) ? 1'b1 : 1'b0;
+  assign move_start = (action_son & action_start & ((cur_beha==3)||(cur_beha==21))) ? 1'b1 : 1'b0;
+
   always @(posedge clk)begin
       case(cur_beha)
               1: begin
@@ -349,17 +340,22 @@ module slv_pul_axis
                   act_error <= home_error;
                   home_stop <= (action_alarm | beat_timeout | action_flag);
               end
-              2, 4: begin
+              2, 20: begin  // JOG (regular & safe)
+                  act_busy  <= jog_busy;
+                  act_done  <= jog_done;
+                  act_error <= jog_error;
+                  jog_stop  <= (action_alarm | beat_timeout | action_flag);
+              end
+              3, 21: begin  // MOVE (regular & safe)
                   act_busy  <= move_busy;
                   act_done  <= move_done;
                   act_error <= move_error;
                   move_stop <= (action_alarm | beat_timeout | action_flag);
               end
-              3: begin
-                  act_busy  <= jog_busy;
-                  act_done  <= jog_done;
-                  act_error <= jog_error;
-                  jog_stop  <= (action_alarm | beat_timeout | action_flag);
+              30: begin  // GETPOS: no motion, claim done immediately
+                  act_busy  <= 1'b0;
+                  act_done  <= action_start;
+                  act_error <= 1'b0;
               end
               default: begin
                   act_busy <= 1'b0;
@@ -368,7 +364,7 @@ module slv_pul_axis
               end
           endcase
       end
-  
+
   always@* begin
       case(cur_beha)
               1: begin
@@ -382,18 +378,7 @@ module slv_pul_axis
                   pos_pf_dir   <= home_pf_dir;
                   pos_quickstop<= home_pf_quickstop;
               end
-              2, 4: begin
-                  pos_pf_spd   <= move_pf_spd > rcfg_spd_max ? rcfg_spd_max : move_pf_spd;
-                  pos_pf_acc   <= move_pf_acc > rcfg_acc_max ? rcfg_acc_max : move_pf_acc;
-                  pos_pf_dec   <= move_pf_dec > rcfg_dec_max ? rcfg_dec_max : move_pf_dec;
-                  pos_pf_mode  <= rcfg_pf_mode ? 8'h11 : 8'h01;
-                  pos_pf_pulse <= move_pf_pulse;
-                  pos_pf_start <= move_pf_start;
-                  pos_pf_stop  <= move_pf_stop;
-                  pos_pf_dir   <= move_pf_dir;
-                  pos_quickstop<= move_pf_quickstop;
-              end
-              3: begin
+              2, 20: begin
                   pos_pf_spd   <= jog_pf_spd > rcfg_spd_max ? rcfg_spd_max : jog_pf_spd;
                   pos_pf_acc   <= jog_pf_acc > rcfg_acc_max ? rcfg_acc_max : jog_pf_acc;
                   pos_pf_dec   <= jog_pf_dec > rcfg_dec_max ? rcfg_dec_max : jog_pf_dec;
@@ -404,7 +389,18 @@ module slv_pul_axis
                   pos_pf_dir   <= jog_pf_dir;
                   pos_quickstop<= jog_pf_quickstop;
               end
-              default: begin
+              3, 21: begin
+                  pos_pf_spd   <= move_pf_spd > rcfg_spd_max ? rcfg_spd_max : move_pf_spd;
+                  pos_pf_acc   <= move_pf_acc > rcfg_acc_max ? rcfg_acc_max : move_pf_acc;
+                  pos_pf_dec   <= move_pf_dec > rcfg_dec_max ? rcfg_dec_max : move_pf_dec;
+                  pos_pf_mode  <= rcfg_pf_mode ? 8'h11 : 8'h01;
+                  pos_pf_pulse <= move_pf_pulse;
+                  pos_pf_start <= move_pf_start;
+                  pos_pf_stop  <= move_pf_stop;
+                  pos_pf_dir   <= move_pf_dir;
+                  pos_quickstop<= move_pf_quickstop;
+              end
+              default: begin  // 30: no motion
                   pos_pf_spd   <= 0;
                   pos_pf_acc   <= 0;
                   pos_pf_dec   <= 0;
