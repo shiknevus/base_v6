@@ -49,6 +49,9 @@ module proactive_beh_2do#(
     ,input                      irq_ack_i       //Interrupt response
     );
 	
+	wire	i_rst = rst_i;
+	wire	i_clk = clk_i;
+	
     reg [7:0]    	curr_state;
 	reg [7:0]    	curr_state_1d;
     reg [7:0]    	next_state;
@@ -317,21 +320,21 @@ module proactive_beh_2do#(
 		else if(curr_state == S_IDLE)
 			a_alm_num <= 8'd0;
         else if(curr_state == S_BHA_PRE_DET && timout)//The pre - full inspection is not met.
-			a_alm_num <= 8'd101;
+			a_alm_num <= 8'd100;
         else if(curr_state == S_READY_10_ACK && ack_tx_result == IRQ_NO_OK)	//Transaction 10 ps response error
             a_alm_num <= ack_ps_alart_num;    
         else if(curr_state == S_READY_10_ACK && timout)						//For Transaction 10, waiting for the ps response timed out.
-            a_alm_num <= 8'd102;    
+            a_alm_num <= 8'd101;    
 		//else if(curr_state == S_EXE_20_ACK && ack_tx_result == IRQ_NO_OK)	//Transaction 20 has a ps response error.
         //    a_alm_num <= ack_ps_alart_num;    
         //else if(curr_state == S_EXE_20_ACK && timout)						//For Transaction 20, waiting for the ps response timed out.
         //    a_alm_num <= 8'd103;    
 		else if(curr_state_1d == S_BHA_POST_DET && curr_state == S_ALERT_40)
-			a_alm_num <= 8'd103; 
+			a_alm_num <= 8'd102; 
 		else if(curr_state == S_SUCC_30_ACK && ack_tx_result == IRQ_NO_OK)	
 			a_alm_num <= ack_ps_alart_num;
 		else if(curr_state == S_SUCC_30_ACK && timout)						//For Transaction 30, waiting for the ps response timed out.
-            a_alm_num <= 8'd104;
+            a_alm_num <= 8'd103;
         else
             a_alm_num <= a_alm_num;
     end
@@ -365,19 +368,20 @@ module proactive_beh_2do#(
 	//------------------------------------------------ user logic start ---------------------------------------------
 	//===============================================================================================================
 
-	
-	always@(posedge clk_i)
+	always@(posedge i_clk)
 	begin
-		if(rst_i)
+		if(i_rst)
 			do_o <= 2'b00;
-		else if(curr_state == S_EXE && a_bhv_id_r == 8'd1)
-			do_o <= {1'b0,1'b1};
-		else if(curr_state == S_EXE && a_bhv_id_r == 8'd2)
-			do_o <= {1'b1,1'b0};
-		else if(curr_state == S_EXE && a_bhv_id_r == 8'd3)
-			do_o <= {1'b0,1'b0};
-		else if(curr_state == S_EXE && a_bhv_id_r == 8'd4)
-			do_o <= {1'b1,1'b1};
+		else if(curr_state == S_EXE)
+			case(a_bhv_id_r)
+				8'd1:do_o <= 2'b01;
+				8'd2:do_o <= 2'b10;
+				8'd3:do_o <= 2'b00;
+				8'd4:do_o <= 2'b11;
+				8'd5:do_o <= 2'b01;
+				8'd6:do_o <= 2'b10;
+				default:do_o <= 2'b00;
+			endcase
 		else
 			do_o <= do_o;
 	end

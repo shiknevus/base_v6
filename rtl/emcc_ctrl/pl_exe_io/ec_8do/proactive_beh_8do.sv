@@ -320,11 +320,11 @@ module proactive_beh_8do#(
 		else if(curr_state == S_IDLE)
 			a_alm_num <= 8'd0;
         else if(curr_state == S_BHA_PRE_DET && timout)
-            a_alm_num <= 8'd101;    
+            a_alm_num <= 8'd100;    
         else if(curr_state == S_READY_10_ACK && ack_tx_result == IRQ_NO_OK)	
             a_alm_num <= ack_ps_alart_num;    
         else if(curr_state == S_READY_10_ACK && timout)						
-            a_alm_num <= 8'd102;    
+            a_alm_num <= 8'd101;    
 		//else if(curr_state == S_EXE_20_ACK && ack_tx_result == IRQ_NO_OK)	
         //    a_alm_num <= ack_ps_alart_num;    
         //else if(curr_state == S_EXE_20_ACK && timout)						
@@ -334,11 +334,11 @@ module proactive_beh_8do#(
 		//else if(curr_state_1d == S_EXE && curr_state == S_ALERT_40 && a_bhv_id_r == 8'd2)
 		//	a_alm_num <= 8'd105;
 		else if(curr_state == S_BHA_POST_DET && timout)
-            a_alm_num <= 8'd103;    
+            a_alm_num <= 8'd102;    
 		else if(curr_state == S_SUCC_30_ACK && ack_tx_result == IRQ_NO_OK)	
 			a_alm_num <= ack_ps_alart_num;
 		else if(curr_state == S_SUCC_30_ACK && timout)						
-            a_alm_num <= 8'd104;
+            a_alm_num <= 8'd103;
         else
             a_alm_num <= a_alm_num;
     end
@@ -394,7 +394,7 @@ module proactive_beh_8do#(
 				14		:	do_o[5] <= 1'b0;
 				15		:	do_o[6] <= 1'b0;
 				16		:	do_o[7] <= 1'b0;
-				default	:	do_o <= do_o;
+				default	:	do_o <= 1'b0;
 			endcase
 		end else
 			do_o <= do_o;

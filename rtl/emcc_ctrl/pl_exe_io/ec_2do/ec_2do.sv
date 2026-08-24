@@ -45,7 +45,7 @@ module ec_2do#(
 		output 	            	o_intr_irq	
     );
 	
-	localparam		A_BHA_NUM	=	4;	
+	localparam		A_BHA_NUM	=	6;	
 	localparam		B_BHA_NUM	=	1;	
 	
 	

@@ -219,7 +219,7 @@ module proactive_beh_2di_2do#(
 				next_state = S_EXE;
             end
 			
-			S_EXE:begin			//11						//active Execution
+			S_EXE:begin			//5						//active Execution
 				next_state = S_BHA_POST_DET;
 			end
 			
@@ -233,7 +233,7 @@ module proactive_beh_2di_2do#(
 			//end
 
 			
-            S_BHA_POST_DET: begin	//curr_state = 6
+            S_BHA_POST_DET: begin	//curr_state = 7
 				if(post_sta_allow[a_bhv_id_r - 1'b1]) begin
 					next_state = S_SUCC_30;
 				end else if(timout) begin
@@ -318,21 +318,21 @@ module proactive_beh_2di_2do#(
 		else if(curr_state == S_IDLE)
 			a_alm_num <= 8'd0;
         else if(curr_state == S_BHA_PRE_DET && timout)						//The pre - full inspection is not met.
-			a_alm_num <= 8'd101;    
+			a_alm_num <= 8'd100;    
         else if(curr_state == S_READY_10_ACK && ack_tx_result == IRQ_NO_OK)	
             a_alm_num <= ack_ps_alart_num;    
         else if(curr_state == S_READY_10_ACK && timout)						//Wait 10 timeout				
-            a_alm_num <= 8'd102;    
+            a_alm_num <= 8'd101;    
 		//else if(curr_state == S_EXE_20_ACK && ack_tx_result == IRQ_NO_OK)	
         //    a_alm_num <= ack_ps_alart_num;    
         //else if(curr_state == S_EXE_20_ACK && timout)						
         //    a_alm_num <= 8'd103;    
 		else if(curr_state_1d == S_BHA_POST_DET && curr_state == S_ALERT_40)//The post - full inspection is not met.
-			a_alm_num 	<= 8'd103;    
+			a_alm_num 	<= 8'd102;    
 		else if(curr_state == S_SUCC_30_ACK && ack_tx_result == IRQ_NO_OK)	
 			a_alm_num <= ack_ps_alart_num;
 		else if(curr_state == S_SUCC_30_ACK && timout)						//Wait 30 timeout				
-            a_alm_num <= 8'd104;
+            a_alm_num <= 8'd103;
 		else if(match_40)
 			a_alm_num <= 8'd0;
         else

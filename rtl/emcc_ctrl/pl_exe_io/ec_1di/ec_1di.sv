@@ -19,6 +19,7 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
+`define DEBUG
 
 module ec_1di#(
 		parameter  				REG_SPACE_BIAS 		= 	2000	,	//Component offset address
@@ -45,8 +46,7 @@ module ec_1di#(
 	
 	localparam		A_BHA_NUM	=	2;	
 	localparam		B_BHA_NUM	=	1;	
-	
-	
+
 	//PS-PL    
 	wire 	[7:0]	unit_id         ;     	
 	wire 	[3:0]	unit_ectrl      ;       
@@ -89,9 +89,9 @@ module ec_1di#(
 	wire	[7:0]	c_alm_num     ;  
 	
 	//PS-PL
-	wire [31:0]		param1			;
+	wire [31:0]		param1			;	
 	wire [31:0]		param2			;
-	wire [31:0]		param3			;
+	wire [31:0]		param3			;	
 	wire [31:0]		param4			;
 	wire [31:0]		param5			;
 	wire [19:0]		param6			;
@@ -149,7 +149,7 @@ module ec_1di#(
 	wire	[31:0]	debug_reg5 ;
 
 
-	wire	[31:0]	task_time_cnt	;
+	wire	[19:0]	task_time_cnt	;
 	
 	wire			a_tx_result_vld;
 	wire			b_tx_result_vld;
@@ -185,7 +185,52 @@ module ec_1di#(
 	
 	wire	[7:0]	a_bhv_id_r;
 	
-	assign	di = i_sign1_check;
+	wire	i_clk = clk_i;
+	wire	i_rst = rst_i;
+	
+	`ifdef DEBUG
+		reg			ro_intr_irq;
+		reg	[11:0]	irq_sta;
+		reg	[7:0]	irq_posedge_cnt;
+		reg	[7:0]	irq_negedge_cnt;
+		
+		always@(posedge i_clk)
+		begin
+			ro_intr_irq <= o_intr_irq;
+		end
+		
+		
+		always@(posedge i_clk)
+		begin
+			if(i_rst)begin
+				irq_sta <= 12'h000;
+				irq_posedge_cnt <= 8'd0;
+				irq_negedge_cnt <= 8'd0;
+			end else if(!ec_cha_st) begin
+				irq_sta <= 12'h000;
+				irq_posedge_cnt <= 8'd0;
+				irq_negedge_cnt <= 8'd0;
+			end else begin
+				irq_sta[0] <= o_intr_irq;
+				
+				if({ro_intr_irq,o_intr_irq} == 2'b01)begin	//rising
+					irq_sta[8] <= ~irq_sta[8];
+					irq_posedge_cnt <= irq_posedge_cnt+1;
+				end else begin
+					irq_sta[8] <= irq_sta[8];
+					irq_posedge_cnt <= irq_posedge_cnt;
+				end
+				
+				if({ro_intr_irq,o_intr_irq} == 2'b10)begin	//falling
+					irq_sta[4] <= ~irq_sta[4];
+					irq_negedge_cnt <= irq_negedge_cnt+1;
+				end else begin
+					irq_sta[4] <= irq_sta[4];
+					irq_negedge_cnt <= irq_negedge_cnt;
+				end
+			end
+		end
+	`endif
 	
 	
 	ps_rw_pl_reg#(
@@ -290,13 +335,13 @@ module ec_1di#(
 	,.param63               (param63		)
 	,.param64               (param64		)
 	,.param65               (param65		)
-	,.param66               (param66		)
+	,.param66               (i_sign1_check	)
 	,.param67               (param67		)
 	,.param68               (param68		)
 	,.param69               (param69		)
 	,.param70               (param70		)
 	,.debug_reg1			(debug_reg1		)
-	,.debug_reg2			(debug_reg2		)
+	,.debug_reg2			({irq_posedge_cnt,irq_negedge_cnt,4'd0,irq_sta}		)
 	,.debug_reg3			(debug_reg3		)
 	,.debug_reg4			(debug_reg4		)
 	,.debug_reg5			(debug_reg5		)
@@ -344,7 +389,7 @@ module ec_1di#(
 	,.ec_chb_st             (ec_chb_st			)
 	,.b_tx_id               (b_tx_id			)
 	,.b_alm_num             (b_alm_num			)
-	,.di				    (param66			)
+	,.di				    (i_sign1_check		)
 	,.irq_o			        (irq_o				)
 	,.irq_ack_i	            (irq_ack_i			)	
     );
@@ -385,7 +430,7 @@ module ec_1di#(
 			.m_wk_mod        	(m_wk_mod       ),
 			.m_saf_st        	(m_saf_st       ),
 			.link_m_saf_st   	(link_m_saf_st  ),
-			.di					(di				),
+			.di					(i_sign1_check	),
 			.a_bhv_id			(a_bhv_id_r		),
 			.b_bhv_id			(b_bhv_id		),
 			.c_bhv_id			(c_bhv_id		),

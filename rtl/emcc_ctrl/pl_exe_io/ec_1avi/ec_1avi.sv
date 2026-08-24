@@ -188,7 +188,7 @@ module ec_1avi#(
 	
 	wire	[7:0]	a_bhv_id_r;
 	
-	wire	[31:0]	adc_dat_o;
+	wire	[15:0]	adc_dat_o;
 	
 	
 	ps_rw_pl_reg#(
@@ -235,7 +235,7 @@ module ec_1avi#(
 	,.c_tsc_result_rpt	    (c_tx_result_rpt)
 	,.c_tsc_result_vld	    (c_tx_result_vld)
 	,.c_bhv_gap_crl         (c_gap_crl		)
-	,.param1			    (adc_dat_o		)
+	,.param1			    (param1			)
 	,.param2			    (param2			)
 	,.param3			    (param3			)
 	,.param4			    (param4			)
@@ -278,7 +278,7 @@ module ec_1avi#(
 	,.c_alm_num             (c_alm_num 		)
 	,.c_tsc_id              (c_tx_id  		)
 	,.c_bhv_id              (c_bhv_id 		)
-	,.param51               (param51		)
+	,.param51               ({16'd0,adc_dat_o})
 	,.param52               (param52		)
 	,.param53               (param53		)
 	,.param54               (param54		)
@@ -293,7 +293,7 @@ module ec_1avi#(
 	,.param63               (param63		)
 	,.param64               (param64		)
 	,.param65               (param65		)
-	,.param66               (di				)
+	,.param66               (param66		)
 	,.param67               (param67		)
 	,.param68               (param68		)
 	,.param69               (param69		)

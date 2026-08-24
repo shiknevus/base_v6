@@ -73,10 +73,10 @@ module tim_beh_pulmotor_handwheel#(
 	reg			timout			;
 	reg	[19:0]	timout_cnt		;	
 	
-	reg [7:0]		ack_beh_id;
-	reg [7:0]		ack_tx_id;
-	reg [7:0]		ack_tx_result;
-	reg	[7:0]		ack_ps_alart_num;
+	reg [7:0]	ack_beh_id;
+	reg [7:0]	ack_tx_id;
+	reg [7:0]	ack_tx_result;
+	reg	[7:0]	ack_ps_alart_num;
 	
 	//State machine state
 	localparam  S_IDLE          = 8'd0; 	//idle
@@ -94,30 +94,6 @@ module tim_beh_pulmotor_handwheel#(
 	
     localparam  IRQ_OK          = 8'h51;	//ps ack:OK
     localparam  IRQ_NO_OK       = 8'h52;	//ps ack:NO OK
-	
-	
-	
-	localparam WHOLE_VALUE  = 10000;        //100us
-    localparam TIME_WIDTH   = $clog2(WHOLE_VALUE);
-    reg [TIME_WIDTH-1:0]    time_cnt;
-    reg                     aclk_r;
-    reg                     aclk_r_r;
-    reg                     aclk_r_r_r;
-    wire                    aclk_pose;
-    wire [1:0]              sigport;
-    wire [15:0]             step_value;
-    reg  [1:0]              previ;
-    reg  [1:0]              clear_pulse_d;
-    reg  [3:0]              wheel_prog_d1;
-    reg signed [31:0]       pulse_cnt_d1;
-    reg signed [31:0]       pulse_cnt_d2;
-	wire					wheel_run;
-	
-	wire 	[11:0] 	inio_tmp;
-    wire        	o_wheel_run_tmp;
-	wire	[13:0]	look_in_gpio;
-	
-	
 	
 	//state monitor
 	reg [7:0]	curr_state_m1;
@@ -218,7 +194,8 @@ module tim_beh_pulmotor_handwheel#(
 	always @(*) begin
         case (curr_state)
             S_IDLE: begin
-                if (c_en || c_gap_crl != 20'd0 && wheel_run)	
+                //if (c_en || c_gap_crl != 20'd0 && !o_wheel_prog)	
+				if(c_en || !o_wheel_prog)	//When the gear is set to off, the timed behavior state machine won't start.
                     next_state = S_BHA_PRE_DET;
                 else
                     next_state = S_IDLE;
@@ -252,7 +229,7 @@ module tim_beh_pulmotor_handwheel#(
             end
 			
 			S_EXE:begin
-				if(task_time_cnt >= c_gap_crl - 1)		//Timer finished
+				if(task_time_cnt >= 1000 - 1)		//Timer finished
 					next_state = S_BHA_POST_DET;
 				else
 					next_state = S_EXE;
@@ -408,13 +385,16 @@ module tim_beh_pulmotor_handwheel#(
 			task_time_cnt <= 'd0;
 		else if(curr_state != S_EXE)
 			task_time_cnt <= 'd0;
+		else if(i_time_1ms_vld)
+			task_time_cnt <= task_time_cnt + 1;
 		else
-			task_time_cnt <= task_time_cnt + i_time_1ms_vld;
+			task_time_cnt <= task_time_cnt;
 	end
 	
 	wire	sample_vld;
 	
-	assign sample_vld = (task_time_cnt >= c_gap_crl - 1)? 1'b1 : 1'b0;
+	//1s 	20 detect
+	assign sample_vld = (task_time_cnt >= 1000/20 - 1)? 1'b1 : 1'b0;
 
 
 	
@@ -422,8 +402,9 @@ module tim_beh_pulmotor_handwheel#(
 	//------------------------------------------------ user logic start ---------------------------------------------
 	//===============================================================================================================
 
+
 	man_handwheel man_handwheel_u0(
-		.clk            (clk_i			)
+		.clk             (clk_i			)
 		,.reset          (rst_i			)
 		,.i_estop        (i_estop		)
 		,.i_pulse_a      (i_pulse_a		)

@@ -18,7 +18,7 @@
 // Additional Comments:
 // 
 //////////////////////////////////////////////////////////////////////////////////
-
+`define DEBUG
 
 module ec_2di#(
 		parameter  				REG_SPACE_BIAS 		= 	2000	,
@@ -121,6 +121,17 @@ module ec_2di#(
 	wire 			param28			;
 	wire 			param29			;
 	wire 			param30			;
+	wire [31:0]		param31			;
+	wire [31:0]		param32			;
+	wire [31:0]		param33			;
+	wire [31:0]		param34			;
+	wire [31:0]		param35			;
+	wire [31:0]		param36			;
+	wire [31:0]		param37			;
+	wire [31:0]		param38			;
+	wire [31:0]		param39			;
+	wire [31:0]		param40			;
+	
 	
 	//PL-PS
 	wire 	[31:0]	param51 ;
@@ -143,7 +154,12 @@ module ec_2di#(
 	wire 			param68 ;
 	wire 			param69 ;
 	wire 			param70 ;
-
+	
+	wire 	[31:0]	debug_reg1;
+	wire 	[31:0]	debug_reg2;
+	wire 	[31:0]	debug_reg3;
+	wire 	[31:0]	debug_reg4;
+    wire 	[31:0]	debug_reg5;
 
 	wire	[31:0]	task_time_cnt	;
 	
@@ -183,8 +199,54 @@ module ec_2di#(
 	
 	wire	[1:0]	di_i;
 	
+	wire	i_clk = clk_i;
+	wire	i_rst = rst_i;
+	
 	assign di_i = {i_sign2_check,i_sign1_check};
 
+	`ifdef DEBUG
+		reg			ro_intr_irq;
+		reg	[11:0]	irq_sta;
+		reg	[7:0]	irq_posedge_cnt;
+		reg	[7:0]	irq_negedge_cnt;
+		
+		always@(posedge i_clk)
+		begin
+			ro_intr_irq <= o_intr_irq;
+		end
+		
+		
+		always@(posedge i_clk)
+		begin
+			if(i_rst)begin
+				irq_sta <= 12'h000;
+				irq_posedge_cnt <= 8'd0;
+				irq_negedge_cnt <= 8'd0;
+			end else if(!ec_cha_st) begin
+				irq_sta <= 12'h000;
+				irq_posedge_cnt <= 8'd0;
+				irq_negedge_cnt <= 8'd0;
+			end else begin
+				irq_sta[0] <= o_intr_irq;
+				
+				if({ro_intr_irq,o_intr_irq} == 2'b01)begin	//rising
+					irq_sta[8] <= ~irq_sta[8];
+					irq_posedge_cnt <= irq_posedge_cnt+1;
+				end else begin
+					irq_sta[8] <= irq_sta[8];
+					irq_posedge_cnt <= irq_posedge_cnt;
+				end
+				
+				if({ro_intr_irq,o_intr_irq} == 2'b10)begin	//falling
+					irq_sta[4] <= ~irq_sta[4];
+					irq_negedge_cnt <= irq_negedge_cnt+1;
+				end else begin
+					irq_sta[4] <= irq_sta[4];
+					irq_negedge_cnt <= irq_negedge_cnt;
+				end
+			end
+		end
+	`endif
 	
 	ps_rw_pl_reg#(
 		.REG_SPACE_BIAS 	(REG_SPACE_BIAS		),
@@ -260,6 +322,16 @@ module ec_2di#(
 	,.param28			    (param28		)
 	,.param29			    (param29		)
 	,.param30				(param30		)
+	,.param31				(param31		)
+	,.param32				(param32		)
+	,.param33				(param33		)
+	,.param34				(param34		)
+	,.param35				(param35		)
+	,.param36				(param36		)
+	,.param37				(param37		)
+	,.param38				(param38		)
+	,.param39				(param39		)
+	,.param40				(param40		)
 	,.irq_reg1	            (irq_reg1		)
 	,.irq_reg2	            (irq_reg2		)
 	,.a_st                  (ec_cha_st		)
@@ -288,13 +360,13 @@ module ec_2di#(
 	,.param63               (param63		)
 	,.param64               (param64		)
 	,.param65               (param65		)
-	,.param66               (param66		)
-	,.param67               (param67		)
+	,.param66               (i_sign1_check		)
+	,.param67               (i_sign2_check		)
 	,.param68               (param68		)
 	,.param69               (param69		)
 	,.param70               (param70		)
 	,.debug_reg1			(debug_reg1		)
-	,.debug_reg2			(debug_reg2		)
+	,.debug_reg2			({irq_posedge_cnt,irq_negedge_cnt,4'd0,irq_sta}			)
 	,.debug_reg3			(debug_reg3		)
 	,.debug_reg4			(debug_reg4		)
 	,.debug_reg5			(debug_reg5		)
@@ -385,6 +457,7 @@ module ec_2di#(
 			.m_wk_mod        	(m_wk_mod       ),
 			.m_saf_st        	(m_saf_st       ),
 			.link_m_saf_st   	(link_m_saf_st  ),
+			.di_i				({i_sign2_check,i_sign1_check}),
 			.signal_vld			(param1[1:0]	),
 			.a_en				(1'b1			),
 			.b_en				(1'b0			),	

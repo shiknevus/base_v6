@@ -73,6 +73,9 @@ module pre_post_sta_check_sys_sf#(
 		,output	reg	[C_BHA_NUM-1:0]		c_pre_sta_allow	
 		,output	reg	[C_BHA_NUM-1:0]		c_post_sta_allow
     );
+	
+	wire	i_clk = clk_i;
+	wire	i_rst = rst_i;
 
 	//========================================================================================//
 	//---------------------------------  Channel A check -------------------------------------//

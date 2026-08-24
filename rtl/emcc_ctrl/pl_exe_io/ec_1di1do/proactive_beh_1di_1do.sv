@@ -320,7 +320,7 @@ module proactive_beh_1di_1do#(
 		else if(!a_en)
 			a_alm_num <= 8'd0;
         else if(curr_state == S_BHA_PRE_DET && timout)						//The pre - full inspection is not met.
-			a_alm_num <= 8'd101;    
+			a_alm_num <= 8'd100;    
         else if(curr_state == S_READY_10_ACK && ack_tx_result == IRQ_NO_OK)	//Transaction 10 ps response error
             a_alm_num <= ack_ps_alart_num;    
         else if(curr_state == S_READY_10_ACK && timout)						//For Transaction 10, waiting for the ps response timed out.
@@ -378,12 +378,12 @@ module proactive_beh_1di_1do#(
 			do_o <= 1'b0;
 		else if(curr_state == S_EXE)
 			case(a_bhv_id_r)
-				8'd1    :	do_o <= 1'b0; 
-				8'd2    :	do_o <= 1'b1; 
+				8'd1    :	do_o <= 1'b1; 
+				8'd2    :	do_o <= 1'b0; 
 				8'd4    :	do_o <= 1'b0; 
 				8'd5    :	do_o <= 1'b0; 
-				8'd6    :	do_o <= 1'b0; 
-				8'd7    :	do_o <= 1'b1; 
+				8'd6    :	do_o <= 1'b1; 
+				8'd7    :	do_o <= 1'b0; 
 				default :	do_o <= 1'b0; 
 			endcase
 		else

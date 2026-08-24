@@ -200,71 +200,75 @@ end
 	always @(*) begin
         case (curr_state)
             S_IDLE: begin
-				if(chl_priority == 4'd0)begin	//abc
-					if(irq_a_i) 
-						next_state = S_WAIT_IRQ_ACK1;
-					else if(irq_b_i)
-						next_state = S_WAIT_IRQ_ACK1;
-					else if(irq_c_i)
-						next_state = S_WAIT_IRQ_ACK1;
-					else
-						next_state = S_IDLE;
-				end else if(chl_priority == 4'd1)begin	//acb
-					if(irq_a_i)
-						next_state = S_WAIT_IRQ_ACK1;
-					else if(irq_c_i)
-						next_state = S_WAIT_IRQ_ACK1;
-					else if(irq_b_i)
-						next_state = S_WAIT_IRQ_ACK1;
-					else begin
-						next_state = S_IDLE;
-					end
-				end else if(chl_priority == 4'd2)begin	//bac
-					if(irq_b_i)		
-						next_state = S_WAIT_IRQ_ACK1;		
-					else if(irq_a_i)		
-						next_state = S_WAIT_IRQ_ACK1;		
-					else if(irq_c_i)		
-						next_state = S_WAIT_IRQ_ACK1;		
-					else		
-						next_state = S_IDLE;		
-				end else if(chl_priority == 4'd3)begin	//bca
-					if(irq_b_i)		
-						next_state = S_WAIT_IRQ_ACK1;		
-					else if(irq_c_i)		
-						next_state = S_WAIT_IRQ_ACK1;		
-					else if(irq_a_i)		
-						next_state = S_WAIT_IRQ_ACK1;		
-					else		
-						next_state = S_IDLE;
-				end else if(chl_priority == 4'd4)begin	//cab
-					if(irq_c_i)		
-						next_state = S_WAIT_IRQ_ACK1;		
-					else if(irq_a_i)		
-						next_state = S_WAIT_IRQ_ACK1;		
-					else if(irq_b_i)		
-						next_state = S_WAIT_IRQ_ACK1;		
-					else		
-						next_state = S_IDLE;		
-				end else if(chl_priority == 4'd5)begin	//cba
-					if(irq_c_i)		
-						next_state = S_WAIT_IRQ_ACK1;		
-					else if(irq_b_i)		
-						next_state = S_WAIT_IRQ_ACK1;		
-					else if(irq_a_i)		
-						next_state = S_WAIT_IRQ_ACK1;		
-					else		
-						next_state = S_IDLE;		
-				end else begin							//default:bac
-					if(irq_b_i)		
-						next_state = S_WAIT_IRQ_ACK1;		
-					else if(irq_a_i)		
-						next_state = S_WAIT_IRQ_ACK1;		
-					else if(irq_c_i)		
-						next_state = S_WAIT_IRQ_ACK1;		
-					else		
-						next_state = S_IDLE;	
-				end
+				if(irq_a_i || irq_b_i || irq_c_i)
+					next_state = S_WAIT_IRQ_ACK1;
+				else
+					next_state = S_IDLE;
+				//if(chl_priority == 4'd0)begin	//abc
+				//	if(irq_a_i) 
+				//		next_state = S_WAIT_IRQ_ACK1;
+				//	else if(irq_b_i)
+				//		next_state = S_WAIT_IRQ_ACK1;
+				//	else if(irq_c_i)
+				//		next_state = S_WAIT_IRQ_ACK1;
+				//	else
+				//		next_state = S_IDLE;
+				//end else if(chl_priority == 4'd1)begin	//acb
+				//	if(irq_a_i)
+				//		next_state = S_WAIT_IRQ_ACK1;
+				//	else if(irq_c_i)
+				//		next_state = S_WAIT_IRQ_ACK1;
+				//	else if(irq_b_i)
+				//		next_state = S_WAIT_IRQ_ACK1;
+				//	else begin
+				//		next_state = S_IDLE;
+				//	end
+				//end else if(chl_priority == 4'd2)begin	//bac
+				//	if(irq_b_i)		
+				//		next_state = S_WAIT_IRQ_ACK1;		
+				//	else if(irq_a_i)		
+				//		next_state = S_WAIT_IRQ_ACK1;		
+				//	else if(irq_c_i)		
+				//		next_state = S_WAIT_IRQ_ACK1;		
+				//	else		
+				//		next_state = S_IDLE;		
+				//end else if(chl_priority == 4'd3)begin	//bca
+				//	if(irq_b_i)		
+				//		next_state = S_WAIT_IRQ_ACK1;		
+				//	else if(irq_c_i)		
+				//		next_state = S_WAIT_IRQ_ACK1;		
+				//	else if(irq_a_i)		
+				//		next_state = S_WAIT_IRQ_ACK1;		
+				//	else		
+				//		next_state = S_IDLE;
+				//end else if(chl_priority == 4'd4)begin	//cab
+				//	if(irq_c_i)		
+				//		next_state = S_WAIT_IRQ_ACK1;		
+				//	else if(irq_a_i)		
+				//		next_state = S_WAIT_IRQ_ACK1;		
+				//	else if(irq_b_i)		
+				//		next_state = S_WAIT_IRQ_ACK1;		
+				//	else		
+				//		next_state = S_IDLE;		
+				//end else if(chl_priority == 4'd5)begin	//cba
+				//	if(irq_c_i)		
+				//		next_state = S_WAIT_IRQ_ACK1;		
+				//	else if(irq_b_i)		
+				//		next_state = S_WAIT_IRQ_ACK1;		
+				//	else if(irq_a_i)		
+				//		next_state = S_WAIT_IRQ_ACK1;		
+				//	else		
+				//		next_state = S_IDLE;		
+				//end else begin							//default:bac
+				//	if(irq_b_i)		
+				//		next_state = S_WAIT_IRQ_ACK1;		
+				//	else if(irq_a_i)		
+				//		next_state = S_WAIT_IRQ_ACK1;		
+				//	else if(irq_c_i)		
+				//		next_state = S_WAIT_IRQ_ACK1;		
+				//	else		
+				//		next_state = S_IDLE;	
+				//end
 			end
 
 			S_WAIT_IRQ_ACK1: begin
@@ -303,7 +307,7 @@ end
 	else if(curr_state != curr_state_1d)
 		irq_cnt <= 8'd0;
 	else if(curr_state == S_WAIT_IRQ_ACK1) begin
-		if(irq_cnt >= 8'd31) 
+		if(irq_cnt >= 8'd32) 
 			irq_cnt <= irq_cnt;
 		else
 			irq_cnt <= irq_cnt +1;

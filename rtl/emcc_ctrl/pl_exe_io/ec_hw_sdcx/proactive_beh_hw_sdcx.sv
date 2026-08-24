@@ -31,7 +31,7 @@ module proactive_beh_hw_sdcx#(
     ,input      [BHA_NUM-1:0]   pre_sta_allow   //Pre - sufficient condition satisfied signal. 0: Not satisfied. 1: Satisfied.
     ,input      [BHA_NUM-1:0]   post_sta_allow  //Post - sufficient condition satisfied signal
 
-    ,input      [1:0]           mode_sel 		//1: Single-key mode 2: Double-key mode
+    //,input      [1:0]           mode_sel 		//1: Single-key mode 2: Double-key mode
 	
 	,input						a_en			//A enable
     ,input      [7:0]           a_bhv_id
@@ -43,7 +43,6 @@ module proactive_beh_hw_sdcx#(
     ,output reg [7:0]           a_tx_id
     ,output reg	[7:0]           a_alm_num
 
-    ,input      [1:0]           di_i
 	,output	reg	[2:0]			do_o
 
 	,output reg	[7:0]           a_bhv_id_r
@@ -221,9 +220,15 @@ module proactive_beh_hw_sdcx#(
 			end
 
             S_EXE_20: begin		//4							//Send 20 interrupt
-				//next_state = S_EXE_20_ACK;
 				next_state = S_EXE;
             end
+			
+			S_EXE:begin		//11								//active Execution
+				if(tim_500ms_cnt >= 499)
+					next_state = S_BHA_POST_DET;
+				else
+					next_state = S_EXE;
+			end
 			
 			//S_EXE_20_ACK: begin
 			//	if(match_20) 								//Transaction 20 Acknowledged OK
@@ -233,14 +238,7 @@ module proactive_beh_hw_sdcx#(
             //    else
             //        next_state = S_EXE_20_ACK;
 			//end
-			
-			S_EXE:begin		//11								//active Execution
-				if(tim_500ms_cnt >= 499)
-					next_state = S_BHA_POST_DET;
-				else
-					next_state = S_EXE;
-			end
-			
+
             S_BHA_POST_DET: begin	//curr_state = 6
 				if(post_sta_allow[a_bhv_id_r - 1'b1]) begin
 					next_state = S_SUCC_30;
@@ -370,20 +368,7 @@ module proactive_beh_hw_sdcx#(
 	//===============================================================================================================
 	//------------------------------------------------ user logic start ---------------------------------------------
 	//===============================================================================================================
-	
-	reg	[1:0]	mode_sel_r;
-	
-	always@(posedge clk_i)
-	begin
-		if(rst_i)
-			mode_sel_r <= 2'b00;
-		else if(a_bhv_vld)
-			mode_sel_r <= mode_sel;
-		else
-			mode_sel_r <= mode_sel_r;
-	end
-	
-	
+
 	//Count 500ms
 	always@(posedge clk_i)
 	begin
@@ -393,35 +378,71 @@ module proactive_beh_hw_sdcx#(
 			if(tim_500ms_cnt >= 499)					
 				tim_500ms_cnt <= tim_500ms_cnt;
 			else
-				//tim_500ms_cnt <= tim_500ms_cnt+i_time_1ms_vld;		//actual
-				tim_500ms_cnt <= tim_500ms_cnt+1;						//sim
+				tim_500ms_cnt <= tim_500ms_cnt+i_time_1ms_vld;		//actual
+				//tim_500ms_cnt <= tim_500ms_cnt+1;						//sim
 		else
 			tim_500ms_cnt <= 9'd0;
 	end
 	
+	//------------------------------------------- Single-Key begin -------------------------------------------
+	//do_o = {KA3,KA2,KA1};
 	
-	always@(posedge clk_i)
+	always@(posedge i_clk)
 	begin
 		if(rst_i || !a_en)
 			do_o <= 3'b000;
-		else if(curr_state == S_EXE && a_bhv_id_r == 8'd1)
-			case(mode_sel_r)
-				1:do_o <= 3'b010;	//Single-key mode
-				2:do_o <= 3'b011;	//Double-key mode
-				default:do_o <= 3'b011;
-			endcase
-		else if(curr_state == S_EXE && a_bhv_id_r == 8'd2)
-			do_o <= 3'b001;
-		else if(curr_state == S_EXE && a_bhv_id_r == 8'd3)
-			case(mode_sel_r)
-				1:do_o <= 3'b100;	//Single-key mode
-				2:do_o <= 3'b110;	//Double-key mode
-				default:do_o <= 3'b110;
+		else if(curr_state == S_EXE)
+			case(a_bhv_id_r)
+				8'd1:do_o <= 3'b010;
+				8'd2:do_o <= 3'b001;
+				8'd3:do_o <= 3'b100;
+				default:do_o <= 3'b000;
 			endcase
 		else
 			do_o <= 3'b000;
 	end
 
+	//------------------------------------------- Single-Key begin -------------------------------------------
+	
+	
+	
+	//------------------------------------------- Single-Key and double-Key begin -------------------------------------------
+	//	reg	[1:0]	mode_sel_r;
+	//	
+	//	always@(posedge clk_i)
+	//	begin
+	//		if(rst_i)
+	//			mode_sel_r <= 2'b00;
+	//		else if(a_bhv_vld)
+	//			mode_sel_r <= mode_sel;
+	//		else
+	//			mode_sel_r <= mode_sel_r;
+	//	end
+	//	
+	//	
+	//	always@(posedge clk_i)
+	//	begin
+	//		if(rst_i || !a_en)
+	//			do_o <= 3'b000;
+	//		else if(curr_state == S_EXE && a_bhv_id_r == 8'd1)
+	//			case(mode_sel_r)
+	//				1:do_o <= 3'b010;	//Single-key mode
+	//				2:do_o <= 3'b011;	//Double-key mode
+	//				default:do_o <= 3'b011;
+	//			endcase
+	//		else if(curr_state == S_EXE && a_bhv_id_r == 8'd2)
+	//			do_o <= 3'b001;
+	//		else if(curr_state == S_EXE && a_bhv_id_r == 8'd3)
+	//			case(mode_sel_r)
+	//				1:do_o <= 3'b100;	//Single-key mode
+	//				2:do_o <= 3'b110;	//Double-key mode
+	//				default:do_o <= 3'b110;
+	//			endcase
+	//		else
+	//			do_o <= 3'b000;
+	//	end
+	
+	//------------------------------------------- Single-Key and double-Key end -------------------------------------------
 
 	//===============================================================================================================
 	//------------------------------------------------ user logic start ---------------------------------------------

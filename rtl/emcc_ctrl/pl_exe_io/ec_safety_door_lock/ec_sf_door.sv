@@ -18,7 +18,7 @@
 // Additional Comments:
 // 
 //////////////////////////////////////////////////////////////////////////////////
-
+`define DEBUG
 
 module ec_sf_door#(
 		parameter  				REG_SPACE_BIAS 		= 	2000	,
@@ -196,9 +196,54 @@ module ec_sf_door#(
 	wire	o_lock_open_b;
 	wire	o_lock_open_a;
 	
+	wire	i_clk = clk_i;
+	wire	i_rst = rst_i;
+	
 	assign o_lock_open = o_lock_open_a || o_lock_open_b;
 	
-	
+	`ifdef DEBUG
+		reg			ro_intr_irq;
+		reg	[11:0]	irq_sta;
+		reg	[7:0]	irq_posedge_cnt;
+		reg	[7:0]	irq_negedge_cnt;
+		
+		always@(posedge i_clk)
+		begin
+			ro_intr_irq <= o_intr_irq;
+		end
+		
+		
+		always@(posedge i_clk)
+		begin
+			if(i_rst)begin
+				irq_sta <= 12'h000;
+				irq_posedge_cnt <= 8'd0;
+				irq_negedge_cnt <= 8'd0;
+			end else if(!ec_cha_st) begin
+				irq_sta <= 12'h000;
+				irq_posedge_cnt <= 8'd0;
+				irq_negedge_cnt <= 8'd0;
+			end else begin
+				irq_sta[0] <= o_intr_irq;
+				
+				if({ro_intr_irq,o_intr_irq} == 2'b01)begin	//rising
+					irq_sta[8] <= ~irq_sta[8];
+					irq_posedge_cnt <= irq_posedge_cnt+1;
+				end else begin
+					irq_sta[8] <= irq_sta[8];
+					irq_posedge_cnt <= irq_posedge_cnt;
+				end
+				
+				if({ro_intr_irq,o_intr_irq} == 2'b10)begin	//falling
+					irq_sta[4] <= ~irq_sta[4];
+					irq_negedge_cnt <= irq_negedge_cnt+1;
+				end else begin
+					irq_sta[4] <= irq_sta[4];
+					irq_negedge_cnt <= irq_negedge_cnt;
+				end
+			end
+		end
+	`endif
 	
 	
 	ps_rw_pl_reg#(
@@ -306,10 +351,10 @@ module ec_sf_door#(
 	,.param66               (i_open_req_key		)
 	,.param67               (i_close_confirm_key)
 	,.param68               (i_lock_monitor		)
-	,.param69               (param69		)
+	,.param69               (o_lock_open		)
 	,.param70               (param70		)
 	,.debug_reg1			(debug_reg1		)
-	,.debug_reg2			(debug_reg2		)
+	,.debug_reg2			({irq_posedge_cnt,irq_negedge_cnt,4'd0,irq_sta}		)
 	,.debug_reg3			(debug_reg3		)
 	,.debug_reg4			(debug_reg4		)
 	,.debug_reg5			(debug_reg5		)
@@ -325,7 +370,7 @@ module ec_sf_door#(
     ,.i_time_1s_vld        	(i_time_1s_vld  	)
     ,.pre_sta_allow        	(a_pre_sta_allow	)
     ,.post_sta_allow       	(a_post_sta_allow	)
-	,.a_en			       	(1'b1				)
+	,.a_en			       	(1'b0				)
     ,.a_bhv_id             	(a_bhv_id       	)
     ,.a_bhv_vld            	(a_bhv_vld      	)
     ,.a_tx_ot              	(a_tx_ot        	)
@@ -336,7 +381,7 @@ module ec_sf_door#(
     ,.a_alm_num            	(a_alm_num      	)
     ,.o_lock_open			(o_lock_open_a		)
 	,.a_bhv_id_r			(a_bhv_id_r			)
-	,.state_monitor_o		(debug_reg1			)
+	,.state_monitor_o		(					)
     ,.irq_o                	(irq_a				)
     ,.irq_ack_i       		(irq_a_grant		)
     );
@@ -360,13 +405,14 @@ module ec_sf_door#(
 	,.b_tx_id               (b_tx_id			)
 	,.b_alm_num             (b_alm_num			)
 	,.i_open_req_key		(i_open_req_key		)
-	,.i_close_confirm_key   (i_close_confirm_key )
-	//,.i_door_monitor  	    (i_door_monitor  	)
+	,.i_close_confirm_key   (i_close_confirm_key)
+	//,.i_door_monitor  	(i_door_monitor 	)
 	,.i_lock_monitor  	    (i_lock_monitor  	)
-	//,.o_key_light     	    (o_key_light     	)
-	,.o_lock_open    		(o_lock_open_b    		)
+	//,.o_key_light     	(o_key_light    	)
+	,.o_lock_open    		(o_lock_open_b    	)
+	,.state_monitor_o		(debug_reg1			)
 	,.irq_o			        (irq_b				)
-	,.irq_ack_i	            (irq_b_grant			)	
+	,.irq_ack_i	            (irq_b_grant		)	
     );
 	 
 	tim_beh_safety_door tim_beh_safety_door_u0(
@@ -410,7 +456,7 @@ module ec_sf_door#(
 			.i_open_req_key     (i_open_req_key		),
 			.i_close_confirm_key(i_close_confirm_key),
 			.i_lock_monitor     (i_lock_monitor  	),
-			.a_en				(1'b1			),
+			.a_en				(1'b0			),
 			.b_en				(1'b1			),	
 			.c_en				(1'b0			),	
 			.a_bhv_id			(a_bhv_id_r		),

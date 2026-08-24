@@ -232,7 +232,7 @@ module proactive_beh_5di#(
 				next_state = S_BHA_POST_DET;
 			end
 			
-            S_BHA_POST_DET: begin	//curr_state = 6
+            S_BHA_POST_DET: begin	//curr_state = 7
 				if(post_sta_allow[a_bhv_id_r - 1'b1]) begin
 					next_state = S_SUCC_30;
 				end else if(timout) begin
@@ -319,21 +319,21 @@ module proactive_beh_5di#(
         if(rst_i || !a_en)
             a_alm_num <= 8'd0;
         else if(curr_state == S_BHA_PRE_DET && timout)			
-            a_alm_num <= 8'd101;     
+            a_alm_num <= 8'd100;     
         else if(curr_state == S_READY_10_ACK && ack_tx_result == IRQ_NO_OK)				
             a_alm_num <= ack_ps_alart_num;    
         else if(curr_state == S_READY_10_ACK && timout)									
-            a_alm_num <= 8'd102;    
+            a_alm_num <= 8'd101;    
 		//else if(curr_state == S_EXE_20_ACK && ack_tx_result == IRQ_NO_OK)				
         //    a_alm_num <= ack_ps_alart_num;    
         //else if(curr_state == S_EXE_20_ACK && timout)									
         //    a_alm_num <= 8'd103;    
 		else if(curr_state == S_BHA_POST_DET && timout)			
-            a_alm_num <= 8'd103;     
+            a_alm_num <= 8'd102;     
 		else if(curr_state == S_SUCC_30_ACK && ack_tx_result == IRQ_NO_OK)				
 			a_alm_num <= ack_ps_alart_num;
 		else if(curr_state == S_SUCC_30_ACK && timout)									
-            a_alm_num <= 8'd104;
+            a_alm_num <= 8'd103;
 		else if(curr_state == S_IDLE)
 			a_alm_num <= 8'd0;
         else

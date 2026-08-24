@@ -38,8 +38,9 @@ module ec_pulmotor_handwheel#(
 		input  		 [19:0]     i_st_rd_addr    ,
 		output 		 [31:0]     o_st_rd_data    ,
 		output 		            o_st_rd_vld     ,
-
-		input 	            	i_estop      ,
+		
+		//sys interface
+		//input 	            	i_estop      ,
 		input 	            	i_pulse_a    ,
 		input 	            	i_pulse_b    ,
 		input 	            	i_stp_x1     ,
@@ -52,11 +53,13 @@ module ec_pulmotor_handwheel#(
 		input 	            	i_axis_5     ,
 		input 	            	i_axis_6     ,
 		input 	            	i_axis_7     ,
-		output	[3:0]       	o_wheel_prog ,
-		output	[31:0]			o_pulse_cnt  ,
-		output					o_estop_sta  ,
-		output					o_axis_num   ,
-		output	            	o_wheel_dir  ,
+		
+		//user interface
+		//output	[3:0]       	o_wheel_prog ,
+		//output	[31:0]			o_pulse_cnt  ,
+		//output					o_estop_sta  ,
+		//output					o_axis_num   ,
+		//output	            	o_wheel_dir  ,
 
 		output 	            	o_intr_irq	
     );
@@ -203,6 +206,10 @@ module ec_pulmotor_handwheel#(
 	
 	wire	[7:0]	a_bhv_id_r;
 
+	assign param51 = {19'd0,i_estop,i_pulse_a,i_pulse_b,i_stp_x1,i_stp_x10,i_stp_x100,i_axis_x,i_axis_y,i_axis_z,i_axis_4,i_axis_5,i_axis_6,i_axis_7};
+
+	
+	
 	
 	ps_rw_pl_reg#(
 		.REG_SPACE_BIAS 	(REG_SPACE_BIAS		),
@@ -291,22 +298,22 @@ module ec_pulmotor_handwheel#(
 	,.c_alm_num             (c_alm_num 		)
 	,.c_tsc_id              (c_tx_id  		)
 	,.c_bhv_id              (c_bhv_id 		)
-	,.param51               ({29'd0,i_stp_x100,i_stp_x10,i_stp_x1}	)
+	,.param51               (param51		)
 	,.param52               (param52		)
 	,.param53               (param53		)
-	,.param54               (param54		)
-	,.param55               (param55		)
-	,.param56               (param56		)
-	,.param57               (param57		)
-	,.param58               (param58		)
-	,.param59               (param59		)
-	,.param60               (param60		)
-	,.param61               (param61		)
-	,.param62               (param62		)
-	,.param63               (param63		)
-	,.param64               (param64		)
-	,.param65               (param65		)
-	,.param66               (i_estop		)
+	,.param54               (param54		) 
+	,.param55               (param55		) 
+	,.param56               (param56		) 
+	,.param57               (param57		) 
+	,.param58               (param58		) 
+	,.param59               (param59		) 
+	,.param60               (param60		) 
+	,.param61               (param61		) 
+	,.param62               (param62		) 
+	,.param63               (param63		) 
+	,.param64               (param64		) 
+	,.param65               (param65		) 
+	,.param66               (i_estop		) 
 	,.param67               (param67		)
 	,.param68               (param68		)
 	,.param69               (param69		)
@@ -385,22 +392,22 @@ module ec_pulmotor_handwheel#(
 	,.c_tx_id         	        (c_tx_id			)
 	,.c_alm_num                 (c_alm_num			)
 	,.c_gap_crl                 (c_gap_crl			)
-	,.i_estop					(0			)
-	,.i_pulse_a					(i_pulse_a			)
-	,.i_pulse_b					(i_pulse_b			)
-	,.i_stp_x1					(1		)
-	,.i_stp_x10					(0		)
-	,.i_stp_x100				(0			)
-	,.i_axis_x					(1			)
-	,.i_axis_y					(0			)
-	,.i_axis_z					(0			)
-	,.i_axis_4					(0			)
-	,.i_axis_5					(0			)
-	,.i_axis_6					(0			)
-	,.i_axis_7					(0			)
+	,.i_estop					(i_estop   			)
+	,.i_pulse_a					(i_pulse_a 			)
+	,.i_pulse_b					(i_pulse_b 			)
+	,.i_stp_x1					(i_stp_x1  			)
+	,.i_stp_x10					(i_stp_x10 			)
+	,.i_stp_x100				(i_stp_x100			)
+	,.i_axis_x					(i_axis_x  			)
+	,.i_axis_y					(i_axis_y  			)
+	,.i_axis_z					(i_axis_z  			)
+	,.i_axis_4					(i_axis_4  			)
+	,.i_axis_5					(i_axis_5  			)
+	,.i_axis_6					(i_axis_6  			)
+	,.i_axis_7					(i_axis_7  			)
 	,.o_wheel_prog				(param61			)//axis
-	,.o_pulse_cnt				(param52			)
-	,.o_wheel_dir				(param67			)
+	,.o_pulse_cnt				(param52			)//pulse
+	,.o_wheel_dir				(param67			)//dir
 	,.state_monitor_o			(debug_reg1			)
 	,.irq_o 					(irq_c				)
 	,.irq_ack_i                 (irq_c_grant		)
@@ -427,9 +434,9 @@ module ec_pulmotor_handwheel#(
 			.ec_id           	(ec_id          ),
 			.di_i				(di_i			),
 			.do_i				(do_o			),
-			.a_en				(1'b1			),
+			.a_en				(1'b0			),
 			.b_en				(1'b0			),	
-			.c_en				(1'b0			),	
+			.c_en				(1'b1			),	
 			.a_bhv_id			(a_bhv_id_r		),
 			.b_bhv_id			(b_bhv_id		),
 			.c_bhv_id			(c_bhv_id		),

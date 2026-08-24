@@ -46,7 +46,7 @@ module proactive_beh_1avi#(
 	,output						spi_csn_o
 	,input						spi_di_i
 	
-	,output	reg	[31:0]			adc_dat_o
+	,output	reg	[15:0]			adc_dat_o
 
 	,output reg [7:0]           a_bhv_id_r
 	,output	reg	[31:0]			state_monitor_o
@@ -67,7 +67,7 @@ module proactive_beh_1avi#(
 	reg	[7:0]		ack_ps_alart_num;
 	
 	wire 			adc_ch0_data_vld  ;
-	wire [31:0]		adc_ch0_data	  ;
+	wire [15:0]		adc_ch0_data	  ;
 	
 	//State machine state
 	localparam  S_IDLE          = 8'd0; 	//idle

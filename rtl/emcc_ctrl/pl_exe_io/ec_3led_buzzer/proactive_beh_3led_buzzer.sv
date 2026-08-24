@@ -49,8 +49,6 @@ module proactive_beh_3led_buzzer#(
 	,output	reg	[31:0]			state_monitor_o
     ,output reg                 irq_o
     ,input                      irq_ack_i       //Interrupt response
-	,input		[31:0]		   	i_blink_times		//Blink times set for 3led and buzzer
-	,input		[31:0]		   	i_exe_times		
     );
 
 	reg	[7:0]		curr_state;

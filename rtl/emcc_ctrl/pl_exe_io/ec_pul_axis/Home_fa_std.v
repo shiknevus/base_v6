@@ -28,13 +28,14 @@ module Home_fa_std
    ,output reg              o_pf_quickstop
    ,input  wire             i_pf_busy
    ,input  wire             i_pf_done
+   ,input  wire [31:0]      i_spd_min
 );
 
 
 
 
    //////////////////////// DEFINE ////////////
-   parameter P_SPD_MIN        = 32'd5000;
+   localparam P_SPD_MIN        = 32'd5000;
    localparam DIR_POS  	       = 1'b1;
    localparam DIR_NEG          = 1'b0;
    localparam ST_HOME_IDLE     = 0;
@@ -276,14 +277,14 @@ module Home_fa_std
                    o_pf_dir   <= DIR_NEG;
                end
                ST_HOME_FMIN: begin
-                   o_pf_spd   <= P_SPD_MIN;
+                   o_pf_spd   <= i_spd_min;
                    o_pf_acc   <= i_pf_acc;
                    o_pf_dec   <= i_pf_dec;
                    o_pf_pulse <= 32'h7FFFFFFF;
                    o_pf_dir   <= DIR_POS;
                end
                ST_HOME_BMIN: begin
-                   o_pf_spd   <= P_SPD_MIN;
+                   o_pf_spd   <= i_spd_min;
                    o_pf_acc   <= i_pf_acc;
                    o_pf_dec   <= i_pf_dec;
                    o_pf_pulse <= 32'h7FFFFFFF;

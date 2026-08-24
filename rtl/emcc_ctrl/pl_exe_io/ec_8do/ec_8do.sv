@@ -203,6 +203,7 @@ module ec_8do#(
 	assign 	o_dri7 = do_o[6];
 	assign 	o_dri8 = do_o[7];
 
+	assign param61 = {o_dri8,o_dri7,o_dri6,o_dri5,o_dri4,o_dri3,o_dri2,o_dri1};
 
 	ps_rw_pl_reg#(
 		.REG_SPACE_BIAS 	(REG_SPACE_BIAS		),
@@ -301,7 +302,7 @@ module ec_8do#(
 	,.param58               (param58		)
 	,.param59               (param59		)
 	,.param60               (param60		)
-	,.param61               (param61		)
+	,.param61               (param61		)	//do
 	,.param62               (param62		)
 	,.param63               (param63		)
 	,.param64               (param64		)

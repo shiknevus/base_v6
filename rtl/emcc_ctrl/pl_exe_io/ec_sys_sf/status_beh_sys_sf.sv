@@ -43,7 +43,7 @@ module status_beh_sys_sf#(
 	,output	reg [7:0]			b_tx_id     
 	,output	reg [7:0]			b_alm_num   
 	
-	,output		[31:0]			status_pl_ps
+	//,output		[31:0]			status_pl_ps
 	
 	,input 						i_start  
 	,input 						i_stop   
@@ -71,6 +71,20 @@ module status_beh_sys_sf#(
 	reg [7:0]		ack_tx_id;
 	reg [7:0]		ack_tx_result;
 	reg	[7:0]		ack_ps_alart_num;
+	
+	reg	[1:0]		ri_start 		;
+	reg	[1:0]		ri_stop  		;
+	reg	[1:0]		ri_rst   		;
+	reg [1:0]		ri_estop		;
+	reg [1:0]		ri_manul		;	
+	reg [1:0]		ri_auto			;
+
+	reg 			negedge_i_start ;
+	reg 			negedge_i_stop  ;
+	reg 			negedge_i_rst   ;
+	reg				edge_i_estop	;
+	reg				edge_i_manul	;
+	reg				edge_i_auto		;
 
 	//State machine state
 	localparam  S_IDLE          = 8'd0; 	//idle
@@ -86,7 +100,7 @@ module status_beh_sys_sf#(
 	localparam 	S_ALERT_40		= 8'd10;	//Alert
 	localparam 	S_ALERT_40_ACK	= 8'd11;	//Alert ack
 	localparam 	S_ACTIVE_END1	= 8'd12;
-	localparam 	S_ACTIVE_END2	= 8'd13;	//Alert ack
+	localparam 	S_ACTIVE_END2	= 8'd13;
 	
     localparam  IRQ_OK          = 8'h51;	//ps ack:OK
     localparam  IRQ_NO_OK       = 8'h52;	//ps ack:NO OK
@@ -166,7 +180,7 @@ module status_beh_sys_sf#(
 				b_bhv_id <= b_bhv_id;
 			
 			if(negedge_i_rst)
-				b_bhv_id <= 8'd101;
+				b_bhv_id <= 8'd102;
 			else if(curr_state == S_ACTIVE_END2)
 				b_bhv_id <= 8'd0;
 			else
@@ -188,6 +202,13 @@ module status_beh_sys_sf#(
 			
 			if(edge_i_manul && !i_manul)
 				b_bhv_id <= 8'd104;
+			else if(curr_state == S_ACTIVE_END2)
+				b_bhv_id <= 8'd0;
+			else
+				b_bhv_id <= b_bhv_id;
+			
+			if((edge_i_manul && i_manul && i_auto) || (edge_i_auto && i_manul && i_auto))
+				b_bhv_id <= 8'd105;
 			else if(curr_state == S_ACTIVE_END2)
 				b_bhv_id <= 8'd0;
 			else
@@ -382,23 +403,21 @@ module status_beh_sys_sf#(
 		else if(!b_en)
 			b_alm_num <= 8'd0;
         else if(curr_state == S_BHA_PRE_DET && timout)						//The pre - full inspection is not met.
-            b_alm_num <= 8'd1;    
+            b_alm_num <= 8'd100;    
         else if(curr_state == S_READY_10_ACK && ack_tx_result == IRQ_NO_OK)	//Transaction 10 ps response error
             b_alm_num <= ack_ps_alart_num;    
         else if(curr_state == S_READY_10_ACK && timout)						//For Transaction 10, waiting for the ps response timed out.
-            b_alm_num <= 8'd2;    
-		else if(curr_state == S_EXE_20_ACK && ack_tx_result == IRQ_NO_OK)	//Transaction 20 has a ps response error.
-            b_alm_num <= ack_ps_alart_num;    
-        else if(curr_state == S_EXE_20_ACK && timout)						//For Transaction 20, waiting for the ps response timed out.
-            b_alm_num <= 8'd3;    
-		else if(curr_state_1d == S_EXE && curr_state == S_ALERT_40 && b_bhv_id == 8'd1)//The execution of Behavior 1 failed.
-			b_alm_num <= 8'd4; 
-		else if(curr_state_1d == S_EXE && curr_state == S_ALERT_40 && b_bhv_id == 8'd2)//The execution of Behavior 2 failed.
-			b_alm_num <= 8'd5;
+            b_alm_num <= 8'd101;    
+		//else if(curr_state == S_EXE_20_ACK && ack_tx_result == IRQ_NO_OK)	//Transaction 20 has a ps response error.
+        //    b_alm_num <= ack_ps_alart_num;    
+        //else if(curr_state == S_EXE_20_ACK && timout)						//For Transaction 20, waiting for the ps response timed out.
+        //    b_alm_num <= 8'd3;    
+		else if(curr_state_1d == S_BHA_POST_DET && timout)					//The execution of Behavior 1 failed.
+			b_alm_num <= 8'd102; 
 		else if(curr_state == S_SUCC_30_ACK && ack_tx_result == IRQ_NO_OK)	//Transaction 30 has a ps response error.
 			b_alm_num <= ack_ps_alart_num;
 		else if(curr_state == S_SUCC_30_ACK && timout)						//For Transaction 30, waiting for the ps response timed out.
-            b_alm_num <= 8'd6;
+            b_alm_num <= 8'd103;
         else
             b_alm_num <= b_alm_num;
     end
@@ -433,19 +452,9 @@ module status_beh_sys_sf#(
 	//===============================================================================================================
 	
 	//button
-	reg	[1:0]		ri_start 		;
-	reg	[1:0]		ri_stop  		;
-	reg	[1:0]		ri_rst   		;
-	reg [1:0]		ri_estop		;
-	reg [1:0]		ri_manul		;	
-	reg [1:0]		ri_auto			;
-
-	reg 			negedge_i_start ;
-	reg 			negedge_i_stop  ;
-	reg 			negedge_i_rst   ;
-	reg				edge_i_estop	;
-	reg				edge_i_manul	;
-	reg				edge_i_auto		;
+	//The mode selector knob has one, 2 di, 3 positions, and in the middle position both 2 di are 0.
+	
+	
 	
 	//Detect the rising/falling edge of the input signal
 	always@(posedge clk_i)
@@ -531,98 +540,98 @@ module status_beh_sys_sf#(
 	
 	//-------------------------------------------------------------------------------
 	
-	reg	[1:0]		run_mode;
-	
-	reg				start		;
-	reg 			normalstop 	;
-	reg				output_rst	;
-	reg 			emstop_begin;	
-	reg 			emstop_end  ;	
-	
-	//default=1		press=0		release=1
-	always@(posedge clk_i)
-	begin
-        if(rst_i)
-			start <= 1'b0;
-		else if(curr_state == S_EXE && b_bhv_id == 100)
-			start <= 1'b1;
-		else if(curr_state == S_ACTIVE_END1)
-			start <= 1'b0;
-		else
-			start <= start;
-    end
-	
-	//normalstop
-	always@(posedge clk_i)
-	begin
-        if(rst_i)
-			normalstop <= 1'b0;
-		else if(curr_state == S_EXE && b_bhv_id == 101)
-			normalstop <= 1'b1;
-		else if(curr_state == S_ACTIVE_END1)
-			normalstop <= 1'b0;
-		else
-			normalstop <= normalstop;
-    end
-	
-	//rst
-	always@(posedge clk_i)
-	begin
-        if(rst_i)
-			output_rst <= 1'b0;
-		else if(curr_state == S_EXE && b_bhv_id == 102)
-			output_rst <= 1'b1;
-		else if(curr_state == S_ACTIVE_END1)
-			output_rst <= 1'b0;
-		else
-			output_rst <= output_rst;
-    end
-
-	//emstop_begin
-	always@(posedge clk_i)
-	begin
-        if(rst_i)
-			emstop_begin <= 1'b0;
-		else if(curr_state == S_EXE && b_bhv_id == 103)
-			emstop_begin <= 1'b1;
-		else if(curr_state == S_ACTIVE_END1)
-			emstop_begin <= 1'b0;
-		else
-			emstop_begin <= emstop_begin;
-    end
-	
-	//emstop_end
-	always@(posedge clk_i)
-	begin
-        if(rst_i)
-			emstop_end <= 1'b0;
-		else if(curr_state == S_EXE && b_bhv_id == 107)
-			emstop_end <= 1'b1;
-		else if(curr_state == S_ACTIVE_END1)
-			emstop_end <= 1'b0;
-		else
-			emstop_end <= emstop_end;
-    end
-	
-	//run_mode	01:auto		10:half auto	11:manul
-	always@(posedge clk_i)
-	begin
-        if(rst_i)
-			run_mode <= 2'b01;	//auto
-		else if(curr_state == S_EXE)
-			case(b_bhv_id)
-				8'd104	:	run_mode <= 2'b11;
-				8'd105	:	run_mode <= 2'b10;
-				8'd106	:	run_mode <= 2'b01;
-				default	:	run_mode <= 2'b01;
-			endcase
-		else if(curr_state == S_ACTIVE_END1)
-			run_mode <= 2'b01;
-		else
-			run_mode <= run_mode;
-    end
-	
-	assign status_pl_ps = {25'd0,start,normalstop,output_rst,emstop_begin,emstop_end,run_mode};
+	//	reg	[1:0]		run_mode;
+	//	
+	//	reg				start		;
+	//	reg 			normalstop 	;
+	//	reg				output_rst	;
+	//	reg 			emstop_begin;	
+	//	reg 			emstop_end  ;	
+	//	
+	//	//default=1		press=0		release=1
+	//	always@(posedge clk_i)
+	//	begin
+    //	    if(rst_i)
+	//			start <= 1'b0;
+	//		else if(curr_state == S_EXE && b_bhv_id == 100)
+	//			start <= 1'b1;
+	//		else if(curr_state == S_ACTIVE_END1)
+	//			start <= 1'b0;
+	//		else
+	//			start <= start;
+    //	end
+	//	
+	//	//normalstop
+	//	always@(posedge clk_i)
+	//	begin
+    //	    if(rst_i)
+	//			normalstop <= 1'b0;
+	//		else if(curr_state == S_EXE && b_bhv_id == 101)
+	//			normalstop <= 1'b1;
+	//		else if(curr_state == S_ACTIVE_END1)
+	//			normalstop <= 1'b0;
+	//		else
+	//			normalstop <= normalstop;
+    //	end
+	//	
+	//	//rst
+	//	always@(posedge clk_i)
+	//	begin
+    //	    if(rst_i)
+	//			output_rst <= 1'b0;
+	//		else if(curr_state == S_EXE && b_bhv_id == 102)
+	//			output_rst <= 1'b1;
+	//		else if(curr_state == S_ACTIVE_END1)
+	//			output_rst <= 1'b0;
+	//		else
+	//			output_rst <= output_rst;
+    //	end
+    //	
+	//	//emstop_begin
+	//	always@(posedge clk_i)
+	//	begin
+    //	    if(rst_i)
+	//			emstop_begin <= 1'b0;
+	//		else if(curr_state == S_EXE && b_bhv_id == 103)
+	//			emstop_begin <= 1'b1;
+	//		else if(curr_state == S_ACTIVE_END1)
+	//			emstop_begin <= 1'b0;
+	//		else
+	//			emstop_begin <= emstop_begin;
+    //	end
+	//	
+	//	//emstop_end
+	//	always@(posedge clk_i)
+	//	begin
+    //	    if(rst_i)
+	//			emstop_end <= 1'b0;
+	//		else if(curr_state == S_EXE && b_bhv_id == 107)
+	//			emstop_end <= 1'b1;
+	//		else if(curr_state == S_ACTIVE_END1)
+	//			emstop_end <= 1'b0;
+	//		else
+	//			emstop_end <= emstop_end;
+    //	end
+	//	
+	//	//run_mode	01:auto		10:half auto	11:manul
+	//	always@(posedge clk_i)
+	//	begin
+    //	    if(rst_i)
+	//			run_mode <= 2'b01;	//auto
+	//		else if(curr_state == S_EXE)
+	//			case(b_bhv_id)
+	//				8'd104	:	run_mode <= 2'b11;
+	//				8'd105	:	run_mode <= 2'b10;
+	//				8'd106	:	run_mode <= 2'b01;
+	//				default	:	run_mode <= 2'b01;
+	//			endcase
+	//		else if(curr_state == S_ACTIVE_END1)
+	//			run_mode <= 2'b01;
+	//		else
+	//			run_mode <= run_mode;
+    //	end
+	//	
+	//	assign status_pl_ps = {25'd0,start,normalstop,output_rst,emstop_begin,emstop_end,run_mode};
 	
 	
 	//===============================================================================================================

@@ -49,10 +49,6 @@ module proactive_beh_1avo#(
 	,output 					o_dac_clr  
 	
 	,input		[11:0]			i_v_value
-	,input						i_v_value_vld
-	,input 		[23:0]			i_rd_reg    
-	,input 						i_rd_reg_vld
-	,output		[23:0]			o_reg_msg
 
 	,output reg	[7:0]           a_bhv_id_r
 	,output	reg	[31:0]			state_monitor_o
@@ -381,24 +377,18 @@ module proactive_beh_1avo#(
 
 	
 	dac_top dac_top_u0(
-		.i_sys_clk        (clk_i)
-		,.i_rst_n         (~rst_i)
-		,.i_time_1ms_vld  (i_time_1ms_vld)
-		,.i_time_1s_vld   (i_time_1s_vld )
-		,.i_v_value		  (i_v_value)
-		,.i_v_value_vld	  (i_v_value_vld)
-		,.i_rd_reg        (i_rd_reg    )
-		,.i_rd_reg_vld    (i_rd_reg_vld)
-		,.o_reg_msg       (o_reg_msg)
-		,.o_reg_vld       (			)
-		,.o_dac_syn       (o_dac_syn )
-		,.o_dac_sclk      (o_dac_sclk)
-		,.o_dac_din       (o_dac_din )
-		,.i_dac_dout      (i_dac_dout)
-		,.o_dac_load      (o_dac_load)
-		,.o_dac_clr       (o_dac_clr )
+		.i_sys_clk        (clk_i			)
+		,.i_rst_n         (~rst_i			)
+		,.i_time_1ms_vld  (i_time_1ms_vld	)
+		,.i_time_1s_vld   (i_time_1s_vld 	)
+		,.v_value		  (i_v_value		)
+		,.o_dac_syn       (o_dac_syn 		)
+		,.o_dac_sclk      (o_dac_sclk		)
+		,.o_dac_din       (o_dac_din 		)
+		,.i_dac_dout      (i_dac_dout		)
+		,.o_dac_load      (o_dac_load		)
+		,.o_dac_clr       (o_dac_clr 		)
 	);
-	
 	
 	//============================================ user logic end ===================================================//
 

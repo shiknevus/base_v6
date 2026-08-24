@@ -30,8 +30,6 @@ module proactive_beh_trayclaw#(
 
     ,input      [BHA_NUM-1:0]   pre_sta_allow   //Pre - sufficient condition satisfied signal. 0: Not satisfied. 1: Satisfied.
     ,input      [BHA_NUM-1:0]   post_sta_allow  //Post - sufficient condition satisfied signal
-
-    ,input      [1:0]           mode_sel 		//1: Single-key mode 2: Double-key mode
 	
 	,input						a_en			//A enable
     ,input      [7:0]           a_bhv_id
@@ -321,21 +319,21 @@ module proactive_beh_trayclaw#(
         if(rst_i || !a_en)
             a_alm_num <= 8'd0;
         else if(curr_state == S_BHA_PRE_DET && timout)						
-			a_alm_num <= 8'd101;
+			a_alm_num <= 8'd100;
         else if(curr_state == S_READY_10_ACK && ack_tx_result == IRQ_NO_OK)	
             a_alm_num <= ack_ps_alart_num;    
         else if(curr_state == S_READY_10_ACK && timout)						
-            a_alm_num <= 8'd102;    
+            a_alm_num <= 8'd101;    
 		//else if(curr_state == S_EXE_20_ACK && ack_tx_result == IRQ_NO_OK)	
         //    a_alm_num <= ack_ps_alart_num;    
         //else if(curr_state == S_EXE_20_ACK && timout)						
         //    a_alm_num <= 8'd103;    
 		else if(curr_state_1d == S_BHA_POST_DET && curr_state == S_ALERT_40)
-			a_alm_num <= 8'd103;  
+			a_alm_num <= 8'd102;  
 		else if(curr_state == S_SUCC_30_ACK && ack_tx_result == IRQ_NO_OK)	
 			a_alm_num <= ack_ps_alart_num;
 		else if(curr_state == S_SUCC_30_ACK && timout)						
-            a_alm_num <= 8'd104;
+            a_alm_num <= 8'd103;
 		else if(match_40)
 			a_alm_num <= 8'd0;
         else
@@ -376,8 +374,8 @@ module proactive_beh_trayclaw#(
 			o_claw_blow 	<= 1'b0;
 		end else if(curr_state == S_EXE)
 			case(a_bhv_id_r)
-				8'd1:	begin	o_claw_unlock <= 1'b1; o_claw_press <= 1'b1; o_claw_blow <= 1'b0; end
-				8'd2:	begin	o_claw_unlock <= 1'b0; o_claw_press <= 1'b0; o_claw_blow <= 1'b0; end
+				8'd1:	begin	o_claw_unlock <= 1'b0; o_claw_press <= 1'b1; o_claw_blow <= 1'b0; end
+				8'd2:	begin	o_claw_unlock <= 1'b1; o_claw_press <= 1'b0; o_claw_blow <= 1'b0; end
 				8'd3:	begin	o_claw_unlock <= 1'b0; o_claw_press <= 1'b0; o_claw_blow <= 1'b1; end
 				8'd4:	begin	o_claw_unlock <= 1'b0; o_claw_press <= 1'b0; o_claw_blow <= 1'b0; end
 				8'd5:	begin	o_claw_unlock <= 1'b0; o_claw_press <= 1'b0; o_claw_blow <= 1'b0; end

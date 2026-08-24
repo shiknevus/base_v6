@@ -240,8 +240,8 @@ module ec_1avo#(
 	,.param2			    (param2			)
 	,.param3			    (param3			)
 	,.param4			    (param4			)
-	,.param5			    (param5			)	//需要读取的寄存器
-	,.param6			    (param6			)	//需要输出的电压值
+	,.param5			    (param5			)
+	,.param6			    (param6			)
 	,.param7			    (param7			)	
 	,.param8			    (param8			)
 	,.param9			    (param9			)
@@ -279,7 +279,7 @@ module ec_1avo#(
 	,.c_alm_num             (c_alm_num 		)
 	,.c_tsc_id              (c_tx_id  		)
 	,.c_bhv_id              (c_bhv_id 		)
-	,.param51               ({8'd0,reg_msg}	)
+	,.param51               (param51		)
 	,.param52               (param52		)
 	,.param53               (param53		)
 	,.param54               (param54		)
@@ -305,45 +305,6 @@ module ec_1avo#(
 	,.debug_reg4			(debug_reg4		)
 	,.debug_reg5			(debug_reg5		)
 	);
-	
-	
-	reg 			v_value_vld ;
-	reg 			rd_reg_vld  ;
-	reg		[31:0]	param5_r;
-	reg		[19:0]	param6_r;
-	
-	always@(posedge clk_i)
-	begin
-		if(rst_i)begin
-			param5_r <= 0;
-			param6_r <= 0;
-		end else begin
-			param5_r <= param5;	
-			param6_r <= param6;				
-		end
-	end
-	
-	
-	always@(posedge clk_i)
-	begin
-		if(rst_i)
-			v_value_vld <= 0;
-		else if(param6 != param6_r)
-			v_value_vld <= 1;
-		else
-			v_value_vld <= 0;
-	end
-	
-	always@(posedge clk_i)
-	begin
-		if(rst_i)
-			rd_reg_vld <= 0;
-		else if(param5 != param5_r)
-			rd_reg_vld <= 1;
-		else
-			rd_reg_vld <= 0;
-	end
-	
 
 	proactive_beh_1avo#(	
 	.BHA_NUM 				(A_BHA_NUM  	 )	//Number of active behaviors
@@ -369,11 +330,7 @@ module ec_1avo#(
 	,.i_dac_dout	        (i_dac_dout			)
 	,.o_dac_load	        (o_dac_load			)
 	,.o_dac_clr 	        (o_dac_clr 			) 
-	,.i_v_value			 	(param6[11:0]		)
-	,.i_v_value_vld         (v_value_vld		)
-	,.i_rd_reg              (param5[23:0]		)
-	,.i_rd_reg_vld          (rd_reg_vld 		)
-	,.o_reg_msg             (reg_msg			)	
+	,.i_v_value			 	(param1[11:0]		)
 	,.a_bhv_id_r			(a_bhv_id_r			)
 	,.state_monitor_o		(debug_reg1			)
     ,.irq_o                	(irq_a				)

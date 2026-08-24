@@ -41,12 +41,9 @@ module pre_post_sta_check_2di#(
 		,input 							m_saf_st        
 		,input 							link_m_saf_st         
 		
-		,input		[1:0]				di_i
-		,input		[1:0]				signal_vld
-		
-		,input							valid_sig_1
-		,input							valid_sig_2
-		,input							valid_sig_3
+		,input		[1:0]				di_i		
+		,input		[1:0]				signal_vld		
+
 		,input							a_en
 		,input							b_en			
 		,input							c_en	
@@ -73,8 +70,6 @@ module pre_post_sta_check_2di#(
 	//========================================================================================//
 	//---------------------------------  Channel A check -------------------------------------//
 	//========================================================================================//
-	
-	
 
 	//pre status
 	always@(posedge clk_i)
@@ -85,16 +80,18 @@ module pre_post_sta_check_2di#(
 			a_pre_sta_allow <= {A_BHA_NUM{1'b1}};
 		end
 	end
-	
-	
-	
+
 	//post  status
 	wire [A_BHA_NUM-1:0]	a_post_sta	;
+	
+	wire [1:0] error_bit = signal_vld & (~di_i);
+	wire	err;
+	assign err  = |error_bit;
+	
+	assign	a_post_sta[0 ] = (a_bhv_id == 1 )&& err;	
+	assign	a_post_sta[1 ] = (a_bhv_id == 2 )&& !err;
 
-	assign	a_post_sta[0 ] = (a_bhv_id == 1 )&&(di_i != signal_vld);
-	assign	a_post_sta[1 ] = (a_bhv_id == 2 )&&(di_i == signal_vld);
-
-
+	
 	always@(posedge clk_i) 
 	begin
 		if(rst_i || !a_en)

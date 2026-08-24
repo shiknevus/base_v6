@@ -56,10 +56,10 @@ module proactive_beh_1avi_1avo#(
 	,output 					o_dac_clr
 	
 	//ADC input Voltage value
-	,output	reg	[31:0]			adc_dat_o
+	,output	reg	[15:0]			adc_dat_o
 	
 	//DAC output Voltage value
-	,input		[19:0]			v_value			
+	,input		[11:0]			v_value			
 
 	,output reg [7:0]           a_bhv_id_r
 	,output	reg	[31:0]			state_monitor_o
@@ -80,7 +80,7 @@ module proactive_beh_1avi_1avo#(
 	reg	[7:0]		ack_ps_alart_num;
 	
 	wire 			adc_ch0_data_vld  ;
-	wire [31:0]		adc_ch0_data	  ;
+	wire [15:0]		adc_ch0_data	  ;
 	
 	//State machine state
 	localparam  S_IDLE          = 8'd0; 	//idle

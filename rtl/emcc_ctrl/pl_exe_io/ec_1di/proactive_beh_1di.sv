@@ -72,6 +72,8 @@ module proactive_beh_1di#(
     localparam  S_SUCC_30_ACK	= 8'd9; 	//success ack
 	localparam 	S_ALERT_40		= 8'd10;	//Alert
 	localparam 	S_ALERT_40_ACK	= 8'd11;	//Alert ack
+	localparam 	S_ACTIVE_END1	= 8'd12;
+	localparam 	S_ACTIVE_END2	= 8'd13;
 	
     localparam  IRQ_OK          = 8'h51;	//ps ack:OK
     localparam  IRQ_NO_OK       = 8'h52;	//ps ack:NO OK
@@ -262,7 +264,7 @@ module proactive_beh_1di#(
                 else
                     next_state = S_ALERT_40_ACK;
 			end
-
+			
             default: begin
                 next_state = S_IDLE;
             end
@@ -312,21 +314,21 @@ module proactive_beh_1di#(
         if(rst_i || !a_en)
             a_alm_num <= 8'd0;
         else if(curr_state == S_BHA_PRE_DET && timout)			
-            a_alm_num <= 8'd151;     
+            a_alm_num <= 8'd100;     
         else if(curr_state == S_READY_10_ACK && ack_tx_result == IRQ_NO_OK)				
             a_alm_num <= ack_ps_alart_num;    
         else if(curr_state == S_READY_10_ACK && timout)									
-            a_alm_num <= 8'd152;    
+            a_alm_num <= 8'd101;    
 		//else if(curr_state == S_EXE_20_ACK && ack_tx_result == IRQ_NO_OK)				
         //    a_alm_num <= ack_ps_alart_num;    
         //else if(curr_state == S_EXE_20_ACK && timout)									
         //    a_alm_num <= 8'd103;    
 		else if(curr_state == S_BHA_POST_DET && timout)			
-            a_alm_num <= 8'd153;     
+            a_alm_num <= 8'd102;     
 		else if(curr_state == S_SUCC_30_ACK && ack_tx_result == IRQ_NO_OK)				
 			a_alm_num <= ack_ps_alart_num;
 		else if(curr_state == S_SUCC_30_ACK && timout)									
-            a_alm_num <= 8'd154;
+            a_alm_num <= 8'd103;
 		else if(curr_state == S_IDLE)
 			a_alm_num <= 8'd0;
         else
@@ -355,5 +357,15 @@ module proactive_beh_1di#(
         else
             timout <= 1'b0;
     end
+	
+	//======================================================================================================//
+	//---------------------------------------------user logic begin-----------------------------------------//
+	//======================================================================================================//
+	
+	
+	
+	//======================================================================================================//
+	//---------------------------------------------user logic end-------------------------------------------//
+	//======================================================================================================//
 
 endmodule

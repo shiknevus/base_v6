@@ -42,18 +42,18 @@ module status_beh_3led_buzzer#(
 	,output	reg [7:0]			b_tx_id     
 	,output	reg [7:0]			b_alm_num   
 	
-	,output 					o_led_r
-	,output 					o_led_y
-	,output 					o_led_g
-	,output 					o_bz
+	,output reg					o_led_r
+	,output reg					o_led_y
+	,output reg					o_led_g
+	,output reg					o_bz
 	
-	,input		[7:0]			ctrl_signal
+	,input		[7:0]			ctrl_signal	//ps Control the LED
 
 	,output	reg	[31:0]			state_monitor_o
 	,output	reg					irq_o			
 	,input						irq_ack_i	
     );
-	
+
 	reg			[7:0]			curr_state		;
 	reg			[7:0]			curr_state_1d	;
 	reg			[7:0]			next_state		;
@@ -68,6 +68,9 @@ module status_beh_3led_buzzer#(
 	
 	reg		[7:0]	ctrl_signal_r;
 	reg				sta_vld;
+	
+	wire	i_clk = clk_i;
+	wire	i_rst = rst_i;
 	
 	//State machine state
 	localparam  S_IDLE          = 8'd0; 	//idle
@@ -139,12 +142,25 @@ module status_beh_3led_buzzer#(
 	end
 	
 	//Current behavior number
-	always @(posedge clk_i) begin
-		if(rst_i)
+	//always @(posedge clk_i) begin
+	//	if(rst_i)
+	//		b_bhv_id <= 8'd0;
+	//	else if(sta_vld)
+	//		b_bhv_id <= 8'd100;
+	//	else if((curr_state_1d != curr_state) && curr_state == S_IDLE)
+	//		b_bhv_id <= 8'd0;
+	//	else
+	//		b_bhv_id <= b_bhv_id;
+	//end
+	
+	always@(posedge i_clk)
+	begin
+		if(i_rst)
 			b_bhv_id <= 8'd0;
 		else
-			b_bhv_id <= 8'd101;
+			b_bhv_id <= 8'h64;
 	end
+	
 	
 	reg match_10;
 	//reg match_20;
@@ -174,7 +190,6 @@ module status_beh_3led_buzzer#(
 			match_40 <= 1'b0;
 		end
 	end
-	
 
 	always @(posedge clk_i) begin
         if (rst_i)
@@ -184,20 +199,19 @@ module status_beh_3led_buzzer#(
     end
 	
 	always @(*) begin
-        next_state = curr_state;
         case (curr_state)
-            S_IDLE: begin
+            S_IDLE: begin	//0
                if (b_en && sta_vld)
                    next_state = S_READY_10;
                else
                    next_state = S_IDLE;
             end
 			
-			S_READY_10: begin        //Send 10 interrupt
+			S_READY_10: begin        //2
 				next_state = S_READY_10_ACK;
             end
 			
-			S_READY_10_ACK: begin
+			S_READY_10_ACK: begin//3
 				if(match_10)  //Transaction 10 Acknowledged OK
                     next_state = S_EXE_20;
                 else if(ack_tx_result == IRQ_NO_OK || timout)
@@ -206,11 +220,11 @@ module status_beh_3led_buzzer#(
                     next_state = S_READY_10_ACK;
 			end
 			
-			S_EXE_20: begin	//Send 20 interrupt
+			S_EXE_20: begin	//4
 				next_state = S_EXE;
             end
 			
-			S_EXE:begin
+			S_EXE:begin	//5
 				next_state = S_BHA_POST_DET;	//Behavior 1/Behavior 2 failed
 			end
 			
@@ -223,8 +237,8 @@ module status_beh_3led_buzzer#(
             //        next_state = S_EXE_20_ACK;
 			//end
 			
-			S_BHA_POST_DET: begin
-				if(post_sta_allow[0] && b_bhv_id == 8'd101)    //Behavior 1 + Post - sufficient condition satisfied
+			S_BHA_POST_DET: begin		//7
+				if(post_sta_allow[0] && b_bhv_id == 8'd100) 
                     next_state = S_SUCC_30;
                 else if(timout)
                     next_state = S_ALERT_40;
@@ -274,8 +288,8 @@ module status_beh_3led_buzzer#(
 			b_tx_id <= 8'd0;
         else if(curr_state == S_READY_10)
             b_tx_id <= 8'd10;
-        else if(curr_state == S_EXE_20)
-            b_tx_id <= 8'd20;
+       //else if(curr_state == S_EXE_20)
+       //    b_tx_id <= 8'd20;
         else if(curr_state == S_SUCC_30)
             b_tx_id <= 8'd30;
         else if(curr_state == S_ALERT_40)
@@ -293,8 +307,8 @@ module status_beh_3led_buzzer#(
             irq_o <= 1'b0;
         else if(curr_state == S_READY_10)
             irq_o <= 1'b1;
-		else if(curr_state == S_EXE_20)
-			irq_o <= 1'b1;
+		//else if(curr_state == S_EXE_20)
+		//	irq_o <= 1'b1;
 		else if(curr_state == S_SUCC_30)
 			irq_o <= 1'b1;
 		else if(curr_state == S_ALERT_40)
@@ -388,72 +402,65 @@ module status_beh_3led_buzzer#(
 	begin
 		if(i_rst)
 			cnt_tim <= 'd0;
-		else if(cnt_tim >= 499)		//0.5s
-			cnt_tim <= 'd0;
 		else if(i_time_1ms_vld)
-			cnt_tim <= cnt_tim + 1;
+			if(cnt_tim >= 499)	//0.5s
+				cnt_tim <= 'd0;
+			else	
+				cnt_tim <= cnt_tim + 1;
 		else
 			cnt_tim <= cnt_tim;
-	end
-		
-	always@(posedge i_clk)
-	begin
-		if(i_rst)
-			o_led_r <= 1'b0;
-		else if(curr_state == S_EXE)
-			case(ctrl_signal[7:6])
-				2'd0:o_led_r <= 1'b0;
-				2'd1:o_led_r <= 1'b1;
-				2'd2:o_led_r <= (cnt_tim >= 499)?(!o_led_r):o_led_r;
-				default:o_led_r <= o_led_r;
-			endcase
-		else
-			o_led_r <= o_led_r;
 	end
 	
 	always@(posedge i_clk)
 	begin
 		if(i_rst)
-			o_led_y <= 1'b0;
-		else if(curr_state == S_EXE)
-			case(ctrl_signal[5:4])
-				2'd0:o_led_y <= 1'b0;
-				2'd1:o_led_y <= 1'b1;
-				2'd2:o_led_y <= (cnt_tim >= 499)?(!o_led_y):o_led_y;
-				default:o_led_y <= o_led_y;
+			o_led_r <= 1'b0;
+		else 
+			case(ctrl_signal[7:6])
+				2'd0:o_led_r <= 1'b0;
+				2'd1:o_led_r <= 1'b1;
+				2'd2:o_led_r <= (i_time_1ms_vld && cnt_tim >= 499)?(!o_led_r):o_led_r;
+				default:o_led_r <= o_led_r;
 			endcase
-		else
-			o_led_y <= o_led_y;
 	end
 	
 	always@(posedge i_clk)
 	begin
 		if(i_rst)
 			o_led_g <= 1'b0;
-		else if(curr_state == S_EXE)
-			case(ctrl_signal[3:2])
+		else
+			case(ctrl_signal[5:4])
 				2'd0:o_led_g <= 1'b0;
 				2'd1:o_led_g <= 1'b1;
-				2'd2:o_led_g <= (cnt_tim >= 499)?(!o_led_g):o_led_g;
+				2'd2:o_led_g <= (i_time_1ms_vld && cnt_tim >= 499)?(!o_led_g):o_led_g;
 				default:o_led_g <= o_led_g;
 			endcase
+	end
+	
+	always@(posedge i_clk)
+	begin
+		if(i_rst)
+			o_led_y <= 1'b0;
 		else
-			o_led_g <= o_led_g;
+			case(ctrl_signal[3:2])
+				2'd0:o_led_y <= 1'b0;
+				2'd1:o_led_y <= 1'b1;
+				2'd2:o_led_y <= (i_time_1ms_vld && cnt_tim >= 499)?(!o_led_y):o_led_y;
+				default:o_led_y <= o_led_y;
+			endcase
 	end
 	
 	always@(posedge i_clk)
 	begin
 		if(i_rst)
 			o_bz <= 1'b0;
-		else if(curr_state == S_EXE)
-			case(ctrl_signal[1:0])
+		else
+			case(ctrl_signal[1:0])	//01
 				2'd0:o_bz <= 1'b0;
 				2'd1:o_bz <= 1'b1;
-				2'd2:o_bz <= (cnt_tim >= 499)?(!o_bz):o_bz;
+				2'd2:o_bz <= (i_time_1ms_vld && cnt_tim >= 499)?(!o_bz):o_bz;
 				default:o_bz <= o_bz;
 			endcase
-		else
-			o_bz <= o_bz;
 	end
 
 	

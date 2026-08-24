@@ -18,7 +18,7 @@
 // Additional Comments:
 // 
 //////////////////////////////////////////////////////////////////////////////////
-
+`define DEBUG
 
 module ec_2di_3do#(
 		parameter  				REG_SPACE_BIAS 		= 	2000	,
@@ -49,9 +49,9 @@ module ec_2di_3do#(
     );
 	
 	
-	localparam		A_BHA_NUM		=	13;	
+	localparam		A_BHA_NUM		=	15;	
 	localparam		B_BHA_NUM		=	1;	
-	
+
 	//PS-PL    
 	wire 	[7:0]	unit_id         ;     	
 	wire 	[3:0]	unit_ectrl      ;       
@@ -192,9 +192,58 @@ module ec_2di_3do#(
 	wire 	[1:0]	di_i;
 	wire 	[2:0]	do_o;
 	
+	wire	i_clk = clk_i;
+	wire	i_rst = rst_i;
+	
 	assign {o_dri,o_dri2,o_dri1} = do_o;
 	assign di_i = {i_poa,i_pos};
 
+	
+	`ifdef DEBUG
+		reg			ro_intr_irq;
+		reg	[11:0]	irq_sta;
+		reg	[7:0]	irq_posedge_cnt;
+		reg	[7:0]	irq_negedge_cnt;
+		
+		always@(posedge i_clk)
+		begin
+			ro_intr_irq <= o_intr_irq;
+		end
+		
+		
+		always@(posedge i_clk)
+		begin
+			if(i_rst)begin
+				irq_sta <= 12'h000;
+				irq_posedge_cnt <= 8'd0;
+				irq_negedge_cnt <= 8'd0;
+			end else if(!ec_cha_st) begin
+				irq_sta <= 12'h000;
+				irq_posedge_cnt <= 8'd0;
+				irq_negedge_cnt <= 8'd0;
+			end else begin
+				irq_sta[0] <= o_intr_irq;
+				
+				if({ro_intr_irq,o_intr_irq} == 2'b01)begin	//rising
+					irq_sta[8] <= ~irq_sta[8];
+					irq_posedge_cnt <= irq_posedge_cnt+1;
+				end else begin
+					irq_sta[8] <= irq_sta[8];
+					irq_posedge_cnt <= irq_posedge_cnt;
+				end
+				
+				if({ro_intr_irq,o_intr_irq} == 2'b10)begin	//falling
+					irq_sta[4] <= ~irq_sta[4];
+					irq_negedge_cnt <= irq_negedge_cnt+1;
+				end else begin
+					irq_sta[4] <= irq_sta[4];
+					irq_negedge_cnt <= irq_negedge_cnt;
+				end
+			end
+		end
+	`endif
+	
+	
 	ps_rw_pl_reg#(
 		.REG_SPACE_BIAS 	(REG_SPACE_BIAS		),
 		.REG_SPACE_SIZE 	(REG_SPACE_SIZE		)
@@ -297,15 +346,15 @@ module ec_2di_3do#(
 	,.param63               (param63		)
 	,.param64               (param64		)
 	,.param65               (param65		)
-	,.param66               (di_i[0]		)
-	,.param67               (di_i[1]		)
-	,.param68               (param68		)
-	,.param69               (param69		)
-	,.param70               (param70		)
+	,.param66               (i_pos			)
+	,.param67               (i_poa			)
+	,.param68               (o_dri			)
+	,.param69               (o_dri2			)
+	,.param70               (o_dri1			)
 	,.debug_reg1			(debug_reg1		)
-	,.debug_reg2			(debug_reg2		)
-	,.debug_reg3			(debug_reg3		)
-	,.debug_reg4			(debug_reg4		)
+	,.debug_reg2			({irq_posedge_cnt,irq_negedge_cnt,4'd0,irq_sta}			)
+	,.debug_reg3			({17'd0,a_pre_sta_allow}		)
+	,.debug_reg4			({17'd0,a_post_sta_allow}		)
 	,.debug_reg5			(debug_reg5		)
 	);
 
@@ -443,9 +492,16 @@ module ec_2di_3do#(
 		,.irq_receive_ack_i (a_tx_result_vld || b_tx_result_vld || c_tx_result_vld)	
     );
 	
-	
-	
-	
+	//	ila_1 your_instance_name (
+	//	.clk(clk_i), // input wire clk
+    //	
+    //	
+	//	.probe0(unit_st), // input wire [3:0]  probe0  
+	//	.probe1(m_st), // input wire [3:0]  probe1 
+	//	.probe2(m_saf_st), // input wire [0:0]  probe2 
+	//	.probe3(link_m_saf_st), // input wire [0:0]  probe3 
+	//	.probe4(a_pre_sta_allow) // input wire [14:0]  probe4
+	//	);
 	
 	
 endmodule

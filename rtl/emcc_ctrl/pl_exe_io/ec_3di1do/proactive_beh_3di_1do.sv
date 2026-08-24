@@ -319,22 +319,24 @@ module proactive_beh_3di_1do#(
     always@(posedge clk_i)begin
         if(rst_i || !a_en)
             a_alm_num <= 8'd0;
+		else if(curr_state == S_IDLE)
+			a_alm_num <= 8'd0;
         else if(curr_state == S_BHA_PRE_DET && timout)			
-            a_alm_num <= 8'd101;     
+            a_alm_num <= 8'd100;     
         else if(curr_state == S_READY_10_ACK && ack_tx_result == IRQ_NO_OK)				
             a_alm_num <= ack_ps_alart_num;    
         else if(curr_state == S_READY_10_ACK && timout)									
-            a_alm_num <= 8'd102;    
+            a_alm_num <= 8'd101;    
 		//else if(curr_state == S_EXE_20_ACK && ack_tx_result == IRQ_NO_OK)				
         //    a_alm_num <= ack_ps_alart_num;    
         //else if(curr_state == S_EXE_20_ACK && timout)									
         //    a_alm_num <= 8'd103;    
 		else if(curr_state == S_BHA_POST_DET && timout)			
-            a_alm_num <= 8'd103;     
+            a_alm_num <= 8'd102;     
 		else if(curr_state == S_SUCC_30_ACK && ack_tx_result == IRQ_NO_OK)				
 			a_alm_num <= ack_ps_alart_num;
 		else if(curr_state == S_SUCC_30_ACK && timout)									
-            a_alm_num <= 8'd104;
+            a_alm_num <= 8'd103;
 		else if(curr_state == S_IDLE)
 			a_alm_num <= 8'd0;
         else
@@ -375,23 +377,23 @@ module proactive_beh_3di_1do#(
 			do_o <= 1'b0;
 		else if(curr_state == S_EXE)
 			case(a_bhv_id_r)
-				8'd1	:	do_o <= 1'b0; 
-				8'd2	:	do_o <= 1'b1; 
+				8'd1	:	do_o <= 1'b1; 
+				8'd2	:	do_o <= 1'b0; 
 				8'd3	:	do_o <= 1'b0; 
 				8'd4	:	do_o <= 1'b0; 
 				8'd5	:	do_o <= 1'b0; 
-				8'd6	:	do_o <= 1'b0; 
-				8'd7	:	do_o <= 1'b1; 
+				8'd6	:	do_o <= 1'b1; 
+				8'd7	:	do_o <= 1'b0; 
 				8'd8	:	do_o <= 1'b0; 
 				8'd9	:	do_o <= 1'b0; 
-				8'd10	:	do_o <= 1'b0; 
-				8'd11	:	do_o <= 1'b1; 
-				8'd12	:	do_o <= 1'b0; 
-				8'd13	:	do_o <= 1'b1; 
+				8'd10	:	do_o <= 1'b1; 
+				8'd11	:	do_o <= 1'b0; 
+				8'd12	:	do_o <= 1'b1; 
+				8'd13	:	do_o <= 1'b0; 
 				default	:	do_o <= 1'b0; 
 			endcase
 		else
-			do_o <= 1'b0; 
+			do_o <= do_o; 
 	end
 
 	//===============================================================================================================

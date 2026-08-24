@@ -51,7 +51,7 @@ module ec_sys_sf#(
 	
 	
 	localparam		A_BHA_NUM		=	1;	
-	localparam		B_BHA_NUM		=	7;	
+	localparam		B_BHA_NUM		=	8;	
 	localparam		C_BHA_NUM		=	1;	
 	
 	//PS-PL    
@@ -292,12 +292,12 @@ module ec_sys_sf#(
 	,.param62               (param62		)
 	,.param63               (param63		)
 	,.param64               (param64		)
-	,.param65               (param65		)
-	,.param66               (param66		)
-	,.param67               (param67		)
-	,.param68               (param68		)
-	,.param69               (param69		)
-	,.param70               (param70		)
+	,.param65               ({7'd0,i_start}	)
+	,.param66               (i_stop  		)
+	,.param67               (i_rst   		)
+	,.param68               (i_estop 		)
+	,.param69               (i_manul		)	
+	,.param70               (i_auto			)
 	,.debug_reg1			(debug_reg1		)
 	,.debug_reg2			(debug_reg2		)
 	,.debug_reg3			(debug_reg3		)
@@ -347,7 +347,7 @@ module ec_sys_sf#(
 	,.ec_chb_st             (ec_chb_st			)
 	,.b_tx_id               (b_tx_id			)
 	,.b_alm_num             (b_alm_num			)
-	,.status_pl_ps		    (param51			)
+	//,.status_pl_ps		    (param51			)
 	,.i_start               (i_start   			)
 	,.i_stop                (i_stop    			)
 	,.i_rst  	            (i_rst  			)

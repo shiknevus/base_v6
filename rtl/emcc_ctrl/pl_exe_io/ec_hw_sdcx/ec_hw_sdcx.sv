@@ -19,6 +19,7 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
+//Default Single-Key Mode
 
 module ec_hw_sdcx#(
 		parameter  				REG_SPACE_BIAS 		= 	2000	,
@@ -193,7 +194,7 @@ module ec_hw_sdcx#(
 	wire 	[1:0]	di_i;	
 	wire 	[2:0]	do_o;	
 	
-	assign {o_lock,o_mag,o_demag} = do_o;
+	assign {o_demag,o_lock,o_mag} = do_o;
 	assign di_i = {i_mgs,i_dmgs};
 
 	ps_rw_pl_reg#(
@@ -298,17 +299,18 @@ module ec_hw_sdcx#(
 	,.param63               (param63		)
 	,.param64               (param64		)
 	,.param65               (param65		)
-	,.param66               (di_i[0]		)
-	,.param67               (di_i[1]		)
-	,.param68               (param68		)
-	,.param69               (param69		)
-	,.param70               (param70		)
+	,.param66               (o_mag			)
+	,.param67               (o_lock			)
+	,.param68               (o_demag		)
+	,.param69               (i_mgs			)
+	,.param70               (i_dmgs			)
 	,.debug_reg1			(debug_reg1		)
 	,.debug_reg2			(debug_reg2		)
 	,.debug_reg3			(debug_reg3		)
 	,.debug_reg4			(debug_reg4		)
 	,.debug_reg5			(debug_reg5		)
 	);
+	
 
 	proactive_beh_hw_sdcx#(	
 	.BHA_NUM 				(A_BHA_NUM  	 	)	//Number of active behaviors
@@ -319,7 +321,7 @@ module ec_hw_sdcx#(
     ,.i_time_1s_vld        	(i_time_1s_vld  	)
     ,.pre_sta_allow        	(a_pre_sta_allow	)
     ,.post_sta_allow       	(a_post_sta_allow	)
-    ,.mode_sel				(param16[1:0]		)
+    //,.mode_sel				(param16[1:0]		)
 	,.a_en			       	(1'b1				)
     ,.a_bhv_id             	(a_bhv_id       	)
     ,.a_bhv_vld            	(a_bhv_vld      	)
@@ -329,7 +331,6 @@ module ec_hw_sdcx#(
     ,.ec_cha_st            	(ec_cha_st			)
     ,.a_tx_id              	(a_tx_id        	)
     ,.a_alm_num            	(a_alm_num      	)
-    ,.di_i                  (di_i				)
 	,.do_o					(do_o				)
 	,.a_bhv_id_r			(a_bhv_id_r			)
 	,.state_monitor_o		(debug_reg1			)

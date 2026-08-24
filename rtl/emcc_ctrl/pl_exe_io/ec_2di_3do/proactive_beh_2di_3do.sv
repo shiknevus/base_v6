@@ -174,6 +174,14 @@ module proactive_beh_2di_3do#(
 	end
 	end
     
+	
+	//ila_3 your_instance_name (
+	//.clk(clk_i), // input wire clk
+    //
+    //
+	//.probe0(curr_state) // input wire [7:0] probe0
+	//);
+
 
     always @(posedge clk_i) begin
         if (rst_i)
@@ -315,21 +323,21 @@ module proactive_beh_2di_3do#(
         if(rst_i || !a_en)
             a_alm_num <= 8'd0;
         else if(curr_state == S_BHA_PRE_DET && timout)						
-			a_alm_num <= 8'd101;
+			a_alm_num <= 8'd100;
         else if(curr_state == S_READY_10_ACK && ack_tx_result == IRQ_NO_OK)	
             a_alm_num <= ack_ps_alart_num;    
         else if(curr_state == S_READY_10_ACK && timout)						
-            a_alm_num <= 8'd102;    
+            a_alm_num <= 8'd101;    
 		//else if(curr_state == S_EXE_20_ACK && ack_tx_result == IRQ_NO_OK)	
         //    a_alm_num <= ack_ps_alart_num;    
         //else if(curr_state == S_EXE_20_ACK && timout)						
         //    a_alm_num <= 8'd103;    
 		else if(curr_state_1d == S_BHA_POST_DET && curr_state == S_ALERT_40)
-			a_alm_num <= 8'd103;  
+			a_alm_num <= 8'd102;  
 		else if(curr_state == S_SUCC_30_ACK && ack_tx_result == IRQ_NO_OK)	
 			a_alm_num <= ack_ps_alart_num;
 		else if(curr_state == S_SUCC_30_ACK && timout)						
-            a_alm_num <= 8'd104;
+            a_alm_num <= 8'd103;
 		else if(match_40)
 			a_alm_num <= 8'd0;
         else
@@ -382,6 +390,8 @@ module proactive_beh_2di_3do#(
 				8'd11:	do_o <= 3'b010;
 				8'd12:	do_o <= 3'b100;
 				8'd13:	do_o <= 3'b000;
+				8'd14:	do_o <= 3'b000;
+				8'd15:	do_o <= 3'b000;
 				default:do_o <= 3'b000;
 			endcase
 		else

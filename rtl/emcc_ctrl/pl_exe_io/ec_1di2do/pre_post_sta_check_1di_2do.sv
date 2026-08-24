@@ -71,16 +71,19 @@ module pre_post_sta_check_1di_2do#(
 	//========================================================================================//
 
 	//pre status
+	
+	localparam	A_BHA_NUM1 = A_BHA_NUM -2 ;
+	
 	always@(posedge clk_i)
 	begin
-		if(rst_i || !a_en) begin
+		if(rst_i || !a_en)
 			a_pre_sta_allow <= {A_BHA_NUM{1'b0}};
-		end else begin
+		else if(!unit_st && !m_st && !m_saf_st && !link_m_saf_st)
 			a_pre_sta_allow <= {A_BHA_NUM{1'b1}};
-		end
+		else
+			a_pre_sta_allow <= {2'b00,{A_BHA_NUM1{1'b1}}};
 	end
-	
-	
+
 	
 	//post status
 	wire [A_BHA_NUM-1:0]	a_post_sta	;

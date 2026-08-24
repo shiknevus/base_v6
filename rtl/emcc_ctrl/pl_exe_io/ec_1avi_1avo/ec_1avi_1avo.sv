@@ -246,7 +246,7 @@ module ec_1avi_1avo#(
 	,.param3			    (param3			)
 	,.param4			    (param4			)
 	,.param5			    (param5			)
-	,.param6			    (v_value		)
+	,.param6			    (param6			)
 	,.param7			    (param7			)
 	,.param8			    (param8			)
 	,.param9			    (param9			)
@@ -284,7 +284,7 @@ module ec_1avi_1avo#(
 	,.c_alm_num             (c_alm_num 		)
 	,.c_tsc_id              (c_tx_id  		)
 	,.c_bhv_id              (c_bhv_id 		)
-	,.param51               (adc_dat_o		)	
+	,.param51               (param51		)	
 	,.param52               (param52		)
 	,.param53               (param53		)
 	,.param54               (param54		)
@@ -339,14 +339,17 @@ module ec_1avi_1avo#(
 	,.i_dac_dout 			(i_dac_dout			)
 	,.o_dac_load 			(o_dac_load			)
 	,.o_dac_clr			    (o_dac_clr			)
-	,.adc_dat_o				(adc_dat_o			)
-	,.v_value				(v_value			)
+	,.adc_dat_o				(param51[15:0]		)	//adc_dat_o[15:14] = 2'b00	adc_dat_o[13] = 0 =>negative voltage adc_dat_o[13] = 1 =>Positive voltage
+	,.v_value				(param1[11:0]		)	//0x800=0,+256 = +1.25V		-256 = -1.25V
 	,.a_bhv_id_r			(a_bhv_id_r			)
 	,.state_monitor_o		(debug_reg1			)
     ,.irq_o                	(irq_a				)
     ,.irq_ack_i       		(irq_a_grant		)
     );
 	
+	//adc_dat_o
+	//+0-+10v =>	0 - 4096
+	//-0--10v =>	4096 - 0
 	 
 	status_beh_1avi_1avo#(
 		.BHA_NUM(B_BHA_NUM	)

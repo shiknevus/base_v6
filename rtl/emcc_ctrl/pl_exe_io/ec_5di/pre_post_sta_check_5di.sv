@@ -33,7 +33,7 @@ module pre_post_sta_check_5di#(
 		
 		,input		[7:0]				unit_id         
 		,input 		[3:0]				unit_ectrl      
-		,input 		[3:0]				unit_st         
+		,input 		[3:0]				unit_st  	       
 		,input 		[7:0]				m_id            
 		,input 		[3:0]				m_ectrl         
 		,input 		[3:0]				m_st            
@@ -63,8 +63,8 @@ module pre_post_sta_check_5di#(
 		,output	reg	[A_BHA_NUM-1:0]		a_post_sta_allow
 		,output	reg	[B_BHA_NUM-1:0]		b_pre_sta_allow	
 		,output	reg	[B_BHA_NUM-1:0]		b_post_sta_allow
-		,output	reg						c_pre_sta_allow	
-		,output	reg						c_post_sta_allow
+		,output	reg	[C_BHA_NUM-1:0]		c_pre_sta_allow	
+		,output	reg	[C_BHA_NUM-1:0]		c_post_sta_allow
     );
 	
 	//========================================================================================//
@@ -77,7 +77,7 @@ module pre_post_sta_check_5di#(
 		if(rst_i || !a_en) begin
 			a_pre_sta_allow <= {A_BHA_NUM{1'b0}};
 		end else begin
-			a_pre_sta_allow <= {A_BHA_NUM{1'b0}};
+			a_pre_sta_allow <= {A_BHA_NUM{1'b1}};
 		end
 	end
 	

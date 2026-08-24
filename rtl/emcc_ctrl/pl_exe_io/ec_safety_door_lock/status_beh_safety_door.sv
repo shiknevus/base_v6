@@ -186,9 +186,7 @@ module status_beh_safety_door#(
 	begin
 		if(i_rst)
 			b_bhv_id_vld <= 1'b0;
-		else if(open_req_key_posedge)
-			b_bhv_id_vld <= 1'b1;
-		else if(close_confirm_key_posedge)
+		else if(open_req_key_posedge || close_confirm_key_posedge)
 			b_bhv_id_vld <= 1'b1;
 		else
 			b_bhv_id_vld <= 1'b0;
@@ -461,7 +459,7 @@ module status_beh_safety_door#(
 			case(b_bhv_id)
 				8'd100: o_lock_open <= 1'b1;
 				8'd101: o_lock_open <= 1'b0;
-				default: o_lock_open <= o_lock_open;
+				default: o_lock_open <= 1'b0;
 			endcase
 		else
 			o_lock_open <= o_lock_open;
