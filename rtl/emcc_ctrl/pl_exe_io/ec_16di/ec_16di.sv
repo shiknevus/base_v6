@@ -226,6 +226,9 @@ module ec_16di#(
 			if(i_rst)begin
 				irq_posedge_cnt <= 8'd0;
 				irq_negedge_cnt <= 8'd0;
+			end else if(a_bhv_vld)begin
+				irq_posedge_cnt <= 8'd0;
+				irq_negedge_cnt <= 8'd0;
 			end else begin
 				if({ro_intr_irq,o_intr_irq} == 2'b01)begin	//rising
 					irq_posedge_cnt <= irq_posedge_cnt+1;
@@ -351,7 +354,7 @@ module ec_16di#(
 	,.param69               (param69		)
 	,.param70               (param70		)
 	,.debug_reg1			(debug_reg1		)
-	,.debug_reg2			({irq_posedge_cnt,irq_negedge_cnt,4'd0,irq_sta}		)
+	,.debug_reg2			({16'd0,irq_posedge_cnt,irq_negedge_cnt}	)
 	,.debug_reg3			(debug_reg3		)
 	,.debug_reg4			(debug_reg4		)
 	,.debug_reg5			(debug_reg5		)

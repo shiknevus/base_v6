@@ -1,0 +1,18 @@
+/*
+ * ec_sf_door.c
+ *
+ *  Created on: 2026Äê8ÔÂ24ÈÕ
+ *      Author: cgliu
+ */
+
+#include <stdio.h>
+#include <stdint.h>
+#include <stddef.h>   // for uintptr_t
+#include "platform.h"
+#include "xil_printf.h"
+#include "sunny_ctrl_test_func.h"
+#include "param.h"
+
+
+
+

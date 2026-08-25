@@ -92,9 +92,9 @@ set_false_path -from [get_clocks -of_objects [get_pins sys_signal_gen_u/MAST.aur
 set_false_path -to [get_clocks -of_objects [get_pins sys_signal_gen_u/MAST.aurora_mmcm_u/inst/mmcme4_adv_inst/CLKOUT0]]
 #create_generated_clock -name prot_clk -source [get_pins aurora_8b10b_top_u/axi_clk_0] -divide_by 1 [get_pins prot_clk_bufg/O]
 #create_clock -period 6.4 -name prot_clk [get_pins {prot_clk_bufg/O}]
-create_clock -period 6.400 -name prot_clk -waveform {0.000 3.200} [get_pins aurora_8b10b_top_u/axi_clk_0]
-set_false_path -from [get_clocks clk_pl_0] -to [get_clocks prot_clk]
-set_false_path -from [get_clocks prot_clk] -to [get_clocks clk_pl_0]
+#create_clock -period 6.400 -name prot_clk -waveform {0.000 3.200} [get_pins aurora_8b10b_top_u/axi_clk_0]
+#set_false_path -from [get_clocks clk_pl_0] -to [get_clocks prot_clk]
+#set_false_path -from [get_clocks prot_clk] -to [get_clocks clk_pl_0]
 ##################################################################
 
 

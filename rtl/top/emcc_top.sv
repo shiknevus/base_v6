@@ -188,6 +188,13 @@ module emcc_mix_top
     
 
     wire    [31:0]              do_mst_msg      ;
+	
+	ila_0 ila_0_u0 (
+	.clk(clk), // input wire clk
+
+
+	.probe0(di_mst_msg) // input wire [63:0] probe0
+);
    
     assign ov_dbg_enable = 0;
 	assign do_relay_mst_msg = do_mst_msg;
@@ -421,7 +428,474 @@ module emcc_mix_top
     assign  emcc_irq[42]   = map_irq[42];
     assign  emcc_irq[43]   = map_irq[43];
     assign  emcc_irq[44]   = map_irq[44];
+	
+	
+	
+	
+	// --- flow_comp_16 --16位感知组件---
+    ec_16di
+    #(
+         .REG_SPACE_BIAS     ( 20'd9216)
+        ,.REG_SPACE_SIZE     ( 512           )
+    )
+    ec_16di_16
+    (
+      
+	  .clk_i                 ( clk               ),
+      .rst                   ( reset             ),
+	  .ps_reg_clk            ( ps_reg_clk        ),
+      .ps_reg_reset          ( ps_reg_reset      ),
+	  
+	  .i_time_1ms_vld        ( time_1ms_vld      ),
+	  .i_time_1s_vld         ( time_1s_vld       ),
+
+	  .i_st_wr_en            ( ps_reg_we         ),
+	  .i_st_wr_addr          ( ps_reg_addr       ),
+      .i_st_wr_data          ( ps_reg_wr_dat     ),
+      .i_st_rd_en            ( ps_reg_re         ),
+      .i_st_rd_addr          ( ps_reg_rd_addr    ),
+	  .o_st_rd_vld           ( sub_comp_rd_vld[14]    ),
+      .o_st_rd_data          ( sub_comp_rd_dat[14]    ),
+	  .o_intr_irq            ( map_irq[14]       )
+
+       ,.i_sign4_check        ( 	di_mst_msg[0]	)   // 感测开关4
+       ,.i_sign12_check        ( 	di_mst_msg[1]	)   // 感测开关12
+       ,.i_sign15_check        ( 	di_mst_msg[2]	)   // 感测开关15
+       ,.i_sign5_check        ( 	di_mst_msg[3]	)   // 感测开关5
+       ,.i_sign13_check        ( 	di_mst_msg[4]	)   // 感测开关13
+       ,.i_sign2_check        ( 	di_mst_msg[5]	)   // 感测开关2
+       ,.i_sign8_check        ( 	di_mst_msg[6]	)   // 感测开关8
+       ,.i_sign7_check        ( 	di_mst_msg[7]	)   // 感测开关7
+       ,.i_sign6_check        ( 	di_mst_msg[8]	)   // 感测开关6
+       ,.i_sign9_check        ( 	di_mst_msg[9]	)   // 感测开关9
+       ,.i_sign16_check        ( 	di_mst_msg[10]	)   // 感测开关16
+       ,.i_sign1_check        ( 	di_mst_msg[11]	)   // 感测开关1
+       ,.i_sign3_check        ( 	di_mst_msg[12]	)   // 感测开关3
+       ,.i_sign11_check        ( 	di_mst_msg[13]	)   // 感测开关11
+       ,.i_sign10_check        ( 	di_mst_msg[14]	)   // 感测开关10
+       ,.i_sign14_check        ( 	di_mst_msg[15]	)   // 感测开关14
+    );
+	
+	wire   o_dri2_17;
+	wire   o_dri1_17;
+	
+	// --- flow_comp_17 --四位两电控制组件---
+    ec_4di_2do
+    #(
+         .REG_SPACE_BIAS     ( 20'd9728)
+        ,.REG_SPACE_SIZE     ( 512           )
+    )
+    ec_4di2do_17
+    (
+      
+	  .clk_i                 ( clk               ),
+      .rst                   ( reset             ),
+	  .ps_reg_clk            ( ps_reg_clk        ),
+      .ps_reg_reset          ( ps_reg_reset      ),
+	  
+	  .i_time_1ms_vld        ( time_1ms_vld      ),
+	  .i_time_1s_vld         ( time_1s_vld       ),
     
+	  .i_st_wr_en            ( ps_reg_we         ),
+	  .i_st_wr_addr          ( ps_reg_addr       ),
+      .i_st_wr_data          ( ps_reg_wr_dat     ),
+      .i_st_rd_en            ( ps_reg_re         ),
+      .i_st_rd_addr          ( ps_reg_rd_addr    ),
+	  .o_st_rd_vld           ( sub_comp_rd_vld[15]    ),
+      .o_st_rd_data          ( sub_comp_rd_dat[15]    ),
+	  .o_intr_irq            ( map_irq[15]       )
+    
+       ,.i_pos1_1        ( di_mst_msg[16]           )   // 左侧门开到位开关
+       ,.i_pos1_2        ( di_mst_msg[17]           )   // 右侧门开到位开关
+       ,.i_pos2_2        ( di_mst_msg[18]           )   // 右侧门关到位开关
+       ,.i_pos2_1        ( di_mst_msg[19]           )   // 左侧门关到位开关
+       ,.o_dri2        ( o_dri2_17           )   // 自动门关驱动信号
+       ,.o_dri1        ( o_dri1_17           )   // 自动门开驱动信号
+    );
+    
+    assign do_mst_msg[0] = o_dri2_17;
+    assign do_mst_msg[1] = o_dri1_17;
+	
+	
+	wire   o_led_r_68;
+	wire   o_led_g_68;
+	wire   o_bz_68;
+	wire   o_led_y_68;
+	
+	// --- flow_comp_68 --三色灯组件---
+    ec_3led_buzzer
+    #(
+         .REG_SPACE_BIAS     ( 20'd5632)
+        ,.REG_SPACE_SIZE     ( 512           )
+    )
+    ec_3led_buzzer_68
+    (
+      
+	  .clk_i                 ( clk               ),
+      .rst                   ( reset             ),
+	  .ps_reg_clk            ( ps_reg_clk        ),
+      .ps_reg_reset          ( ps_reg_reset      ),
+	  
+	  .i_time_1ms_vld        ( time_1ms_vld      ),
+	  .i_time_1s_vld         ( time_1s_vld       ),
+
+	  .i_st_wr_en            ( ps_reg_we         ),
+	  .i_st_wr_addr          ( ps_reg_addr       ),
+      .i_st_wr_data          ( ps_reg_wr_dat     ),
+      .i_st_rd_en            ( ps_reg_re         ),
+      .i_st_rd_addr          ( ps_reg_rd_addr    ),
+	  .o_st_rd_vld           ( sub_comp_rd_vld[7]    ),
+      .o_st_rd_data          ( sub_comp_rd_dat[7]    ),
+	  .o_intr_irq            ( map_irq[7]       )
+
+       ,.o_led_r        ( o_led_r_68           )   // 红色驱动信号
+       ,.o_led_g        ( o_led_g_68           )   // 绿色驱动信号
+       ,.o_bz        ( o_bz_68           )   // 蜂鸣驱动信号
+       ,.o_led_y        ( o_led_y_68           )   // 黄色驱动信号
+    );
+
+    assign do_mst_msg[2] = o_led_r_68;
+    assign do_mst_msg[3] = o_led_g_68;
+    assign do_mst_msg[5] = o_bz_68;
+    assign do_mst_msg[4] = o_led_y_68;
+	
+	// --- flow_comp_65 --双位感知组件---
+    ec_2di
+    #(
+         .REG_SPACE_BIAS     ( 20'd4096)
+        ,.REG_SPACE_SIZE     ( 512           )
+    )
+    ec_2di_65
+    (
+      
+	  .clk_i                 ( clk               ),
+      .rst                   ( reset             ),
+	  .ps_reg_clk            ( ps_reg_clk        ),
+      .ps_reg_reset          ( ps_reg_reset      ),
+	  
+	  .i_time_1ms_vld        ( time_1ms_vld      ),
+	  .i_time_1s_vld         ( time_1s_vld       ),
+
+	  .i_st_wr_en            ( ps_reg_we         ),
+	  .i_st_wr_addr          ( ps_reg_addr       ),
+      .i_st_wr_data          ( ps_reg_wr_dat     ),
+      .i_st_rd_en            ( ps_reg_re         ),
+      .i_st_rd_addr          ( ps_reg_rd_addr    ),
+	  .o_st_rd_vld           ( sub_comp_rd_vld[4]    ),
+      .o_st_rd_data          ( sub_comp_rd_dat[4]    ),
+	  .o_intr_irq            ( map_irq[4]       )
+
+       ,.i_sign1_check        ( di_mst_msg[20]           )   // 感测开关1
+       ,.i_sign2_check        ( di_mst_msg[21]           )   // 感测开关2
+    );
+	
+	// --- flow_comp_90 --单电驱动组件---
+	wire   o_sig_dri_90;
+	
+    ec_1do
+    #(
+         .REG_SPACE_BIAS     ( 20'd19968)
+        ,.REG_SPACE_SIZE     ( 512           )
+    )
+    ec_1do_90
+    (
+      
+	  .clk_i                 ( clk               ),
+      .rst                   ( reset             ),
+	  .ps_reg_clk            ( ps_reg_clk        ),
+      .ps_reg_reset          ( ps_reg_reset      ),
+	  
+	  .i_time_1ms_vld        ( time_1ms_vld      ),
+	  .i_time_1s_vld         ( time_1s_vld       ),
+
+	  .i_st_wr_en            ( ps_reg_we         ),
+	  .i_st_wr_addr          ( ps_reg_addr       ),
+      .i_st_wr_data          ( ps_reg_wr_dat     ),
+      .i_st_rd_en            ( ps_reg_re         ),
+      .i_st_rd_addr          ( ps_reg_rd_addr    ),
+	  .o_st_rd_vld           ( sub_comp_rd_vld[35]    ),
+      .o_st_rd_data          ( sub_comp_rd_dat[35]    ),
+	  .o_intr_irq            ( map_irq[35]       )
+
+       ,.o_sig_dri        ( o_sig_dri_90           )   // 单电驱动信号
+    );
+
+    assign do_mst_msg[6] = o_sig_dri_90;
+	
+	
+	
+	// --- flow_comp_104 --五位感知组件---
+    ec_5di
+    #(
+         .REG_SPACE_BIAS     ( 20'd27136)
+        ,.REG_SPACE_SIZE     ( 512           )
+    )
+    ec_5di_104
+    (
+      
+	  .clk_i                 ( clk               ),
+      .rst                   ( reset             ),
+	  .ps_reg_clk            ( ps_reg_clk        ),
+      .ps_reg_reset          ( ps_reg_reset      ),
+	  
+	  .i_time_1ms_vld        ( time_1ms_vld      ),
+	  .i_time_1s_vld         ( time_1s_vld       ),
+
+	  .i_st_wr_en            ( ps_reg_we         ),
+	  .i_st_wr_addr          ( ps_reg_addr       ),
+      .i_st_wr_data          ( ps_reg_wr_dat     ),
+      .i_st_rd_en            ( ps_reg_re         ),
+      .i_st_rd_addr          ( ps_reg_rd_addr    ),
+	  .o_st_rd_vld           ( sub_comp_rd_vld[49]    ),
+      .o_st_rd_data          ( sub_comp_rd_dat[49]    ),
+	  .o_intr_irq            ( map_irq[49]       )
+
+       ,.i_sign1_check        ( di_mst_msg[22]         )   // 感测开关1
+       ,.i_sign4_check        ( di_mst_msg[23]          )   // 感测开关4
+       ,.i_sign5_check        ( di_mst_msg[24]          )   // 感测开关5
+       ,.i_sign3_check        ( di_mst_msg[25]          )   // 感测开关3
+       ,.i_sign2_check        ( di_mst_msg[26]         )   // 感测开关2
+    );
+
+    	// --- flow_comp_107 --三线接近开关组件---
+    ec_1di
+    #(
+         .REG_SPACE_BIAS     ( 20'd28672)
+        ,.REG_SPACE_SIZE     ( 512           )
+    )
+    ec_1di_u0
+    (
+      
+	  .clk_i                 ( clk               ),
+      .rst                   ( reset             ),
+	  .ps_reg_clk            ( ps_reg_clk        ),
+      .ps_reg_reset          ( ps_reg_reset      ),
+	  
+	  .i_time_1ms_vld        ( time_1ms_vld      ),
+	  .i_time_1s_vld         ( time_1s_vld       ),
+
+	  .i_st_wr_en            ( ps_reg_we         ),
+	  .i_st_wr_addr          ( ps_reg_addr       ),
+      .i_st_wr_data          ( ps_reg_wr_dat     ),
+      .i_st_rd_en            ( ps_reg_re         ),
+      .i_st_rd_addr          ( ps_reg_rd_addr    ),
+	  .o_st_rd_vld           ( sub_comp_rd_vld[52]    ),
+      .o_st_rd_data          ( sub_comp_rd_dat[52]    ),
+	  .o_intr_irq            ( map_irq[52]       )
+
+      ,.i_sign1_check        ( di_mst_msg[27]        )   // 物料感测端口
+    );
+
+	
+	
+	wire   o_dri2_108;
+	wire   o_dri1_108;
+	wire   o_dri_108;
+	
+	// --- flow_comp_108 --卡盘定位器(有传感器)组件---
+    ec_2di_3do
+    #(
+         .REG_SPACE_BIAS     ( 20'd29184)
+        ,.REG_SPACE_SIZE     ( 512           )
+    )
+    ec_2di_3do_108
+    (
+      
+	  .clk_i                 ( clk               ),
+      .rst                   ( reset             ),
+	  .ps_reg_clk            ( ps_reg_clk        ),
+      .ps_reg_reset          ( ps_reg_reset      ),
+	  
+	  .i_time_1ms_vld        ( time_1ms_vld      ),
+	  .i_time_1s_vld         ( time_1s_vld       ),
+
+	  .i_st_wr_en            ( ps_reg_we         ),
+	  .i_st_wr_addr          ( ps_reg_addr       ),
+      .i_st_wr_data          ( ps_reg_wr_dat     ),
+      .i_st_rd_en            ( ps_reg_re         ),
+      .i_st_rd_addr          ( ps_reg_rd_addr    ),
+	  .o_st_rd_vld           ( sub_comp_rd_vld[53]    ),
+      .o_st_rd_data          ( sub_comp_rd_dat[53]    ),
+	  .o_intr_irq            ( map_irq[53]       )
+
+       ,.o_dri2        ( o_dri2_108           )   // 闭合驱动信号
+       ,.i_pos        ( di_mst_msg[28]          )   // 位置到位开关
+       ,.i_poa        ( di_mst_msg[29]          )   // 物料感测开关
+       ,.o_dri1        ( o_dri1_108           )   // 张开驱动信号
+       ,.o_dri        ( o_dri_108           )   // 吹气驱动信号
+    );
+
+    assign do_mst_msg[7] = o_dri2_108;
+    assign do_mst_msg[8] = o_dri1_108;
+    assign do_mst_msg[9] = o_dri_108;
+	
+	
+	
+	// --- flow_comp_110 --两位两电控制组件---
+	wire   o_dri2_110;
+	wire   o_dri1_110;
+	
+	
+    ec_2di_2do
+    #(
+         .REG_SPACE_BIAS     ( 20'd30208)
+        ,.REG_SPACE_SIZE     ( 512           )
+    )
+    ec_2di_2do_110
+    (
+      
+	  .clk_i                 ( clk               ),
+      .rst                   ( reset             ),
+	  .ps_reg_clk            ( ps_reg_clk        ),
+      .ps_reg_reset          ( ps_reg_reset      ),
+	  
+	  .i_time_1ms_vld        ( time_1ms_vld      ),
+	  .i_time_1s_vld         ( time_1s_vld       ),
+
+	  .i_st_wr_en            ( ps_reg_we         ),
+	  .i_st_wr_addr          ( ps_reg_addr       ),
+      .i_st_wr_data          ( ps_reg_wr_dat     ),
+      .i_st_rd_en            ( ps_reg_re         ),
+      .i_st_rd_addr          ( ps_reg_rd_addr    ),
+	  .o_st_rd_vld           ( sub_comp_rd_vld[55]    ),
+      .o_st_rd_data          ( sub_comp_rd_dat[55]    ),
+	  .o_intr_irq            ( map_irq[55]       )
+
+       ,.o_dri2        ( o_dri2_110           )   // 位置2驱动信号
+       ,.o_dri1        ( o_dri1_110           )   // 位置1驱动信号
+       ,.i_pos2        ( di_mst_msg[30]           )   // 位置2到位开关
+       ,.i_pos1        ( di_mst_msg[31]           )   // 位置1到位开关
+    );
+
+    assign do_mst_msg[10] = o_dri2_110;
+    assign do_mst_msg[11] = o_dri1_110;
+	
+	// --- flow_comp_91 --夹爪组件---
+	
+	wire   o_dri2_91;
+	wire   o_dri1_91;
+    ec_3di_2do
+    #(
+         .REG_SPACE_BIAS     ( 20'd20480)
+        ,.REG_SPACE_SIZE     ( 512           )
+    )
+    ec_3di_2do_91
+    (
+      
+	  .clk_i                 ( clk               ),
+      .rst                   ( reset             ),
+	  .ps_reg_clk            ( ps_reg_clk        ),
+      .ps_reg_reset          ( ps_reg_reset      ),
+	  
+	  .i_time_1ms_vld        ( time_1ms_vld      ),
+	  .i_time_1s_vld         ( time_1s_vld       ),
+
+	  .i_st_wr_en            ( ps_reg_we         ),
+	  .i_st_wr_addr          ( ps_reg_addr       ),
+      .i_st_wr_data          ( ps_reg_wr_dat     ),
+      .i_st_rd_en            ( ps_reg_re         ),
+      .i_st_rd_addr          ( ps_reg_rd_addr    ),
+	  .o_st_rd_vld           ( sub_comp_rd_vld[36]    ),
+      .o_st_rd_data          ( sub_comp_rd_dat[36]    ),
+	  .o_intr_irq            ( map_irq[36]       )
+
+       ,.i_pos2        ( di_mst_msg[33]           )   // 闭合到位开关
+       ,.i_pos1        ( di_mst_msg[32]           )   // 张开到位开关
+       ,.o_dri2        ( o_dri2_91           )   // 闭合驱动信号
+       ,.o_dri1        ( o_dri1_91           )   // 张开驱动信号
+       ,.i_poa        ( di_mst_msg[34]           )   // 物料感测开关
+    );
+
+    assign do_mst_msg[12] = o_dri2_91;
+    assign do_mst_msg[13] = o_dri1_91;
+	
+	// --- flow_comp_99 --托盘夹爪组件---
+	
+	wire   o_claw_press_99;
+	wire   o_claw_blow_99;
+	wire   o_claw_unlock_99;
+	
+    ec_trayclaw
+    #(
+         .REG_SPACE_BIAS     ( 20'd24576)
+        ,.REG_SPACE_SIZE     ( 512           )
+    )
+    ec_trayclaw_99
+    (
+      
+	  .clk_i                 ( clk               ),
+      .rst                   ( reset             ),
+	  .ps_reg_clk            ( ps_reg_clk        ),
+      .ps_reg_reset          ( ps_reg_reset      ),
+	  
+	  .i_time_1ms_vld        ( time_1ms_vld      ),
+	  .i_time_1s_vld         ( time_1s_vld       ),
+
+	  .i_st_wr_en            ( ps_reg_we         ),
+	  .i_st_wr_addr          ( ps_reg_addr       ),
+      .i_st_wr_data          ( ps_reg_wr_dat     ),
+      .i_st_rd_en            ( ps_reg_re         ),
+      .i_st_rd_addr          ( ps_reg_rd_addr    ),
+	  .o_st_rd_vld           ( sub_comp_rd_vld[44]    ),
+      .o_st_rd_data          ( sub_comp_rd_dat[44]    ),
+	  .o_intr_irq            ( map_irq[44]       )
+
+       ,.i_open_arr        ( 		di_mst_msg[35]           )   // 松开到位开关
+       ,.i_close_arr        ( 		di_mst_msg[36]           )   // 锁紧到位开关
+       ,.i_airtight_arr        ( 	di_mst_msg[37]           )   // 气密检测开关
+       ,.o_claw_press        ( 	o_claw_press_99           )   // 增压驱动信号
+       ,.o_claw_blow        ( 	o_claw_blow_99           )   // 吹气驱动信号
+       ,.i_material_arr        ( 	di_mst_msg[38]           )   // 物料感测开关
+       ,.o_claw_unlock        ( o_claw_unlock_99           )   // 解锁驱动信号
+    );
+
+    assign do_mst_msg[14] = o_claw_press_99;
+    assign do_mst_msg[15] = o_claw_blow_99;
+    assign do_mst_msg[16] = o_claw_unlock_99;
+	
+	
+	
+	// --- flow_comp_111 --安全铰链门组件---
+	
+	wire   o_lock_open_111;
+	wire   o_key_light_111;
+    ec_sf_door
+    #(
+         .REG_SPACE_BIAS     ( 20'd30720)
+        ,.REG_SPACE_SIZE     ( 512           )
+    )
+    ec_safety_door_lock_111
+    (
+      
+	  .clk_i                 ( clk               ),
+      .rst                   ( reset             ),
+	  .ps_reg_clk            ( ps_reg_clk        ),
+      .ps_reg_reset          ( ps_reg_reset      ),
+	  
+	  .i_time_1ms_vld        ( time_1ms_vld      ),
+	  .i_time_1s_vld         ( time_1s_vld       ),
+
+	  .i_st_wr_en            ( ps_reg_we         ),
+	  .i_st_wr_addr          ( ps_reg_addr       ),
+      .i_st_wr_data          ( ps_reg_wr_dat     ),
+      .i_st_rd_en            ( ps_reg_re         ),
+      .i_st_rd_addr          ( ps_reg_rd_addr    ),
+	  .o_st_rd_vld           ( sub_comp_rd_vld[56]    ),
+      .o_st_rd_data          ( sub_comp_rd_dat[56]    ),
+	  .o_intr_irq            ( map_irq[56]       )
+
+       ,.i_close_confirm_key        ( 	di_mst_msg[39]           )   // 门关确认黄色按钮
+       ,.o_lock_open        ( 				o_lock_open_111           )   // 电磁锁A1
+       ,.i_open_req_key        ( 		di_mst_msg[40]           )   // 开门请求绿色按钮
+       ,.i_lock_monitor        ( 		di_mst_msg[41]           )   // 锁监控常闭DO端口
+       ,.i_door_monitor        ( 		di_mst_msg[42]           )   // 门监控常闭DO端口
+       ,.o_key_light        ( 				o_key_light_111           )   // 
+    );
+
+    assign do_mst_msg[17] = o_lock_open_111;
+    assign do_mst_msg[18] = o_key_light_111;
+	
+	
 	
 	
 	// --- flow_comp_14 --EECC30控制板组件---
@@ -488,97 +962,7 @@ module emcc_mix_top
     //   ,.i_limf        ( di_regoin_msg[1][20]           )   // 正限位到位开关
     //);
 
-	
-	
-	
-	// --- flow_comp_16 --16位感知组件---
-    ec_16di
-    #(
-         .REG_SPACE_BIAS     ( 20'd9216)
-        ,.REG_SPACE_SIZE     ( 512           )
-    )
-    ec_16di_16
-    (
-      
-	  .clk_i                 ( clk               ),
-      .rst                   ( reset             ),
-	  .ps_reg_clk            ( ps_reg_clk        ),
-      .ps_reg_reset          ( ps_reg_reset      ),
-	  
-	  .i_time_1ms_vld        ( time_1ms_vld      ),
-	  .i_time_1s_vld         ( time_1s_vld       ),
 
-	  .i_st_wr_en            ( ps_reg_we         ),
-	  .i_st_wr_addr          ( ps_reg_addr       ),
-      .i_st_wr_data          ( ps_reg_wr_dat     ),
-      .i_st_rd_en            ( ps_reg_re         ),
-      .i_st_rd_addr          ( ps_reg_rd_addr    ),
-	  .o_st_rd_vld           ( sub_comp_rd_vld[14]    ),
-      .o_st_rd_data          ( sub_comp_rd_dat[14]    ),
-	  .o_intr_irq            ( map_irq[14]       )
-
-       ,.i_sign4_check        ( di_regoin_msg[1][27]           )   // 感测开关4
-       ,.i_sign12_check        ( di_regoin_msg[1][35]           )   // 感测开关12
-       ,.i_sign15_check        ( di_regoin_msg[1][38]           )   // 感测开关15
-       ,.i_sign5_check        ( di_regoin_msg[1][28]           )   // 感测开关5
-       ,.i_sign13_check        ( di_regoin_msg[1][36]           )   // 感测开关13
-       ,.i_sign2_check        ( di_regoin_msg[1][25]           )   // 感测开关2
-       ,.i_sign8_check        ( di_regoin_msg[1][31]           )   // 感测开关8
-       ,.i_sign7_check        ( di_regoin_msg[1][30]           )   // 感测开关7
-       ,.i_sign6_check        ( di_regoin_msg[1][29]           )   // 感测开关6
-       ,.i_sign9_check        ( di_regoin_msg[1][32]           )   // 感测开关9
-       ,.i_sign16_check        ( di_regoin_msg[1][39]           )   // 感测开关16
-       ,.i_sign1_check        ( di_regoin_msg[1][24]           )   // 感测开关1
-       ,.i_sign3_check        ( di_regoin_msg[1][26]           )   // 感测开关3
-       ,.i_sign11_check        ( di_regoin_msg[1][34]           )   // 感测开关11
-       ,.i_sign10_check        ( di_regoin_msg[1][33]           )   // 感测开关10
-       ,.i_sign14_check        ( di_regoin_msg[1][37]           )   // 感测开关14
-    );
-
-	
-	
-	wire   o_dri2_17;
-	wire   o_dri1_17;
-	
-	// --- flow_comp_17 --四位两电控制组件---
-    //ec_4di2do
-    //#(
-    //     .REG_SPACE_BIAS     ( 20'd9728)
-    //    ,.REG_SPACE_SIZE     ( 512           )
-    //)
-    //ec_4di2do_17
-    //(
-    //  
-	//  .clk_i                 ( clk               ),
-    //  .rst                   ( reset             ),
-	//  .ps_reg_clk            ( ps_reg_clk        ),
-    //  .ps_reg_reset          ( ps_reg_reset      ),
-	//  
-	//  .i_time_1ms_vld        ( time_1ms_vld      ),
-	//  .i_time_1s_vld         ( time_1s_vld       ),
-    //
-	//  .i_st_wr_en            ( ps_reg_we         ),
-	//  .i_st_wr_addr          ( ps_reg_addr       ),
-    //  .i_st_wr_data          ( ps_reg_wr_dat     ),
-    //  .i_st_rd_en            ( ps_reg_re         ),
-    //  .i_st_rd_addr          ( ps_reg_rd_addr    ),
-	//  .o_st_rd_vld           ( sub_comp_rd_vld[15]    ),
-    //  .o_st_rd_data          ( sub_comp_rd_dat[15]    ),
-	//  .o_intr_irq            ( map_irq[15]       )
-    //
-    //   ,.i_pos1_1        ( di_regoin_msg[1][4]           )   // 左侧门开到位开关
-    //   ,.i_pos1_2        ( di_regoin_msg[1][5]           )   // 右侧门开到位开关
-    //   ,.i_pos2_2        ( di_regoin_msg[1][7]           )   // 右侧门关到位开关
-    //   ,.i_pos2_1        ( di_regoin_msg[1][6]           )   // 左侧门关到位开关
-    //   ,.o_dri2        ( o_dri2_17           )   // 自动门关驱动信号
-    //   ,.o_dri1        ( o_dri1_17           )   // 自动门开驱动信号
-    //);
-    //
-    //assign do_regoin_r_msg[ 1][3] = o_dri2_17;
-    //assign do_regoin_r_msg[ 1][2] = o_dri1_17;
-	
-	
-	
 	// --- flow_comp_18 --思谷RFID读写器组件---
     //ec_sg_rfid
     //#(
@@ -607,9 +991,6 @@ module emcc_mix_top
     //
     //);
 
-	
-	
-	
 	// --- flow_comp_19 --电气比例阀组件---
     // ec_1avi_1avo
     // #(
@@ -860,41 +1241,6 @@ module emcc_mix_top
     // );
 
 	
-	
-	
-	// --- flow_comp_65 --双位感知组件---
-    ec_2di
-    #(
-         .REG_SPACE_BIAS     ( 20'd4096)
-        ,.REG_SPACE_SIZE     ( 512           )
-    )
-    ec_2di_65
-    (
-      
-	  .clk_i                 ( clk               ),
-      .rst                   ( reset             ),
-	  .ps_reg_clk            ( ps_reg_clk        ),
-      .ps_reg_reset          ( ps_reg_reset      ),
-	  
-	  .i_time_1ms_vld        ( time_1ms_vld      ),
-	  .i_time_1s_vld         ( time_1s_vld       ),
-
-	  .i_st_wr_en            ( ps_reg_we         ),
-	  .i_st_wr_addr          ( ps_reg_addr       ),
-      .i_st_wr_data          ( ps_reg_wr_dat     ),
-      .i_st_rd_en            ( ps_reg_re         ),
-      .i_st_rd_addr          ( ps_reg_rd_addr    ),
-	  .o_st_rd_vld           ( sub_comp_rd_vld[4]    ),
-      .o_st_rd_data          ( sub_comp_rd_dat[4]    ),
-	  .o_intr_irq            ( map_irq[4]       )
-
-       ,.i_sign1_check        ( di_mst_msg[26]           )   // 感测开关1
-       ,.i_sign2_check        ( di_mst_msg[27]           )   // 感测开关2
-    );
-
-	
-	
-	
 	// --- flow_comp_66 --多圈位置模式/单DI/EtherCAT/汇川伺服驱动组件---
     // ec_ecat_multi_turn_angle_spin_servo
     // #(
@@ -957,47 +1303,7 @@ module emcc_mix_top
 
 	
 	
-	wire   o_led_r_68;
-	wire   o_led_g_68;
-	wire   o_bz_68;
-	wire   o_led_y_68;
 	
-	// --- flow_comp_68 --三色灯组件---
-    ec_3led_buzzer
-    #(
-         .REG_SPACE_BIAS     ( 20'd5632)
-        ,.REG_SPACE_SIZE     ( 512           )
-    )
-    ec_3led_buzzer_68
-    (
-      
-	  .clk_i                 ( clk               ),
-      .rst                   ( reset             ),
-	  .ps_reg_clk            ( ps_reg_clk        ),
-      .ps_reg_reset          ( ps_reg_reset      ),
-	  
-	  .i_time_1ms_vld        ( time_1ms_vld      ),
-	  .i_time_1s_vld         ( time_1s_vld       ),
-
-	  .i_st_wr_en            ( ps_reg_we         ),
-	  .i_st_wr_addr          ( ps_reg_addr       ),
-      .i_st_wr_data          ( ps_reg_wr_dat     ),
-      .i_st_rd_en            ( ps_reg_re         ),
-      .i_st_rd_addr          ( ps_reg_rd_addr    ),
-	  .o_st_rd_vld           ( sub_comp_rd_vld[7]    ),
-      .o_st_rd_data          ( sub_comp_rd_dat[7]    ),
-	  .o_intr_irq            ( map_irq[7]       )
-
-       ,.o_led_r        ( o_led_r_68           )   // 红色驱动信号
-       ,.o_led_g        ( o_led_g_68           )   // 绿色驱动信号
-       ,.o_bz        ( o_bz_68           )   // 蜂鸣驱动信号
-       ,.o_led_y        ( o_led_y_68           )   // 黄色驱动信号
-    );
-
-    assign do_mst_msg[3] = o_led_r_68;
-    assign do_mst_msg[2] = o_led_g_68;
-    assign do_mst_msg[1] = o_bz_68;
-    assign do_mst_msg[4] = o_led_y_68;
 	
 	
 	
@@ -1270,33 +1576,33 @@ module emcc_mix_top
 	
 	
 	// --- flow_comp_77 --单位感知控件V6.0调试组件---
-    ec_1di
-    #(
-         .REG_SPACE_BIAS     ( 20'd13312)
-        ,.REG_SPACE_SIZE     ( 512           )
-    )
-    ec_1di_77
-    (
-      
-	  .clk_i                 ( clk               ),
-      .rst                   ( reset             ),
-	  .ps_reg_clk            ( ps_reg_clk        ),
-      .ps_reg_reset          ( ps_reg_reset      ),
-	  
-	  .i_time_1ms_vld        ( time_1ms_vld      ),
-	  .i_time_1s_vld         ( time_1s_vld       ),
-
-	  .i_st_wr_en            ( ps_reg_we         ),
-	  .i_st_wr_addr          ( ps_reg_addr       ),
-      .i_st_wr_data          ( ps_reg_wr_dat     ),
-      .i_st_rd_en            ( ps_reg_re         ),
-      .i_st_rd_addr          ( ps_reg_rd_addr    ),
-	  .o_st_rd_vld           ( sub_comp_rd_vld[22]    ),
-      .o_st_rd_data          ( sub_comp_rd_dat[22]    ),
-	  .o_intr_irq            ( map_irq[22]       )
-
-       ,.i_sign1_check        ( di_mst_msg[0]           )   // 物料感测端口
-    );
+    //ec_1di
+    //#(
+    //     .REG_SPACE_BIAS     ( 20'd13312)
+    //    ,.REG_SPACE_SIZE     ( 512           )
+    //)
+    //ec_1di_77
+    //(
+    //  
+	//  .clk_i                 ( clk               ),
+    //  .rst                   ( reset             ),
+	//  .ps_reg_clk            ( ps_reg_clk        ),
+    //  .ps_reg_reset          ( ps_reg_reset      ),
+	//  
+	//  .i_time_1ms_vld        ( time_1ms_vld      ),
+	//  .i_time_1s_vld         ( time_1s_vld       ),
+    //
+	//  .i_st_wr_en            ( ps_reg_we         ),
+	//  .i_st_wr_addr          ( ps_reg_addr       ),
+    //  .i_st_wr_data          ( ps_reg_wr_dat     ),
+    //  .i_st_rd_en            ( ps_reg_re         ),
+    //  .i_st_rd_addr          ( ps_reg_rd_addr    ),
+	//  .o_st_rd_vld           ( sub_comp_rd_vld[22]    ),
+    //  .o_st_rd_data          ( sub_comp_rd_dat[22]    ),
+	//  .o_intr_irq            ( map_irq[22]       )
+    //
+    //   ,.i_sign1_check        ( di_mst_msg[0]           )   // 物料感测端口
+    //);
 
 	
 	
@@ -1723,78 +2029,9 @@ module emcc_mix_top
 
 	
 	
-	wire   o_sig_dri_90;
-	
-	// --- flow_comp_90 --单电驱动组件---
-    ec_1do
-    #(
-         .REG_SPACE_BIAS     ( 20'd19968)
-        ,.REG_SPACE_SIZE     ( 512           )
-    )
-    ec_1do_90
-    (
-      
-	  .clk_i                 ( clk               ),
-      .rst                   ( reset             ),
-	  .ps_reg_clk            ( ps_reg_clk        ),
-      .ps_reg_reset          ( ps_reg_reset      ),
-	  
-	  .i_time_1ms_vld        ( time_1ms_vld      ),
-	  .i_time_1s_vld         ( time_1s_vld       ),
-
-	  .i_st_wr_en            ( ps_reg_we         ),
-	  .i_st_wr_addr          ( ps_reg_addr       ),
-      .i_st_wr_data          ( ps_reg_wr_dat     ),
-      .i_st_rd_en            ( ps_reg_re         ),
-      .i_st_rd_addr          ( ps_reg_rd_addr    ),
-	  .o_st_rd_vld           ( sub_comp_rd_vld[35]    ),
-      .o_st_rd_data          ( sub_comp_rd_dat[35]    ),
-	  .o_intr_irq            ( map_irq[35]       )
-
-       ,.o_sig_dri        ( o_sig_dri_90           )   // 单电驱动信号
-    );
-
-    assign do_mst_msg[10] = o_sig_dri_90;
 	
 	
-	wire   o_dri2_91;
-	wire   o_dri1_91;
 	
-	// --- flow_comp_91 --夹爪组件---
-    // ec_3di_2do
-    // #(
-         // .REG_SPACE_BIAS     ( 20'd20480)
-        // ,.REG_SPACE_SIZE     ( 512           )
-    // )
-    // ec_3di_2do_91
-    // (
-      
-	  // .clk_i                 ( clk               ),
-      // .rst                   ( reset             ),
-	  // .ps_reg_clk            ( ps_reg_clk        ),
-      // .ps_reg_reset          ( ps_reg_reset      ),
-	  
-	  // .i_time_1ms_vld        ( time_1ms_vld      ),
-	  // .i_time_1s_vld         ( time_1s_vld       ),
-
-	  // .i_st_wr_en            ( ps_reg_we         ),
-	  // .i_st_wr_addr          ( ps_reg_addr       ),
-      // .i_st_wr_data          ( ps_reg_wr_dat     ),
-      // .i_st_rd_en            ( ps_reg_re         ),
-      // .i_st_rd_addr          ( ps_reg_rd_addr    ),
-	  // .o_st_rd_vld           ( sub_comp_rd_vld[36]    ),
-      // .o_st_rd_data          ( sub_comp_rd_dat[36]    ),
-	  // .o_intr_irq            ( map_irq[36]       )
-
-       // ,.i_pos2        ( di_mst_msg[21]           )   // 闭合到位开关
-       // ,.i_pos1        ( di_mst_msg[20]           )   // 张开到位开关
-       // ,.o_dri2        ( o_dri2_91           )   // 闭合驱动信号
-       // ,.o_dri1        ( o_dri1_91           )   // 张开驱动信号
-       // ,.i_poa        ( di_mst_msg[22]           )   // 物料感测开关
-    // );
-
-    // assign do_mst_msg[6] = o_dri2_91;
-    // assign do_mst_msg[5] = o_dri1_91;
 	
 	
 	
@@ -2035,51 +2272,6 @@ module emcc_mix_top
 
 	
 	
-	wire   o_claw_press_99;
-	wire   o_claw_blow_99;
-	wire   o_claw_unlock_99;
-	
-	// --- flow_comp_99 --托盘夹爪组件---
-    // ec_trayclaw
-    // #(
-         // .REG_SPACE_BIAS     ( 20'd24576)
-        // ,.REG_SPACE_SIZE     ( 512           )
-    // )
-    // ec_trayclaw_99
-    // (
-      
-	  // .clk_i                 ( clk               ),
-      // .rst                   ( reset             ),
-	  // .ps_reg_clk            ( ps_reg_clk        ),
-      // .ps_reg_reset          ( ps_reg_reset      ),
-	  
-	  // .i_time_1ms_vld        ( time_1ms_vld      ),
-	  // .i_time_1s_vld         ( time_1s_vld       ),
-
-	  // .i_st_wr_en            ( ps_reg_we         ),
-	  // .i_st_wr_addr          ( ps_reg_addr       ),
-      // .i_st_wr_data          ( ps_reg_wr_dat     ),
-      // .i_st_rd_en            ( ps_reg_re         ),
-      // .i_st_rd_addr          ( ps_reg_rd_addr    ),
-	  // .o_st_rd_vld           ( sub_comp_rd_vld[44]    ),
-      // .o_st_rd_data          ( sub_comp_rd_dat[44]    ),
-	  // .o_intr_irq            ( map_irq[44]       )
-
-       // ,.i_open_arr        ( di_mst_msg[33]           )   // 松开到位开关
-       // ,.i_close_arr        ( di_mst_msg[34]           )   // 锁紧到位开关
-       // ,.i_airtight_arr        ( di_mst_msg[36]           )   // 气密检测开关
-       // ,.o_claw_press        ( o_claw_press_99           )   // 增压驱动信号
-       // ,.o_claw_blow        ( o_claw_blow_99           )   // 吹气驱动信号
-       // ,.i_material_arr        ( di_mst_msg[35]           )   // 物料感测开关
-       // ,.o_claw_unlock        ( o_claw_unlock_99           )   // 解锁驱动信号
-    // );
-
-    assign do_mst_msg[9] = o_claw_press_99;
-    assign do_mst_msg[7] = o_claw_blow_99;
-    assign do_mst_msg[8] = o_claw_unlock_99;
-	
-	
-	
 	// --- flow_comp_100 --FANUC系统加工中心组件---
     // ec_fanuc_cnc
     // #(
@@ -2151,41 +2343,41 @@ module emcc_mix_top
 	wire   o_dri2_102;
 	
 	// --- flow_comp_102 --两位三电驱动组件---
-    ec_2di_3do
-    #(
-         .REG_SPACE_BIAS     ( 20'd26112)
-        ,.REG_SPACE_SIZE     ( 512           )
-    )
-    ec_2di_3do_102
-    (
-      
-	  .clk_i                 ( clk               ),
-      .rst                   ( reset             ),
-	  .ps_reg_clk            ( ps_reg_clk        ),
-      .ps_reg_reset          ( ps_reg_reset      ),
-	  
-	  .i_time_1ms_vld        ( time_1ms_vld      ),
-	  .i_time_1s_vld         ( time_1s_vld       ),
-
-	  .i_st_wr_en            ( ps_reg_we         ),
-	  .i_st_wr_addr          ( ps_reg_addr       ),
-      .i_st_wr_data          ( ps_reg_wr_dat     ),
-      .i_st_rd_en            ( ps_reg_re         ),
-      .i_st_rd_addr          ( ps_reg_rd_addr    ),
-	  .o_st_rd_vld           ( sub_comp_rd_vld[47]    ),
-      .o_st_rd_data          ( sub_comp_rd_dat[47]    ),
-	  .o_intr_irq            ( map_irq[47]       )
-
-       ,.i_poa        ( di_regoin_msg[1][43]           )   // 物料感测开关
-       ,.o_dri        ( o_dri_102           )   // 单驱信号
-       ,.i_pos        ( di_regoin_msg[1][42]           )   // 位置到位开关
-       ,.o_dri1        ( o_dri1_102           )   // 位置1驱动信号
-       ,.o_dri2        ( o_dri2_102           )   // 位置2驱动信号
-    );
-
-    assign do_regoin_r_msg[ 1][21] = o_dri_102;
-    assign do_regoin_r_msg[ 1][22] = o_dri1_102;
-    assign do_regoin_r_msg[ 1][23] = o_dri2_102;
+    //ec_2di_3do
+    //#(
+    //     .REG_SPACE_BIAS     ( 20'd26112)
+    //    ,.REG_SPACE_SIZE     ( 512           )
+    //)
+    //ec_2di_3do_102
+    //(
+    //  
+	//  .clk_i                 ( clk               ),
+    //  .rst                   ( reset             ),
+	//  .ps_reg_clk            ( ps_reg_clk        ),
+    //  .ps_reg_reset          ( ps_reg_reset      ),
+	//  
+	//  .i_time_1ms_vld        ( time_1ms_vld      ),
+	//  .i_time_1s_vld         ( time_1s_vld       ),
+    //
+	//  .i_st_wr_en            ( ps_reg_we         ),
+	//  .i_st_wr_addr          ( ps_reg_addr       ),
+    //  .i_st_wr_data          ( ps_reg_wr_dat     ),
+    //  .i_st_rd_en            ( ps_reg_re         ),
+    //  .i_st_rd_addr          ( ps_reg_rd_addr    ),
+	//  .o_st_rd_vld           ( sub_comp_rd_vld[47]    ),
+    //  .o_st_rd_data          ( sub_comp_rd_dat[47]    ),
+	//  .o_intr_irq            ( map_irq[47]       )
+    //
+    //   ,.i_poa        ( di_regoin_msg[1][43]           )   // 物料感测开关
+    //   ,.o_dri        ( o_dri_102           )   // 单驱信号
+    //   ,.i_pos        ( di_regoin_msg[1][42]           )   // 位置到位开关
+    //   ,.o_dri1        ( o_dri1_102           )   // 位置1驱动信号
+    //   ,.o_dri2        ( o_dri2_102           )   // 位置2驱动信号
+    //);
+    //
+    //assign do_regoin_r_msg[ 1][21] = o_dri_102;
+    //assign do_regoin_r_msg[ 1][22] = o_dri1_102;
+    //assign do_regoin_r_msg[ 1][23] = o_dri2_102;
 	
 	
 	wire   o_dri_103;
@@ -2222,43 +2414,6 @@ module emcc_mix_top
     // );
 
     // assign do_regoin_r_msg[ 1][24] = o_dri_103;
-	
-	
-	
-	// --- flow_comp_104 --五位感知组件---
-    ec_5di
-    #(
-         .REG_SPACE_BIAS     ( 20'd27136)
-        ,.REG_SPACE_SIZE     ( 512           )
-    )
-    ec_5di_104
-    (
-      
-	  .clk_i                 ( clk               ),
-      .rst                   ( reset             ),
-	  .ps_reg_clk            ( ps_reg_clk        ),
-      .ps_reg_reset          ( ps_reg_reset      ),
-	  
-	  .i_time_1ms_vld        ( time_1ms_vld      ),
-	  .i_time_1s_vld         ( time_1s_vld       ),
-
-	  .i_st_wr_en            ( ps_reg_we         ),
-	  .i_st_wr_addr          ( ps_reg_addr       ),
-      .i_st_wr_data          ( ps_reg_wr_dat     ),
-      .i_st_rd_en            ( ps_reg_re         ),
-      .i_st_rd_addr          ( ps_reg_rd_addr    ),
-	  .o_st_rd_vld           ( sub_comp_rd_vld[49]    ),
-      .o_st_rd_data          ( sub_comp_rd_dat[49]    ),
-	  .o_intr_irq            ( map_irq[49]       )
-
-       ,.i_sign1_check        ( di_regoin_msg[1][8]           )   // 感测开关1
-       ,.i_sign4_check        ( di_regoin_msg[1][11]           )   // 感测开关4
-       ,.i_sign5_check        ( di_regoin_msg[1][12]           )   // 感测开关5
-       ,.i_sign3_check        ( di_regoin_msg[1][10]           )   // 感测开关3
-       ,.i_sign2_check        ( di_regoin_msg[1][9]           )   // 感测开关2
-    );
-
-	
 	
 	wire   o_dri_105;
 	
@@ -2340,77 +2495,7 @@ module emcc_mix_top
 	
 	
 	
-	// --- flow_comp_107 --三线接近开关组件---
-    ec_1di
-    #(
-         .REG_SPACE_BIAS     ( 20'd28672)
-        ,.REG_SPACE_SIZE     ( 512           )
-    )
-    ec_1di_u0
-    (
-      
-	  .clk_i                 ( clk               ),
-      .rst                   ( reset             ),
-	  .ps_reg_clk            ( ps_reg_clk        ),
-      .ps_reg_reset          ( ps_reg_reset      ),
-	  
-	  .i_time_1ms_vld        ( time_1ms_vld      ),
-	  .i_time_1s_vld         ( time_1s_vld       ),
-
-	  .i_st_wr_en            ( ps_reg_we         ),
-	  .i_st_wr_addr          ( ps_reg_addr       ),
-      .i_st_wr_data          ( ps_reg_wr_dat     ),
-      .i_st_rd_en            ( ps_reg_re         ),
-      .i_st_rd_addr          ( ps_reg_rd_addr    ),
-	  .o_st_rd_vld           ( sub_comp_rd_vld[52]    ),
-      .o_st_rd_data          ( sub_comp_rd_dat[52]    ),
-	  .o_intr_irq            ( map_irq[52]       )
-
-      ,.i_sign1_check        ( di_regoin_msg[1][0]           )   // 物料感测端口
-    );
-
 	
-	
-	wire   o_dri2_108;
-	wire   o_dri1_108;
-	wire   o_dri_108;
-	
-	// --- flow_comp_108 --卡盘定位器(有传感器)组件---
-    ec_2di_3do
-    #(
-         .REG_SPACE_BIAS     ( 20'd29184)
-        ,.REG_SPACE_SIZE     ( 512           )
-    )
-    ec_2di_3do_108
-    (
-      
-	  .clk_i                 ( clk               ),
-      .rst                   ( reset             ),
-	  .ps_reg_clk            ( ps_reg_clk        ),
-      .ps_reg_reset          ( ps_reg_reset      ),
-	  
-	  .i_time_1ms_vld        ( time_1ms_vld      ),
-	  .i_time_1s_vld         ( time_1s_vld       ),
-
-	  .i_st_wr_en            ( ps_reg_we         ),
-	  .i_st_wr_addr          ( ps_reg_addr       ),
-      .i_st_wr_data          ( ps_reg_wr_dat     ),
-      .i_st_rd_en            ( ps_reg_re         ),
-      .i_st_rd_addr          ( ps_reg_rd_addr    ),
-	  .o_st_rd_vld           ( sub_comp_rd_vld[53]    ),
-      .o_st_rd_data          ( sub_comp_rd_dat[53]    ),
-	  .o_intr_irq            ( map_irq[53]       )
-
-       ,.o_dri2        ( o_dri2_108           )   // 闭合驱动信号
-       ,.i_pos        ( di_regoin_msg[1][13]           )   // 位置到位开关
-       ,.i_poa        ( di_regoin_msg[1][14]           )   // 物料感测开关
-       ,.o_dri1        ( o_dri1_108           )   // 张开驱动信号
-       ,.o_dri        ( o_dri_108           )   // 吹气驱动信号
-    );
-
-    assign do_regoin_r_msg[ 1][6] = o_dri2_108;
-    assign do_regoin_r_msg[ 1][5] = o_dri1_108;
-    assign do_regoin_r_msg[ 1][4] = o_dri_108;
 	
 	
 	wire   o_dri1_109;
@@ -2451,87 +2536,7 @@ module emcc_mix_top
 
     // assign do_regoin_r_msg[ 1][0] = o_dri1_109;
     // assign do_regoin_r_msg[ 1][1] = o_dri2_109;
-	
-	
-	wire   o_dri2_110;
-	wire   o_dri1_110;
-	
-	// --- flow_comp_110 --两位两电控制组件---
-    ec_2di_2do
-    #(
-         .REG_SPACE_BIAS     ( 20'd30208)
-        ,.REG_SPACE_SIZE     ( 512           )
-    )
-    ec_2di_2do_110
-    (
-      
-	  .clk_i                 ( clk               ),
-      .rst                   ( reset             ),
-	  .ps_reg_clk            ( ps_reg_clk        ),
-      .ps_reg_reset          ( ps_reg_reset      ),
-	  
-	  .i_time_1ms_vld        ( time_1ms_vld      ),
-	  .i_time_1s_vld         ( time_1s_vld       ),
 
-	  .i_st_wr_en            ( ps_reg_we         ),
-	  .i_st_wr_addr          ( ps_reg_addr       ),
-      .i_st_wr_data          ( ps_reg_wr_dat     ),
-      .i_st_rd_en            ( ps_reg_re         ),
-      .i_st_rd_addr          ( ps_reg_rd_addr    ),
-	  .o_st_rd_vld           ( sub_comp_rd_vld[55]    ),
-      .o_st_rd_data          ( sub_comp_rd_dat[55]    ),
-	  .o_intr_irq            ( map_irq[55]       )
-
-       ,.o_dri2        ( o_dri2_110           )   // 位置2驱动信号
-       ,.o_dri1        ( o_dri1_110           )   // 位置1驱动信号
-       ,.i_pos2        ( di_regoin_msg[1][41]           )   // 位置2到位开关
-       ,.i_pos1        ( di_regoin_msg[1][40]           )   // 位置1到位开关
-    );
-
-    assign do_regoin_r_msg[ 1][20] = o_dri2_110;
-    assign do_regoin_r_msg[ 1][19] = o_dri1_110;
-	
-	
-	wire   o_lock_open_111;
-	wire   o_key_light_111;
-	
-	// --- flow_comp_111 --安全铰链门组件---
-    // ec_safety_door_lock
-    // #(
-         // .REG_SPACE_BIAS     ( 20'd30720)
-        // ,.REG_SPACE_SIZE     ( 512           )
-    // )
-    // ec_safety_door_lock_111
-    // (
-      
-	  // .clk_i                 ( clk               ),
-      // .rst                   ( reset             ),
-	  // .ps_reg_clk            ( ps_reg_clk        ),
-      // .ps_reg_reset          ( ps_reg_reset      ),
-	  
-	  // .i_time_1ms_vld        ( time_1ms_vld      ),
-	  // .i_time_1s_vld         ( time_1s_vld       ),
-
-	  // .i_st_wr_en            ( ps_reg_we         ),
-	  // .i_st_wr_addr          ( ps_reg_addr       ),
-      // .i_st_wr_data          ( ps_reg_wr_dat     ),
-      // .i_st_rd_en            ( ps_reg_re         ),
-      // .i_st_rd_addr          ( ps_reg_rd_addr    ),
-	  // .o_st_rd_vld           ( sub_comp_rd_vld[56]    ),
-      // .o_st_rd_data          ( sub_comp_rd_dat[56]    ),
-	  // .o_intr_irq            ( map_irq[56]       )
-
-       // ,.i_close_confirm_key        ( di_regoin_msg[1][18]           )   // 门关确认黄色按钮
-       // ,.o_lock_open        ( o_lock_open_111           )   // 电磁锁A1
-       // ,.i_open_req_key        ( di_regoin_msg[1][17]           )   // 开门请求绿色按钮
-       // ,.i_lock_monitor        ( di_regoin_msg[1][16]           )   // 锁监控常闭DO端口
-       // ,.i_door_monitor        ( di_regoin_msg[1][15]           )   // 门监控常闭DO端口
-       // ,.o_key_light        ( o_key_light_111           )   // 
-    // );
-
-    // assign do_regoin_r_msg[ 1][7] = o_lock_open_111;
-    // assign do_regoin_r_msg[ 1][9] = o_key_light_111;
-	
 
 	`endif
 

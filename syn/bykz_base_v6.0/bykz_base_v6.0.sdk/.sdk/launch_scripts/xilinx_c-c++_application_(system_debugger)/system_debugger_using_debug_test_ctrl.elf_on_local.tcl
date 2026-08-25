@@ -5,8 +5,6 @@ rst -system
 after 3000
 targets -set -nocase -filter {name =~"APU*" && jtag_cable_name =~ "Digilent JTAG-HS1 210512180081"} -index 1
 reset_apu
-targets -set -nocase -filter {name =~"RPU*" && jtag_cable_name =~ "Digilent JTAG-HS1 210512180081"} -index 1
-clear_rpu_reset
 targets -set -filter {jtag_cable_name =~ "Digilent JTAG-HS1 210512180081" && level==0} -index 0
 fpga -file C:/Users/keyang/Desktop/Git_cgliu/bykz_v6.0/syn/bykz_base_v6.0/bykz_base_v6.0.runs/impl_1/sunny_fpga.bit
 targets -set -nocase -filter {name =~"APU*" && jtag_cable_name =~ "Digilent JTAG-HS1 210512180081"} -index 1

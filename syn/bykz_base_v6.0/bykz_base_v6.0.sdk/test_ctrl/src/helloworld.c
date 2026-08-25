@@ -48,47 +48,34 @@
 #include <stddef.h>   // for uintptr_t
 #include "platform.h"
 #include "xil_printf.h"
-
-#define 	BUS_base_addr	0xB0100000
-#define 	sc_offset_addr	0x1600
-
-#define		RST_EN          0x008
-#define		A_TX_OT         0x064
-#define		PARAM3			0x0E0
-
-static inline void reg_write32(uintptr_t reg_phy_addr, uint32_t val);
-static inline uint32_t reg_read32(uintptr_t reg_phy_addr);
+#include "sunny_ctrl_test_func.h"
+#include "param.h"
 
 
 int main()
 {
-	uint32_t read_data;
-
     init_platform();
 
-    reg_write32(BUS_base_addr+sc_offset_addr+RST_EN, 0x1);
-    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_OT, 0xFFFFFFFF);
-    reg_write32(BUS_base_addr+sc_offset_addr+PARAM3, 0x88);
+    //test_ec_1do();
+    //test_ec_1di();
+    //test_ec_4di_2do();
 
-    read_data = reg_read32(BUS_base_addr+sc_offset_addr+PARAM3);
+    //test_ec_3di_2do();
+    test_ec_trayclaw();
 
     cleanup_platform();
     return 0;
 }
 
-static inline void reg_write32(uintptr_t reg_phy_addr, uint32_t val)
-{
-    volatile uint32_t *reg_addr = (volatile uint32_t *)reg_phy_addr;
-    *reg_addr = val;
-}
 
-/**
- * @brief 读32bit寄存器，入参直接填物理地址数字
- * @param reg_phy_addr 寄存器物理地址（直接写 0xB0102400）
- * @return 读取到的32位寄存器值
- */
-static inline uint32_t reg_read32(uintptr_t reg_phy_addr)
-{
-    volatile uint32_t *reg_addr = (volatile uint32_t *)reg_phy_addr;
-    return *reg_addr;
-}
+
+
+
+
+
+
+
+
+
+
+

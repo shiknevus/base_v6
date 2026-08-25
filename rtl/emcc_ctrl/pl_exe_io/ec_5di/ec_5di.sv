@@ -209,7 +209,6 @@ module ec_5di#(
 	
 	`ifdef DEBUG
 		reg			ro_intr_irq;
-		reg	[11:0]	irq_sta;
 		reg	[7:0]	irq_posedge_cnt;
 		reg	[7:0]	irq_negedge_cnt;
 		
@@ -222,29 +221,21 @@ module ec_5di#(
 		always@(posedge i_clk)
 		begin
 			if(i_rst)begin
-				irq_sta <= 12'h000;
 				irq_posedge_cnt <= 8'd0;
 				irq_negedge_cnt <= 8'd0;
-			end else if(!ec_cha_st) begin
-				irq_sta <= 12'h000;
+			end else if(a_bhv_vld)begin
 				irq_posedge_cnt <= 8'd0;
 				irq_negedge_cnt <= 8'd0;
 			end else begin
-				irq_sta[0] <= o_intr_irq;
-				
 				if({ro_intr_irq,o_intr_irq} == 2'b01)begin	//rising
-					irq_sta[8] <= ~irq_sta[8];
 					irq_posedge_cnt <= irq_posedge_cnt+1;
 				end else begin
-					irq_sta[8] <= irq_sta[8];
 					irq_posedge_cnt <= irq_posedge_cnt;
 				end
 				
 				if({ro_intr_irq,o_intr_irq} == 2'b10)begin	//falling
-					irq_sta[4] <= ~irq_sta[4];
 					irq_negedge_cnt <= irq_negedge_cnt+1;
 				end else begin
-					irq_sta[4] <= irq_sta[4];
 					irq_negedge_cnt <= irq_negedge_cnt;
 				end
 			end
@@ -369,7 +360,7 @@ module ec_5di#(
 	,.param69               (i_sign4_check	)
 	,.param70               (i_sign5_check	)
 	,.debug_reg1			(debug_reg1		)
-	,.debug_reg2			({irq_posedge_cnt,irq_negedge_cnt,4'd0,irq_sta}		)
+	,.debug_reg2			({16'd0,irq_posedge_cnt,irq_negedge_cnt})
 	,.debug_reg3			(debug_reg3		)
 	,.debug_reg4			(debug_reg4		)
 	,.debug_reg5			(debug_reg5		)
