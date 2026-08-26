@@ -17,6 +17,8 @@
 /////////////////////////////////////////////////////////////////
 //      THESE DEFINE IS ONLY  USED BY MASTER DEPOT             //
 /////////////////////////////////////////////////////////////////
+`ifndef DEPOT_ADDR_MAP_VH
+`define DEPOT_ADDR_MAP_VH
 //`define RS232_NUM 7
 `define CHILD_DEPOT_NUM         5       //this value corresponds to the number of slave station
 //so the number of bytes received or sent is 1460 bytes.
@@ -66,5 +68,7 @@
 //`define DEPOT_ACTIVE_BYTE_NUM   (`DEPOT_SIZE_ID + `DEPOT_SIZE_DO + `DEPOT_SIZE_DI  + `DEPOT_SIZE_AI +  + (`DEPOT_SIZE_RS232_1ST * 8) + `DEPOT_SIZE_RSV)*4
 
 `define DEPOT_ACTIVE_BYTE_NUM   (`DEPOT_SIZE_ID + `DEPOT_SIZE_DO + `DEPOT_SIZE_DI  + `DEPOT_SIZE_AI + (`DEPOT_SIZE_RS232_1ST * 9) + (`DEPOT_SIZE_PUL_MOTOR0 * 4))*4
+
+`endif //DEPOT_ADDR_MAP_VH
 
 

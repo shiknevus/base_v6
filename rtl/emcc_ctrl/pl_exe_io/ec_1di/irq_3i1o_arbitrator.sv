@@ -54,130 +54,18 @@ module irq_3i1o_arbitrator(
 	,input					irq_receive_ack_i	// PS interrupt receive acknowledge
 );
 	
-	reg	[7:0]	curr_state		;
-	reg	[7:0]	curr_state_1d	;
-	reg	[7:0]	next_state		;
 	
 	reg [7:0] 	irq_cnt;
 	
 	reg			irq_receive_ack	;
 	reg	[1:0]	irq_receive_ack_i_r;
 
-reg sel_irq_a;
-reg sel_irq_b;
-reg sel_irq_c;
-
 	localparam	S_IDLE			=	8'd0;
 	localparam	S_WAIT_IRQ_ACK1	=	8'd1;
 	localparam	S_WAIT_IRQ_ACK2	=	8'd2;
 	localparam	S_END_DELAY		=	8'd3;
-
-always @(*) begin
-    sel_irq_a = 1'b0;
-    sel_irq_b = 1'b0;
-    sel_irq_c = 1'b0;
-    case(chl_priority)
-        4'd0: begin // abc
-            if(irq_a_i && curr_state == S_IDLE)
-                sel_irq_a = 1'b1;
-            else if(irq_b_i && curr_state == S_IDLE)
-                sel_irq_b = 1'b1;
-            else if(irq_c_i && curr_state == S_IDLE)
-                sel_irq_c = 1'b1;
-        end
-        4'd1: begin // acb
-            if(irq_a_i && curr_state == S_IDLE)
-                sel_irq_a = 1'b1;
-            else if(irq_c_i && curr_state == S_IDLE)
-                sel_irq_c = 1'b1;
-            else if(irq_b_i && curr_state == S_IDLE)
-                sel_irq_b = 1'b1;
-        end
-        4'd2: begin // bac
-            if(irq_b_i && curr_state == S_IDLE)
-                sel_irq_b = 1'b1;
-            else if(irq_a_i && curr_state == S_IDLE)
-                sel_irq_a = 1'b1;
-            else if(irq_c_i && curr_state == S_IDLE)
-                sel_irq_c = 1'b1;
-        end
-        4'd3: begin // bca
-            if(irq_b_i && curr_state == S_IDLE)
-                sel_irq_b = 1'b1;
-            else if(irq_c_i && curr_state == S_IDLE)
-                sel_irq_c = 1'b1;
-            else if(irq_a_i && curr_state == S_IDLE)
-                sel_irq_a = 1'b1;
-        end
-        4'd4: begin // cab
-            if(irq_c_i && curr_state == S_IDLE)
-                sel_irq_c = 1'b1;
-            else if(irq_a_i && curr_state == S_IDLE)
-                sel_irq_a = 1'b1;
-            else if(irq_b_i && curr_state == S_IDLE)
-                sel_irq_b = 1'b1;
-        end
-        4'd5: begin // cba
-            if(irq_c_i && curr_state == S_IDLE)
-                sel_irq_c = 1'b1;
-            else if(irq_b_i && curr_state == S_IDLE)
-                sel_irq_b = 1'b1;
-            else if(irq_a_i && curr_state == S_IDLE)
-                sel_irq_a = 1'b1;
-        end
-        default: begin // default bac
-            if(irq_b_i && curr_state == S_IDLE)
-                sel_irq_b = 1'b1;
-            else if(irq_a_i && curr_state == S_IDLE)
-                sel_irq_a = 1'b1;
-            else if(irq_c_i && curr_state == S_IDLE)
-                sel_irq_c = 1'b1;
-        end
-    endcase
-end
-
-reg sel_irq_a_d;
-reg sel_irq_b_d;
-reg sel_irq_c_d;
-
-always @(posedge clk_i) begin
-    if(rst_i) begin
-        sel_irq_a_d <= 1'b0;
-        sel_irq_b_d <= 1'b0;
-        sel_irq_c_d <= 1'b0;
-    end else begin
-        sel_irq_a_d <= sel_irq_a;
-        sel_irq_b_d <= sel_irq_b;
-        sel_irq_c_d <= sel_irq_c;
-    end
-end
-
-always @(posedge clk_i) begin
-    if(rst_i) begin
-        irq_a_grant_o <= 1'b0;
-        irq_b_grant_o <= 1'b0;
-        irq_c_grant_o <= 1'b0;
-    end else begin
-        irq_a_grant_o <= 1'b0;
-        irq_b_grant_o <= 1'b0;
-        irq_c_grant_o <= 1'b0;
-        if(sel_irq_a && !sel_irq_a_d) begin
-            irq_a_grant_o <= 1'b1;
-        end else if(sel_irq_b && !sel_irq_b_d) begin
-            irq_b_grant_o <= 1'b1;
-        end else if(sel_irq_c && !sel_irq_c_d) begin
-            irq_c_grant_o <= 1'b1;
-        end
-    end
-end
-// ======================================================================
 	
-	always@(posedge clk_i)begin
-	if(rst_i)
-		curr_state_1d <= 8'd0;
-	else
-		curr_state_1d <= curr_state;
-	end
+	reg		[7:0]	s_sta;
 	
 	//delect posedge irq_receive_ack_i
 	always@(posedge clk_i)begin
@@ -190,126 +78,224 @@ end
 	end
 	end
 
-	always @(posedge clk_i) begin
-        if (rst_i)
-            curr_state <= S_IDLE;
-        else
-            curr_state <= next_state;
-    end
-	
-	always @(*) begin
-        case (curr_state)
-            S_IDLE: begin
-				if(chl_priority == 4'd0)begin	//abc
-					if(irq_a_i) 
-						next_state = S_WAIT_IRQ_ACK1;
-					else if(irq_b_i)
-						next_state = S_WAIT_IRQ_ACK1;
-					else if(irq_c_i)
-						next_state = S_WAIT_IRQ_ACK1;
-					else
-						next_state = S_IDLE;
-				end else if(chl_priority == 4'd1)begin	//acb
-					if(irq_a_i)
-						next_state = S_WAIT_IRQ_ACK1;
-					else if(irq_c_i)
-						next_state = S_WAIT_IRQ_ACK1;
-					else if(irq_b_i)
-						next_state = S_WAIT_IRQ_ACK1;
-					else begin
-						next_state = S_IDLE;
+always @(posedge clk_i) begin
+	if(rst_i) begin
+		s_sta <= S_IDLE;
+		irq_a_grant_o <= 1'b0;
+        irq_b_grant_o <= 1'b0;
+        irq_c_grant_o <= 1'b0;
+	end else
+		case(s_sta)
+			S_IDLE:begin
+			
+				case(chl_priority)
+					4'd0: begin // abc
+						if(irq_a_i)begin
+							irq_a_grant_o <= 1'b1;
+							irq_b_grant_o <= 1'b0;
+							irq_c_grant_o <= 1'b0;
+							s_sta <= S_WAIT_IRQ_ACK1;
+						end else if(irq_b_i)begin
+							irq_a_grant_o <= 1'b0;
+							irq_b_grant_o <= 1'b1;
+							irq_c_grant_o <= 1'b0;
+							s_sta <= S_WAIT_IRQ_ACK1;
+						end else if(irq_c_i)begin
+							irq_a_grant_o <= 1'b0;
+							irq_b_grant_o <= 1'b0;
+							irq_c_grant_o <= 1'b1;
+							s_sta <= S_WAIT_IRQ_ACK1;
+						end else begin
+							irq_a_grant_o <= 1'b0;
+							irq_b_grant_o <= 1'b0;
+							irq_c_grant_o <= 1'b0;
+							s_sta <= S_IDLE;
+						end
 					end
-				end else if(chl_priority == 4'd2)begin	//bac
-					if(irq_b_i)		
-						next_state = S_WAIT_IRQ_ACK1;		
-					else if(irq_a_i)		
-						next_state = S_WAIT_IRQ_ACK1;		
-					else if(irq_c_i)		
-						next_state = S_WAIT_IRQ_ACK1;		
-					else		
-						next_state = S_IDLE;		
-				end else if(chl_priority == 4'd3)begin	//bca
-					if(irq_b_i)		
-						next_state = S_WAIT_IRQ_ACK1;		
-					else if(irq_c_i)		
-						next_state = S_WAIT_IRQ_ACK1;		
-					else if(irq_a_i)		
-						next_state = S_WAIT_IRQ_ACK1;		
-					else		
-						next_state = S_IDLE;
-				end else if(chl_priority == 4'd4)begin	//cab
-					if(irq_c_i)		
-						next_state = S_WAIT_IRQ_ACK1;		
-					else if(irq_a_i)		
-						next_state = S_WAIT_IRQ_ACK1;		
-					else if(irq_b_i)		
-						next_state = S_WAIT_IRQ_ACK1;		
-					else		
-						next_state = S_IDLE;		
-				end else if(chl_priority == 4'd5)begin	//cba
-					if(irq_c_i)		
-						next_state = S_WAIT_IRQ_ACK1;		
-					else if(irq_b_i)		
-						next_state = S_WAIT_IRQ_ACK1;		
-					else if(irq_a_i)		
-						next_state = S_WAIT_IRQ_ACK1;		
-					else		
-						next_state = S_IDLE;		
-				end else begin							//default:bac
-					if(irq_b_i)		
-						next_state = S_WAIT_IRQ_ACK1;		
-					else if(irq_a_i)		
-						next_state = S_WAIT_IRQ_ACK1;		
-					else if(irq_c_i)		
-						next_state = S_WAIT_IRQ_ACK1;		
-					else		
-						next_state = S_IDLE;	
-				end
+					4'd1: begin // acb
+						if(irq_a_i)begin
+							irq_a_grant_o <= 1'b1;
+							irq_b_grant_o <= 1'b0;
+							irq_c_grant_o <= 1'b0;
+							s_sta <= S_WAIT_IRQ_ACK1;
+						end else if(irq_c_i)begin
+							irq_a_grant_o <= 1'b0;
+							irq_b_grant_o <= 1'b0;
+							irq_c_grant_o <= 1'b1;
+							s_sta <= S_WAIT_IRQ_ACK1;
+						end else if(irq_b_i)begin
+							irq_a_grant_o <= 1'b0;
+							irq_b_grant_o <= 1'b1;
+							irq_c_grant_o <= 1'b0;
+							s_sta <= S_WAIT_IRQ_ACK1;
+						end else begin
+							irq_a_grant_o <= 1'b0;
+							irq_b_grant_o <= 1'b0;
+							irq_c_grant_o <= 1'b0;
+							s_sta <= S_IDLE;
+						end
+					end
+					4'd2: begin // bac
+						if(irq_b_i)begin
+							irq_a_grant_o <= 1'b0;
+							irq_b_grant_o <= 1'b1;
+							irq_c_grant_o <= 1'b0;
+							s_sta <= S_WAIT_IRQ_ACK1;
+						end else if(irq_a_i)begin
+							irq_a_grant_o <= 1'b1;
+							irq_b_grant_o <= 1'b0;
+							irq_c_grant_o <= 1'b0;
+							s_sta <= S_WAIT_IRQ_ACK1;
+						end else if(irq_c_i)begin
+							irq_a_grant_o <= 1'b0;
+							irq_b_grant_o <= 1'b0;
+							irq_c_grant_o <= 1'b1;
+							s_sta <= S_WAIT_IRQ_ACK1;
+						end else begin
+							irq_a_grant_o <= 1'b0;
+							irq_b_grant_o <= 1'b0;
+							irq_c_grant_o <= 1'b0;
+							s_sta <= S_IDLE;
+						end
+					end
+					4'd3: begin // bca
+						if(irq_b_i)begin
+							irq_a_grant_o <= 1'b0;
+							irq_b_grant_o <= 1'b1;
+							irq_c_grant_o <= 1'b0;
+							s_sta <= S_WAIT_IRQ_ACK1;
+						end else if(irq_c_i)begin
+							irq_a_grant_o <= 1'b0;
+							irq_b_grant_o <= 1'b0;
+							irq_c_grant_o <= 1'b1;
+							s_sta <= S_WAIT_IRQ_ACK1;
+						end else if(irq_a_i)begin
+							irq_a_grant_o <= 1'b1;
+							irq_b_grant_o <= 1'b0;
+							irq_c_grant_o <= 1'b0;
+							s_sta <= S_WAIT_IRQ_ACK1;
+						end else begin
+							irq_a_grant_o <= 1'b0;
+							irq_b_grant_o <= 1'b0;
+							irq_c_grant_o <= 1'b0;
+							s_sta <= S_IDLE;
+						end
+					end
+					4'd4: begin // cab
+						if(irq_c_i)begin
+							irq_a_grant_o <= 1'b0;
+							irq_b_grant_o <= 1'b0;
+							irq_c_grant_o <= 1'b1;
+							s_sta <= S_WAIT_IRQ_ACK1;
+						end else if(irq_a_i)begin
+							irq_a_grant_o <= 1'b1;
+							irq_b_grant_o <= 1'b0;
+							irq_c_grant_o <= 1'b0;
+							s_sta <= S_WAIT_IRQ_ACK1;
+						end else if(irq_b_i)begin
+							irq_a_grant_o <= 1'b0;
+							irq_b_grant_o <= 1'b1;
+							irq_c_grant_o <= 1'b0;
+							s_sta <= S_WAIT_IRQ_ACK1;
+						end else begin
+							irq_a_grant_o <= 1'b0;
+							irq_b_grant_o <= 1'b0;
+							irq_c_grant_o <= 1'b0;
+							s_sta <= S_IDLE;
+						end
+					end
+					4'd5: begin // cba
+						if(irq_c_i)begin
+							irq_a_grant_o <= 1'b0;
+							irq_b_grant_o <= 1'b0;
+							irq_c_grant_o <= 1'b1;
+							s_sta <= S_WAIT_IRQ_ACK1;
+						end else if(irq_b_i)begin
+							irq_a_grant_o <= 1'b0;
+							irq_b_grant_o <= 1'b1;
+							irq_c_grant_o <= 1'b0;
+							s_sta <= S_WAIT_IRQ_ACK1;
+						end else if(irq_a_i)begin
+							irq_a_grant_o <= 1'b1;
+							irq_b_grant_o <= 1'b0;
+							irq_c_grant_o <= 1'b0;
+							s_sta <= S_WAIT_IRQ_ACK1;
+						end else begin
+							irq_a_grant_o <= 1'b0;
+							irq_b_grant_o <= 1'b0;
+							irq_c_grant_o <= 1'b0;
+							s_sta <= S_IDLE;
+						end
+					end
+					default: begin // default bac
+						if(irq_b_i)begin
+							irq_a_grant_o <= 1'b0;
+							irq_b_grant_o <= 1'b1;
+							irq_c_grant_o <= 1'b0;
+							s_sta <= S_WAIT_IRQ_ACK1;
+						end else if(irq_a_i)begin
+							irq_a_grant_o <= 1'b1;
+							irq_b_grant_o <= 1'b0;
+							irq_c_grant_o <= 1'b0;
+							s_sta <= S_WAIT_IRQ_ACK1;
+						end else if(irq_c_i)begin
+							irq_a_grant_o <= 1'b0;
+							irq_b_grant_o <= 1'b0;
+							irq_c_grant_o <= 1'b1;
+							s_sta <= S_WAIT_IRQ_ACK1;
+						end else begin
+							irq_a_grant_o <= 1'b0;
+							irq_b_grant_o <= 1'b0;
+							irq_c_grant_o <= 1'b0;
+							s_sta <= S_IDLE;
+						end
+					end
+				endcase
 			end
-
-			S_WAIT_IRQ_ACK1: begin
+			
+			S_WAIT_IRQ_ACK1:begin
+				irq_a_grant_o <= 1'b0;
+				irq_b_grant_o <= 1'b0;
+				irq_c_grant_o <= 1'b0;
+				
 				if(irq_cnt <= 8'd31)begin
 					if(irq_receive_ack)// Interrupt acknowledge received successfully
-						next_state = S_END_DELAY;
+						s_sta <= S_END_DELAY;
 					else
-						next_state = S_WAIT_IRQ_ACK1;
+						s_sta <= S_WAIT_IRQ_ACK1;
 				end else begin
-						next_state = S_WAIT_IRQ_ACK2;
+						s_sta <= S_WAIT_IRQ_ACK2;
 				end
 			end
 			
-			S_WAIT_IRQ_ACK2: begin	//irq_
+			S_WAIT_IRQ_ACK2:begin
 				if(irq_receive_ack)// Interrupt acknowledge received successfully
-					next_state = S_END_DELAY;
-				else if(irq_cnt >= 8'd200)	//escape: PS ack lost (CDC), re-arbitrate instead of hang
-					next_state = S_IDLE;
+					s_sta <= S_END_DELAY;
 				else
-					next_state = S_WAIT_IRQ_ACK2;
+					s_sta <= S_WAIT_IRQ_ACK2;
 			end
-						
+			
 			S_END_DELAY: begin
 				if(irq_cnt >= 8)
-					next_state = S_IDLE; 
+					s_sta <= S_IDLE; 
 				else
-					next_state = S_END_DELAY;
+					s_sta <= S_END_DELAY;
 			end
 			
 			default:
-				next_state = S_IDLE;
+				s_sta <= S_IDLE;
 		endcase
-	end
-	
+end
+
 	always@(posedge clk_i)begin
 	if(rst_i)
 		irq_cnt <= 8'd0;
-	else if(curr_state != curr_state_1d)
-		irq_cnt <= 8'd0;
-	else if(curr_state == S_WAIT_IRQ_ACK1) begin
-		if(irq_cnt >= 8'd31) 
+	else if(s_sta == S_WAIT_IRQ_ACK1) begin
+		if(irq_cnt >= 8'd32) 
 			irq_cnt <= irq_cnt;
 		else
 			irq_cnt <= irq_cnt +1;
-	end else if(curr_state == S_END_DELAY) begin
+	end else if(s_sta == S_END_DELAY) begin
 		if(irq_cnt >= 8'd8)
 			irq_cnt <= irq_cnt;
 		else
@@ -321,7 +307,7 @@ end
 	always@(posedge clk_i)begin
 	if(rst_i)
 		irq_busy_o <= 1'b0;
-	else if(curr_state == S_IDLE)
+	else if(s_sta == S_IDLE)
 		irq_busy_o <= 1'b0;
 	else
 		irq_busy_o <= 1'b1;
@@ -331,9 +317,7 @@ end
 	always@(posedge clk_i)begin
 	if(rst_i)
 		irq_o <= 1'b0;
-	else if(curr_state == S_IDLE && (sel_irq_a || sel_irq_b || sel_irq_c))
-		irq_o <= 1'b1;
-	else if(curr_state == S_WAIT_IRQ_ACK1)
+	else if(s_sta == S_WAIT_IRQ_ACK1)
 		irq_o <= 1'b1;
 	else
 		irq_o <= 1'b0;
@@ -353,7 +337,7 @@ begin
 	end else if(irq_c_grant_o)begin
         irq_reg1_o <= {ec_id,sc_id,c_bhv_id};
         irq_reg2_o <= {c_tx_id,c_alm_num,16'd0};
-	end else if(curr_state == S_END_DELAY)begin
+	end else if(s_sta == S_END_DELAY)begin
 		irq_reg1_o <= 32'd0;
         irq_reg2_o <= 32'd0;
 	end else begin
@@ -361,6 +345,7 @@ begin
         irq_reg2_o <= irq_reg2_o;
     end
 end
+
 	
 endmodule
 

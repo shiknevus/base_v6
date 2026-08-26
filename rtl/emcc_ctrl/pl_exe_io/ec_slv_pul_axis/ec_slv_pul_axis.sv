@@ -51,8 +51,8 @@ module ec_slv_pul_axis#(
    		,input  	            i_axis_reset		//axis reset
 
 		//slave board interface
-		,input					cur_slv_board_id    //current slave board id
-		,input					slv_board_id        //slave board id
+		,input 		 [4:0]		cur_slv_board_id    //current slave board id
+		,input 		 [4:0]		slv_board_id        //slave board id
 		,input					pul_motor_r_flag    //pul motor ready flag
 		,input					pul_motor_flag      //pul motor flag
 		,output 	[31:0] 		m2s_pulm_msg        //message  master to slave
@@ -168,7 +168,7 @@ module ec_slv_pul_axis#(
 	wire	[31:0]	debug_reg4 ;
 	wire	[31:0]	debug_reg5 ;
 
-	wire	[31:0]	task_time_cnt	;
+	wire	[19:0]	task_time_cnt	;
 
 	wire			a_tx_result_vld;
 	wire			b_tx_result_vld;
@@ -211,12 +211,17 @@ module ec_slv_pul_axis#(
 	wire 	[31:0]	param35		;
 	wire 	[31:0]	param36		;
 	wire 	[31:0]	param37		;
+	wire 	[31:0]	param38		;
+	wire 	[31:0]	param39		;
+	wire 	[31:0]	param40		;
 	wire 	[0:0]	action_busy	;
 	wire 	[0:0]	action_done	;
 	wire 	[0:0]	action_error;
 	wire 			b_clr_pause	;
 	wire 			b_clr_resume;
 	wire 			b_clr_stop	;
+	wire 			b_reset		;
+	wire 			b_son		;
 	wire 			b_pause		;
 	wire 			b_stop		;
 //----------------------------------------------------- user logic end -------------------------------------------------------//
@@ -303,6 +308,9 @@ module ec_slv_pul_axis#(
 	,.param35				(param35		)
 	,.param36				(param36		)
 	,.param37				(param37		)
+	,.param38				(param38		)
+	,.param39				(param39		)
+	,.param40				(param40		)
 	,.clr_pause				(b_clr_pause	)
 	,.clr_resume			(b_clr_resume	)
 	,.clr_stop				(b_clr_stop		)
@@ -365,7 +373,6 @@ module ec_slv_pul_axis#(
     ,.ec_cha_st            	(ec_cha_st			)
     ,.a_tx_id              	(a_tx_id        	)
     ,.a_alm_num            	(a_alm_num      	)
-	,.ec_id					(ec_id				)
     ,.i_servo_notok			(i_servo_notok		)
     ,.i_servo_stop			(i_servo_stop		)
     ,.i_axis_limf			(i_axis_limf		)
@@ -382,12 +389,6 @@ module ec_slv_pul_axis#(
     ,.m2s_pulm_msg			(m2s_pulm_msg		)
     ,.s2m_pulm_msg			(s2m_pulm_msg		)
 
-    ,.rctrl_drive_on		(param30				)
-    ,.rctrl_drive_reset		(param29			    )
-    ,.rctrl_resume			(param28			    )
-    ,.rctrl_pause			(param26			    )
-    ,.rctrl_quickstop		(param26			    )
-    ,.rcfg_pf_mode			(param16[0]			    )
     ,.rserv_dir				(param16[0]			    )
     ,.rserv_step_pulse		(param37				)
     ,.rserv_target_pulse	(param36				)
@@ -404,11 +405,10 @@ module ec_slv_pul_axis#(
     ,.rcfg_acc_max			(param2					)
     ,.rcfg_dec_max			(param3					)
     ,.rcfg_touch_spd		(param33				)
-    ,.rcfg_qs_dec			(param7				    )
-    ,.rcfg_timedly			(param31			    )
 
-//	,.r_pf_abspos			(param51				)
-
+	,.r_pf_abspos			(param51				)
+	,.i_drive_on			(b_son					)
+	,.i_drive_reset			(b_reset				)
     ,.i_pause				(b_pause				)
     ,.i_stop				(b_stop					)
     ,.action_busy			(action_busy			)
@@ -440,15 +440,14 @@ module ec_slv_pul_axis#(
 	,.ec_chb_st             (ec_chb_st			)
 	,.b_tx_id               (b_tx_id			)
 	,.b_alm_num             (b_alm_num			)
-	,.di				    ( 					)
 	,.irq_o			        (irq_b				)
 	,.irq_ack_i	            (irq_b_grant		)
 
 //----------------------------------------------------- user logic begin -----------------------------------------------------//
-    ,.o_dv_reset			(					)
-    ,.o_dv_son				(					)
-    ,.b_pause				(b_pause			)
-    ,.b_stop				(b_stop				)
+    ,.o_dv_reset			(b_reset			)
+    ,.o_dv_son				(b_son				)
+    ,.o_pause				(b_pause			)
+    ,.o_stop				(b_stop				)
 //----------------------------------------------------- user logic end -------------------------------------------------------//
     );
 
@@ -483,8 +482,6 @@ module ec_slv_pul_axis#(
 	)pre_post_sta_check_slv_pul_axis_u0(
 			.clk_i				(clk_i			),
 			.rst_i				(rst_i			),
-			.i_time_1ms_vld		(i_time_1ms_vld	),
-			.i_time_1s_vld 		(i_time_1s_vld 	),
 			.unit_id         	(unit_id        ),
 			.unit_ectrl      	(unit_ectrl     ),
 			.unit_st         	(unit_st        ),
@@ -494,8 +491,6 @@ module ec_slv_pul_axis#(
 			.m_wk_mod        	(m_wk_mod       ),
 			.m_saf_st        	(m_saf_st       ),
 			.link_m_saf_st   	(link_m_saf_st  ),
-			.sc_id				(sc_id			),
-			.ec_id           	(ec_id          ),
 			.a_en				(a_en			),
 			.b_en				(b_en			),
 			.c_en				(c_en			),
@@ -514,16 +509,6 @@ module ec_slv_pul_axis#(
 			.c_pre_sta_allow	(c_pre_sta_allow),
 			.c_post_sta_allow	(c_post_sta_allow)
 
-		,.i_servo_notok			(i_servo_notok		)
-		,.i_servo_stop			(i_servo_stop		)
-		,.i_axis_limf			(i_axis_limf		)
-		,.i_axis_org			(i_axis_org		)
-		,.i_axis_limb			(i_axis_limb		)
-		,.i_emerge_stop_signal	(i_emerge_stop_signal)
-		,.i_safe_status			(i_safe_status		)
-		,.i_axis_point			(i_axis_point		)
-		,.i_axis_reset			(i_axis_reset		)
-		,.a_bhv_vld				(a_bhv_vld			)
 //----------------------------------------------------- user logic begin -----------------------------------------------------//
 		,.action_busy			(action_busy		)
 		,.action_done			(action_done		)
@@ -534,7 +519,7 @@ module ec_slv_pul_axis#(
 		,.rctrl_resume			(param28			)
 		,.rctrl_pause			(param26			)
 		,.rctrl_stop			(param27			)
-		,.rserv_dir				(param27			)
+		
 		,.b_clr_pause			(b_clr_pause		)
 		,.b_clr_resume			(b_clr_resume		)
 		,.b_clr_stop			(b_clr_stop			)

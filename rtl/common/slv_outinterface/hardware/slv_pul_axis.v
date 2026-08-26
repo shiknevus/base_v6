@@ -46,6 +46,7 @@ module slv_pul_axis
    ,output wire             action_error
    ,output wire             action_busy
    ,output wire             action_done
+   ,output wire             action_ack
    
    ,output reg signed [31:0]  r_pf_abspos
    ,input  wire [7:0]       cur_beha
@@ -55,26 +56,25 @@ module slv_pul_axis
    ,input  wire             rcfg_pf_mode
    ,input  wire [31:0]      rserv_step_pulse
    ,input  wire [31:0]      rserv_target_pulse   
-   ,input  wire [15:0]      rcfg_home_spd
-   ,input  wire [15:0]      rcfg_home_acc
-   ,input  wire [15:0]      rcfg_home_dec
-   ,input  wire [15:0]      rcfg_jog_spd
-   ,input  wire [15:0]      rcfg_jog_acc
-   ,input  wire [15:0]      rcfg_jog_dec
-   ,input  wire [15:0]      rcfg_move_spd
-   ,input  wire [15:0]      rcfg_move_acc
-   ,input  wire [15:0]      rcfg_move_dec
-   ,input  wire [15:0]      rcfg_spd_max
-   ,input  wire [15:0]      rcfg_acc_max
-   ,input  wire [15:0]      rcfg_dec_max
-   ,input  wire [15:0]      rcfg_qs_dec
-   ,input  wire [31:0]      rcfg_timedly
+   ,input  wire [31:0]      rcfg_home_spd
+   ,input  wire [31:0]      rcfg_home_acc
+   ,input  wire [31:0]      rcfg_home_dec
+   ,input  wire [31:0]      rcfg_jog_spd
+   ,input  wire [31:0]      rcfg_jog_acc
+   ,input  wire [31:0]      rcfg_jog_dec
+   ,input  wire [31:0]      rcfg_move_spd
+   ,input  wire [31:0]      rcfg_move_acc
+   ,input  wire [31:0]      rcfg_move_dec
+   ,input  wire [31:0]      rcfg_spd_max
+   ,input  wire [31:0]      rcfg_acc_max
+   ,input  wire [31:0]      rcfg_dec_max
+   ,input  wire [31:0]      rcfg_touch_spd
 
    ,input  wire             i_axis_limf     //forward limit
    ,input  wire             i_axis_limb     //backward limit
    ,input  wire             i_axis_org
-   ,input  wire             i_axis_point
    ,input  wire             i_axis_abspos0
+   ,input  wire             i_pause
    ,input  wire             i_device_alarm
    ,output wire             o_device_pulse
    ,output wire             o_device_dir
@@ -89,9 +89,28 @@ module slv_pul_axis
     localparam P_EN_EFF     	  = 1'b0;
     localparam P_RST_EFF    	  = 1'b0;
 
+    function automatic [31:0] zdef(input [31:0] v, input [31:0] d);
+      zdef = (v == 32'd0) ? d : v;
+    endfunction
+    wire [31:0] home_spd_eff  = zdef(rcfg_home_spd,  32'd1000000);
+    wire [31:0] home_acc_eff  = zdef(rcfg_home_acc,  32'd2500000);
+    wire [31:0] home_dec_eff  = zdef(rcfg_home_dec,  32'd2500000);
+    wire [31:0] jog_spd_eff   = zdef(rcfg_jog_spd,   32'd1000000);
+    wire [31:0] jog_acc_eff   = zdef(rcfg_jog_acc,   32'd2500000);
+    wire [31:0] jog_dec_eff   = zdef(rcfg_jog_dec,   32'd2500000);
+    wire [31:0] move_spd_eff  = zdef(rcfg_move_spd,  32'd1000000);
+    wire [31:0] move_acc_eff  = zdef(rcfg_move_acc,  32'd2500000);
+    wire [31:0] move_dec_eff  = zdef(rcfg_move_dec,  32'd2500000);
+    wire [31:0] spd_max_eff   = zdef(rcfg_spd_max,   32'd4000000);
+    wire [31:0] acc_max_eff   = zdef(rcfg_acc_max,   32'd10000000);
+    wire [31:0] dec_max_eff   = zdef(rcfg_dec_max,   32'd10000000);
+    wire [31:0] touch_spd_eff = zdef(rcfg_touch_spd, 32'd5000);
+
    reg          act_busy;
    reg          act_done;
    reg          act_error;
+   reg          action_start_d;
+   reg          action_ack_r;
    reg          beat_timeout;
    reg [31:0]   slv_beat_cnt;
    reg          action_beat_d;
@@ -103,6 +122,8 @@ module slv_pul_axis
    assign action_busy = act_busy;
    assign action_error = act_error;
    assign action_done = (act_done & ~act_error) ? 1'b1 : 1'b0;
+   assign action_ack = action_ack_r;
+   wire action_start_pulse = action_start & ~action_start_d;
 
    always @(posedge clk)begin
        if(reset)begin
@@ -134,7 +155,7 @@ module slv_pul_axis
       .clk              ( clk                    ),
       .reset            ( reset                  ),
       
-      .i_bv_pulse_start ( o_rc_pulse_start       ),
+      .i_bv_pulse_start ( i_pause ? 1'b0 : o_rc_pulse_start ),
       .i_bv_pulse_period( o_rc_pulse_period      ),
       .i_bv_pulse_number( o_rc_pulse_number      ),
       .i_bv_pulse_dir   ( o_rc_pulse_dir         ),
@@ -153,7 +174,7 @@ module slv_pul_axis
    reg  [31:0]  pos_pf_spd;
    reg  [31:0]  pos_pf_acc;
    reg  [31:0]  pos_pf_dec;
-   wire [31:0]  pos_quickstop_dec = rcfg_qs_dec;
+   wire [31:0]  pos_quickstop_dec = dec_max_eff;
    reg          pos_quickstop;
    reg  [31:0]  pos_pf_mode;
    reg          pos_pf_start;
@@ -178,6 +199,7 @@ module slv_pul_axis
       .i_pf_pulse     ( pos_pf_pulse       ),
       .i_quickstop    ( pos_quickstop      ),
       .i_quickstop_dec( pos_quickstop_dec  ),
+      .i_pause        ( i_pause            ),
       .o_pf_done      ( pos_pf_done        ),
       .o_pf_error     ( pos_pf_error       ),
       .o_pf_busy      ( pos_pf_busy        ),
@@ -213,9 +235,9 @@ module slv_pul_axis
       .i_lim_f        ( i_axis_limf        ),
       .i_lim_b        ( i_axis_limb        ),
       .i_org          ( i_axis_org         ),
-      .i_pf_spd       ( rcfg_home_spd      ),
-      .i_pf_acc       ( rcfg_home_acc      ),
-      .i_pf_dec       ( rcfg_home_dec      ),
+      .i_pf_spd       ( home_spd_eff       ),
+      .i_pf_acc       ( home_acc_eff       ),
+      .i_pf_dec       ( home_dec_eff       ),
       .i_pf_dir       ( DIR_NEG            ),
       .i_start        ( home_start    	   ),
       .i_stop         ( home_stop          ),
@@ -231,7 +253,8 @@ module slv_pul_axis
       .o_pf_stop      ( home_pf_stop       ),
       .o_pf_quickstop ( home_pf_quickstop  ),
       .i_pf_busy      ( pos_pf_busy        ),
-      .i_pf_done      ( pos_pf_done        )
+      .i_pf_done      ( pos_pf_done        ),
+      .i_spd_min      ( touch_spd_eff      )
    );
    
    ////////////////// JOG
@@ -254,13 +277,13 @@ module slv_pul_axis
       .clk            ( clk                ),
       .reset          ( reset              ),
       
-      .i_drv_son      ( action_son         ),
+      .i_drv_son      ( 1'b1               ),
       .i_lim_f        ( i_axis_limf        ),
       .i_lim_b        ( i_axis_limb        ),
       .i_org          ( i_axis_org         ),
-      .i_pf_spd       ( rcfg_jog_spd       ),
-      .i_pf_acc       ( rcfg_jog_acc       ),
-      .i_pf_dec       ( rcfg_jog_dec       ),
+      .i_pf_spd       ( jog_spd_eff        ),
+      .i_pf_acc       ( jog_acc_eff        ),
+      .i_pf_dec       ( jog_dec_eff        ),
       .i_pf_pulse     ( rserv_step_pulse   ),
       .i_pf_dir       ( rserv_dir          ),
       .i_start        ( jog_start   	   ),
@@ -305,9 +328,9 @@ module slv_pul_axis
       .i_lim_b        ( i_axis_limb        ),
       .i_org          ( i_axis_org         ),
       .i_abspos       ( r_pf_abspos        ),
-      .i_pf_spd       ( rcfg_move_spd      ),
-      .i_pf_acc       ( rcfg_move_acc      ),
-      .i_pf_dec       ( rcfg_move_dec      ),
+       .i_pf_spd      ( move_spd_eff       ),
+       .i_pf_acc      ( move_acc_eff       ),
+       .i_pf_dec      ( move_dec_eff       ),
       .i_pf_pulse     ( rserv_target_pulse ),
       .i_start        ( move_start     	   ),
       .i_stop         ( move_stop          ),
@@ -328,50 +351,76 @@ module slv_pul_axis
 
   //behavior mapping (aligned with master ec_pul_axis):
   //  1=HOME  2=JOG  3=MOVE  20=JOG[safe]  21=MOVE[safe]  30=GETPOS
-  assign home_start = (action_son & action_start & cur_beha==1) ? 1'b1 : 1'b0;
-  assign jog_start  = (action_son & action_start & ((cur_beha==2)||(cur_beha==20))) ? 1'b1 : 1'b0;
-  assign move_start = (action_son & action_start & ((cur_beha==3)||(cur_beha==21))) ? 1'b1 : 1'b0;
+  assign home_start = (action_son & action_start_pulse & (cur_beha==1)) ? 1'b1 : 1'b0;
+  assign jog_start  = (action_son & action_start_pulse & ((cur_beha==2)||(cur_beha==20))) ? 1'b1 : 1'b0;
+  assign move_start = (action_son & action_start_pulse & ((cur_beha==3)||(cur_beha==21))) ? 1'b1 : 1'b0;
 
   always @(posedge clk)begin
-      case(cur_beha)
+      if(reset) begin
+          act_busy      <= 1'b0;
+          act_done      <= 1'b0;
+          act_error     <= 1'b0;
+          action_start_d<= 1'b0;
+          action_ack_r  <= 1'b0;
+          home_stop     <= 1'b0;
+          jog_stop      <= 1'b0;
+          move_stop     <= 1'b0;
+      end else begin
+          action_start_d <= action_start;
+          if(action_start_pulse) begin
+              act_done  <= 1'b0;
+              act_error <= 1'b0;
+              action_ack_r <= ~action_ack_r;
+          end
+          case(cur_beha)
               1: begin
                   act_busy  <= home_busy;
-                  act_done  <= home_done;
-                  act_error <= home_error;
+                  if(home_done)  act_done  <= 1'b1;
+                  if(home_error) act_error <= 1'b1;
                   home_stop <= (action_alarm | beat_timeout | action_flag);
+                  jog_stop  <= 1'b0;
+                  move_stop <= 1'b0;
               end
               2, 20: begin  // JOG (regular & safe)
                   act_busy  <= jog_busy;
-                  act_done  <= jog_done;
-                  act_error <= jog_error;
+                  if(jog_done)  act_done  <= 1'b1;
+                  if(jog_error) act_error <= 1'b1;
                   jog_stop  <= (action_alarm | beat_timeout | action_flag);
+                  home_stop <= 1'b0;
+                  move_stop <= 1'b0;
               end
               3, 21: begin  // MOVE (regular & safe)
                   act_busy  <= move_busy;
-                  act_done  <= move_done;
-                  act_error <= move_error;
+                  if(move_done)  act_done  <= 1'b1;
+                  if(move_error) act_error <= 1'b1;
                   move_stop <= (action_alarm | beat_timeout | action_flag);
+                  home_stop <= 1'b0;
+                  jog_stop  <= 1'b0;
               end
               30: begin  // GETPOS: no motion, claim done immediately
                   act_busy  <= 1'b0;
-                  act_done  <= action_start;
-                  act_error <= 1'b0;
+                  if(action_start_pulse) act_done <= 1'b1;
+                  home_stop <= 1'b0;
+                  jog_stop  <= 1'b0;
+                  move_stop <= 1'b0;
               end
               default: begin
                   act_busy <= 1'b0;
-                  act_done <= 1'b0;
-                  act_error <= 1'b0;
+                  home_stop <= 1'b0;
+                  jog_stop  <= 1'b0;
+                  move_stop <= 1'b0;
               end
           endcase
       end
+  end
 
   always@* begin
       case(cur_beha)
               1: begin
-                  pos_pf_spd   <= home_pf_spd > rcfg_spd_max ? rcfg_spd_max : home_pf_spd;
-                  pos_pf_acc   <= home_pf_acc > rcfg_acc_max ? rcfg_acc_max : home_pf_acc;
-                  pos_pf_dec   <= home_pf_dec > rcfg_dec_max ? rcfg_dec_max : home_pf_dec;
-                  pos_pf_mode  <= rcfg_pf_mode ? 8'h10 : 8'h00;
+                  pos_pf_spd   <= home_pf_spd > spd_max_eff ? spd_max_eff : home_pf_spd;
+                  pos_pf_acc   <= home_pf_acc > acc_max_eff ? acc_max_eff : home_pf_acc;
+                  pos_pf_dec   <= home_pf_dec > dec_max_eff ? dec_max_eff : home_pf_dec;
+                  pos_pf_mode   = 32'h00;   // home
                   pos_pf_pulse <= home_pf_pulse;
                   pos_pf_start <= home_pf_start;
                   pos_pf_stop  <= home_pf_stop;
@@ -379,10 +428,10 @@ module slv_pul_axis
                   pos_quickstop<= home_pf_quickstop;
               end
               2, 20: begin
-                  pos_pf_spd   <= jog_pf_spd > rcfg_spd_max ? rcfg_spd_max : jog_pf_spd;
-                  pos_pf_acc   <= jog_pf_acc > rcfg_acc_max ? rcfg_acc_max : jog_pf_acc;
-                  pos_pf_dec   <= jog_pf_dec > rcfg_dec_max ? rcfg_dec_max : jog_pf_dec;
-                  pos_pf_mode  <= rcfg_pf_mode ? 8'h11 : 8'h01;
+                  pos_pf_spd   <= jog_pf_spd > spd_max_eff ? spd_max_eff : jog_pf_spd;
+                  pos_pf_acc   <= jog_pf_acc > acc_max_eff ? acc_max_eff : jog_pf_acc;
+                  pos_pf_dec   <= jog_pf_dec > dec_max_eff ? dec_max_eff : jog_pf_dec;
+                  pos_pf_mode   = 32'h01;   // jog
                   pos_pf_pulse <= jog_pf_pulse;
                   pos_pf_start <= jog_pf_start;
                   pos_pf_stop  <= jog_pf_stop;
@@ -390,10 +439,10 @@ module slv_pul_axis
                   pos_quickstop<= jog_pf_quickstop;
               end
               3, 21: begin
-                  pos_pf_spd   <= move_pf_spd > rcfg_spd_max ? rcfg_spd_max : move_pf_spd;
-                  pos_pf_acc   <= move_pf_acc > rcfg_acc_max ? rcfg_acc_max : move_pf_acc;
-                  pos_pf_dec   <= move_pf_dec > rcfg_dec_max ? rcfg_dec_max : move_pf_dec;
-                  pos_pf_mode  <= rcfg_pf_mode ? 8'h11 : 8'h01;
+                  pos_pf_spd   <= move_pf_spd > spd_max_eff ? spd_max_eff : move_pf_spd;
+                  pos_pf_acc   <= move_pf_acc > acc_max_eff ? acc_max_eff : move_pf_acc;
+                  pos_pf_dec   <= move_pf_dec > dec_max_eff ? dec_max_eff : move_pf_dec;
+                  pos_pf_mode   = 32'h01;   // move
                   pos_pf_pulse <= move_pf_pulse;
                   pos_pf_start <= move_pf_start;
                   pos_pf_stop  <= move_pf_stop;
@@ -401,30 +450,43 @@ module slv_pul_axis
                   pos_quickstop<= move_pf_quickstop;
               end
               default: begin  // 30: no motion
-                  pos_pf_spd   <= 0;
-                  pos_pf_acc   <= 0;
-                  pos_pf_dec   <= 0;
-                  pos_pf_mode  <= 0;
-                  pos_pf_pulse <= 0;
-                  pos_pf_start <= 1'b0;
-                  pos_pf_stop  <= 1'b0;
-                  pos_pf_dir   <= 1'b0;
-                  pos_quickstop<= 1'b0;
+                  pos_pf_spd   <= 32'b0;
+                  pos_pf_acc   <= 32'b0;
+                  pos_pf_dec   <= 32'b0;
+                  pos_pf_mode  <= 32'b0;
+                  pos_pf_pulse <= 32'b0;
+                  pos_pf_start <= 1'b0 ;
+                  pos_pf_stop  <= 1'b0 ;
+                  pos_pf_dir   <= 1'b0 ;
+                  pos_quickstop<= 1'b0 ;
               end
           endcase
   end
    
+// absolute position tracking
+reg home_pos_reset;
+always@(posedge clk) begin
+    if(reset || home_busy)
+        home_pos_reset <= 1'b0;
+    else if(home_done & ~home_busy & ~home_error)
+        home_pos_reset <= 1'b1;
+    else 
+        home_pos_reset <= home_pos_reset;
+end
+
    ////////////////// Absolute Position (Pulse)
   always@(posedge clk) begin
       if(reset) begin
-          r_pf_abspos <= 0;
-      end else if(action_son) begin
-          if(i_axis_abspos0 | (home_done & ~home_busy & ~home_error)) begin
-              r_pf_abspos <= 0;
-          end else if(i_rc_pulse_done) begin
-              r_pf_abspos <= (o_rc_pulse_dir==DIR_POS) ? r_pf_abspos + 1'b1 : r_pf_abspos - 1'b1;
-          end
-      end
+        r_pf_abspos <= 32'd0;
+        end
+     else begin
+        if(home_done & ~home_busy & ~home_error & ~home_pos_reset)
+            r_pf_abspos <= 32'd0;
+        else if(i_rc_pulse_done & o_rc_pulse_start)
+            r_pf_abspos <= (o_rc_pulse_dir == DIR_POS) ? r_pf_abspos + 1'b1 : r_pf_abspos - 1'b1;
+        else
+            r_pf_abspos <= r_pf_abspos;
+        end
   end
 
 endmodule

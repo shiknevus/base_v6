@@ -449,10 +449,8 @@ module ec_can_servo#(
 		,.irq_reg2_o		(irq_reg2			)
 		,.irq_o				(o_intr_irq			)
 		,.irq_busy_o		(irq_busy_o			)
-		,.irq_receive_ack_i (a_tx_result_vld_sync || b_tx_result_vld_sync || c_tx_result_vld_sync)
-    );
-	
-	
+		,.irq_receive_ack_i (a_tx_result_vld || b_tx_result_vld || c_tx_result_vld)	
+	  );
 	
 	
 	

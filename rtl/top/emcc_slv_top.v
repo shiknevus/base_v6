@@ -208,8 +208,6 @@ module emcc_slv_top #
          .clk               (ll_clk             )
         ,.reset             (ll_clk_rst         )
          
-        ,.downstream_lane_up(LANE_UP_0 &  CHANNEL_UP_0)
-	    ,.downstream_link   (LANE_UP_1 &  CHANNEL_UP_1)
 	    ,.s_axi_rx_tvalid_0	(m_axi_rx_tvalid_0  )
 	    ,.s_axi_rx_tvalid_1	(m_axi_rx_tvalid_1  )
 

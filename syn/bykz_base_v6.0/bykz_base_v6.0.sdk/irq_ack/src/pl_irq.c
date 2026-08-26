@@ -103,8 +103,8 @@ static u32 AckIrq(u32 base, u32 reg1, u32 reg2)
     resp = (bhv << 24) | (tx << 16) | (RES_OK << 8) | 0x00U;   // rpt={bhv,tx,result,alm}
     Xil_Out32(base + rpt_off, resp);
 
-    // getpos done: report position (PARAM51 pulses -> mm)
-    if (base == EC_BASE && rpt_off == A_TX_RSULT_RPT && tx == 0x1EU &&
+    // getpos done: report position (PARAM51 pulses -> mm), mst+slv
+    if ((base == EC_BASE || base == EC_SLV_BASE) && rpt_off == A_TX_RSULT_RPT && tx == 0x1EU &&
         (Xil_In32(base + A_BHV_ID) & 0xFFU) == 30U) {
         u32 p51 = Xil_In32(base + PARAM51);
         xil_printf("pos %d pulses (", (int)p51);

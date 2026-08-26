@@ -158,7 +158,7 @@ module emcc_mix_top
     wire    [RAM_AWIDTH-1:0]            sys_addra[RAM_DWIDTH-1:0];
 
     wire    [RAM_DWIDTH-1:0]            pre_r_uuid[RAM_DWIDTH-1:0];
-    wire    [RAM_DWIDTH*2-1:0]          do_regoin_r_msg[RAM_DWIDTH-1:0];
+    tri1    [RAM_DWIDTH*2-1:0]          do_regoin_r_msg[RAM_DWIDTH-1:0];
     wire    [RAM_DWIDTH*2-1:0]          do_regoin_r_msg_n[RAM_DWIDTH-1:0];
     wire    [RAM_DWIDTH*3-1:0]          di_regoin_r_msg[RAM_DWIDTH-1:0];
     wire    [RAM_DWIDTH*4-1:0]          ai_regoin_r_msg[RAM_DWIDTH-1:0];
@@ -190,7 +190,7 @@ module emcc_mix_top
     wire                                pul_motor3_r_flag;
     
 
-    wire    [31:0]              do_mst_msg      ;
+    tri1    [31:0]              do_mst_msg      ;
     wire    [31:0]              do_mst_msg_force      ;
     assign ov_dbg_enable = 0;
     
@@ -212,6 +212,7 @@ module emcc_mix_top
     (
          .clk                   (clk                )
         ,.rst                   (reset              )
+        ,.sy_jerk               (1'b0               )
 
         ,.slv_cfg_msg_rden      (slv_cfg_msg_rden   )
         ,.slv_cfg_msg_addr      (slv_cfg_msg_addr   )
@@ -347,8 +348,6 @@ module emcc_mix_top
     );
 	wire    [4:0]                       slv_board_id;
     assign  slv_board_id = slv_sta_msg_addr[RAM_AWIDTH-1:9];
-	wire ext_emerg_stop;
-	wire ext_pause_sig ;
 	`ifdef RLL_ENB
 	// --------------------------------------------------------------------------------------------------------------------------------------
 	// -------------------------------- The following is the roller components --------------------------------------------------------------
@@ -403,20 +402,20 @@ module emcc_mix_top
 		    	,.i_st_rd_addr  		(ps_reg_rd_addr			)
 		    	,.o_st_rd_data  		(sub_comp_rd_dat[9]		)
 		    	,.o_st_rd_vld   		(sub_comp_rd_vld[9]		)
-		    	,.i_servo_notok			(~di_mst_msg[19]	    )
-		    	,.i_servo_stop			(~di_mst_msg[20]	    )
+		    	,.i_servo_notok			()
+		    	,.i_servo_stop			()
 		    	,.i_axis_limf			(~di_mst_msg[21]	    )
 		    	,.i_axis_org			(~di_mst_msg[22]	    )
 		    	,.i_axis_limb			(~di_mst_msg[23]	    )
-		    	,.i_emerge_stop_signal	(~di_mst_msg[24]	    )
-		    	,.i_safe_status			(~di_mst_msg[25]	    )
-		    	,.i_axis_point			(~di_mst_msg[26]	    )
-		    	,.i_axis_reset			(~di_mst_msg[27]	    )
-		    	,.i_dv_alarm			(~di_mst_msg[28]	    )
-		    	,.o_dv_pulse			(o_dv_pulse[0]		    )
-		    	,.o_dv_dir				(o_dv_dir[0]		    )
-		    	,.o_dv_reset			(o_dv_reset[0]		    )
-		    	,.o_dv_son				(o_dv_son[0]		    )
+		    	,.i_emerge_stop_signal	()
+		    	,.i_safe_status			()
+		    	,.i_axis_point			()
+		    	,.i_axis_reset			()
+		    	,.i_dv_alarm			()
+		    	,.o_dv_pulse			(o_dv_pulse[2]		    )
+		    	,.o_dv_dir				(o_dv_dir[2]		    )
+		    	,.o_dv_reset			(o_dv_reset[2]		    )
+		    	,.o_dv_son				(o_dv_son[2]		    )
 		    	,.o_intr_irq			(map_irq[9]		        )
 		    );
 
@@ -437,21 +436,21 @@ module emcc_mix_top
 		    	,.i_st_rd_addr  		(ps_reg_rd_addr			)
 		    	,.o_st_rd_data  		(sub_comp_rd_dat[10]	)
 		    	,.o_st_rd_vld   		(sub_comp_rd_vld[10]	)
-		    	,.i_servo_notok			(~di_mst_msg[19]	    )
-		    	,.i_servo_stop			(~di_mst_msg[20]	    )
-		    	,.i_axis_limf			(~di_mst_msg[21]	    )
-		    	,.i_axis_org			(~di_mst_msg[22]	    )
-		    	,.i_axis_limb			(~di_mst_msg[23]	    )
-		    	,.i_emerge_stop_signal	(~di_mst_msg[24]	    )
-		    	,.i_safe_status			(~di_mst_msg[25]	    )
-		    	,.i_axis_point			(~di_mst_msg[26]	    )
-		    	,.i_axis_reset			(~di_mst_msg[27]	    )
-		    	,.cur_slv_board_id		(slv_board_id[0]	    )
-		    	,.slv_board_id			(1'b0		            )
-		    	,.pul_motor_r_flag		(pul_motor0_r_flag	    )
-		    	,.pul_motor_flag		(pul_motor0_flag	    )
-		    	,.m2s_pulm_msg			(pul_motor0_r_msg[0]	)
-		    	,.s2m_pulm_msg			(pul_motor0_msg[0]	    )
+				,.i_servo_notok			()
+				,.i_servo_stop			()
+				,.i_axis_limf			(~di_regoin_msg[0][21]	)
+				,.i_axis_org			(~di_regoin_msg[0][22]	)
+				,.i_axis_limb			(~di_regoin_msg[0][23]	)
+				,.i_emerge_stop_signal	()
+				,.i_safe_status			()
+				,.i_axis_point			()
+				,.i_axis_reset			()
+				,.cur_slv_board_id		(1'b0                   )
+				,.slv_board_id			(slv_board_id           )
+				,.pul_motor_r_flag		(pul_motor2_r_flag      )
+		    	,.pul_motor_flag		(pul_motor2_flag	    )
+				,.m2s_pulm_msg			(pul_motor2_r_msg[0]    )
+				,.s2m_pulm_msg			(pul_motor2_msg[0]      )
 		    	,.o_intr_irq			(map_irq[10]		    )
 		    );
             

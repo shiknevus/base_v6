@@ -70,7 +70,7 @@ void CmdInit(void)
     Xil_Out32(base + PARAM36, (u32)(int)(g_target * f));  // target
     Xil_Out32(base + PARAM37, (u32)(int)(g_step   * f));  // step
     Xil_Out32(base + PARAM16, 0x00000001U);               // dir POS
-    Xil_Out32(base + PARAM30, 0x00000001U);               // drive on
+    Xil_Out32(base + PARAM30, 0x00000000U);               // drive on
 }
 
 static int PollKey(void)
@@ -92,7 +92,7 @@ void PrintMenu(void)
     xil_printf(" B: x/v/k/e/f/d = pause/resume/stop/son/soff/reset \r\n");
     xil_printf(" 1DO: 7/8/9=do on/off/st   t/y/u=slv on/off/st \r\n");
     xil_printf(" SRV: h/z/p=home/zero/pos  b/c=stop/read  o=st \r\n");
-    xil_printf(" SLV: a/j/l=home/jog/move  i=st  n/q/U=pause/resume/stop\r\n");
+    xil_printf(" SLV: a/j/l=home/jog/move  L=getpos  i=st  n/q/U=pause/resume/stop\r\n");
     xil_printf("      D/E/F=reset/son/soff\r\n");
     xil_printf(" w: set params   r: regs   s: ch status   \r\n");
     xil_printf("-------------------------------------------\r\n");
@@ -432,6 +432,7 @@ static void HandleKey(char key)
     case 'a': TrigSlvBhv(1); break;   // home
     case 'j': TrigSlvBhv(2); break;   // jog
     case 'l': TrigSlvBhv(3); break;   // move
+    case 'L': TrigSlvBhv(30); break;  // getpos
     case 'i': ReadSlvChSt(); break;
     case 'n': TrigSlvPause(); break;
     case 'q': TrigSlvResume(); break;

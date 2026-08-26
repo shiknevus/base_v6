@@ -2,7 +2,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 // Company:
 // Engineer: cgliu
-//
+// 
 // Create Date: 2026/06/30 10:12:00
 // Design Name:
 // Module Name: pre_post_sta_check
@@ -21,61 +21,44 @@
 
 
 module pre_post_sta_check_slv_pul_axis#(
-		parameter		A_BHA_NUM		=	200
-		,parameter		B_BHA_NUM		=	200
-		,parameter		C_BHA_NUM		=	200
+		parameter		A_BHA_NUM		=	1
+		,parameter		B_BHA_NUM		=	1
+		,parameter		C_BHA_NUM		=	1
 )(
-		input							clk_i
-		,input							rst_i
+		input							clk_i			
+		,input							rst_i			
+		
+		,input		[7:0]				unit_id         
+		,input 		[3:0]				unit_ectrl      
+		,input 		[3:0]				unit_st         
+		,input 		[7:0]				m_id            
+		,input 		[3:0]				m_ectrl         
+		,input 		[3:0]				m_st            
+		,input 		[3:0]				m_wk_mod        
+		,input 							m_saf_st        
+		,input 							link_m_saf_st           
 
-		,input							i_time_1ms_vld
-		,input							i_time_1s_vld
-
-		,input		[7:0]				unit_id
-		,input 		[3:0]				unit_ectrl
-		,input 		[3:0]				unit_st
-		,input 		[7:0]				m_id
-		,input 		[3:0]				m_ectrl
-		,input 		[3:0]				m_st
-		,input 		[3:0]				m_wk_mod
-		,input 							m_saf_st
-		,input 							link_m_saf_st
-		,input 		[7:0]				sc_id
-		,input 		[7:0]				ec_id
-
-		//io port start
-		,input		[0:0]				i_servo_notok
-		,input		[0:0]				i_servo_stop
-		,input		[0:0]				i_axis_limf
-		,input		[0:0]				i_axis_org
-		,input		[0:0]				i_axis_limb
-		,input		[0:0]				i_emerge_stop_signal
-		,input		[0:0]				i_safe_status
-		,input		[0:0]				i_axis_point
-		,input		[0:0]				i_axis_reset
-		//io port end
-
+	
+		,input 		[7:0]				a_bhv_id
+		,input 		[7:0]				b_bhv_id
+		,input 		[7:0]				c_bhv_id
+		
 		,input							a_en
-		,input							a_bhv_vld
-		,input							b_en
-		,input							c_en
+		,input							b_en			
+		,input							c_en			
+		
+		,input							ec_cha_st		
+		,input							ec_chb_st       
+		,input							ec_chc_st       
+		
+		,input 		[19:0] 				c_circle_time	
+		,input 		[19:0]				task_time_cnt	
 
-		,input		[7:0]				a_bhv_id
-		,input		[7:0]				b_bhv_id
-		,input		[7:0]				c_bhv_id
-
-		,input							ec_cha_st
-		,input							ec_chb_st
-		,input							ec_chc_st
-
-		,input 		[19:0] 				c_circle_time
-		,input 		[19:0]				task_time_cnt
-
-		,output	reg	[A_BHA_NUM-1:0]		a_pre_sta_allow
+		,output	reg	[A_BHA_NUM-1:0]		a_pre_sta_allow	
 		,output	reg	[A_BHA_NUM-1:0]		a_post_sta_allow
-		,output	reg	[B_BHA_NUM-1:0]		b_pre_sta_allow
+		,output	reg	[B_BHA_NUM-1:0]		b_pre_sta_allow	
 		,output	reg	[B_BHA_NUM-1:0]		b_post_sta_allow
-		,output	reg	[C_BHA_NUM-1:0]		c_pre_sta_allow
+		,output	reg	[C_BHA_NUM-1:0]		c_pre_sta_allow	
 		,output	reg	[C_BHA_NUM-1:0]		c_post_sta_allow
 
 //----------------------------------------------------- user logic begin -----------------------------------------------------//
@@ -88,7 +71,7 @@ module pre_post_sta_check_slv_pul_axis#(
 		,input							rctrl_resume
 		,input							rctrl_pause
 		,input							rctrl_stop
-		,input							rserv_dir
+
 		,output	reg						b_clr_pause  	//clear PS pause request after beh 100 done
 		,output	reg						b_clr_resume 	//clear PS resume request after beh 101 done
 		,output	reg						b_clr_stop   	//clear PS stop request after beh 103 done
@@ -98,34 +81,10 @@ module pre_post_sta_check_slv_pul_axis#(
 	//========================================================================================//
 	//---------------------------------  Channel A check -------------------------------------//
 	//========================================================================================//
-
-	//limit rising-edge latch
-	reg			limf_d1, limb_d1;
-	reg			limf_alarm, limb_alarm;
-	wire		limf_rise = i_axis_limf & ~limf_d1;
-	wire		limb_rise = i_axis_limb & ~limb_d1;
-	always@(posedge clk_i) begin
-		if(rst_i || !a_en) begin
-			limf_d1    <= 1'b0;
-			limb_d1    <= 1'b0;
-			limf_alarm <= 1'b0;
-			limb_alarm <= 1'b0;
-		end else begin
-			limf_d1 <= i_axis_limf;
-			limb_d1 <= i_axis_limb;
-			if(limf_rise)
-				limf_alarm <= 1'b1;
-			else if(limb_rise)
-				limb_alarm <= 1'b1;
-			else if(a_bhv_vld && !(i_axis_limf|i_axis_limb)) begin
-				limf_alarm <= 1'b0;
-				limb_alarm <= 1'b0;
-			end
-		end
-	end
-	wire servo_limit_alarm = limf_alarm | limb_alarm | (i_axis_limf|i_axis_limb);  //level fallback
-
-	//home completed: beh1 passes post-check -> set; b_bhv_id==105 (soff) clears
+	
+	//pre status
+	wire device_safe;
+	assign device_safe =(~unit_st && ~m_st && ~m_saf_st && ~link_m_saf_st);
 	reg home_completed;
 	always@(posedge clk_i) begin
 		if(rst_i || !a_en)
@@ -136,27 +95,32 @@ module pre_post_sta_check_slv_pul_axis#(
 			home_completed <= 1'b0;
 	end
 
-	//pre status (aligned with master ec_pul_axis behavior numbering):
-	//  1=home  2=jog  3=move  20=jog[safe]  21=move[safe]  30=getpos
-	wire device_safe = (~unit_st && ~m_st && ~m_saf_st && ~link_m_saf_st);
-	wire axis_ok = !i_servo_notok && !i_emerge_stop_signal && !i_safe_status
-	            && !unit_st && !m_st && !m_saf_st && !link_m_saf_st;
-	always@(posedge clk_i)begin
-		if(rst_i || !a_en)
+	wire [A_BHA_NUM-1:0]	a_pre_sta	;
+
+	assign	a_pre_sta[0 ] = (a_bhv_id == 1 );    // HOME: always allowed
+	assign	a_pre_sta[1 ] = (a_bhv_id == 2 );
+	assign	a_pre_sta[2 ] = (a_bhv_id == 3 ) && home_completed;
+	assign	a_pre_sta[19] = (a_bhv_id == 20) && device_safe;//[safe]
+	assign	a_pre_sta[20] = (a_bhv_id == 21) && home_completed && device_safe;//[safe]
+	assign	a_pre_sta[29] = (a_bhv_id == 30);   // GETPOS: always allowed
+
+	always@(posedge clk_i)
+	begin
+		integer i;
+		if(rst_i && !a_en)
 			a_pre_sta_allow <= {A_BHA_NUM{1'b0}};
 		else begin
 			a_pre_sta_allow <= {A_BHA_NUM{1'b0}};
-			a_pre_sta_allow[0] <= axis_ok;                                           // beh1 home
-			a_pre_sta_allow[1] <= home_completed && axis_ok && !servo_limit_alarm;   // beh2 jog
-			a_pre_sta_allow[2] <= home_completed && axis_ok && !servo_limit_alarm;   // beh3 move
-			a_pre_sta_allow[19] <= device_safe;                                      // beh20 jog[safe]
-			a_pre_sta_allow[20] <= home_completed && device_safe;                    // beh21 move[safe]
-			a_pre_sta_allow[29] <= 1'b1;                                              // beh30 getpos
+			for(i = 0; i < A_BHA_NUM; i = i + 1) begin
+				if(a_pre_sta[i])
+					a_pre_sta_allow[i] <= 1'b1;
+			end
 		end
 	end
-
-	//post status (aligned with master ec_pul_axis)
+	
+	//post status
 	wire [A_BHA_NUM-1:0]	a_post_sta	;
+
 	assign	a_post_sta[0 ] = (a_bhv_id == 1 )&&action_done&&(~action_error);
 	assign	a_post_sta[1 ] = (a_bhv_id == 2 )&&action_done&&(~action_error);
 	assign	a_post_sta[2 ] = (a_bhv_id == 3 )&&action_done&&(~action_error);
@@ -291,7 +255,7 @@ module pre_post_sta_check_slv_pul_axis#(
 			c_pre_sta_allow <= {C_BHA_NUM{1'b0}};
 		end
 	end
-
+	
 	always@(posedge clk_i)
 	begin
 		if(rst_i) begin

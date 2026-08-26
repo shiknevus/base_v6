@@ -17,8 +17,6 @@ module hardware_interface_top
      input                       clk
     ,input                       reset
 
-	,input                       downstream_lane_up
-    ,input                       downstream_link
 	,input                       s_axi_rx_tvalid_0
 	,input             	         s_axi_rx_tvalid_1
 
@@ -77,46 +75,46 @@ module hardware_interface_top
     wire             action_busy[3:0];
     wire             action_done[3:0];
     wire             action_error[3:0];
+    wire             action_ack[3:0];
     wire             device_alarm[3:0];
     wire             device_beat[3:0];
     wire             rctrl_drive_on[3:0];
     wire             rctrl_drive_reset[3:0];
     wire             rserv_dir[3:0];
     wire             rcfg_pf_mode[3:0];
+    wire             i_pause[3:0];
     wire [31:0]      r_pf_abspos[3:0];
     wire [7:0]       cur_beha[3:0];
     wire [31:0]      rserv_step_pulse[3:0];
     wire [31:0]      rserv_target_pulse[3:0];
-    wire [15:0]      rcfg_home_spd[3:0];
-    wire [15:0]      rcfg_home_acc[3:0];
-    wire [15:0]      rcfg_home_dec[3:0];
-    wire [15:0]      rcfg_jog_spd[3:0];
-    wire [15:0]      rcfg_jog_acc[3:0];
-    wire [15:0]      rcfg_jog_dec[3:0];
-    wire [15:0]      rcfg_move_spd[3:0];
-    wire [15:0]      rcfg_move_acc[3:0];
-    wire [15:0]      rcfg_move_dec[3:0];
-    wire [15:0]      rcfg_spd_max[3:0];
-    wire [15:0]      rcfg_acc_max[3:0];
-    wire [15:0]      rcfg_dec_max[3:0];
-    wire [15:0]      rcfg_qs_dec[3:0];
-    wire [31:0]      rcfg_timedly[3:0];
+    wire [31:0]      rcfg_home_spd[3:0];
+    wire [31:0]      rcfg_home_acc[3:0];
+    wire [31:0]      rcfg_home_dec[3:0];
+    wire [31:0]      rcfg_jog_spd[3:0];
+    wire [31:0]      rcfg_jog_acc[3:0];
+    wire [31:0]      rcfg_jog_dec[3:0];
+    wire [31:0]      rcfg_move_spd[3:0];
+    wire [31:0]      rcfg_move_acc[3:0];
+    wire [31:0]      rcfg_move_dec[3:0];
+    wire [31:0]      rcfg_spd_max[3:0];
+    wire [31:0]      rcfg_acc_max[3:0];
+    wire [31:0]      rcfg_dec_max[3:0];
+    wire [31:0]      rcfg_touch_spd[3:0];
     wire             i_axis_limf[3:0];
     wire             i_axis_limb[3:0];
     wire             i_axis_org[3:0];
-    wire             i_axis_point[3:0];
     wire             i_axis_abspos0[3:0]; 
     wire [31:0]      rs232_uart_id[7:0];            //uart_id
-    wire [3:0]       rs232_baud_rate[7:0];          //波特率
-    wire             rs232_start_send[7:0];         //开始发送
-    wire [1:0]       rs232_odd_even[7:0];           //奇偶校验
-    wire [7:0]       rs232_send_num[7:0];           //发送的字节数
-    wire [7:0]       rs232_recv_num[7:0];           //接收的字节数
-    wire [7:0]       rs232_tail_symbol[7:0];        //结束符
-    wire [31:0]      rs232_send_char1[7:0];         //发送字符1*4
-    wire [31:0]      rs232_send_char2[7:0];         //发送字符2*4
-    wire [31:0]      rs232_send_char3[7:0];         //发送字符3*4
-    wire [31:0]      rs232_send_char4[7:0];         //发送字符4*4
+    wire [3:0]       rs232_baud_rate[7:0];          
+    wire             rs232_start_send[7:0];         
+    wire [1:0]       rs232_odd_even[7:0];           
+    wire [7:0]       rs232_send_num[7:0];           
+    wire [7:0]       rs232_recv_num[7:0];           
+    wire [7:0]       rs232_tail_symbol[7:0];        
+    wire [31:0]      rs232_send_char1[7:0];         
+    wire [31:0]      rs232_send_char2[7:0];         
+    wire [31:0]      rs232_send_char3[7:0];         
+    wire [31:0]      rs232_send_char4[7:0];         
     wire [31:0]      rs485_uart_id;
     wire [3:0]       rs485_baud_rate;
     wire             rs485_start_send;
@@ -134,6 +132,14 @@ module hardware_interface_top
     reg  [31:0]      pul_motor1_buf[15:0];
     reg  [31:0]      pul_motor2_buf[15:0];
     reg  [31:0]      pul_motor3_buf[15:0];
+    reg              pul_motor0_frame_start;
+    reg              pul_motor1_frame_start;
+    reg              pul_motor2_frame_start;
+    reg              pul_motor3_frame_start;
+    reg              pul_motor0_action_seen;
+    reg              pul_motor1_action_seen;
+    reg              pul_motor2_action_seen;
+    reg              pul_motor3_action_seen;
     reg  [31:0]      rs232_ch0_buf[31:0];
     reg  [31:0]      rs232_ch1_buf[31:0];
     reg  [31:0]      rs232_ch2_buf[31:0];
@@ -164,18 +170,18 @@ module hardware_interface_top
     assign uart_rx_sel[7] = ((rd_msg_addr_d >= bias_rs232_ch7) & (rd_msg_addr_d < bias_rs485_ch8)) ? (rd_msg_addr_d - bias_rs232_ch7) : 0;
     assign uart_485_rx_sel = ((rd_msg_addr_d >= bias_rs485_ch8) & (rd_msg_addr_d < bias_pul_motor0)) ? (rd_msg_addr_d - bias_rs485_ch8) : 0;
 	assign slvbd_outio = {slvbd_outio_high,slvbd_outio_low};
-	assign action_alarm[0] = pul_motor0_buf[0][0];
-    assign action_alarm[1] = pul_motor1_buf[0][0];
-    assign action_alarm[2] = pul_motor2_buf[0][0];
-    assign action_alarm[3] = pul_motor3_buf[0][0];
-    assign action_start[0] = pul_motor0_buf[0][1];
-    assign action_start[1] = pul_motor1_buf[0][1];
-    assign action_start[2] = pul_motor2_buf[0][1];
-    assign action_start[3] = pul_motor3_buf[0][1];
-    assign action_son[0] = pul_motor0_buf[0][2];
-    assign action_son[1] = pul_motor1_buf[0][2];
-    assign action_son[2] = pul_motor2_buf[0][2];
-    assign action_son[3] = pul_motor3_buf[0][2];
+    assign action_alarm[0] = pul_motor0_buf[0][0] | pul_motor0_buf[0][7];
+    assign action_alarm[1] = pul_motor1_buf[0][0] | pul_motor1_buf[0][7];
+    assign action_alarm[2] = pul_motor2_buf[0][0] | pul_motor2_buf[0][7];
+    assign action_alarm[3] = pul_motor3_buf[0][0] | pul_motor3_buf[0][7];
+    assign action_start[0] = pul_motor0_frame_start;
+    assign action_start[1] = pul_motor1_frame_start;
+    assign action_start[2] = pul_motor2_frame_start;
+    assign action_start[3] = pul_motor3_frame_start;
+    assign action_son[0] = ~pul_motor0_buf[0][12];
+    assign action_son[1] = ~pul_motor1_buf[0][12];
+    assign action_son[2] = ~pul_motor2_buf[0][12];
+    assign action_son[3] = ~pul_motor3_buf[0][12];
     assign i_axis_limf[0] = pul_motor0_buf[0][3];
     assign i_axis_limf[1] = pul_motor1_buf[0][3];
     assign i_axis_limf[2] = pul_motor2_buf[0][3];
@@ -192,14 +198,30 @@ module hardware_interface_top
     assign action_beat[1] = pul_motor1_buf[0][6];
     assign action_beat[2] = pul_motor2_buf[0][6];
     assign action_beat[3] = pul_motor3_buf[0][6];
-    assign i_axis_point[0] = pul_motor0_buf[0][7];
-    assign i_axis_point[1] = pul_motor1_buf[0][7];
-    assign i_axis_point[2] = pul_motor2_buf[0][7];
-    assign i_axis_point[3] = pul_motor3_buf[0][7];
-    assign i_axis_abspos0[0] = pul_motor0_buf[0][15];
-    assign i_axis_abspos0[1] = pul_motor1_buf[0][15];
-    assign i_axis_abspos0[2] = pul_motor2_buf[0][15];
-    assign i_axis_abspos0[3] = pul_motor3_buf[0][15];
+    assign i_pause[0] = pul_motor0_buf[0][8];
+    assign i_pause[1] = pul_motor1_buf[0][8];
+    assign i_pause[2] = pul_motor2_buf[0][8];
+    assign i_pause[3] = pul_motor3_buf[0][8];
+    assign rserv_dir[0] = pul_motor0_buf[0][10];
+    assign rserv_dir[1] = pul_motor1_buf[0][10];
+    assign rserv_dir[2] = pul_motor2_buf[0][10];
+    assign rserv_dir[3] = pul_motor3_buf[0][10];
+    assign rctrl_drive_reset[0] = ~pul_motor0_buf[0][11];
+    assign rctrl_drive_reset[1] = ~pul_motor1_buf[0][11];
+    assign rctrl_drive_reset[2] = ~pul_motor2_buf[0][11];
+    assign rctrl_drive_reset[3] = ~pul_motor3_buf[0][11];
+    assign rctrl_drive_on[0] = ~pul_motor0_buf[0][12];
+    assign rctrl_drive_on[1] = ~pul_motor1_buf[0][12];
+    assign rctrl_drive_on[2] = ~pul_motor2_buf[0][12];
+    assign rctrl_drive_on[3] = ~pul_motor3_buf[0][12];
+    assign i_axis_abspos0[0] = pul_motor0_buf[0][13];
+    assign i_axis_abspos0[1] = pul_motor1_buf[0][13];
+    assign i_axis_abspos0[2] = pul_motor2_buf[0][13];
+    assign i_axis_abspos0[3] = pul_motor3_buf[0][13];
+    assign rcfg_pf_mode[0] = pul_motor0_buf[0][14];
+    assign rcfg_pf_mode[1] = pul_motor1_buf[0][14];
+    assign rcfg_pf_mode[2] = pul_motor2_buf[0][14];
+    assign rcfg_pf_mode[3] = pul_motor3_buf[0][14];
     assign cur_beha[0] = pul_motor0_buf[0][23:16];
     assign cur_beha[1] = pul_motor1_buf[0][23:16];
     assign cur_beha[2] = pul_motor2_buf[0][23:16];
@@ -212,39 +234,59 @@ module hardware_interface_top
     assign rserv_target_pulse[1] = pul_motor1_buf[2];
     assign rserv_target_pulse[2] = pul_motor2_buf[2];
     assign rserv_target_pulse[3] = pul_motor3_buf[2];
-    assign {rcfg_home_spd[0],rcfg_move_spd[0]} = pul_motor0_buf[3];
-    assign {rcfg_home_spd[1],rcfg_move_spd[1]} = pul_motor1_buf[3];
-    assign {rcfg_home_spd[2],rcfg_move_spd[2]} = pul_motor2_buf[3];
-    assign {rcfg_home_spd[3],rcfg_move_spd[3]} = pul_motor3_buf[3];
-    assign {rctrl_drive_reset[0],rctrl_drive_on[0],rcfg_pf_mode[0],rserv_dir[0],rcfg_jog_spd[0]} = pul_motor0_buf[4][19:0];
-    assign {rctrl_drive_reset[1],rctrl_drive_on[1],rcfg_pf_mode[1],rserv_dir[1],rcfg_jog_spd[1]} = pul_motor1_buf[4][19:0];
-    assign {rctrl_drive_reset[2],rctrl_drive_on[2],rcfg_pf_mode[2],rserv_dir[2],rcfg_jog_spd[2]} = pul_motor2_buf[4][19:0];
-    assign {rctrl_drive_reset[3],rctrl_drive_on[3],rcfg_pf_mode[3],rserv_dir[3],rcfg_jog_spd[3]} = pul_motor3_buf[4][19:0];
-    assign {rcfg_home_acc[0],rcfg_home_dec[0]} = pul_motor0_buf[5];
-    assign {rcfg_home_acc[1],rcfg_home_dec[1]} = pul_motor1_buf[5];
-    assign {rcfg_home_acc[2],rcfg_home_dec[2]} = pul_motor2_buf[5];
-    assign {rcfg_home_acc[3],rcfg_home_dec[3]} = pul_motor3_buf[5];
-    assign {rcfg_jog_acc[0],rcfg_jog_dec[0]} = pul_motor0_buf[6];
-    assign {rcfg_jog_acc[1],rcfg_jog_dec[1]} = pul_motor1_buf[6];
-    assign {rcfg_jog_acc[2],rcfg_jog_dec[2]} = pul_motor2_buf[6];
-    assign {rcfg_jog_acc[3],rcfg_jog_dec[3]} = pul_motor3_buf[6];
-    assign {rcfg_move_acc[0],rcfg_move_dec[0]} = pul_motor0_buf[7];
-    assign {rcfg_move_acc[1],rcfg_move_dec[1]} = pul_motor1_buf[7];
-    assign {rcfg_move_acc[2],rcfg_move_dec[2]} = pul_motor2_buf[7];
-    assign {rcfg_move_acc[3],rcfg_move_dec[3]} = pul_motor3_buf[7];
-    assign {rcfg_acc_max[0],rcfg_dec_max[0]} = pul_motor0_buf[8];
-    assign {rcfg_acc_max[1],rcfg_dec_max[1]} = pul_motor1_buf[8];
-    assign {rcfg_acc_max[2],rcfg_dec_max[2]} = pul_motor2_buf[8];
-    assign {rcfg_acc_max[3],rcfg_dec_max[3]} = pul_motor3_buf[8];
-    assign {rcfg_spd_max[0],rcfg_qs_dec[0]} = pul_motor0_buf[9];
-    assign {rcfg_spd_max[1],rcfg_qs_dec[1]} = pul_motor1_buf[9];
-    assign {rcfg_spd_max[2],rcfg_qs_dec[2]} = pul_motor2_buf[9];
-    assign {rcfg_spd_max[3],rcfg_qs_dec[3]} = pul_motor3_buf[9];
-    assign rcfg_timedly[0] = pul_motor0_buf[10];
-    assign rcfg_timedly[1] = pul_motor1_buf[10];
-    assign rcfg_timedly[2] = pul_motor2_buf[10];
-    assign rcfg_timedly[3] = pul_motor3_buf[10];
-    assign rs232_uart_id[0] = rs232_ch0_buf[0];
+    assign rcfg_home_spd[0] = pul_motor0_buf[3];
+    assign rcfg_home_spd[1] = pul_motor1_buf[3];
+    assign rcfg_home_spd[2] = pul_motor2_buf[3];
+    assign rcfg_home_spd[3] = pul_motor3_buf[3];
+    assign rcfg_home_acc[0] = pul_motor0_buf[4];
+    assign rcfg_home_acc[1] = pul_motor1_buf[4];
+    assign rcfg_home_acc[2] = pul_motor2_buf[4];
+    assign rcfg_home_acc[3] = pul_motor3_buf[4];
+    assign rcfg_home_dec[0] = pul_motor0_buf[5];
+    assign rcfg_home_dec[1] = pul_motor1_buf[5];
+    assign rcfg_home_dec[2] = pul_motor2_buf[5];
+    assign rcfg_home_dec[3] = pul_motor3_buf[5];
+    assign rcfg_jog_spd[0] = pul_motor0_buf[6];
+    assign rcfg_jog_spd[1] = pul_motor1_buf[6];
+    assign rcfg_jog_spd[2] = pul_motor2_buf[6];
+    assign rcfg_jog_spd[3] = pul_motor3_buf[6];
+    assign rcfg_jog_acc[0] = pul_motor0_buf[7];
+    assign rcfg_jog_acc[1] = pul_motor1_buf[7];
+    assign rcfg_jog_acc[2] = pul_motor2_buf[7];
+    assign rcfg_jog_acc[3] = pul_motor3_buf[7];
+    assign rcfg_jog_dec[0] = pul_motor0_buf[8];
+    assign rcfg_jog_dec[1] = pul_motor1_buf[8];
+    assign rcfg_jog_dec[2] = pul_motor2_buf[8];
+    assign rcfg_jog_dec[3] = pul_motor3_buf[8];
+    assign rcfg_move_spd[0] = pul_motor0_buf[9];
+    assign rcfg_move_spd[1] = pul_motor1_buf[9];
+    assign rcfg_move_spd[2] = pul_motor2_buf[9];
+    assign rcfg_move_spd[3] = pul_motor3_buf[9];
+    assign rcfg_move_acc[0] = pul_motor0_buf[10];
+    assign rcfg_move_acc[1] = pul_motor1_buf[10];
+    assign rcfg_move_acc[2] = pul_motor2_buf[10];
+    assign rcfg_move_acc[3] = pul_motor3_buf[10];
+    assign rcfg_move_dec[0] = pul_motor0_buf[11];
+    assign rcfg_move_dec[1] = pul_motor1_buf[11];
+    assign rcfg_move_dec[2] = pul_motor2_buf[11];
+    assign rcfg_move_dec[3] = pul_motor3_buf[11];
+    assign rcfg_spd_max[0] = pul_motor0_buf[12];
+    assign rcfg_spd_max[1] = pul_motor1_buf[12];
+    assign rcfg_spd_max[2] = pul_motor2_buf[12];
+    assign rcfg_spd_max[3] = pul_motor3_buf[12];
+    assign rcfg_acc_max[0] = pul_motor0_buf[13];
+    assign rcfg_acc_max[1] = pul_motor1_buf[13];
+    assign rcfg_acc_max[2] = pul_motor2_buf[13];
+    assign rcfg_acc_max[3] = pul_motor3_buf[13];
+    assign rcfg_dec_max[0] = pul_motor0_buf[14];
+    assign rcfg_dec_max[1] = pul_motor1_buf[14];
+    assign rcfg_dec_max[2] = pul_motor2_buf[14];
+    assign rcfg_dec_max[3] = pul_motor3_buf[14];
+    assign rcfg_touch_spd[0] = pul_motor0_buf[15];
+    assign rcfg_touch_spd[1] = pul_motor1_buf[15];
+    assign rcfg_touch_spd[2] = pul_motor2_buf[15];
+    assign rcfg_touch_spd[3] = pul_motor3_buf[15];
+assign rs232_uart_id[0] = rs232_ch0_buf[0];
     assign rs232_uart_id[1] = rs232_ch1_buf[0];
     assign rs232_uart_id[2] = rs232_ch2_buf[0];
     assign rs232_uart_id[3] = rs232_ch3_buf[0];
@@ -423,7 +465,7 @@ module hardware_interface_top
                 end
                 16'h009x: begin
                     if(rd_msg_addr_d == (bias_pul_motor0+10)) begin
-                        pul_motor0_msg <= {26'd0,device_beat[0],o_dv_dir[0],device_alarm[0],action_error[0],action_done[0],action_busy[0]};
+                        pul_motor0_msg <= {24'd0,action_ack[0],1'b0,device_beat[0],o_dv_dir[0],device_alarm[0],action_error[0],action_done[0],action_busy[0]};
                     end else if(rd_msg_addr_d == (bias_pul_motor0+11)) begin
                         pul_motor0_msg <= r_pf_abspos[0];
                     end else begin
@@ -432,7 +474,7 @@ module hardware_interface_top
                 end
                 16'h00ax: begin
                     if(rd_msg_addr_d == (bias_pul_motor1+10)) begin
-                        pul_motor1_msg <= {26'd0,device_beat[1],o_dv_dir[1],device_alarm[1],action_error[1],action_done[1],action_busy[1]};
+                        pul_motor1_msg <= {24'd0,action_ack[1],1'b0,device_beat[1],o_dv_dir[1],device_alarm[1],action_error[1],action_done[1],action_busy[1]};
                     end else if(rd_msg_addr_d == (bias_pul_motor1+11)) begin
                         pul_motor1_msg <= r_pf_abspos[1];
                     end else begin
@@ -441,7 +483,7 @@ module hardware_interface_top
                 end
                 16'h00bx: begin
                     if(rd_msg_addr_d == (bias_pul_motor2+10)) begin
-                        pul_motor2_msg <= {26'd0,device_beat[2],o_dv_dir[2],device_alarm[2],action_error[2],action_done[2],action_busy[2]};
+                        pul_motor2_msg <= {24'd0,action_ack[2],1'b0,device_beat[2],o_dv_dir[2],device_alarm[2],action_error[2],action_done[2],action_busy[2]};
                     end else if(rd_msg_addr_d == (bias_pul_motor2+11)) begin
                         pul_motor2_msg <= r_pf_abspos[2];
                     end else begin
@@ -450,7 +492,7 @@ module hardware_interface_top
                 end
                 16'h00cx: begin
                     if(rd_msg_addr_d == (bias_pul_motor3+10)) begin
-                        pul_motor3_msg <= {26'd0,device_beat[3],o_dv_dir[3],device_alarm[3],action_error[3],action_done[3],action_busy[3]};
+                        pul_motor3_msg <= {24'd0,action_ack[3],1'b0,device_beat[3],o_dv_dir[3],device_alarm[3],action_error[3],action_done[3],action_busy[3]};
                     end else if(rd_msg_addr_d == (bias_pul_motor3+11)) begin
                         pul_motor3_msg <= r_pf_abspos[3];
                     end else begin
@@ -463,6 +505,40 @@ module hardware_interface_top
         end    
     end
     
+    always @(posedge clk)begin
+        if (reset) begin
+            pul_motor0_frame_start <= 1'b0;
+            pul_motor1_frame_start <= 1'b0;
+            pul_motor2_frame_start <= 1'b0;
+            pul_motor3_frame_start <= 1'b0;
+            pul_motor0_action_seen <= 1'b0;
+            pul_motor1_action_seen <= 1'b0;
+            pul_motor2_action_seen <= 1'b0;
+            pul_motor3_action_seen <= 1'b0;
+        end else begin
+            pul_motor0_frame_start <= 1'b0;
+            pul_motor1_frame_start <= 1'b0;
+            pul_motor2_frame_start <= 1'b0;
+            pul_motor3_frame_start <= 1'b0;
+            if (driver_cfg_wea && (driver_cfg_addra == (bias_pul_motor0 + 15))) begin
+                pul_motor0_frame_start <= pul_motor0_buf[0][1] & ~pul_motor0_action_seen;
+                pul_motor0_action_seen <= pul_motor0_buf[0][1];
+            end
+            if (driver_cfg_wea && (driver_cfg_addra == (bias_pul_motor1 + 15))) begin
+                pul_motor1_frame_start <= pul_motor1_buf[0][1] & ~pul_motor1_action_seen;
+                pul_motor1_action_seen <= pul_motor1_buf[0][1];
+            end
+            if (driver_cfg_wea && (driver_cfg_addra == (bias_pul_motor2 + 15))) begin
+                pul_motor2_frame_start <= pul_motor2_buf[0][1] & ~pul_motor2_action_seen;
+                pul_motor2_action_seen <= pul_motor2_buf[0][1];
+            end
+            if (driver_cfg_wea && (driver_cfg_addra == (bias_pul_motor3 + 15))) begin
+                pul_motor3_frame_start <= pul_motor3_buf[0][1] & ~pul_motor3_action_seen;
+                pul_motor3_action_seen <= pul_motor3_buf[0][1];
+            end
+        end
+    end
+
     always @(posedge clk)begin
         if(reset | axi_flag)begin
             slvbd_outio_low <= 32'hffff_ffff;
@@ -543,6 +619,7 @@ module hardware_interface_top
 		   ,.action_error   	     ( action_error[i]      )
 		   ,.action_busy   	         ( action_busy[i]       )
 		   ,.action_done   	         ( action_done[i]       )
+		   ,.action_ack   	         ( action_ack[i]        )
 
            ,.r_pf_abspos   	         ( r_pf_abspos[i]       )
            ,.cur_beha   	         ( cur_beha[i]          )
@@ -564,14 +641,13 @@ module hardware_interface_top
 		   ,.rcfg_spd_max	         ( rcfg_spd_max[i]	    )
 		   ,.rcfg_acc_max   	     ( rcfg_acc_max[i]      )
 		   ,.rcfg_dec_max   	     ( rcfg_dec_max[i]      )
-		   ,.rcfg_qs_dec   	         ( rcfg_qs_dec[i]       )
-		   ,.rcfg_timedly   	     ( rcfg_timedly[i]      )
+		   ,.rcfg_touch_spd         ( rcfg_touch_spd[i]     )
 
 		   ,.i_axis_limf             ( i_axis_limf[i]       )
 		   ,.i_axis_limb             ( i_axis_limb[i]       )
            ,.i_axis_org              ( i_axis_org[i]        )
-           ,.i_axis_point            ( i_axis_point[i]      )
            ,.i_axis_abspos0          ( i_axis_abspos0[i]    )
+           ,.i_pause                 ( i_pause[i]           )
            ,.i_device_alarm          ( i_dv_alarm[i]        )
            ,.o_device_pulse          ( o_dv_pulse[i]        )
            ,.o_device_dir            ( o_dv_dir[i]          )

@@ -17,7 +17,8 @@
 /////////////////////////////////////////////////////////////////
 //      THESE DEFINE IS ONLY  USED BY MASTER DEPOT             //
 /////////////////////////////////////////////////////////////////
-
+`ifndef DEPOT_ADDR_MAP_SLV_VH
+`define DEPOT_ADDR_MAP_SLV_VH
 `define CHILD_DEPOT_NUM         5       //this value corresponds to the number of slave station
 //so the number of bytes received or sent is 1460 bytes.
 //so the depth of the buffer received or sent is 512 , and data width is 32; total byter is 512*4 = 2048.
@@ -58,4 +59,5 @@
 `define DEPOT_SIZE_PUL_MOTOR3   16
 
 
-`define DEPOT_ACTIVE_BYTE_NUM   (`DEPOT_SIZE_ID + `DEPOT_SIZE_DO + `DEPOT_SIZE_DI  + `DEPOT_SIZE_AI +  + (`DEPOT_SIZE_RS232_CH0 * 9) + (`DEPOT_SIZE_PUL_MOTOR0 * 4))*4
+`define DEPOT_ACTIVE_BYTE_NUM   (`DEPOT_SIZE_ID + `DEPOT_SIZE_DO + `DEPOT_SIZE_DI  + `DEPOT_SIZE_AI + (`DEPOT_SIZE_RS232_CH0 * 9) + (`DEPOT_SIZE_PUL_MOTOR0 * 4))*4
+`endif //DEPOT_ADDR_MAP_SLV_VH
