@@ -12,6 +12,7 @@
 #include "xil_printf.h"
 #include "sunny_ctrl_test_func.h"
 #include "param.h"
+#include "sleep.h"
 
 		uint32_t rd_param;
 		uint32_t irq1;
@@ -23,54 +24,499 @@ void test_ec_1do()
 {
 	uint32_t	sc_offset_addr = 0x4E00;
 
-	//#################### 调试ec_4di_2do (begin) ###############
-	    //复位寄存器
 	    reg_write32(BUS_base_addr+sc_offset_addr+RST_EN, 0x0);
 	    reg_write32(BUS_base_addr+sc_offset_addr+RST_EN, 0x1);
+
+	    reg_write32(BUS_base_addr+sc_offset_addr+EC_ID, 66);
+	    reg_write32(BUS_base_addr+sc_offset_addr+SC_ID, 88);
 	    //通道A超时寄存器
-	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_OT, 0xFFFFFFFF);
+	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_OT, 0x64);
 	    rd_param = reg_read32(BUS_base_addr+sc_offset_addr+A_TX_OT);
 
-	    rd_param = reg_read32(BUS_base_addr+sc_offset_addr+EC_CHA_ST);
+//	    	    //写行为ID
+//	    	    reg_write32(BUS_base_addr+sc_offset_addr+A_BHV_ID, 0x1);
+//
+//	    	    //状态机状态
+//	    	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
+//	    	    //14bit控件ID + 10bit组件ID + 8bit行为ID
+//	    	    irq1 = reg_read32(BUS_base_addr+sc_offset_addr+IRQ_REG1);
+//
+//
+//	    	    //写中断应答寄存器（事务10）
+//	    	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_RSULT_RPT, 0x010A5100);
+//
+//	    	    //状态机状态
+//	    	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
+//	    	    //14bit控件ID + 10bit组件ID + 8bit行为ID
+//	    	    irq1 = reg_read32(BUS_base_addr+sc_offset_addr+IRQ_REG1);
+//
+//
+//	    	    //写中断应答寄存器（事务30）
+//	    	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_RSULT_RPT, 0x011E5100);
+//
+//	    	    //状态机状态
+//	    	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
+//	    	    //14bit控件ID + 10bit组件ID + 8bit行为ID
+//	    	    irq1 = reg_read32(BUS_base_addr+sc_offset_addr+IRQ_REG1);
+//
+//
+//
+//
+//
+//
+//
+//	    	    //写行为ID
+//	    	    reg_write32(BUS_base_addr+sc_offset_addr+A_BHV_ID, 0x2);
+//
+//	    	    //状态机状态
+//	    	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
+//	    	    //14bit控件ID + 10bit组件ID + 8bit行为ID
+//	    	    irq1 = reg_read32(BUS_base_addr+sc_offset_addr+IRQ_REG1);
+//
+//
+//	    	    //写中断应答寄存器（事务10）
+//	    	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_RSULT_RPT, 0x020A5100);
+//
+//	    	    //状态机状态
+//	    	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
+//	    	    //14bit控件ID + 10bit组件ID + 8bit行为ID
+//	    	    irq1 = reg_read32(BUS_base_addr+sc_offset_addr+IRQ_REG1);
+//
+//
+//	    	    //写中断应答寄存器（事务30）
+//	    	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_RSULT_RPT, 0x021E5100);
+//
+//	    	    //状态机状态
+//	    	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
+//	    	    //14bit控件ID + 10bit组件ID + 8bit行为ID
+//	    	    irq1 = reg_read32(BUS_base_addr+sc_offset_addr+IRQ_REG1);
 
+
+
+
+
+
+
+
+
+
+
+
+	   int cnt = 0;
+	   while(cnt < 1000)
+	   {
 	    //############### 行为1 ############
 	    //写行为ID
-	    reg_write32(BUS_base_addr+sc_offset_addr+A_BHV_ID, 0x2);
-
-	    rd_param = reg_read32(BUS_base_addr+sc_offset_addr+EC_CHA_ST);
-
+	    reg_write32(BUS_base_addr+sc_offset_addr+A_BHV_ID, 0x1);
 	    //状态机状态
 	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
-	    //中断请求信号
-	    debug_reg2 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG2);
 	    //14bit控件ID + 10bit组件ID + 8bit行为ID
 	    irq1 = reg_read32(BUS_base_addr+sc_offset_addr+IRQ_REG1);
-	    //8bit事务ID + 8bit报警号
-	    irq2 = reg_read32(BUS_base_addr+sc_offset_addr+IRQ_REG2);
+
+	    uint8_t irq_low8 = irq1 & 0xFF;
+	    if(irq_low8 == 0x00000000)
+	    {
+	    	break;
+	    }
 
 	    //写中断应答寄存器（事务10）
-	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_RSULT_RPT, 0x020A5100);
-
-	    //状态机状态
-	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
-	    //中断请求信号
-	    debug_reg2 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG2);
-	    //14bit控件ID + 10bit组件ID + 8bit行为ID
-	    irq1 = reg_read32(BUS_base_addr+sc_offset_addr+IRQ_REG1);
-	    //8bit事务ID + 8bit报警号
-	    irq2 = reg_read32(BUS_base_addr+sc_offset_addr+IRQ_REG2);
-
+	    usleep(100);
+	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_RSULT_RPT, 0x010A5100);
 	    //写中断应答寄存器（事务30）
-	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_RSULT_RPT, 0x021E5100);
+	    usleep(100);
+	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_RSULT_RPT, 0x011E5100);
 
-	    //状态机状态
 	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
-	    //中断请求信号
-	    debug_reg2 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG2);
-	    //14bit控件ID + 10bit组件ID + 8bit行为ID
-	    irq1 = reg_read32(BUS_base_addr+sc_offset_addr+IRQ_REG1);
-	    //8bit事务ID + 8bit报警号
-	    irq2 = reg_read32(BUS_base_addr+sc_offset_addr+IRQ_REG2);
 
+	   }
+
+	   return 0;
+
+//
+
+//
+//
+//
+//	    //写行为ID
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_BHV_ID, 0x1);
+//	    //状态机状态
+//	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
+//	    //14bit控件ID + 10bit组件ID + 8bit行为ID
+//	    irq1 = reg_read32(BUS_base_addr+sc_offset_addr+IRQ_REG1);
+//	    //写中断应答寄存器（事务10）
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_RSULT_RPT, 0x010A5100);
+//	    //写中断应答寄存器（事务30）
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_RSULT_RPT, 0x011E5100);
+//	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
+//
+//
+//
+//
+//
+//
+//	    //写行为ID
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_BHV_ID, 0x1);
+//	    //状态机状态
+//	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
+//	    //14bit控件ID + 10bit组件ID + 8bit行为ID
+//	    irq1 = reg_read32(BUS_base_addr+sc_offset_addr+IRQ_REG1);
+//	    //写中断应答寄存器（事务10）
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_RSULT_RPT, 0x010A5100);
+//	    //写中断应答寄存器（事务30）
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_RSULT_RPT, 0x011E5100);
+//	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
+//
+//
+//
+//
+//	    //写行为ID
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_BHV_ID, 0x1);
+//	    //状态机状态
+//	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
+//	    //14bit控件ID + 10bit组件ID + 8bit行为ID
+//	    irq1 = reg_read32(BUS_base_addr+sc_offset_addr+IRQ_REG1);
+//	    //写中断应答寄存器（事务10）
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_RSULT_RPT, 0x010A5100);
+//	    //写中断应答寄存器（事务30）
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_RSULT_RPT, 0x011E5100);
+//	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
+//
+//
+//
+//	    //写行为ID
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_BHV_ID, 0x1);
+//	    //状态机状态
+//	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
+//	    //14bit控件ID + 10bit组件ID + 8bit行为ID
+//	    irq1 = reg_read32(BUS_base_addr+sc_offset_addr+IRQ_REG1);
+//	    //写中断应答寄存器（事务10）
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_RSULT_RPT, 0x010A5100);
+//	    //写中断应答寄存器（事务30）
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_RSULT_RPT, 0x011E5100);
+//	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
+//
+//
+//
+//	    //写行为ID
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_BHV_ID, 0x1);
+//	    //状态机状态
+//	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
+//	    //14bit控件ID + 10bit组件ID + 8bit行为ID
+//	    irq1 = reg_read32(BUS_base_addr+sc_offset_addr+IRQ_REG1);
+//	    //写中断应答寄存器（事务10）
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_RSULT_RPT, 0x010A5100);
+//	    //写中断应答寄存器（事务30）
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_RSULT_RPT, 0x011E5100);
+//	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
+//
+//
+//
+//
+//	    //写行为ID
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_BHV_ID, 0x1);
+//	    //状态机状态
+//	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
+//	    //14bit控件ID + 10bit组件ID + 8bit行为ID
+//	    irq1 = reg_read32(BUS_base_addr+sc_offset_addr+IRQ_REG1);
+//	    //写中断应答寄存器（事务10）
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_RSULT_RPT, 0x010A5100);
+//	    //写中断应答寄存器（事务30）
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_RSULT_RPT, 0x011E5100);
+//	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
+//
+//
+//
+//
+//	    //写行为ID
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_BHV_ID, 0x1);
+//	    //状态机状态
+//	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
+//	    //14bit控件ID + 10bit组件ID + 8bit行为ID
+//	    irq1 = reg_read32(BUS_base_addr+sc_offset_addr+IRQ_REG1);
+//	    //写中断应答寄存器（事务10）
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_RSULT_RPT, 0x010A5100);
+//	    //写中断应答寄存器（事务30）
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_RSULT_RPT, 0x011E5100);
+//	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
+//
+//
+//
+//	    //写行为ID
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_BHV_ID, 0x1);
+//	    //状态机状态
+//	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
+//	    //14bit控件ID + 10bit组件ID + 8bit行为ID
+//	    irq1 = reg_read32(BUS_base_addr+sc_offset_addr+IRQ_REG1);
+//	    //写中断应答寄存器（事务10）
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_RSULT_RPT, 0x010A5100);
+//	    //写中断应答寄存器（事务30）
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_RSULT_RPT, 0x011E5100);
+//	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
+//
+//
+//
+//
+//
+//
+//	    //写行为ID
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_BHV_ID, 0x1);
+//	    //状态机状态
+//	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
+//	    //14bit控件ID + 10bit组件ID + 8bit行为ID
+//	    irq1 = reg_read32(BUS_base_addr+sc_offset_addr+IRQ_REG1);
+//	    //写中断应答寄存器（事务10）
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_RSULT_RPT, 0x010A5100);
+//	    //写中断应答寄存器（事务30）
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_RSULT_RPT, 0x011E5100);
+//	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
+//
+//
+//
+//
+//	    //写行为ID
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_BHV_ID, 0x1);
+//	    //状态机状态
+//	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
+//	    //14bit控件ID + 10bit组件ID + 8bit行为ID
+//	    irq1 = reg_read32(BUS_base_addr+sc_offset_addr+IRQ_REG1);
+//	    //写中断应答寄存器（事务10）
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_RSULT_RPT, 0x010A5100);
+//	    //写中断应答寄存器（事务30）
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_RSULT_RPT, 0x011E5100);
+//	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
+//
+//
+//
+//	    //写行为ID
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_BHV_ID, 0x1);
+//	    //状态机状态
+//	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
+//	    //14bit控件ID + 10bit组件ID + 8bit行为ID
+//	    irq1 = reg_read32(BUS_base_addr+sc_offset_addr+IRQ_REG1);
+//	    //写中断应答寄存器（事务10）
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_RSULT_RPT, 0x010A5100);
+//	    //写中断应答寄存器（事务30）
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_RSULT_RPT, 0x011E5100);
+//	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
+//
+//
+//
+//	    //写行为ID
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_BHV_ID, 0x1);
+//	    //状态机状态
+//	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
+//	    //14bit控件ID + 10bit组件ID + 8bit行为ID
+//	    irq1 = reg_read32(BUS_base_addr+sc_offset_addr+IRQ_REG1);
+//	    //写中断应答寄存器（事务10）
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_RSULT_RPT, 0x010A5100);
+//	    //写中断应答寄存器（事务30）
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_RSULT_RPT, 0x011E5100);
+//	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
+//
+//
+//
+//	    //写行为ID
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_BHV_ID, 0x1);
+//	    //状态机状态
+//	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
+//	    //14bit控件ID + 10bit组件ID + 8bit行为ID
+//	    irq1 = reg_read32(BUS_base_addr+sc_offset_addr+IRQ_REG1);
+//	    //写中断应答寄存器（事务10）
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_RSULT_RPT, 0x010A5100);
+//	    //写中断应答寄存器（事务30）
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_RSULT_RPT, 0x011E5100);
+//	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
+//
+//
+//
+//
+//	    //写行为ID
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_BHV_ID, 0x1);
+//	    //状态机状态
+//	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
+//	    //14bit控件ID + 10bit组件ID + 8bit行为ID
+//	    irq1 = reg_read32(BUS_base_addr+sc_offset_addr+IRQ_REG1);
+//	    //写中断应答寄存器（事务10）
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_RSULT_RPT, 0x010A5100);
+//	    //写中断应答寄存器（事务30）
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_RSULT_RPT, 0x011E5100);
+//	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
+//
+//
+//
+//	    //写行为ID
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_BHV_ID, 0x1);
+//	    //状态机状态
+//	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
+//	    //14bit控件ID + 10bit组件ID + 8bit行为ID
+//	    irq1 = reg_read32(BUS_base_addr+sc_offset_addr+IRQ_REG1);
+//	    //写中断应答寄存器（事务10）
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_RSULT_RPT, 0x010A5100);
+//	    //写中断应答寄存器（事务30）
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_RSULT_RPT, 0x011E5100);
+//	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
+//
+//
+//
+//
+//
+//
+//	    //写行为ID
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_BHV_ID, 0x1);
+//	    //状态机状态
+//	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
+//	    //14bit控件ID + 10bit组件ID + 8bit行为ID
+//	    irq1 = reg_read32(BUS_base_addr+sc_offset_addr+IRQ_REG1);
+//	    //写中断应答寄存器（事务10）
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_RSULT_RPT, 0x010A5100);
+//	    //写中断应答寄存器（事务30）
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_RSULT_RPT, 0x011E5100);
+//	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
+//
+//
+//
+//
+//	    //写行为ID
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_BHV_ID, 0x1);
+//	    //状态机状态
+//	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
+//	    //14bit控件ID + 10bit组件ID + 8bit行为ID
+//	    irq1 = reg_read32(BUS_base_addr+sc_offset_addr+IRQ_REG1);
+//	    //写中断应答寄存器（事务10）
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_RSULT_RPT, 0x010A5100);
+//	    //写中断应答寄存器（事务30）
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_RSULT_RPT, 0x011E5100);
+//	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
+//
+//
+//
+//	    //写行为ID
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_BHV_ID, 0x1);
+//	    //状态机状态
+//	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
+//	    //14bit控件ID + 10bit组件ID + 8bit行为ID
+//	    irq1 = reg_read32(BUS_base_addr+sc_offset_addr+IRQ_REG1);
+//	    //写中断应答寄存器（事务10）
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_RSULT_RPT, 0x010A5100);
+//	    //写中断应答寄存器（事务30）
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_RSULT_RPT, 0x011E5100);
+//	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
+//
+//
+//
+//	    //写行为ID
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_BHV_ID, 0x1);
+//	    //状态机状态
+//	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
+//	    //14bit控件ID + 10bit组件ID + 8bit行为ID
+//	    irq1 = reg_read32(BUS_base_addr+sc_offset_addr+IRQ_REG1);
+//	    //写中断应答寄存器（事务10）
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_RSULT_RPT, 0x010A5100);
+//	    //写中断应答寄存器（事务30）
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_RSULT_RPT, 0x011E5100);
+//	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
+//
+//
+//
+//	    //写行为ID
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_BHV_ID, 0x1);
+//	    //状态机状态
+//	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
+//	    //14bit控件ID + 10bit组件ID + 8bit行为ID
+//	    irq1 = reg_read32(BUS_base_addr+sc_offset_addr+IRQ_REG1);
+//	    //写中断应答寄存器（事务10）
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_RSULT_RPT, 0x010A5100);
+//	    //写中断应答寄存器（事务30）
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_RSULT_RPT, 0x011E5100);
+//	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
+//
+//
+//
+//
+//	    //写行为ID
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_BHV_ID, 0x1);
+//	    //状态机状态
+//	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
+//	    //14bit控件ID + 10bit组件ID + 8bit行为ID
+//	    irq1 = reg_read32(BUS_base_addr+sc_offset_addr+IRQ_REG1);
+//	    //写中断应答寄存器（事务10）
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_RSULT_RPT, 0x010A5100);
+//	    //写中断应答寄存器（事务30）
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_RSULT_RPT, 0x011E5100);
+//	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
+//
+//
+//
+//	    //写行为ID
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_BHV_ID, 0x1);
+//	    //状态机状态
+//	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
+//	    //14bit控件ID + 10bit组件ID + 8bit行为ID
+//	    irq1 = reg_read32(BUS_base_addr+sc_offset_addr+IRQ_REG1);
+//	    //写中断应答寄存器（事务10）
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_RSULT_RPT, 0x010A5100);
+//	    //写中断应答寄存器（事务30）
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_RSULT_RPT, 0x011E5100);
+//	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
+//
+//
+//
+//
+//
+//
+//	    //写行为ID
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_BHV_ID, 0x1);
+//	    //状态机状态
+//	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
+//	    //14bit控件ID + 10bit组件ID + 8bit行为ID
+//	    irq1 = reg_read32(BUS_base_addr+sc_offset_addr+IRQ_REG1);
+//	    //写中断应答寄存器（事务10）
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_RSULT_RPT, 0x010A5100);
+//	    //写中断应答寄存器（事务30）
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_RSULT_RPT, 0x011E5100);
+//	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
+//
+//
+//
+//
+//	    //写行为ID
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_BHV_ID, 0x1);
+//	    //状态机状态
+//	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
+//	    //14bit控件ID + 10bit组件ID + 8bit行为ID
+//	    irq1 = reg_read32(BUS_base_addr+sc_offset_addr+IRQ_REG1);
+//	    //写中断应答寄存器（事务10）
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_RSULT_RPT, 0x010A5100);
+//	    //写中断应答寄存器（事务30）
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_RSULT_RPT, 0x011E5100);
+//	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
+//
+//
+//
+//	    //写行为ID
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_BHV_ID, 0x1);
+//	    //状态机状态
+//	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
+//	    //14bit控件ID + 10bit组件ID + 8bit行为ID
+//	    irq1 = reg_read32(BUS_base_addr+sc_offset_addr+IRQ_REG1);
+//	    //写中断应答寄存器（事务10）
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_RSULT_RPT, 0x010A5100);
+//	    //写中断应答寄存器（事务30）
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_RSULT_RPT, 0x011E5100);
+//	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
+//
+//
+//
+//	    //写行为ID
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_BHV_ID, 0x1);
+//	    //状态机状态
+//	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
+//	    //14bit控件ID + 10bit组件ID + 8bit行为ID
+//	    irq1 = reg_read32(BUS_base_addr+sc_offset_addr+IRQ_REG1);
+//	    //写中断应答寄存器（事务10）
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_RSULT_RPT, 0x010A5100);
+//	    //写中断应答寄存器（事务30）
+//	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_RSULT_RPT, 0x011E5100);
+//	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
 
 }

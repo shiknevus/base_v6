@@ -139,56 +139,57 @@ module pre_post_sta_check_safety_door#(
 
 	
 	//pre status
-	always@(posedge i_clk)
-	begin
-		if(i_rst)
-			ri_open_req_key <= 0;
-		else
-			ri_open_req_key <= i_open_req_key;
-	end
+	//always@(posedge i_clk)
+	//begin
+	//	if(i_rst)
+	//		ri_open_req_key <= 0;
+	//	else
+	//		ri_open_req_key <= i_open_req_key;
+	//end
+	//
+	//always@(posedge i_clk)
+	//begin
+	//	if(i_rst)
+	//		open_req_key_posedge <= 0;
+	//	else if({ri_open_req_key,i_open_req_key} == 2'b01)
+	//		open_req_key_posedge <= 1;
+	//	else
+	//		open_req_key_posedge <= 0;
+	//end
+	//
+	//
+	//always@(posedge i_clk)
+	//begin
+	//	if(i_rst)
+	//		ri_close_confirm_key <= 0;
+	//	else
+	//		ri_close_confirm_key <= i_close_confirm_key;
+	//end
+	//
+	//always@(posedge i_clk)
+	//begin
+	//	if(i_rst)
+	//		close_confirm_key_posedge <= 0;
+	//	else if({ri_close_confirm_key,i_close_confirm_key} == 2'b01)
+	//		close_confirm_key_posedge <= 1;
+	//	else
+	//		close_confirm_key_posedge <= 0;
+	//end
 	
-	always@(posedge i_clk)
-	begin
-		if(i_rst)
-			open_req_key_posedge <= 0;
-		else if({ri_open_req_key,i_open_req_key} == 2'b01)
-			open_req_key_posedge <= 1;
-		else
-			open_req_key_posedge <= 0;
-	end
-	
-	
-	always@(posedge i_clk)
-	begin
-		if(i_rst)
-			ri_close_confirm_key <= 0;
-		else
-			ri_close_confirm_key <= i_close_confirm_key;
-	end
-	
-	always@(posedge i_clk)
-	begin
-		if(i_rst)
-			close_confirm_key_posedge <= 0;
-		else if({ri_close_confirm_key,i_close_confirm_key} == 2'b01)
-			close_confirm_key_posedge <= 1;
-		else
-			close_confirm_key_posedge <= 0;
-	end
-	
-	wire safe_allow = !unit_st && !m_st && !m_saf_st && !link_m_saf_st;
+	//wire safe_allow = !unit_st && !m_st && !m_saf_st && !link_m_saf_st;
 	
 	//action 100 pre-status
 	always@(posedge i_clk)
 	begin
 		if(i_rst || !b_en)
 			b_pre_sta_allow_act100 <= 1'b0;
-		else if(safe_allow && open_req_key_posedge)
+		//else if(safe_allow && open_req_key_posedge)
+		else if(!link_m_saf_st)
 			b_pre_sta_allow_act100 <= 1'b1;
-		else if(ec_chb_st_negedge)
-			b_pre_sta_allow_act100 <= 1'b0;
+		//else if(ec_chb_st_negedge)
+		//	b_pre_sta_allow_act100 <= 1'b0;
 		else
-			b_pre_sta_allow_act100 <= b_pre_sta_allow_act100;
+			b_pre_sta_allow_act100 <= 1'b0;
 	end
 	
 	//action 101 pre-status
@@ -196,12 +197,13 @@ module pre_post_sta_check_safety_door#(
 	begin
 		if(i_rst || !b_en)
 			b_pre_sta_allow_act101 <= 1'b0;
-		else if(safe_allow && close_confirm_key_posedge)
+		//else if(safe_allow && close_confirm_key_posedge)
+		else if(!link_m_saf_st)
 			b_pre_sta_allow_act101 <= 1'b1;
-		else if(ec_chb_st_negedge)
-			b_pre_sta_allow_act101 <= 1'b0;
+		//else if(ec_chb_st_negedge)
+		//	b_pre_sta_allow_act101 <= 1'b0;
 		else
-			b_pre_sta_allow_act101 <= b_pre_sta_allow_act101;
+			b_pre_sta_allow_act101 <= 1'b0;
 	end
 	
 	
@@ -217,10 +219,10 @@ module pre_post_sta_check_safety_door#(
 			b_post_sta_allow_act100 <= 1'b0;
 		else if(!i_lock_monitor)	//0:open
 			b_post_sta_allow_act100 <= 1'b1;
-		else if(ec_chb_st_negedge)
-			b_post_sta_allow_act100 <= 1'b0;
+		//else if(ec_chb_st_negedge)
+		//	b_post_sta_allow_act100 <= 1'b0;
 		else
-			b_post_sta_allow_act100 <= b_post_sta_allow_act100;
+			b_post_sta_allow_act100 <= 1'b0;
 	end
 	
 	//action 101 post-status
@@ -230,10 +232,10 @@ module pre_post_sta_check_safety_door#(
 			b_post_sta_allow_act101 <= 1'b0;
 		else if(i_lock_monitor)	//1:close
 			b_post_sta_allow_act101 <= 1'b1;
-		else if(ec_chb_st_negedge)
-			b_post_sta_allow_act101 <= 1'b0;
+		//else if(ec_chb_st_negedge)
+		//	b_post_sta_allow_act101 <= 1'b0;
 		else
-			b_post_sta_allow_act101 <= b_post_sta_allow_act101;
+			b_post_sta_allow_act101 <= 1'b0;
 	end
 	
 	

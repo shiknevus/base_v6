@@ -345,7 +345,7 @@ module ec_sf_door#(
 	,.param69               (o_lock_open		)
 	,.param70               (param70		)
 	,.debug_reg1			(debug_reg1		)
-	,.debug_reg2			({irq_posedge_cnt,irq_negedge_cnt,4'd0,irq_sta}		)
+	,.debug_reg2			({16'd0,irq_posedge_cnt,irq_negedge_cnt}		)
 	,.debug_reg3			(debug_reg3		)
 	,.debug_reg4			(debug_reg4		)
 	,.debug_reg5			(debug_reg5		)

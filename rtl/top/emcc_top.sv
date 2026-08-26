@@ -189,12 +189,12 @@ module emcc_mix_top
 
     wire    [31:0]              do_mst_msg      ;
 	
-	ila_0 ila_0_u0 (
-	.clk(clk), // input wire clk
-
-
-	.probe0(di_mst_msg) // input wire [63:0] probe0
-);
+//	ila_0 ila_0_u0 (
+//	.clk(clk), // input wire clk
+//
+//
+//	.probe0(di_mst_msg) // input wire [63:0] probe0
+//);
    
     assign ov_dbg_enable = 0;
 	assign do_relay_mst_msg = do_mst_msg;
@@ -429,8 +429,7 @@ module emcc_mix_top
     assign  emcc_irq[43]   = map_irq[43];
     assign  emcc_irq[44]   = map_irq[44];
 	
-	
-	
+
 	
 	// --- flow_comp_16 --16位感知组件---
     ec_16di
@@ -513,8 +512,8 @@ module emcc_mix_top
        ,.o_dri1        ( o_dri1_17           )   // 自动门开驱动信号
     );
     
-    assign do_mst_msg[0] = o_dri2_17;
-    assign do_mst_msg[1] = o_dri1_17;
+    assign do_mst_msg[0] = !o_dri2_17;
+    assign do_mst_msg[1] = !o_dri1_17;
 	
 	
 	wire   o_led_r_68;
@@ -554,10 +553,10 @@ module emcc_mix_top
        ,.o_led_y        ( o_led_y_68           )   // 黄色驱动信号
     );
 
-    assign do_mst_msg[2] = o_led_r_68;
-    assign do_mst_msg[3] = o_led_g_68;
-    assign do_mst_msg[5] = o_bz_68;
-    assign do_mst_msg[4] = o_led_y_68;
+    assign do_mst_msg[2] = !o_led_r_68;
+    assign do_mst_msg[3] = !o_led_g_68;
+    assign do_mst_msg[5] = !o_bz_68;
+    assign do_mst_msg[4] = !o_led_y_68;
 	
 	// --- flow_comp_65 --双位感知组件---
     ec_2di
@@ -588,6 +587,8 @@ module emcc_mix_top
        ,.i_sign1_check        ( di_mst_msg[20]           )   // 感测开关1
        ,.i_sign2_check        ( di_mst_msg[21]           )   // 感测开关2
     );
+	
+
 	
 	// --- flow_comp_90 --单电驱动组件---
 	wire   o_sig_dri_90;
@@ -620,8 +621,7 @@ module emcc_mix_top
        ,.o_sig_dri        ( o_sig_dri_90           )   // 单电驱动信号
     );
 
-    assign do_mst_msg[6] = o_sig_dri_90;
-	
+    assign do_mst_msg[6] = !o_sig_dri_90;
 	
 	
 	// --- flow_comp_104 --五位感知组件---
@@ -725,9 +725,9 @@ module emcc_mix_top
        ,.o_dri        ( o_dri_108           )   // 吹气驱动信号
     );
 
-    assign do_mst_msg[7] = o_dri2_108;
-    assign do_mst_msg[8] = o_dri1_108;
-    assign do_mst_msg[9] = o_dri_108;
+    assign do_mst_msg[7] = !o_dri2_108;
+    assign do_mst_msg[8] = !o_dri1_108;
+    assign do_mst_msg[9] = !o_dri_108;
 	
 	
 	
@@ -767,8 +767,8 @@ module emcc_mix_top
        ,.i_pos1        ( di_mst_msg[31]           )   // 位置1到位开关
     );
 
-    assign do_mst_msg[10] = o_dri2_110;
-    assign do_mst_msg[11] = o_dri1_110;
+    assign do_mst_msg[10] = !o_dri2_110;
+    assign do_mst_msg[11] = !o_dri1_110;
 	
 	// --- flow_comp_91 --夹爪组件---
 	
@@ -806,8 +806,8 @@ module emcc_mix_top
        ,.i_poa        ( di_mst_msg[34]           )   // 物料感测开关
     );
 
-    assign do_mst_msg[12] = o_dri2_91;
-    assign do_mst_msg[13] = o_dri1_91;
+    assign do_mst_msg[12] = !o_dri2_91;
+    assign do_mst_msg[13] = !o_dri1_91;
 	
 	// --- flow_comp_99 --托盘夹爪组件---
 	
@@ -849,9 +849,9 @@ module emcc_mix_top
        ,.o_claw_unlock        ( o_claw_unlock_99           )   // 解锁驱动信号
     );
 
-    assign do_mst_msg[14] = o_claw_press_99;
-    assign do_mst_msg[15] = o_claw_blow_99;
-    assign do_mst_msg[16] = o_claw_unlock_99;
+    assign do_mst_msg[14] = !o_claw_press_99;
+    assign do_mst_msg[15] = !o_claw_blow_99;
+    assign do_mst_msg[16] = !o_claw_unlock_99;
 	
 	
 	
@@ -888,12 +888,24 @@ module emcc_mix_top
        ,.o_lock_open        ( 				o_lock_open_111           )   // 电磁锁A1
        ,.i_open_req_key        ( 		di_mst_msg[40]           )   // 开门请求绿色按钮
        ,.i_lock_monitor        ( 		di_mst_msg[41]           )   // 锁监控常闭DO端口
-       ,.i_door_monitor        ( 		di_mst_msg[42]           )   // 门监控常闭DO端口
-       ,.o_key_light        ( 				o_key_light_111           )   // 
+      // ,.i_door_monitor        ( 0		        )   // 门监控常闭DO端口
+      // ,.o_key_light        ( 				           )   // 
     );
 
-    assign do_mst_msg[17] = o_lock_open_111;
-    assign do_mst_msg[18] = o_key_light_111;
+    assign do_mst_msg[17] = !o_lock_open_111;
+    //assign do_mst_msg[18] = o_key_light_111;
+	
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	

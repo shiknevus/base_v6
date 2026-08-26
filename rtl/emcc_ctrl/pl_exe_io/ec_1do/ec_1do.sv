@@ -340,6 +340,9 @@ module ec_1do#(
 	,.debug_reg5			(debug_reg5		)
 	);
 
+	wire	[7:0]	curr_state;
+	wire			a_bhv_vld_r;
+	
 	proactive_beh_1do#(	
 	.BHA_NUM 				(A_BHA_NUM  	 )	//Number of active behaviors
 )proactive_beh_1do_u0(
@@ -363,6 +366,8 @@ module ec_1do#(
 	,.state_monitor_o		(debug_reg1			)
     ,.irq_o                	(irq_a				)
     ,.irq_ack_i       		(irq_a_grant		)
+	//,.curr_state			(curr_state)
+	//,.a_bhv_vld_r			(a_bhv_vld_r)
     );
 	 
 	status_beh_1do#(
@@ -471,7 +476,21 @@ module ec_1do#(
 		,.irq_receive_ack_i (a_tx_result_vld || b_tx_result_vld || c_tx_result_vld)	
     );
 	
-	
+	//ila_1 ila_1 (
+	//.clk(clk_i), // input wire clk
+    //
+    //
+	//.probe0(curr_state), // input wire [7:0]  probe0  
+	//.probe1(irq_a		), // input wire [0:0]  probe1 
+	//.probe2(irq_a_grant), // input wire [0:0]  probe2 
+	//.probe3(a_bhv_id_r), // input wire [7:0]  probe3 
+	//.probe4(a_bhv_id), // input wire [7:0]  probe4 
+	//.probe5(o_intr_irq), // input wire [0:0]  probe5 
+	//.probe6(irq_reg1), // input wire [31:0]  probe6 
+	//.probe7(irq_reg2), // input wire [31:0]  probe7 
+	//.probe8(a_bhv_vld), // input wire [0:0]  probe8 
+	//.probe9(a_bhv_vld_r) // input wire [0:0]  probe9
+	//);
 	
 	
 	

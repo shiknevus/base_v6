@@ -15,8 +15,9 @@ void test_ec_4di_2do();
 void test_ec_1di();
 void test_ec_1do();
 void test_ec_3di_2do();
-void ec_sf_door();
-void ec_trayclaw();
+void test_ec_sf_door();
+void test_ec_trayclaw();
+void test_ec_2di();
 
 
 

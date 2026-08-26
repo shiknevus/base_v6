@@ -394,7 +394,7 @@ module emcc_mst_top #
 	begin
 		if(prot_clk_rst)
 			sync_time_10ms_vld <= 1'b0;
-		else if(r_time_1ms_vld == 2'b01)
+		else if(r_time_10ms_vld == 2'b01)
 			sync_time_10ms_vld <= 1'b1;
 		else
 			sync_time_10ms_vld <= 1'b0;
@@ -404,7 +404,7 @@ module emcc_mst_top #
 	begin
 		if(prot_clk_rst)
 			sync_time_100ms_vld <= 1'b0;
-		else if(r_time_1ms_vld == 2'b01)
+		else if(r_time_100ms_vld == 2'b01)
 			sync_time_100ms_vld <= 1'b1;
 		else
 			sync_time_100ms_vld <= 1'b0;
@@ -414,7 +414,7 @@ module emcc_mst_top #
 	begin
 		if(prot_clk_rst)
 			sync_time_1s_vld <= 1'b0;
-		else if(r_time_1ms_vld == 2'b01)
+		else if(r_time_1s_vld == 2'b01)
 			sync_time_1s_vld <= 1'b1;
 		else
 			sync_time_1s_vld <= 1'b0;
@@ -533,7 +533,7 @@ localparam DO_BIT_WIDTH = 32;
 //`else
 
     assign main_board_outio  =  emcc_main_outio; 
-    assign emcc_main_inio    =  emcc_main_inio_debounce; 
+    assign emcc_main_inio    =  ~emcc_main_inio_debounce; 
 
 //`endif
     

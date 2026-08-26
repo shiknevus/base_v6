@@ -390,11 +390,11 @@ module status_beh_safety_door#(
     always@(posedge clk_i)begin
         if(rst_i)
             timout_cnt <= 20'd0;
-		else if(!a_en)
+		else if(!b_en)
 			timout_cnt <= 20'd0;
 		else if(curr_state != curr_state_1d)
 			timout_cnt <= 20'd0;
-        else if(timout_cnt > a_tx_ot)
+        else if(timout_cnt > b_tx_ot)
             timout_cnt <= 20'd0;
         else if(i_time_1s_vld)
             timout_cnt <= timout_cnt+1;
@@ -403,7 +403,7 @@ module status_beh_safety_door#(
     always@(posedge clk_i)begin
         if(rst_i)
             timout <= 1'b0;
-        else if(timout_cnt > a_tx_ot)
+        else if(timout_cnt > b_tx_ot)
             timout <= 1'b1;
         else
             timout <= 1'b0;

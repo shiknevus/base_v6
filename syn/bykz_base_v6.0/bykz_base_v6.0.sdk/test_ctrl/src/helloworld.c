@@ -56,12 +56,14 @@ int main()
 {
     init_platform();
 
+    test_ec_2di();
     //test_ec_1do();
     //test_ec_1di();
     //test_ec_4di_2do();
 
     //test_ec_3di_2do();
-    test_ec_trayclaw();
+    //test_ec_trayclaw();
+    //test_ec_sf_door();
 
     cleanup_platform();
     return 0;

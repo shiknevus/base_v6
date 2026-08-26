@@ -1,0 +1,87 @@
+/*
+ * ec_sf_door.c
+ *
+ *  Created on: 2026年8月24日
+ *      Author: cgliu
+ */
+
+#include <stdio.h>
+#include <stdint.h>
+#include <stddef.h>   // for uintptr_t
+#include "platform.h"
+#include "xil_printf.h"
+#include "sunny_ctrl_test_func.h"
+#include "param.h"
+
+
+
+void test_ec_sf_door()
+{
+	uint32_t	sc_offset_addr = 0x7800;
+
+	uint32_t rd_param;
+	uint32_t irq1;
+	uint32_t irq2;
+	uint32_t debug_reg1;
+	uint32_t debug_reg2;
+
+	    //复位寄存器
+	    reg_write32(BUS_base_addr+sc_offset_addr+RST_EN, 0x0);
+	    reg_write32(BUS_base_addr+sc_offset_addr+RST_EN, 0x1);
+	    //安全寄存器
+	    reg_write32(BUS_base_addr+sc_offset_addr+UNIT_ST, 0x0);
+	    reg_write32(BUS_base_addr+sc_offset_addr+M_ST, 0x0);
+	    reg_write32(BUS_base_addr+sc_offset_addr+M_SAF_ST, 0x0);
+	    reg_write32(BUS_base_addr+sc_offset_addr+LINK_M_SAF_ST, 0x0);
+
+	    //通道B超时寄存器
+	    reg_write32(BUS_base_addr+sc_offset_addr+B_TX_OT, 0x64);
+	    rd_param = reg_read32(BUS_base_addr+sc_offset_addr+B_TX_OT);
+
+	    //状态机状态
+	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
+	    //中断请求信号
+	    debug_reg2 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG2);
+	    //14bit控件ID + 10bit组件ID + 8bit行为ID
+	    irq1 = reg_read32(BUS_base_addr+sc_offset_addr+IRQ_REG1);
+	    //8bit事务ID + 8bit报警号
+	    irq2 = reg_read32(BUS_base_addr+sc_offset_addr+IRQ_REG2);
+
+
+	    //状态机状态
+	    	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
+	    	    //中断请求信号
+	    	    debug_reg2 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG2);
+	    	    //14bit控件ID + 10bit组件ID + 8bit行为ID
+	    	    irq1 = reg_read32(BUS_base_addr+sc_offset_addr+IRQ_REG1);
+	    	    //8bit事务ID + 8bit报警号
+	    	    irq2 = reg_read32(BUS_base_addr+sc_offset_addr+IRQ_REG2);
+
+
+	    //写中断应答寄存器（事务10）
+	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_RSULT_RPT, 0x640A5100);
+
+	    //状态机状态
+	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
+	    //中断请求信号
+	    debug_reg2 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG2);
+	    //14bit控件ID + 10bit组件ID + 8bit行为ID
+	    irq1 = reg_read32(BUS_base_addr+sc_offset_addr+IRQ_REG1);
+	    //8bit事务ID + 8bit报警号
+	    irq2 = reg_read32(BUS_base_addr+sc_offset_addr+IRQ_REG2);
+
+
+	    //写中断应答寄存器（事务30）
+	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_RSULT_RPT, 0x641E5100);
+
+	    //状态机状态
+	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
+	    //中断请求信号
+	    debug_reg2 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG2);
+	    //14bit控件ID + 10bit组件ID + 8bit行为ID
+	    irq1 = reg_read32(BUS_base_addr+sc_offset_addr+IRQ_REG1);
+	    //8bit事务ID + 8bit报警号
+	    irq2 = reg_read32(BUS_base_addr+sc_offset_addr+IRQ_REG2);
+
+}
+

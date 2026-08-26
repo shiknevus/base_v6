@@ -19,6 +19,8 @@
 #define		A_BHV_ID        0x074	//AÐÐÎªID
 
 #define		A_TX_RSULT_RPT  0x068
+#define		B_TX_RSULT_RPT  0x090
+#define		C_TX_RSULT_RPT  0x0B8
 
 #define		DEBUG_REG1      0x1EC
 #define		DEBUG_REG2      0x1F0
@@ -30,5 +32,8 @@
 #define		M_SAF_ST		0x038
 #define		LINK_M_SAF_ST	0x03C
 
+#define		PARAM1			0x0D8
 #define		PARAM3			0x0E0
 
+#define		EC_ID			0x00C
+#define		SC_ID			0x010
