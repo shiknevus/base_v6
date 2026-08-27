@@ -235,20 +235,16 @@ module emcc_mst_top #
     wire            mst_data_act = m_app_tx_tvalid | s_app_rx_tvalid
                                  | s_axi_tx_tvalid_0 | m_axi_rx_tvalid_0
                                  | s_axi_tx_tvalid_1 | m_axi_rx_tvalid_1;
-    (* ASYNC_REG = "TRUE" *) reg [1:0]  led_act_sync;
-    reg [22:0]      led_act_hold;
-    reg [22:0]      led_free_cnt;
-
-    always @(posedge clk_10m) begin
-        led_act_sync    <= {led_act_sync[0], mst_data_act};
+    reg [26:0]      led_act_hold;
+    reg [26:0]      led_free_cnt;
+    always @(posedge axi_clk_0) begin
         led_free_cnt    <= led_free_cnt + 1'b1;
-        if (led_act_sync[1])
-            led_act_hold <= 23'd5_000_000;              //0.5s stretch @10MHz
+        if (mst_data_act)
+            led_act_hold <= 27'd78_125_000;             //0.5s hold @156.25MHz
         else if (led_act_hold != 0)
             led_act_hold <= led_act_hold - 1'b1;
     end
-
-    assign led = mst_link_up & ((led_act_hold != 0) ? led_free_cnt[20] : 1'b1); //~5Hz blink on activity
+    assign led = mst_link_up & ((led_act_hold != 0) ? led_free_cnt[24] : 1'b1); //~5Hz blink on activity
 
     always @(posedge axi_clk_0)begin
         axi_clk_rst_0_d1    <=  axi_clk_rst_0;
