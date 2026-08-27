@@ -71,26 +71,30 @@ module pre_post_sta_check_1di_1do#(
 	//========================================================================================//
 	
 	//pre status
+	
+	localparam A_BHA_NUM1 = A_BHA_NUM - 2;
+	
 	always@(posedge clk_i)
 	begin
-		if(rst_i || !a_en) begin
+		if(rst_i || !a_en)
 			a_pre_sta_allow <= {A_BHA_NUM{1'b0}};
-		end else begin
+		else if(!unit_st && !m_st && !m_saf_st && !link_m_saf_st)
 			a_pre_sta_allow <= {A_BHA_NUM{1'b1}};
-		end
+		else
+			a_pre_sta_allow <= {2'b00,{A_BHA_NUM1{1'b1}}};
 	end
 	
 
 	//post status
 	wire [A_BHA_NUM-1:0]	a_post_sta	;
 
-	assign	a_post_sta[0 ] = (a_bhv_id == 1 )&&(di_i ==1'b0);
-	assign	a_post_sta[1 ] = (a_bhv_id == 2 )&&(di_i ==1'b1);
+	assign	a_post_sta[0 ] = (a_bhv_id == 1 )&&(di_i ==1'b1);
+	assign	a_post_sta[1 ] = (a_bhv_id == 2 )&&(di_i ==1'b0);
 	assign	a_post_sta[2 ] = (a_bhv_id == 3 );
-	assign	a_post_sta[3 ] = (a_bhv_id == 4 )&&(di_i ==1'b0);
-	assign	a_post_sta[4 ] = (a_bhv_id == 5 )&&(di_i ==1'b1);
-	assign	a_post_sta[5 ] = (a_bhv_id == 6 )&&(di_i ==1'b0);
-	assign	a_post_sta[6 ] = (a_bhv_id == 7 )&&(di_i ==1'b1);
+	assign	a_post_sta[3 ] = (a_bhv_id == 4 )&&(di_i ==1'b1);
+	assign	a_post_sta[4 ] = (a_bhv_id == 5 )&&(di_i ==1'b0);
+	assign	a_post_sta[5 ] = (a_bhv_id == 6 )&&(di_i ==1'b1);
+	assign	a_post_sta[6 ] = (a_bhv_id == 7 )&&(di_i ==1'b0);
 
 
 	always@(posedge clk_i) 

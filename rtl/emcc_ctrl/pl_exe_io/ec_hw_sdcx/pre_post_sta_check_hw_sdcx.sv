@@ -62,8 +62,8 @@ module pre_post_sta_check_hw_sdcx#(
 		,output	reg	[A_BHA_NUM-1:0]		a_post_sta_allow
 		,output	reg	[B_BHA_NUM-1:0]		b_pre_sta_allow	
 		,output	reg	[B_BHA_NUM-1:0]		b_post_sta_allow
-		,output	reg						c_pre_sta_allow	
-		,output	reg						c_post_sta_allow
+		,output	reg	[C_BHA_NUM-1:0]		c_pre_sta_allow	
+		,output	reg	[C_BHA_NUM-1:0]		c_post_sta_allow
     );
 	
 	//========================================================================================//
@@ -80,10 +80,8 @@ module pre_post_sta_check_hw_sdcx#(
 		end
 	end
 	
-	
-	
 	//post status
-	wire [6:0]	a_post_sta	;
+	wire [A_BHA_NUM-1:0]	a_post_sta	;
 	
 	assign	a_post_sta[0] = (a_bhv_id == 1 && di_i == 2'b01);
 	assign	a_post_sta[1] = (a_bhv_id == 2 && di_i == 2'b01);

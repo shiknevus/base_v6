@@ -19,9 +19,42 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
+/*
+
+P_CPOL = 0	P_CPHL = 0
+		|---|   |---|   |---|   |---|   |---|   |---|   |---|   |---|
+		|	|   |	|   |	|   |	|   |	|   |	|   |	|   |	|
+--------|	|---|	|---|	|---|	|---|	|---|	|---|	|---|	|---------
+	    S   V
+	  
+P_CPOL = 0	P_CPHL = 1
+		|---|   |---|   |---|   |---|   |---|   |---|   |---|   |---|
+		|	|   |	|   |	|   |	|   |	|   |	|   |	|   |	|
+--------|	|---|	|---|	|---|	|---|	|---|	|---|	|---|	|---------
+	    V   S 
+
+P_CPOL = 1	P_CPHL = 0
+--------|   |---|   |---|   |---|   |---|   |---|   |---|   |---|	|-----------
+		|   |	|   |	|   |	|   |	|   |	|   |	|   |	|	|
+		|---|	|---|	|---|	|---|	|---|	|---|	|---|	|---|
+	    S   V  
+
+P_CPOL = 1	P_CPHL = 1
+--------|   |---|   |---|   |---|   |---|   |---|   |---|   |---|   |-----------
+		|   |	|   |	|   |	|   |	|   |	|   |	|   |	|   |
+		|---|	|---|	|---|	|---|	|---|	|---|	|---|	|---|
+	    V   S  
+
+run
+	|--------------------------------------------------------------------|
+	|																	 |
+----|																	 |-----------
+
+*/
+
 
 module spi_module#(
-    parameter                           P_DATA_WIDTH      	= 8 ,
+    parameter                           P_DATA_WIDTH      	= 8 ,	
                                         P_CPOL              = 0 ,
                                         P_CPHL              = 0 ,
 										P_DIV_NUM			= 10
@@ -30,7 +63,7 @@ module spi_module#(
     input                               i_rst               ,
 
     output  reg                         o_spi_clk           ,
-    output  reg                         o_spi_csn           ,
+    output                           	o_spi_csn           ,
     output  reg                         o_spi_mosi          ,
     input                               i_spi_miso          ,
 
@@ -54,7 +87,6 @@ reg		[7:0]					cnt_sck	;
 reg								posedge_sck;
 reg								negedge_sck;
 reg								run_1d;
-reg		[7:0]					cnt_delay;
 
 
 wire	run_negedge	= !run && run_1d;
@@ -72,71 +104,11 @@ localparam		S_DELAY1	=	8'd3;
 always@(posedge i_clk)
 begin
 	if(i_rst)
-		cnt_delay <= 0;
-	else if(curr_sta == S_DELAY || curr_sta == S_DELAY1)
-		if(cnt_delay >= CS_DELAY-1) 
-			cnt_delay <= 0;
-		else
-			cnt_delay <= cnt_delay + 1;
-	else
-		cnt_delay <= 0;	
-end
-
-
-always@(posedge i_clk)
-begin
-	if(i_rst)
-		curr_sta <= S_IDLE;
-	else
-		curr_sta <= next_sta;
-end
-
-always@(*)
-begin
-	next_sta = curr_sta;
-	case(curr_sta)
-		S_IDLE:	begin
-			if(i_tx_vld)
-				next_sta = S_DELAY;
-			else
-				next_sta = S_IDLE;
-		end
-		
-		S_DELAY:begin
-			if(cnt_delay >= CS_DELAY-1)
-				next_sta = WORKING;
-			else
-				next_sta = S_DELAY;
-		end
-		
-		WORKING:begin
-			if(run_negedge)
-				next_sta = S_DELAY1;
-			else
-				next_sta = WORKING;
-		end
-		
-		S_DELAY1:begin
-			if(cnt_delay >= CS_DELAY-1)
-				next_sta = S_IDLE;
-			else
-				next_sta = S_DELAY1;
-		end
-
-		default: begin
-			next_sta <= S_IDLE;
-		end
-	endcase
-end
-
-always@(posedge i_clk)
-begin
-	if(i_rst)
 		run <= 1'b0;
-	else if(curr_sta == S_DELAY && cnt_delay >= CS_DELAY-1)
+	else if((cnt_div >= P_DIV_NUM/2-2) && (cnt_sck >= P_DATA_WIDTH*2))
+		run <= 1'b0;
+	else if(curr_sta == WORKING)
 		run <= 1'b1;
-	else if((cnt_div >= P_DIV_NUM/2-1) && (cnt_sck >= P_DATA_WIDTH*2 - 1))
-		run <= 1'b0;
 	else
 		run <= run;
 end
@@ -148,52 +120,6 @@ begin
 	else
 		run_1d <= run;
 end
-
-
-always@(posedge i_clk)
-begin
-	if(i_rst)
-		ri_tx_da <= 0;
-	else if(curr_sta == S_IDLE && i_tx_vld)
-		ri_tx_da <= i_tx_da;
-	else if(curr_sta == WORKING || curr_sta == S_DELAY)
-		case({P_CPOL[0],P_CPHL[0]})
-			2'b00:begin						//默认低电平，上升沿采样,下降沿改变数据
-				if(negedge_sck)
-					ri_tx_da <= ri_tx_da << 1;
-				else
-					ri_tx_da <= ri_tx_da;
-			end
-			
-			2'b01:begin						//默认低电平，下降沿采样,上升沿改变数据
-				if(posedge_sck)
-					ri_tx_da <= ri_tx_da << 1;
-				else
-					ri_tx_da <= ri_tx_da;
-			end
-			
-			2'b10:begin						//默认高电平，下降沿采样,上升沿改变数据
-				if(posedge_sck)
-					ri_tx_da <= ri_tx_da << 1;
-				else
-					ri_tx_da <= ri_tx_da;
-			end
-			
-			2'b11:begin						//默认高电平，上升沿采样,下降沿改变数据
-				if(negedge_sck)
-					ri_tx_da <= ri_tx_da << 1;
-				else
-					ri_tx_da <= ri_tx_da;
-			end
-			
-			default:begin
-				ri_tx_da <= ri_tx_da;
-			end
-		endcase
-	else
-		ri_tx_da <= 0;
-end
-
 
 always@(posedge i_clk)
 begin
@@ -213,14 +139,13 @@ begin
 	if(i_rst)
 		cnt_sck <= 'd0;
 	else if(cnt_div >= P_DIV_NUM/2-1)
-		if(cnt_sck >= P_DATA_WIDTH*2 - 1)
+		if(cnt_sck >= P_DATA_WIDTH*2)
 			cnt_sck <= 'd0;
 		else
 			cnt_sck <= cnt_sck+1;
 	else
 		cnt_sck <= cnt_sck;
 end
-
 
 always@(posedge i_clk)
 begin
@@ -230,13 +155,13 @@ begin
 	end else begin
 		case(P_CPOL[0])
 			1'b0:begin
-				if(curr_sta == WORKING)begin
-					if(!cnt_sck[0] && cnt_div == 0)
+				if(run)begin
+					if(!cnt_sck[0] && cnt_div >= P_DIV_NUM/2-1)
 						posedge_sck <= 1;
 					else
 						posedge_sck <= 0;
 					
-					if(cnt_sck[0] && cnt_div == 0)
+					if(cnt_sck[0] && cnt_div >= P_DIV_NUM/2-1)
 						negedge_sck <= 1;
 					else
 						negedge_sck <= 0;
@@ -247,13 +172,13 @@ begin
 			end
 			
 			1'b1:begin
-				if(curr_sta == WORKING)begin
-					if(cnt_sck[0] && cnt_div == 0)
+				if(run)begin
+					if(cnt_sck[0] && cnt_div >= P_DIV_NUM/2-1)
 						posedge_sck <= 1;
 					else
 						posedge_sck <= 0;
 					
-					if(!cnt_sck[0] && cnt_div == 0)
+					if(!cnt_sck[0] && cnt_div >= P_DIV_NUM/2-1)
 						negedge_sck <= 1;
 					else
 						negedge_sck <= 0;
@@ -271,35 +196,99 @@ begin
 	end
 end
 
+
 always@(posedge i_clk)
 begin
 	if(i_rst)
-		o_spi_clk <= P_CPOL[0];
-	if(run)
-		if(negedge_sck)
-			o_spi_clk <= 0;
-		else if(posedge_sck)
-			o_spi_clk <= 1;
-		else if(run_negedge)
-			o_spi_clk <= P_CPOL[0];
-		else
-			o_spi_clk <= o_spi_clk;
+		curr_sta <= S_IDLE;
 	else
-		o_spi_clk <= P_CPOL[0];
+		curr_sta <= next_sta;
+end
+
+always@(*)
+begin
+	next_sta = curr_sta;
+	case(curr_sta)
+		S_IDLE:	begin
+			if(i_tx_vld)	//spi bus start
+				next_sta = WORKING;
+			else
+				next_sta = S_IDLE;
+		end
+		
+		WORKING:begin
+			if(run_negedge)
+				next_sta = S_IDLE;
+			else
+				next_sta = WORKING;
+		end
+		
+		default: begin
+			next_sta = S_IDLE;
+		end
+	endcase
 end
 
 
 always@(posedge i_clk)
 begin
 	if(i_rst)
-		o_spi_csn <= 1'b1;
+		ri_tx_da <= 0;
 	else if(curr_sta == S_IDLE && i_tx_vld)
-		o_spi_csn <= 1'b0;
-	else if(curr_sta == S_DELAY1 && cnt_delay >= CS_DELAY-1)
-		o_spi_csn <= 1'b1;
+		ri_tx_da <= i_tx_da;	//Save temporarily
+	else if(run)
+		case({P_CPOL[0],P_CPHL[0]})
+			2'b00:begin						
+				if(negedge_sck)
+					ri_tx_da <= ri_tx_da << 1;
+				else
+					ri_tx_da <= ri_tx_da;
+			end
+			
+			2'b01:begin						
+				if(posedge_sck)
+					ri_tx_da <= ri_tx_da << 1;
+				else
+					ri_tx_da <= ri_tx_da;
+			end
+			
+			2'b10:begin					
+				if(posedge_sck)
+					ri_tx_da <= ri_tx_da << 1;
+				else
+					ri_tx_da <= ri_tx_da;
+			end
+			
+			2'b11:begin					
+				if(negedge_sck)
+					ri_tx_da <= ri_tx_da << 1;
+				else
+					ri_tx_da <= ri_tx_da;
+			end
+			
+			default:begin
+				ri_tx_da <= ri_tx_da;
+			end
+		endcase
 	else
-		o_spi_csn <= o_spi_csn;
+		ri_tx_da <= ri_tx_da;
 end
+
+always@(posedge i_clk)
+begin
+	if(i_rst)
+		o_spi_clk <= P_CPOL[0];
+	else if(run_negedge)
+		o_spi_clk <= P_CPOL[0];
+	else if(negedge_sck)
+		o_spi_clk <= 0;
+	else if(posedge_sck)
+		o_spi_clk <= 1;
+	else
+		o_spi_clk <= o_spi_clk;
+end
+
+assign o_spi_csn = ~run;
 
 always@(posedge i_clk)
 begin
@@ -313,30 +302,30 @@ always@(posedge i_clk)
 begin
 	if(i_rst)
 		o_rx_da <= 0;
-	else if(curr_sta == WORKING)
+	else if(run)
 		case({P_CPOL[0],P_CPHL[0]})
-			2'b00:begin						//默认低电平，上升沿采样,下降沿改变数据
+			2'b00:begin						
 				if(posedge_sck)
 					o_rx_da <= {o_rx_da[P_DATA_WIDTH-2:0],i_spi_miso};
 				else
 					o_rx_da <= o_rx_da;
 			end
 			
-			2'b01:begin						//默认低电平，下降沿采样,上升沿改变数据
+			2'b01:begin						
 				if(negedge_sck)
 					o_rx_da <= {o_rx_da[P_DATA_WIDTH-2:0],i_spi_miso};
 				else
 					o_rx_da <= o_rx_da;
 			end
 			
-			2'b10:begin						//默认高电平，下降沿采样,上升沿改变数据
+			2'b10:begin						
 				if(negedge_sck)
 					o_rx_da <= {o_rx_da[P_DATA_WIDTH-2:0],i_spi_miso};
 				else
 					o_rx_da <= o_rx_da;
 			end
 			
-			2'b11:begin						//默认高电平，上升沿采样,下降沿改变数据
+			2'b11:begin						
 				if(posedge_sck)
 					o_rx_da <= {o_rx_da[P_DATA_WIDTH-2:0],i_spi_miso};
 				else
@@ -348,14 +337,14 @@ begin
 			end
 		endcase
 	else
-		o_rx_da <= 0;
+		o_rx_da <= o_rx_da;
 end
 
 always@(posedge i_clk)
 begin
 	if(i_rst)
 		o_rx_vld <= 1'b0;
-	else if((cnt_sck >= P_DATA_WIDTH*2 - 1) && (cnt_div >= P_DIV_NUM/2-1))
+	else if(run_negedge)
 		o_rx_vld <= 1'b1;
 	else
 		o_rx_vld <= 1'b0;

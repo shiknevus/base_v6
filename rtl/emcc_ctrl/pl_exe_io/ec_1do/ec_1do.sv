@@ -18,7 +18,7 @@
 // Additional Comments:
 // 
 //////////////////////////////////////////////////////////////////////////////////
-
+`define DEBUG
 
 module ec_1do#(
 		parameter  				REG_SPACE_BIAS 		= 	2000	,	//Component offset address
@@ -46,7 +46,6 @@ module ec_1do#(
 	
 	localparam		A_BHA_NUM	=	2;	
 	localparam		B_BHA_NUM	=	1;	
-	
 	
 	//PS-PL    
 	wire 	[7:0]	unit_id         ;     	
@@ -187,8 +186,81 @@ module ec_1do#(
 	
 	wire	do_o;
 	
+	wire	i_clk = clk_i;
+	wire	i_rst = rst_i;
+	
 	assign o_sig_dri = do_o;
 	
+	`ifdef DEBUG
+		reg			ro_intr_irq;
+		reg	[7:0]	irq_posedge_cnt;
+		reg	[7:0]	irq_negedge_cnt;
+		
+		always@(posedge i_clk)
+		begin
+			ro_intr_irq <= o_intr_irq;
+		end
+		
+		
+		always@(posedge i_clk)
+		begin
+			if(i_rst)begin
+				irq_posedge_cnt <= 8'd0;
+				irq_negedge_cnt <= 8'd0;
+			end else if(a_bhv_vld)begin
+				irq_posedge_cnt <= 8'd0;
+				irq_negedge_cnt <= 8'd0;
+			end else begin
+				if({ro_intr_irq,o_intr_irq} == 2'b01)begin	//rising
+					irq_posedge_cnt <= irq_posedge_cnt+1;
+				end else begin
+					irq_posedge_cnt <= irq_posedge_cnt;
+				end
+				
+				if({ro_intr_irq,o_intr_irq} == 2'b10)begin	//falling
+					irq_negedge_cnt <= irq_negedge_cnt+1;
+				end else begin
+					irq_negedge_cnt <= irq_negedge_cnt;
+				end
+			end
+		end
+	`endif
+	
+	//valid signal sync
+	reg 		r_a_tx_result_vld ;
+	reg 		r_b_tx_result_vld ;
+	reg 		r_c_tx_result_vld ;
+	reg 		r_a_bhv_vld       ;
+	
+	reg 		sync_a_tx_result_vld ;
+	reg 		sync_b_tx_result_vld ;
+	reg 		sync_c_tx_result_vld ;
+	reg 		sync_a_bhv_vld       ;
+	
+	always@(posedge clk_i)
+	begin
+		if(rst_i)begin
+			r_a_tx_result_vld 		<= 1'b0;
+			r_b_tx_result_vld 		<= 1'b0;
+			r_c_tx_result_vld 		<= 1'b0;
+			r_a_bhv_vld       		<= 1'b0;
+			
+			sync_a_tx_result_vld 	<= 1'b0;
+			sync_b_tx_result_vld 	<= 1'b0;
+			sync_c_tx_result_vld 	<= 1'b0;
+			sync_a_bhv_vld       	<= 1'b0;
+		end else begin
+			r_a_tx_result_vld		<= a_tx_result_vld;
+			r_b_tx_result_vld		<= b_tx_result_vld;
+			r_c_tx_result_vld		<= c_tx_result_vld;
+			r_a_bhv_vld      		<= a_bhv_vld      ;
+			
+			sync_a_tx_result_vld 	<= r_a_tx_result_vld;
+			sync_b_tx_result_vld 	<= r_b_tx_result_vld;
+			sync_c_tx_result_vld 	<= r_c_tx_result_vld;
+			sync_a_bhv_vld       	<= r_a_bhv_vld      ;
+		end
+	end
 	
 	ps_rw_pl_reg#(
 		.REG_SPACE_BIAS 	(REG_SPACE_BIAS		),
@@ -298,12 +370,15 @@ module ec_1do#(
 	,.param69               (param69		)
 	,.param70               (param70		)
 	,.debug_reg1			(debug_reg1		)
-	,.debug_reg2			(debug_reg2		)
+	,.debug_reg2			({16'd0,irq_posedge_cnt,irq_negedge_cnt})
 	,.debug_reg3			(debug_reg3		)
 	,.debug_reg4			(debug_reg4		)
 	,.debug_reg5			(debug_reg5		)
 	);
 
+	wire	[7:0]	curr_state;
+	wire			a_bhv_vld_r;
+	
 	proactive_beh_1do#(	
 	.BHA_NUM 				(A_BHA_NUM  	 )	//Number of active behaviors
 )proactive_beh_1do_u0(
@@ -315,10 +390,10 @@ module ec_1do#(
     ,.post_sta_allow       	(a_post_sta_allow	)
 	,.a_en			       	(1'b1				)
     ,.a_bhv_id             	(a_bhv_id       	)
-    ,.a_bhv_vld            	(a_bhv_vld      	)
+    ,.a_bhv_vld            	(sync_a_bhv_vld      	)
     ,.a_tx_ot              	(a_tx_ot        	)
     ,.a_tx_result_rpt	   	(a_tx_result_rpt	)
-	,.a_tx_result_vld      	(a_tx_result_vld	)
+	,.a_tx_result_vld      	(sync_a_tx_result_vld	)
     ,.ec_cha_st            	(ec_cha_st			)
     ,.a_tx_id              	(a_tx_id        	)
     ,.a_alm_num            	(a_alm_num      	)
@@ -327,6 +402,8 @@ module ec_1do#(
 	,.state_monitor_o		(debug_reg1			)
     ,.irq_o                	(irq_a				)
     ,.irq_ack_i       		(irq_a_grant		)
+	//,.curr_state			(curr_state)
+	//,.a_bhv_vld_r			(a_bhv_vld_r)
     );
 	 
 	status_beh_1do#(
@@ -342,7 +419,7 @@ module ec_1do#(
 	,.b_bhv_id              (b_bhv_id			)
 	,.b_tx_ot               (b_tx_ot			)
 	,.b_tx_result_rpt       (b_tx_result_rpt	)
-	,.b_tx_result_vld       (b_tx_result_vld	)
+	,.b_tx_result_vld       (sync_b_tx_result_vld	)
 	,.ec_chb_st             (ec_chb_st			)
 	,.b_tx_id               (b_tx_id			)
 	,.b_alm_num             (b_alm_num			)
@@ -363,7 +440,7 @@ module ec_1do#(
 	,.c_bhv_id                  (c_bhv_id			)
 	,.c_tx_ot          	        (c_tx_ot			)
 	,.c_tx_result_rpt  	        (c_tx_result_rpt	)
-	,.c_tx_result_vld           (c_tx_result_vld	)
+	,.c_tx_result_vld           (sync_c_tx_result_vld	)
 	,.ec_chc_st	                (ec_chc_st			)
 	,.c_tx_id         	        (c_tx_id			)
 	,.c_alm_num                 (c_alm_num			)
@@ -432,10 +509,24 @@ module ec_1do#(
 		,.irq_reg2_o		(irq_reg2			)
 		,.irq_o				(o_intr_irq			)
 		,.irq_busy_o		(irq_busy_o			)
-		,.irq_receive_ack_i (a_tx_result_vld || b_tx_result_vld || c_tx_result_vld)	
+		,.irq_receive_ack_i (sync_a_tx_result_vld || sync_b_tx_result_vld || sync_c_tx_result_vld)	
     );
 	
-	
+	//ila_1 ila_1 (
+	//.clk(clk_i), // input wire clk
+    //
+    //
+	//.probe0(curr_state), // input wire [7:0]  probe0  
+	//.probe1(irq_a		), // input wire [0:0]  probe1 
+	//.probe2(irq_a_grant), // input wire [0:0]  probe2 
+	//.probe3(a_bhv_id_r), // input wire [7:0]  probe3 
+	//.probe4(a_bhv_id), // input wire [7:0]  probe4 
+	//.probe5(o_intr_irq), // input wire [0:0]  probe5 
+	//.probe6(irq_reg1), // input wire [31:0]  probe6 
+	//.probe7(irq_reg2), // input wire [31:0]  probe7 
+	//.probe8(a_bhv_vld), // input wire [0:0]  probe8 
+	//.probe9(a_bhv_vld_r) // input wire [0:0]  probe9
+	//);
 	
 	
 	

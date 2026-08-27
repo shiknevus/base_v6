@@ -79,6 +79,7 @@ module pre_post_sta_check_16di#(
 	
 	//post status
 	wire [A_BHA_NUM-1:0]	a_post_sta	;
+	
 	wire [15:0] error_bit = signal_vld & (~di);
 	wire	err;
 	assign err  = |error_bit;

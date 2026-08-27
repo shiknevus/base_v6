@@ -360,6 +360,75 @@ module emcc_mst_top #
         .o_time_100ms_vld ( time_100ms_vld ),
         .o_time_1s_vld    ( time_1s_vld    )
     );
+	
+	reg 	[1:0]	r_time_1ms_vld   ;
+	reg 	[1:0]	r_time_10ms_vld  ;
+	reg 	[1:0]	r_time_100ms_vld ;
+	reg 	[1:0]	r_time_1s_vld    ;
+	
+	reg 	sync_time_1ms_vld   ;
+	reg 	sync_time_10ms_vld  ;
+	reg 	sync_time_100ms_vld ;
+	reg 	sync_time_1s_vld    ;
+	
+	
+	always@(posedge prot_clk)
+	begin
+		if(prot_clk_rst)begin
+			r_time_1ms_vld    <= 2'b00;
+			r_time_10ms_vld   <= 2'b00;
+			r_time_100ms_vld  <= 2'b00;
+			r_time_1s_vld     <= 2'b00;
+		end else begin
+			r_time_1ms_vld    <= {r_time_1ms_vld  [0],time_1ms_vld  };
+			r_time_10ms_vld   <= {r_time_10ms_vld [0],time_10ms_vld };
+			r_time_100ms_vld  <= {r_time_100ms_vld[0],time_100ms_vld};
+			r_time_1s_vld     <= {r_time_1s_vld   [0],time_1s_vld   };
+		end
+	end
+	
+	always@(posedge prot_clk)
+	begin
+		if(prot_clk_rst)
+			sync_time_1ms_vld <= 1'b0;
+		else if(r_time_1ms_vld == 2'b01)
+			sync_time_1ms_vld <= 1'b1;
+		else
+			sync_time_1ms_vld <= 1'b0;
+	end
+	
+	always@(posedge prot_clk)
+	begin
+		if(prot_clk_rst)
+			sync_time_10ms_vld <= 1'b0;
+		else if(r_time_10ms_vld == 2'b01)
+			sync_time_10ms_vld <= 1'b1;
+		else
+			sync_time_10ms_vld <= 1'b0;
+	end
+	
+	always@(posedge prot_clk)
+	begin
+		if(prot_clk_rst)
+			sync_time_100ms_vld <= 1'b0;
+		else if(r_time_100ms_vld == 2'b01)
+			sync_time_100ms_vld <= 1'b1;
+		else
+			sync_time_100ms_vld <= 1'b0;
+	end
+	
+	always@(posedge prot_clk)
+	begin
+		if(prot_clk_rst)
+			sync_time_1s_vld <= 1'b0;
+		else if(r_time_1s_vld == 2'b01)
+			sync_time_1s_vld <= 1'b1;
+		else
+			sync_time_1s_vld <= 1'b0;
+	end
+	
+	
+	
     // -------------------------------------------------------------------------------------------------------------------------------------
     
         
@@ -471,7 +540,7 @@ localparam DO_BIT_WIDTH = 32;
 `else
 
     assign main_board_outio  =  emcc_main_outio; 
-    assign emcc_main_inio    =  emcc_main_inio_debounce; 
+    assign emcc_main_inio    =  ~emcc_main_inio_debounce; 
 
 `endif
     
@@ -824,10 +893,10 @@ localparam DO_BIT_WIDTH = 32;
            ,.main_232_rxd           (USER_UART3_RX      )
            ,.main_232_txd           (USER_UART3_TX      )
            
-           ,.i_time_1ms_vld        (time_1ms_vld     )
-           ,.i_time_10ms_vld       (time_10ms_vld    )
-           ,.i_time_100ms_vld      (time_100ms_vld   )
-           ,.i_time_1s_vld         (time_1s_vld      )
+           ,.i_time_1ms_vld        (sync_time_1ms_vld     )
+           ,.i_time_10ms_vld       (sync_time_10ms_vld    )
+           ,.i_time_100ms_vld      (sync_time_100ms_vld   )
+           ,.i_time_1s_vld         (sync_time_1s_vld      )
            
             ,.i_dv_alarm            (i_servo_alarm      )
             ,.o_dv_pulse            (o_dv_pulse         )

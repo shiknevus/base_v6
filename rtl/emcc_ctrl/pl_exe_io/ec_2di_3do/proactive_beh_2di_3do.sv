@@ -41,7 +41,7 @@ module proactive_beh_2di_3do#(
     ,output reg [7:0]           a_tx_id
     ,output reg	[7:0]           a_alm_num
 
-	,output	reg	[2:0]			do_o
+	,output		[2:0]			do_o
 
 	,output reg	[7:0]           a_bhv_id_r
 	,output	reg	[31:0]			state_monitor_o
@@ -74,6 +74,8 @@ module proactive_beh_2di_3do#(
     localparam  S_SUCC_30_ACK	= 8'd9; 	//success ack
 	localparam 	S_ALERT_40		= 8'd10;	//Alert
 	localparam 	S_ALERT_40_ACK	= 8'd11;	//Alert ack
+	localparam 	S_ACT_END_1		= 8'd12;
+	localparam 	S_ACT_END_2		= 8'd13;
 	
     localparam  IRQ_OK          = 8'h51;	//ps ack:OK
     localparam  IRQ_NO_OK       = 8'h52;	//ps ack:NO OK
@@ -131,21 +133,48 @@ module proactive_beh_2di_3do#(
 	end
 	
     reg			a_bhv_vld_r;
-    //Current behavior number
+    reg	[7:0]	sta1;
+	 //Current behavior number
     always@(posedge clk_i)begin
         if(rst_i)begin
             a_bhv_id_r <= 8'd0;
 			a_bhv_vld_r <= 1'b0;
-		end else if(a_en && ((a_bhv_id >= 8'd1) && (a_bhv_id <= BHA_NUM)) && a_bhv_vld)begin
-			a_bhv_id_r <= a_bhv_id;
-			a_bhv_vld_r <= a_bhv_vld;
-		end else if(curr_state == S_IDLE && curr_state_1d != curr_state)begin
-			a_bhv_id_r <= 8'd0;
-			a_bhv_vld_r <= 1'b0;
-		end else begin
-			a_bhv_id_r <= a_bhv_id_r;
-			a_bhv_vld_r <= 1'b0;
-		end
+			sta1 <= 0;
+		end else 
+			case(sta1)
+				0:begin
+					if(a_en && ((a_bhv_id >= 8'd1) && (a_bhv_id <= BHA_NUM)) && a_bhv_vld)begin
+						a_bhv_id_r <= a_bhv_id;
+						a_bhv_vld_r <= 1'b1;
+						sta1 <= 1;
+					end else begin
+						a_bhv_id_r <= 8'd0;
+						a_bhv_vld_r <= 1'b0;
+						sta1 <= 0;
+					end
+				end
+				1:begin
+					a_bhv_id_r <= a_bhv_id;
+					a_bhv_vld_r <= 1'b0;
+					sta1 <= 2;
+				end
+				2:begin
+					if(curr_state == S_ACT_END_1)begin
+						a_bhv_id_r <= 8'd0;
+						a_bhv_vld_r <= 1'b0;
+						sta1 <= 0;
+					end else begin
+						a_bhv_id_r <= a_bhv_id;
+						a_bhv_vld_r <= 1'b0;
+						sta1 <= 2;
+					end
+				end
+				default:begin
+					a_bhv_id_r <= 8'd0;
+				    a_bhv_vld_r <= 1'b0;
+					sta1 <= 0;
+				end
+			endcase
     end
 
 	reg match_10;
@@ -174,6 +203,14 @@ module proactive_beh_2di_3do#(
 	end
 	end
     
+	
+	//ila_3 your_instance_name (
+	//.clk(clk_i), // input wire clk
+    //
+    //
+	//.probe0(curr_state) // input wire [7:0] probe0
+	//);
+
 
     always @(posedge clk_i) begin
         if (rst_i)
@@ -248,7 +285,7 @@ module proactive_beh_2di_3do#(
 			
 			S_SUCC_30_ACK:begin	//9
 				if(match_30)    							//30 response success
-                    next_state = S_IDLE;
+                    next_state = S_ACT_END_1;
                 else if(ack_tx_result == IRQ_NO_OK || timout)
                     next_state = S_ALERT_40;
                 else
@@ -261,9 +298,17 @@ module proactive_beh_2di_3do#(
 			
 			S_ALERT_40_ACK:begin	//11
 				if(match_40 || timout) 						//40 response
-                    next_state = S_IDLE;
+                    next_state = S_ACT_END_1;
                 else
                     next_state = S_ALERT_40_ACK;
+			end
+			
+			S_ACT_END_1:begin
+				next_state = S_ACT_END_2;
+			end
+			
+			S_ACT_END_2:begin
+				next_state = S_IDLE;
 			end
 
             default: begin
@@ -315,21 +360,21 @@ module proactive_beh_2di_3do#(
         if(rst_i || !a_en)
             a_alm_num <= 8'd0;
         else if(curr_state == S_BHA_PRE_DET && timout)						
-			a_alm_num <= 8'd101;
+			a_alm_num <= 8'd100;
         else if(curr_state == S_READY_10_ACK && ack_tx_result == IRQ_NO_OK)	
             a_alm_num <= ack_ps_alart_num;    
         else if(curr_state == S_READY_10_ACK && timout)						
-            a_alm_num <= 8'd102;    
+            a_alm_num <= 8'd101;    
 		//else if(curr_state == S_EXE_20_ACK && ack_tx_result == IRQ_NO_OK)	
         //    a_alm_num <= ack_ps_alart_num;    
         //else if(curr_state == S_EXE_20_ACK && timout)						
         //    a_alm_num <= 8'd103;    
 		else if(curr_state_1d == S_BHA_POST_DET && curr_state == S_ALERT_40)
-			a_alm_num <= 8'd103;  
+			a_alm_num <= 8'd102;  
 		else if(curr_state == S_SUCC_30_ACK && ack_tx_result == IRQ_NO_OK)	
 			a_alm_num <= ack_ps_alart_num;
 		else if(curr_state == S_SUCC_30_ACK && timout)						
-            a_alm_num <= 8'd104;
+            a_alm_num <= 8'd103;
 		else if(match_40)
 			a_alm_num <= 8'd0;
         else
@@ -338,11 +383,13 @@ module proactive_beh_2di_3do#(
 
     //Timeout count
     always@(posedge clk_i)begin
-        if(rst_i || !a_en)
+        if(rst_i)
             timout_cnt <= 20'd0;
+		else if(!a_en)
+			timout_cnt <= 20'd0;
 		else if(curr_state != curr_state_1d)
 			timout_cnt <= 20'd0;
-        else if(timout_cnt >= a_tx_ot-1)
+        else if(timout_cnt > a_tx_ot)
             timout_cnt <= 20'd0;
         else if(i_time_1s_vld)
             timout_cnt <= timout_cnt+1;
@@ -351,7 +398,7 @@ module proactive_beh_2di_3do#(
     always@(posedge clk_i)begin
         if(rst_i)
             timout <= 1'b0;
-        else if(timout_cnt >= a_tx_ot-1)
+        else if(timout_cnt > a_tx_ot)
             timout <= 1'b1;
         else
             timout <= 1'b0;
@@ -361,31 +408,40 @@ module proactive_beh_2di_3do#(
 	//===============================================================================================================
 	//------------------------------------------------ user logic begin ---------------------------------------------
 	//===============================================================================================================
+	assign do_o = {do3,do2,do1};
 	
+	reg	do1;
+	reg	do2;
+	reg	do3;
 	
 	always@(posedge clk_i)
 	begin
 		if(rst_i || !a_en)
-			do_o <= 3'b000;
+			{do3,do2,do1} <= 3'b000;
 		else if(curr_state == S_EXE)
 			case(a_bhv_id_r)
-				8'd1:	do_o <= 3'b001;
-				8'd2:	do_o <= 3'b010;
-				8'd3:	do_o <= 3'b000;
-				8'd4:	do_o <= 3'b000;
-				8'd5:	do_o <= 3'b000;
-				8'd6:	do_o <= 3'b001;
-				8'd7:	do_o <= 3'b010;
-				8'd8:	do_o <= 3'b001;
-				8'd9:	do_o <= 3'b010;
-				8'd10:	do_o <= 3'b001;
-				8'd11:	do_o <= 3'b010;
-				8'd12:	do_o <= 3'b100;
-				8'd13:	do_o <= 3'b000;
-				default:do_o <= 3'b000;
+				8'd1	:	begin	do1 <= 1'b1	; 	do2 <= 1'b0	; 	do3 <= do3	;	end
+				8'd2	:	begin	do1 <= 1'b0	; 	do2 <= 1'b1	; 	do3 <= do3	;	end
+				8'd3	:	begin	do1 <= 1'b0	; 	do2 <= 1'b0	; 	do3 <= do3	;	end
+				8'd4	:	begin	do1 <= do1	; 	do2 <= do2	; 	do3 <= do3	;	end
+				8'd5	:	begin	do1 <= do1	; 	do2 <= do2	; 	do3 <= do3	;	end
+				8'd6	:	begin	do1 <= 1'b1	; 	do2 <= 1'b0	; 	do3 <= do3	; 	end
+				8'd7	:	begin	do1 <= 1'b0	; 	do2 <= 1'b1	; 	do3 <= do3	; 	end
+				8'd8	:	begin	do1 <= 1'b1	; 	do2 <= 1'b0	; 	do3 <= do3	; 	end
+				8'd9	:	begin	do1 <= 1'b0	; 	do2 <= 1'b1	; 	do3 <= do3	; 	end
+				8'd10	:	begin	do1 <= 1'b1	; 	do2 <= 1'b0	; 	do3 <= do3	; 	end
+				8'd11	:	begin	do1 <= 1'b0	; 	do2 <= 1'b1	; 	do3 <= do3	; 	end
+				8'd12	:	begin	do1 <= do1	; 	do2 <= do2	; 	do3 <= 1'b1	;	end
+				8'd13	:	begin	do1 <= do1	; 	do2 <= do2	; 	do3 <= 1'b0	;	end
+				8'd14	:	begin	do1 <= do1	; 	do2 <= do2	; 	do3 <= do3	;	end
+				8'd15	:	begin	do1 <= do1	; 	do2 <= do2	; 	do3 <= do3	;	end
+				default	:	begin	do1 <= do1	; 	do2 <= do2	; 	do3 <= do3	;	end
 			endcase
-		else
-			do_o <= do_o;
+		else begin
+			do1 <= do1	;
+			do2 <= do2	;
+			do3 <= do3	;
+		end
 	end
 
 

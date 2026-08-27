@@ -38,8 +38,9 @@ module ec_pulmotor_handwheel#(
 		input  		 [19:0]     i_st_rd_addr    ,
 		output 		 [31:0]     o_st_rd_data    ,
 		output 		            o_st_rd_vld     ,
-
-		input 	            	i_estop      ,
+		
+		//sys interface
+		//input 	            	i_estop      ,
 		input 	            	i_pulse_a    ,
 		input 	            	i_pulse_b    ,
 		input 	            	i_stp_x1     ,
@@ -52,11 +53,6 @@ module ec_pulmotor_handwheel#(
 		input 	            	i_axis_5     ,
 		input 	            	i_axis_6     ,
 		input 	            	i_axis_7     ,
-		output	[3:0]       	o_wheel_prog ,
-		output	[31:0]			o_pulse_cnt  ,
-		output					o_estop_sta  ,
-		output					o_axis_num   ,
-		output	            	o_wheel_dir  ,
 
 		output 	            	o_intr_irq	
     );
@@ -202,7 +198,87 @@ module ec_pulmotor_handwheel#(
 	wire 	[31:0]	bhv_en;
 	
 	wire	[7:0]	a_bhv_id_r;
+	
+	wire 	[3:0]	axis_number	;
+	wire 	[31:0]	pulse_cnt	;
+	wire 	[7:0]	speed_gear	;
+	wire 			wheel_dir	;
 
+	assign param51 = {20'd0,i_pulse_a,i_pulse_b,i_stp_x1,i_stp_x10,i_stp_x100,i_axis_x,i_axis_y,i_axis_z,i_axis_4,i_axis_5,i_axis_6,i_axis_7};
+
+	
+	`ifdef DEBUG
+		reg			ro_intr_irq;
+		reg	[7:0]	irq_posedge_cnt;
+		reg	[7:0]	irq_negedge_cnt;
+		
+		always@(posedge clk_i)
+		begin
+			ro_intr_irq <= o_intr_irq;
+		end
+		
+		
+		always@(posedge clk_i)
+		begin
+			if(rst_i)begin
+				irq_posedge_cnt <= 8'd0;
+				irq_negedge_cnt <= 8'd0;
+			end else if(a_bhv_vld)begin
+				irq_posedge_cnt <= 8'd0;
+				irq_negedge_cnt <= 8'd0;
+			end else begin
+				if({ro_intr_irq,o_intr_irq} == 2'b01)begin	//rising
+					irq_posedge_cnt <= irq_posedge_cnt+1;
+				end else begin
+					irq_posedge_cnt <= irq_posedge_cnt;
+				end
+				
+				if({ro_intr_irq,o_intr_irq} == 2'b10)begin	//falling
+					irq_negedge_cnt <= irq_negedge_cnt+1;
+				end else begin
+					irq_negedge_cnt <= irq_negedge_cnt;
+				end
+			end
+		end
+	`endif
+	
+	
+	//valid signal sync
+	reg 		r_a_tx_result_vld ;
+	reg 		r_b_tx_result_vld ;
+	reg 		r_c_tx_result_vld ;
+	reg 		r_a_bhv_vld       ;
+	
+	reg 		sync_a_tx_result_vld ;
+	reg 		sync_b_tx_result_vld ;
+	reg 		sync_c_tx_result_vld ;
+	reg 		sync_a_bhv_vld       ;
+	
+	always@(posedge clk_i)
+	begin
+		if(rst_i)begin
+			r_a_tx_result_vld 		<= 1'b0;
+			r_b_tx_result_vld 		<= 1'b0;
+			r_c_tx_result_vld 		<= 1'b0;
+			r_a_bhv_vld       		<= 1'b0;
+			
+			sync_a_tx_result_vld 	<= 1'b0;
+			sync_b_tx_result_vld 	<= 1'b0;
+			sync_c_tx_result_vld 	<= 1'b0;
+			sync_a_bhv_vld       	<= 1'b0;
+		end else begin
+			r_a_tx_result_vld		<= a_tx_result_vld;
+			r_b_tx_result_vld		<= b_tx_result_vld;
+			r_c_tx_result_vld		<= c_tx_result_vld;
+			r_a_bhv_vld      		<= a_bhv_vld      ;
+			
+			sync_a_tx_result_vld 	<= r_a_tx_result_vld;
+			sync_b_tx_result_vld 	<= r_b_tx_result_vld;
+			sync_c_tx_result_vld 	<= r_c_tx_result_vld;
+			sync_a_bhv_vld       	<= r_a_bhv_vld      ;
+		end
+	end
+	
 	
 	ps_rw_pl_reg#(
 		.REG_SPACE_BIAS 	(REG_SPACE_BIAS		),
@@ -291,28 +367,28 @@ module ec_pulmotor_handwheel#(
 	,.c_alm_num             (c_alm_num 		)
 	,.c_tsc_id              (c_tx_id  		)
 	,.c_bhv_id              (c_bhv_id 		)
-	,.param51               ({29'd0,i_stp_x100,i_stp_x10,i_stp_x1}	)
+	,.param51               (pulse_cnt		)
 	,.param52               (param52		)
 	,.param53               (param53		)
-	,.param54               (param54		)
-	,.param55               (param55		)
-	,.param56               (param56		)
-	,.param57               (param57		)
-	,.param58               (param58		)
-	,.param59               (param59		)
-	,.param60               (param60		)
-	,.param61               (param61		)
-	,.param62               (param62		)
-	,.param63               (param63		)
-	,.param64               (param64		)
-	,.param65               (param65		)
-	,.param66               (i_estop		)
+	,.param54               (param54		) 
+	,.param55               (param55		) 
+	,.param56               (param56		) 
+	,.param57               (param57		) 
+	,.param58               (param58		) 
+	,.param59               (param59		) 
+	,.param60               (param60		) 
+	,.param61               ({4'd0,axis_number}		) 	
+	,.param62               (speed_gear		) 	
+	,.param63               (param63		) 	
+	,.param64               (param64		) 	
+	,.param65               (param65		) 
+	,.param66               (wheel_dir		) 
 	,.param67               (param67		)
 	,.param68               (param68		)
 	,.param69               (param69		)
 	,.param70               (param70		)
 	,.debug_reg1			(debug_reg1		)
-	,.debug_reg2			(debug_reg2		)
+	,.debug_reg2			({16'd0,irq_posedge_cnt,irq_negedge_cnt}		)
 	,.debug_reg3			(debug_reg3		)
 	,.debug_reg4			(debug_reg4		)
 	,.debug_reg5			(debug_reg5		)
@@ -329,10 +405,10 @@ module ec_pulmotor_handwheel#(
     ,.post_sta_allow       	(a_post_sta_allow	)
 	,.a_en			       	(1'b0				)
     ,.a_bhv_id             	(a_bhv_id       	)
-    ,.a_bhv_vld            	(a_bhv_vld      	)
+    ,.a_bhv_vld            	(sync_a_bhv_vld      	)
     ,.a_tx_ot              	(a_tx_ot        	)
     ,.a_tx_result_rpt	   	(a_tx_result_rpt	)
-	,.a_tx_result_vld      	(a_tx_result_vld	)
+	,.a_tx_result_vld      	(sync_a_tx_result_vld	)
     ,.ec_cha_st            	(ec_cha_st			)
     ,.a_tx_id              	(a_tx_id        	)
     ,.a_alm_num            	(a_alm_num      	)
@@ -357,7 +433,7 @@ module ec_pulmotor_handwheel#(
 	,.b_bhv_id              (b_bhv_id			)
 	,.b_tx_ot               (b_tx_ot			)
 	,.b_tx_result_rpt       (b_tx_result_rpt	)
-	,.b_tx_result_vld       (b_tx_result_vld	)
+	,.b_tx_result_vld       (sync_b_tx_result_vld	)
 	,.ec_chb_st             (ec_chb_st			)
 	,.b_tx_id               (b_tx_id			)
 	,.b_alm_num             (b_alm_num			)
@@ -365,6 +441,7 @@ module ec_pulmotor_handwheel#(
 	,.irq_o			        (irq_b				)
 	,.irq_ack_i	            (irq_b_grant		)	
     );
+
 	 
 	tim_beh_pulmotor_handwheel #(
 		.BHA_NUM(C_BHA_NUM	)
@@ -380,27 +457,27 @@ module ec_pulmotor_handwheel#(
 	,.c_bhv_id                  (c_bhv_id			)
 	,.c_tx_ot          	        (c_tx_ot			)
 	,.c_tx_result_rpt  	        (c_tx_result_rpt	)
-	,.c_tx_result_vld           (c_tx_result_vld	)
+	,.c_tx_result_vld           (sync_c_tx_result_vld	)
 	,.ec_chc_st	                (ec_chc_st			)
 	,.c_tx_id         	        (c_tx_id			)
 	,.c_alm_num                 (c_alm_num			)
 	,.c_gap_crl                 (c_gap_crl			)
-	,.i_estop					(0			)
-	,.i_pulse_a					(i_pulse_a			)
-	,.i_pulse_b					(i_pulse_b			)
-	,.i_stp_x1					(1		)
-	,.i_stp_x10					(0		)
-	,.i_stp_x100				(0			)
-	,.i_axis_x					(1			)
-	,.i_axis_y					(0			)
-	,.i_axis_z					(0			)
-	,.i_axis_4					(0			)
-	,.i_axis_5					(0			)
-	,.i_axis_6					(0			)
-	,.i_axis_7					(0			)
-	,.o_wheel_prog				(param61			)//axis
-	,.o_pulse_cnt				(param52			)
-	,.o_wheel_dir				(param67			)
+	,.i_pulse_a					(i_pulse_a 			)
+	,.i_pulse_b					(i_pulse_b 			)
+	,.i_stp_x1					(i_stp_x1  			)
+	,.i_stp_x10					(i_stp_x10 			)
+	,.i_stp_x100				(i_stp_x100			)
+	,.i_axis_x					(i_axis_x  			)
+	,.i_axis_y					(i_axis_y  			)
+	,.i_axis_z					(i_axis_z  			)
+	,.i_axis_4					(i_axis_4  			)
+	,.i_axis_5					(i_axis_5  			)
+	,.i_axis_6					(i_axis_6  			)
+	,.i_axis_7					(i_axis_7  			)
+	,.o_axis_number				(axis_number		)
+	,.o_pulse_cnt				(pulse_cnt			)
+	,.o_speed_gear				(speed_gear			)
+	,.o_wheel_dir				(wheel_dir			)
 	,.state_monitor_o			(debug_reg1			)
 	,.irq_o 					(irq_c				)
 	,.irq_ack_i                 (irq_c_grant		)
@@ -427,16 +504,16 @@ module ec_pulmotor_handwheel#(
 			.ec_id           	(ec_id          ),
 			.di_i				(di_i			),
 			.do_i				(do_o			),
-			.a_en				(1'b1			),
+			.a_en				(1'b0			),
 			.b_en				(1'b0			),	
-			.c_en				(1'b0			),	
+			.c_en				(1'b1			),	
 			.a_bhv_id			(a_bhv_id_r		),
 			.b_bhv_id			(b_bhv_id		),
 			.c_bhv_id			(c_bhv_id		),
 			.ec_cha_st			(ec_cha_st		),
 			.ec_chb_st       	(ec_chb_st		),
 			.ec_chc_st       	(ec_chc_st		),
-			.c_circle_time		(1000			),	
+			.c_circle_time		(c_gap_crl		),	
 			.task_time_cnt		(task_time_cnt	),	
 			.a_pre_sta_allow	(a_pre_sta_allow),	
 			.a_post_sta_allow	(a_post_sta_allow),	
@@ -471,12 +548,8 @@ module ec_pulmotor_handwheel#(
 		,.irq_reg2_o		(irq_reg2			)
 		,.irq_o				(o_intr_irq			)
 		,.irq_busy_o		(irq_busy_o			)
-		,.irq_receive_ack_i (a_tx_result_vld || b_tx_result_vld || c_tx_result_vld)	
+		,.irq_receive_ack_i (sync_a_tx_result_vld || sync_b_tx_result_vld || sync_c_tx_result_vld)	
     );
-	
-	
-	
-	
-	
+
 	
 endmodule

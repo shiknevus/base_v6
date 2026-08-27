@@ -81,7 +81,6 @@ module pre_post_sta_check_4di_2do#(
 	end
 
 	
-	
 	//post status
 	
 	wire [A_BHA_NUM-1:0]	a_post_sta	;

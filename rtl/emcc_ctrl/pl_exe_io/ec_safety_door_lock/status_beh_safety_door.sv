@@ -90,6 +90,8 @@ module status_beh_safety_door#(
     localparam  S_SUCC_30_ACK	= 8'd9; 	//success ack
 	localparam 	S_ALERT_40		= 8'd10;	//Alert
 	localparam 	S_ALERT_40_ACK	= 8'd11;	//Alert ack
+	localparam 	S_ACT_END_1		= 8'd12;
+	localparam 	S_ACT_END_2		= 8'd13;
 	
     localparam  IRQ_OK          = 8'h51;	//ps ack:OK
     localparam  IRQ_NO_OK       = 8'h52;	//ps ack:NO OK
@@ -186,9 +188,7 @@ module status_beh_safety_door#(
 	begin
 		if(i_rst)
 			b_bhv_id_vld <= 1'b0;
-		else if(open_req_key_posedge)
-			b_bhv_id_vld <= 1'b1;
-		else if(close_confirm_key_posedge)
+		else if(open_req_key_posedge || close_confirm_key_posedge)
 			b_bhv_id_vld <= 1'b1;
 		else
 			b_bhv_id_vld <= 1'b0;
@@ -294,7 +294,7 @@ module status_beh_safety_door#(
 			
 			S_SUCC_30_ACK:begin
 				if(match_30)    //30 response success
-                    next_state = S_IDLE;
+                    next_state = S_ACT_END_1;
                 else if(ack_tx_result == IRQ_NO_OK || timout)
                     next_state = S_ALERT_40;
                 else
@@ -307,10 +307,19 @@ module status_beh_safety_door#(
 			
 			S_ALERT_40_ACK:begin
 				if(match_40 || timout) //40 response
-                    next_state = S_IDLE;
+                    next_state = S_ACT_END_1;
                 else
                     next_state = S_ALERT_40_ACK;
 			end
+			
+			S_ACT_END_1:begin
+				next_state = S_ACT_END_2;
+			end
+			
+			S_ACT_END_2:begin
+				next_state = S_IDLE;
+			end
+
 
             default: begin
                 next_state = S_IDLE;
@@ -361,28 +370,22 @@ module status_beh_safety_door#(
 	
 
 	always@(posedge clk_i)begin
-        if(rst_i)
+        if(rst_i || !b_en)
             b_alm_num <= 8'd0;
-		else if(!b_en)
-			b_alm_num <= 8'd0;
         else if(curr_state == S_BHA_PRE_DET && timout)						//The pre - full inspection is not met.
-            b_alm_num <= 8'd1;    
+            b_alm_num <= 8'd100;    
         else if(curr_state == S_READY_10_ACK && ack_tx_result == IRQ_NO_OK)	//Transaction 10 ps response error
             b_alm_num <= ack_ps_alart_num;    
         else if(curr_state == S_READY_10_ACK && timout)						//For Transaction 10, waiting for the ps response timed out.
-            b_alm_num <= 8'd2;    
-		else if(curr_state == S_EXE_20_ACK && ack_tx_result == IRQ_NO_OK)	//Transaction 20 has a ps response error.
-            b_alm_num <= ack_ps_alart_num;    
-        else if(curr_state == S_EXE_20_ACK && timout)						//For Transaction 20, waiting for the ps response timed out.
-            b_alm_num <= 8'd3;    
-		else if(curr_state_1d == S_EXE && curr_state == S_ALERT_40 && b_bhv_id == 8'd1)//The execution of Behavior 1 failed.
-			b_alm_num <= 8'd4; 
-		else if(curr_state_1d == S_EXE && curr_state == S_ALERT_40 && b_bhv_id == 8'd2)//The execution of Behavior 2 failed.
-			b_alm_num <= 8'd5;
+            b_alm_num <= 8'd101;    
+		else if(curr_state == S_BHA_POST_DET && timout)//The execution of Behavior 2 failed.
+			b_alm_num <= 8'd102;
 		else if(curr_state == S_SUCC_30_ACK && ack_tx_result == IRQ_NO_OK)	//Transaction 30 has a ps response error.
 			b_alm_num <= ack_ps_alart_num;
 		else if(curr_state == S_SUCC_30_ACK && timout)						//For Transaction 30, waiting for the ps response timed out.
-            b_alm_num <= 8'd6;
+            b_alm_num <= 8'd103;
+		else if(curr_state == S_ACT_END_1)
+			b_alm_num <= 8'd0;
         else
             b_alm_num <= b_alm_num;
     end
@@ -396,7 +399,7 @@ module status_beh_safety_door#(
 			timout_cnt <= 20'd0;
 		else if(curr_state != curr_state_1d)
 			timout_cnt <= 20'd0;
-        else if(timout_cnt >= b_tx_ot-1)
+        else if(timout_cnt > b_tx_ot)
             timout_cnt <= 20'd0;
         else if(i_time_1s_vld)
             timout_cnt <= timout_cnt+1;
@@ -405,7 +408,7 @@ module status_beh_safety_door#(
     always@(posedge clk_i)begin
         if(rst_i)
             timout <= 1'b0;
-        else if(timout_cnt >= b_tx_ot-1)
+        else if(timout_cnt > b_tx_ot)
             timout <= 1'b1;
         else
             timout <= 1'b0;
@@ -461,7 +464,7 @@ module status_beh_safety_door#(
 			case(b_bhv_id)
 				8'd100: o_lock_open <= 1'b1;
 				8'd101: o_lock_open <= 1'b0;
-				default: o_lock_open <= o_lock_open;
+				default: o_lock_open <= 1'b0;
 			endcase
 		else
 			o_lock_open <= o_lock_open;

@@ -30,8 +30,6 @@ module proactive_beh_trayclaw#(
 
     ,input      [BHA_NUM-1:0]   pre_sta_allow   //Pre - sufficient condition satisfied signal. 0: Not satisfied. 1: Satisfied.
     ,input      [BHA_NUM-1:0]   post_sta_allow  //Post - sufficient condition satisfied signal
-
-    ,input      [1:0]           mode_sel 		//1: Single-key mode 2: Double-key mode
 	
 	,input						a_en			//A enable
     ,input      [7:0]           a_bhv_id
@@ -65,8 +63,6 @@ module proactive_beh_trayclaw#(
 	reg [7:0]		ack_tx_result;
 	reg	[7:0]		ack_ps_alart_num;
 	
-	reg	[8:0]		tim_500ms_cnt;
-	
 	//State machine state
 	localparam  S_IDLE          = 8'd0; 	//idle
     localparam  S_BHA_PRE_DET	= 8'd1; 	//Pre-condition check
@@ -80,6 +76,8 @@ module proactive_beh_trayclaw#(
     localparam  S_SUCC_30_ACK	= 8'd9; 	//success ack
 	localparam 	S_ALERT_40		= 8'd10;	//Alert
 	localparam 	S_ALERT_40_ACK	= 8'd11;	//Alert ack
+	localparam 	S_ACT_END_1		= 8'd12;
+	localparam 	S_ACT_END_2		= 8'd13;
 	
     localparam  IRQ_OK          = 8'h51;	//ps ack:OK
     localparam  IRQ_NO_OK       = 8'h52;	//ps ack:NO OK
@@ -138,21 +136,48 @@ module proactive_beh_trayclaw#(
 	end
 	
     reg			a_bhv_vld_r;
-    //Current behavior number
+    reg	[7:0]	sta1;
+	 //Current behavior number
     always@(posedge clk_i)begin
         if(rst_i)begin
             a_bhv_id_r <= 8'd0;
 			a_bhv_vld_r <= 1'b0;
-		end else if(a_en && ((a_bhv_id >= 8'd1) && (a_bhv_id <= BHA_NUM)) && a_bhv_vld)begin
-			a_bhv_id_r <= a_bhv_id;
-			a_bhv_vld_r <= a_bhv_vld;
-		end else if(curr_state == S_IDLE && curr_state_1d != curr_state)begin
-			a_bhv_id_r <= 8'd0;
-			a_bhv_vld_r <= 1'b0;
-		end else begin
-			a_bhv_id_r <= a_bhv_id_r;
-			a_bhv_vld_r <= 1'b0;
-		end
+			sta1 <= 0;
+		end else 
+			case(sta1)
+				0:begin
+					if(a_en && ((a_bhv_id >= 8'd1) && (a_bhv_id <= BHA_NUM)) && a_bhv_vld)begin
+						a_bhv_id_r <= a_bhv_id;
+						a_bhv_vld_r <= 1'b1;
+						sta1 <= 1;
+					end else begin
+						a_bhv_id_r <= 8'd0;
+						a_bhv_vld_r <= 1'b0;
+						sta1 <= 0;
+					end
+				end
+				1:begin
+					a_bhv_id_r <= a_bhv_id;
+					a_bhv_vld_r <= 1'b0;
+					sta1 <= 2;
+				end
+				2:begin
+					if(curr_state == S_ACT_END_1)begin
+						a_bhv_id_r <= 8'd0;
+						a_bhv_vld_r <= 1'b0;
+						sta1 <= 0;
+					end else begin
+						a_bhv_id_r <= a_bhv_id;
+						a_bhv_vld_r <= 1'b0;
+						sta1 <= 2;
+					end
+				end
+				default:begin
+					a_bhv_id_r <= 8'd0;
+				    a_bhv_vld_r <= 1'b0;
+					sta1 <= 0;
+				end
+			endcase
     end
 
 	reg match_10;
@@ -254,7 +279,7 @@ module proactive_beh_trayclaw#(
 			
 			S_SUCC_30_ACK:begin	//8
 				if(match_30)    							//30 response success
-                    next_state = S_IDLE;
+                    next_state = S_ACT_END_1;
                 else if(ack_tx_result == IRQ_NO_OK || timout)
                     next_state = S_ALERT_40;
                 else
@@ -267,10 +292,19 @@ module proactive_beh_trayclaw#(
 			
 			S_ALERT_40_ACK:begin	//10
 				if(match_40 || timout) 						//40 response
-                    next_state = S_IDLE;
+                    next_state = S_ACT_END_1;
                 else
                     next_state = S_ALERT_40_ACK;
 			end
+			
+			S_ACT_END_1:begin
+				next_state = S_ACT_END_2;
+			end
+			
+			S_ACT_END_2:begin
+				next_state = S_IDLE;
+			end
+
 
             default: begin
                 next_state = S_IDLE;
@@ -321,21 +355,21 @@ module proactive_beh_trayclaw#(
         if(rst_i || !a_en)
             a_alm_num <= 8'd0;
         else if(curr_state == S_BHA_PRE_DET && timout)						
-			a_alm_num <= 8'd101;
+			a_alm_num <= 8'd100;
         else if(curr_state == S_READY_10_ACK && ack_tx_result == IRQ_NO_OK)	
             a_alm_num <= ack_ps_alart_num;    
         else if(curr_state == S_READY_10_ACK && timout)						
-            a_alm_num <= 8'd102;    
+            a_alm_num <= 8'd101;    
 		//else if(curr_state == S_EXE_20_ACK && ack_tx_result == IRQ_NO_OK)	
         //    a_alm_num <= ack_ps_alart_num;    
         //else if(curr_state == S_EXE_20_ACK && timout)						
         //    a_alm_num <= 8'd103;    
 		else if(curr_state_1d == S_BHA_POST_DET && curr_state == S_ALERT_40)
-			a_alm_num <= 8'd103;  
+			a_alm_num <= 8'd102;  
 		else if(curr_state == S_SUCC_30_ACK && ack_tx_result == IRQ_NO_OK)	
 			a_alm_num <= ack_ps_alart_num;
 		else if(curr_state == S_SUCC_30_ACK && timout)						
-            a_alm_num <= 8'd104;
+            a_alm_num <= 8'd103;
 		else if(match_40)
 			a_alm_num <= 8'd0;
         else
@@ -344,11 +378,13 @@ module proactive_beh_trayclaw#(
 
     //Timeout count
     always@(posedge clk_i)begin
-        if(rst_i || !a_en)
+        if(rst_i)
             timout_cnt <= 20'd0;
+		else if(!a_en)
+			timout_cnt <= 20'd0;
 		else if(curr_state != curr_state_1d)
 			timout_cnt <= 20'd0;
-        else if(timout_cnt >= a_tx_ot-1)
+        else if(timout_cnt > a_tx_ot)
             timout_cnt <= 20'd0;
         else if(i_time_1s_vld)
             timout_cnt <= timout_cnt+1;
@@ -357,7 +393,7 @@ module proactive_beh_trayclaw#(
     always@(posedge clk_i)begin
         if(rst_i)
             timout <= 1'b0;
-        else if(timout_cnt >= a_tx_ot-1)
+        else if(timout_cnt > a_tx_ot)
             timout <= 1'b1;
         else
             timout <= 1'b0;
@@ -376,12 +412,11 @@ module proactive_beh_trayclaw#(
 			o_claw_blow 	<= 1'b0;
 		end else if(curr_state == S_EXE)
 			case(a_bhv_id_r)
-				8'd1:	begin	o_claw_unlock <= 1'b1; o_claw_press <= 1'b1; o_claw_blow <= 1'b0; end
-				8'd2:	begin	o_claw_unlock <= 1'b0; o_claw_press <= 1'b0; o_claw_blow <= 1'b0; end
-				8'd3:	begin	o_claw_unlock <= 1'b0; o_claw_press <= 1'b0; o_claw_blow <= 1'b1; end
-				8'd4:	begin	o_claw_unlock <= 1'b0; o_claw_press <= 1'b0; o_claw_blow <= 1'b0; end
-				8'd5:	begin	o_claw_unlock <= 1'b0; o_claw_press <= 1'b0; o_claw_blow <= 1'b0; end
-				8'd6:	begin	o_claw_unlock <= 1'b0; o_claw_press <= 1'b0; o_claw_blow <= 1'b0; end
+				8'd1	:	begin	o_claw_unlock <= 1'b0; 				o_claw_press <= 1'b1; 			o_claw_blow <= o_claw_blow; end
+				8'd2	:	begin	o_claw_unlock <= 1'b1; 				o_claw_press <= 1'b0; 			o_claw_blow <= o_claw_blow; end
+				8'd3	:	begin	o_claw_unlock <= o_claw_unlock;		o_claw_press <= o_claw_press;	o_claw_blow <= 1'b1; end
+				8'd4	:	begin	o_claw_unlock <= o_claw_unlock;		o_claw_press <= o_claw_press;	o_claw_blow <= 1'b0; end
+				default	:	begin	o_claw_unlock <= o_claw_unlock; 	o_claw_press <= o_claw_press; 	o_claw_blow <= o_claw_blow;end
 			endcase
 		else begin
 			o_claw_unlock 	<= o_claw_unlock 	;

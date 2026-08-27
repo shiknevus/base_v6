@@ -22,8 +22,8 @@
 module tb_irq_3i1o_arbitrator;
 	reg 			clk_i			   	;
 	reg 			rst_i              	;
-	reg 	[7:0]	sc_id              	;
-	reg 	[7:0]	ec_id              	;
+	reg 	[9:0]	sc_id              	;
+	reg 	[13:0]	ec_id              	;
 	reg 	[3:0]	chl_priority       	;
 	reg 			irq_a_i			   	;
 	reg 	[7:0]	a_bhv_id           	;
@@ -47,7 +47,7 @@ module tb_irq_3i1o_arbitrator;
 	wire 			irq_o		       ;
 	wire 			irq_busy_o	       ;
 
-// 生成50MHz时钟
+// 生成100MHz时钟
 initial clk_i = 0;
 always #5 clk_i = ~clk_i;
 
@@ -83,9 +83,9 @@ end
 initial begin
 	// 复位初始化所有信号
 	rst_i 				=	1;
-	sc_id              	=	8'h66;
-	ec_id              	=	8'h88;
-	chl_priority       	=	4'd2;
+	sc_id              	=	10'd102;
+	ec_id              	=	14'd136;
+	chl_priority       	=	4'd0;
 	irq_a_i			   	=	0;
 	a_bhv_id           	=	0;
 	a_tx_id            	=	0;

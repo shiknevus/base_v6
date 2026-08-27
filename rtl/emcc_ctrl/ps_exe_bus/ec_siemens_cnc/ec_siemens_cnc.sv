@@ -42,7 +42,7 @@ module ec_siemens_cnc#(
 		output 	            	o_intr_irq
     );
 
-	localparam		A_BHA_NUM	=	128;	//generic behaviors 1-128
+	localparam		A_BHA_NUM	=	62;	//generic behaviors 1-128
 	localparam		B_BHA_NUM	=	1;
 	localparam		C_BHA_NUM	=	1;
 
@@ -330,7 +330,7 @@ module ec_siemens_cnc#(
     ,.i_time_1s_vld        	(i_time_1s_vld  	)
     ,.pre_sta_allow        	(a_pre_sta_allow	)
     ,.post_sta_allow       	(a_post_sta_allow	)
-	,.a_en			       	(a_en				)
+	,.a_en			       	(1'b1				)
     ,.a_bhv_id             	(a_bhv_id       	)
     ,.a_bhv_vld            	(a_bhv_vld_sync 	)
     ,.a_tx_ot              	(a_tx_ot        	)
@@ -410,7 +410,7 @@ module ec_siemens_cnc#(
 			.a_bhv_id			(a_bhv_id_r		),
 			.b_bhv_id			(b_bhv_id		),
 			.c_bhv_id			(c_bhv_id		),
-			.a_en				(a_en			),
+			.a_en				(1'b1			),
 			.b_en				(1'b0			),
 			.c_en				(1'b1			),
 			.ec_cha_st			(ec_cha_st		),

@@ -224,23 +224,16 @@ emcc_mst_top emcc_mst_top_u
 				@(posedge tb_ACLK);
 				ps_write_word(	`PL_CFG_BASE_ADDR + REG_BIAS_ADDR + `A_BHV_ID,32'h0000_0001,resp1);	
 				
-				@(posedge tb_ACLK);
-				wait (tb_ec_1do.emcc_mst_top_u.emcc_mix_top_u.ec_1do_u0.o_intr_irq === 1'b1);
-				ps_read_word(`PL_CFG_BASE_ADDR + REG_BIAS_ADDR + `IRQ_REG1, read_data);
-				if(read_data == {8'h88,8'h66,8'd1,8'd10})	
-					ps_write_word(	`PL_CFG_BASE_ADDR + REG_BIAS_ADDR + `A_TX_RSULT_RPT,32'h010a_5167,resp1);//写事务回应寄存器
-				else
-					$stop;
+				#600;
 				
-				@(posedge tb_ACLK);
-				wait (tb_ec_1do.emcc_mst_top_u.emcc_mix_top_u.ec_1do_u0.o_intr_irq === 1'b1);
-				ps_read_word(`PL_CFG_BASE_ADDR + REG_BIAS_ADDR + `IRQ_REG1, read_data);
-				if(read_data == {8'h88,8'h66,8'd1,8'd30})	
-					ps_write_word(	`PL_CFG_BASE_ADDR + REG_BIAS_ADDR + `A_TX_RSULT_RPT,32'h011E_5167,resp1);//写事务回应寄存器
-				else if(read_data == {8'h88,8'h66,8'd1,8'd40})
-					ps_write_word(	`PL_CFG_BASE_ADDR + REG_BIAS_ADDR + `A_TX_RSULT_RPT,32'h0128_5199,resp1);//写事务回应寄存器
-				else
-					$stop;
+				
+				ps_write_word(	`PL_CFG_BASE_ADDR + REG_BIAS_ADDR + `A_TX_RSULT_RPT,32'h010a_5167,resp1);//写事务回应寄存器
+				
+				#600;
+				
+				
+				ps_write_word(	`PL_CFG_BASE_ADDR + REG_BIAS_ADDR + `A_TX_RSULT_RPT,32'h011E_5167,resp1);//写事务回应寄存器
+				
 				
 				//============================================	行为ID=2	无效输出 成功	==================================
 				

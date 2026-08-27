@@ -245,7 +245,7 @@ module tim_beh_siemens_cnc(
 		if(rst_i || !c_en)
 			c_bhv_id <= 8'd0;
 		else if(curr_state != S_IDLE)
-			c_bhv_id <= 8'd129 + src;
+			c_bhv_id <= 8'd150 + src;
 		else
 			c_bhv_id <= 8'd0;
 	end
@@ -260,17 +260,17 @@ module tim_beh_siemens_cnc(
 			//restart the acknowledged source (30 ack, any result)
 			if(ack_match_any && src == 2'd0)
 				timer_cnt0 <= 20'd0;
-			else if(!expire0 && !(curr_state != S_IDLE))
+			else if(!expire0 && (curr_state == S_IDLE))
 				timer_cnt0 <= timer_cnt0 + i_time_1s_vld;
 
 			if(ack_match_any && src == 2'd1)
 				timer_cnt1 <= 20'd0;
-			else if(!expire1 && !(curr_state != S_IDLE))
+			else if(!expire1 && (curr_state == S_IDLE))
 				timer_cnt1 <= timer_cnt1 + i_time_1s_vld;
 
 			if(ack_match_any && src == 2'd2)
 				timer_cnt2 <= 20'd0;
-			else if(!expire2 && !(curr_state != S_IDLE))
+			else if(!expire2 && (curr_state == S_IDLE))
 				timer_cnt2 <= timer_cnt2 + i_time_1s_vld;
 		end
 	end

@@ -18,7 +18,7 @@
 // Additional Comments:
 // 
 //////////////////////////////////////////////////////////////////////////////////
-
+`define DEBUG
 
 module ec_sf_door#(
 		parameter  				REG_SPACE_BIAS 		= 	2000	,
@@ -196,9 +196,81 @@ module ec_sf_door#(
 	wire	o_lock_open_b;
 	wire	o_lock_open_a;
 	
+	wire	i_clk = clk_i;
+	wire	i_rst = rst_i;
+	
 	assign o_lock_open = o_lock_open_a || o_lock_open_b;
 	
+	`ifdef DEBUG
+		reg			ro_intr_irq;
+		reg	[7:0]	irq_posedge_cnt;
+		reg	[7:0]	irq_negedge_cnt;
+		
+		always@(posedge i_clk)
+		begin
+			ro_intr_irq <= o_intr_irq;
+		end
+		
+		
+		always@(posedge i_clk)
+		begin
+			if(i_rst)begin
+				irq_posedge_cnt <= 8'd0;
+				irq_negedge_cnt <= 8'd0;
+			end else if(a_bhv_vld)begin
+				irq_posedge_cnt <= 8'd0;
+				irq_negedge_cnt <= 8'd0;
+			end else begin
+				if({ro_intr_irq,o_intr_irq} == 2'b01)begin	//rising
+					irq_posedge_cnt <= irq_posedge_cnt+1;
+				end else begin
+					irq_posedge_cnt <= irq_posedge_cnt;
+				end
+				
+				if({ro_intr_irq,o_intr_irq} == 2'b10)begin	//falling
+					irq_negedge_cnt <= irq_negedge_cnt+1;
+				end else begin
+					irq_negedge_cnt <= irq_negedge_cnt;
+				end
+			end
+		end
+	`endif
 	
+	//valid signal sync
+	reg 		r_a_tx_result_vld ;
+	reg 		r_b_tx_result_vld ;
+	reg 		r_c_tx_result_vld ;
+	reg 		r_a_bhv_vld       ;
+	
+	reg 		sync_a_tx_result_vld ;
+	reg 		sync_b_tx_result_vld ;
+	reg 		sync_c_tx_result_vld ;
+	reg 		sync_a_bhv_vld       ;
+	
+	always@(posedge clk_i)
+	begin
+		if(rst_i)begin
+			r_a_tx_result_vld 		<= 1'b0;
+			r_b_tx_result_vld 		<= 1'b0;
+			r_c_tx_result_vld 		<= 1'b0;
+			r_a_bhv_vld       		<= 1'b0;
+			
+			sync_a_tx_result_vld 	<= 1'b0;
+			sync_b_tx_result_vld 	<= 1'b0;
+			sync_c_tx_result_vld 	<= 1'b0;
+			sync_a_bhv_vld       	<= 1'b0;
+		end else begin
+			r_a_tx_result_vld		<= a_tx_result_vld;
+			r_b_tx_result_vld		<= b_tx_result_vld;
+			r_c_tx_result_vld		<= c_tx_result_vld;
+			r_a_bhv_vld      		<= a_bhv_vld      ;
+			
+			sync_a_tx_result_vld 	<= r_a_tx_result_vld;
+			sync_b_tx_result_vld 	<= r_b_tx_result_vld;
+			sync_c_tx_result_vld 	<= r_c_tx_result_vld;
+			sync_a_bhv_vld       	<= r_a_bhv_vld      ;
+		end
+	end
 	
 	
 	ps_rw_pl_reg#(
@@ -306,10 +378,10 @@ module ec_sf_door#(
 	,.param66               (i_open_req_key		)
 	,.param67               (i_close_confirm_key)
 	,.param68               (i_lock_monitor		)
-	,.param69               (param69		)
+	,.param69               (o_lock_open		)
 	,.param70               (param70		)
 	,.debug_reg1			(debug_reg1		)
-	,.debug_reg2			(debug_reg2		)
+	,.debug_reg2			({16'd0,irq_posedge_cnt,irq_negedge_cnt}		)
 	,.debug_reg3			(debug_reg3		)
 	,.debug_reg4			(debug_reg4		)
 	,.debug_reg5			(debug_reg5		)
@@ -325,18 +397,18 @@ module ec_sf_door#(
     ,.i_time_1s_vld        	(i_time_1s_vld  	)
     ,.pre_sta_allow        	(a_pre_sta_allow	)
     ,.post_sta_allow       	(a_post_sta_allow	)
-	,.a_en			       	(1'b1				)
+	,.a_en			       	(1'b0				)
     ,.a_bhv_id             	(a_bhv_id       	)
-    ,.a_bhv_vld            	(a_bhv_vld      	)
+    ,.a_bhv_vld            	(sync_a_bhv_vld      	)
     ,.a_tx_ot              	(a_tx_ot        	)
     ,.a_tx_result_rpt	   	(a_tx_result_rpt	)
-	,.a_tx_result_vld      	(a_tx_result_vld	)
+	,.a_tx_result_vld      	(sync_a_tx_result_vld	)
     ,.ec_cha_st            	(ec_cha_st			)
     ,.a_tx_id              	(a_tx_id        	)
     ,.a_alm_num            	(a_alm_num      	)
     ,.o_lock_open			(o_lock_open_a		)
 	,.a_bhv_id_r			(a_bhv_id_r			)
-	,.state_monitor_o		(debug_reg1			)
+	,.state_monitor_o		(					)
     ,.irq_o                	(irq_a				)
     ,.irq_ack_i       		(irq_a_grant		)
     );
@@ -355,18 +427,19 @@ module ec_sf_door#(
 	,.b_bhv_id              (b_bhv_id			)
 	,.b_tx_ot               (b_tx_ot			)
 	,.b_tx_result_rpt       (b_tx_result_rpt	)
-	,.b_tx_result_vld       (b_tx_result_vld	)
+	,.b_tx_result_vld       (sync_b_tx_result_vld	)
 	,.ec_chb_st             (ec_chb_st			)
 	,.b_tx_id               (b_tx_id			)
 	,.b_alm_num             (b_alm_num			)
 	,.i_open_req_key		(i_open_req_key		)
-	,.i_close_confirm_key   (i_close_confirm_key )
-	//,.i_door_monitor  	    (i_door_monitor  	)
+	,.i_close_confirm_key   (i_close_confirm_key)
+	//,.i_door_monitor  	(i_door_monitor 	)
 	,.i_lock_monitor  	    (i_lock_monitor  	)
-	//,.o_key_light     	    (o_key_light     	)
-	,.o_lock_open    		(o_lock_open_b    		)
+	//,.o_key_light     	(o_key_light    	)
+	,.o_lock_open    		(o_lock_open_b    	)
+	,.state_monitor_o		(debug_reg1			)
 	,.irq_o			        (irq_b				)
-	,.irq_ack_i	            (irq_b_grant			)	
+	,.irq_ack_i	            (irq_b_grant		)	
     );
 	 
 	tim_beh_safety_door tim_beh_safety_door_u0(
@@ -381,7 +454,7 @@ module ec_sf_door#(
 	,.c_bhv_id                  (c_bhv_id			)
 	,.c_tx_ot          	        (c_tx_ot			)
 	,.c_tx_result_rpt  	        (c_tx_result_rpt	)
-	,.c_tx_result_vld           (c_tx_result_vld	)
+	,.c_tx_result_vld           (sync_c_tx_result_vld	)
 	,.ec_chc_st	                (ec_chc_st			)
 	,.c_tx_id         	        (c_tx_id			)
 	,.c_alm_num                 (c_alm_num			)
@@ -410,7 +483,7 @@ module ec_sf_door#(
 			.i_open_req_key     (i_open_req_key		),
 			.i_close_confirm_key(i_close_confirm_key),
 			.i_lock_monitor     (i_lock_monitor  	),
-			.a_en				(1'b1			),
+			.a_en				(1'b0			),
 			.b_en				(1'b1			),	
 			.c_en				(1'b0			),	
 			.a_bhv_id			(a_bhv_id_r		),
@@ -454,7 +527,7 @@ module ec_sf_door#(
 		,.irq_reg2_o		(irq_reg2			)
 		,.irq_o				(o_intr_irq			)
 		,.irq_busy_o		(irq_busy_o			)
-		,.irq_receive_ack_i (a_tx_result_vld || b_tx_result_vld || c_tx_result_vld)	
+		,.irq_receive_ack_i (sync_a_tx_result_vld || sync_b_tx_result_vld || sync_c_tx_result_vld)	
     );
 	
 	
