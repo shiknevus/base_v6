@@ -371,7 +371,7 @@ module proactive_beh_16di#(
 			a_alm_num <= ack_ps_alart_num;
 		else if(curr_state == S_SUCC_30_ACK && timout)									
             a_alm_num <= 8'd103;
-		else if(curr_state == S_IDLE)
+		else if(curr_state == S_ACT_END_1)
 			a_alm_num <= 8'd0;
         else
             a_alm_num <= a_alm_num;

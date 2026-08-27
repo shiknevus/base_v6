@@ -41,7 +41,7 @@ module proactive_beh_2di_3do#(
     ,output reg [7:0]           a_tx_id
     ,output reg	[7:0]           a_alm_num
 
-	,output	reg	[2:0]			do_o
+	,output		[2:0]			do_o
 
 	,output reg	[7:0]           a_bhv_id_r
 	,output	reg	[31:0]			state_monitor_o
@@ -408,33 +408,40 @@ module proactive_beh_2di_3do#(
 	//===============================================================================================================
 	//------------------------------------------------ user logic begin ---------------------------------------------
 	//===============================================================================================================
+	assign do_o = {do3,do2,do1};
 	
+	reg	do1;
+	reg	do2;
+	reg	do3;
 	
 	always@(posedge clk_i)
 	begin
 		if(rst_i || !a_en)
-			do_o <= 3'b000;
+			{do3,do2,do1} <= 3'b000;
 		else if(curr_state == S_EXE)
 			case(a_bhv_id_r)
-				8'd1:	do_o <= 3'b001;
-				8'd2:	do_o <= 3'b010;
-				8'd3:	do_o <= 3'b000;
-				8'd4:	do_o <= 3'b000;
-				8'd5:	do_o <= 3'b000;
-				8'd6:	do_o <= 3'b001;
-				8'd7:	do_o <= 3'b010;
-				8'd8:	do_o <= 3'b001;
-				8'd9:	do_o <= 3'b010;
-				8'd10:	do_o <= 3'b001;
-				8'd11:	do_o <= 3'b010;
-				8'd12:	do_o <= 3'b100;
-				8'd13:	do_o <= 3'b000;
-				8'd14:	do_o <= 3'b000;
-				8'd15:	do_o <= 3'b000;
-				default:do_o <= 3'b000;
+				8'd1	:	begin	do1 <= 1'b1	; 	do2 <= 1'b0	; 	do3 <= do3	;	end
+				8'd2	:	begin	do1 <= 1'b0	; 	do2 <= 1'b1	; 	do3 <= do3	;	end
+				8'd3	:	begin	do1 <= 1'b0	; 	do2 <= 1'b0	; 	do3 <= do3	;	end
+				8'd4	:	begin	do1 <= do1	; 	do2 <= do2	; 	do3 <= do3	;	end
+				8'd5	:	begin	do1 <= do1	; 	do2 <= do2	; 	do3 <= do3	;	end
+				8'd6	:	begin	do1 <= 1'b1	; 	do2 <= 1'b0	; 	do3 <= do3	; 	end
+				8'd7	:	begin	do1 <= 1'b0	; 	do2 <= 1'b1	; 	do3 <= do3	; 	end
+				8'd8	:	begin	do1 <= 1'b1	; 	do2 <= 1'b0	; 	do3 <= do3	; 	end
+				8'd9	:	begin	do1 <= 1'b0	; 	do2 <= 1'b1	; 	do3 <= do3	; 	end
+				8'd10	:	begin	do1 <= 1'b1	; 	do2 <= 1'b0	; 	do3 <= do3	; 	end
+				8'd11	:	begin	do1 <= 1'b0	; 	do2 <= 1'b1	; 	do3 <= do3	; 	end
+				8'd12	:	begin	do1 <= do1	; 	do2 <= do2	; 	do3 <= 1'b1	;	end
+				8'd13	:	begin	do1 <= do1	; 	do2 <= do2	; 	do3 <= 1'b0	;	end
+				8'd14	:	begin	do1 <= do1	; 	do2 <= do2	; 	do3 <= do3	;	end
+				8'd15	:	begin	do1 <= do1	; 	do2 <= do2	; 	do3 <= do3	;	end
+				default	:	begin	do1 <= do1	; 	do2 <= do2	; 	do3 <= do3	;	end
 			endcase
-		else
-			do_o <= do_o;
+		else begin
+			do1 <= do1	;
+			do2 <= do2	;
+			do3 <= do3	;
+		end
 	end
 
 

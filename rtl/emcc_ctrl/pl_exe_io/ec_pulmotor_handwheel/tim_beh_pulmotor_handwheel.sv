@@ -43,7 +43,6 @@ module tim_beh_pulmotor_handwheel#(
 	
 	,input 		[19:0]			c_gap_crl
 	
-	,input 	            		i_estop
 	,input 	            		i_pulse_a
 	,input 	            		i_pulse_b
 	,input 	            		i_stp_x1
@@ -56,16 +55,16 @@ module tim_beh_pulmotor_handwheel#(
 	,input 	            		i_axis_5
 	,input 	            		i_axis_6
 	,input 	            		i_axis_7
-	,output	[3:0]       		o_wheel_prog
+	,output	[3:0]       		o_axis_number
 	,output	[31:0]				o_pulse_cnt
-	,output						o_axis_num
+	,output	[7:0]				o_speed_gear
 	,output	            		o_wheel_dir
 	
 	,output	reg	[31:0]			state_monitor_o
 	,output reg              	irq_o 					
 	,input                   	irq_ack_i
    );
-	
+   
 	reg	[7:0]	curr_state		;
 	reg	[7:0]	curr_state_1d	;
 	reg	[7:0]	next_state		;
@@ -79,18 +78,20 @@ module tim_beh_pulmotor_handwheel#(
 	reg	[7:0]	ack_ps_alart_num;
 	
 	//State machine state
-	localparam  S_IDLE          = 8'd0; 	//idle
-    localparam  S_BHA_PRE_DET	= 8'd1; 	//Pre-condition check
-	localparam	S_READY_10		= 8'd2;		//ready
-    localparam  S_READY_10_ACK  = 8'd3; 	//ready ok/no ok
-    localparam  S_EXE_20     	= 8'd4; 	//Action begin
-	localparam	S_EXE			= 8'd5;		//Action execute
-    localparam  S_EXE_20_ACK	= 8'd6;		//Action end
-    localparam  S_BHA_POST_DET  = 8'd7; 	//Post-condition check
-    localparam  S_SUCC_30       = 8'd8; 	//success
-    localparam  S_SUCC_30_ACK	= 8'd9; 	//success ack
-	localparam 	S_ALERT_40		= 8'd10;	//Alert
-	localparam 	S_ALERT_40_ACK	= 8'd11;	//Alert ack
+	localparam  S_IDLE          = 8'd0; 	
+    localparam  S_BHA_PRE_DET	= 8'd1; 	
+	localparam	S_READY_10		= 8'd2;		
+    localparam  S_READY_10_ACK  = 8'd3; 	
+    localparam  S_EXE_20     	= 8'd4; 	
+	localparam	S_EXE			= 8'd5;		
+    localparam  S_EXE_20_ACK	= 8'd6;		
+    localparam  S_BHA_POST_DET  = 8'd7; 	
+    localparam  S_SUCC_30       = 8'd8; 	
+    localparam  S_SUCC_30_ACK	= 8'd9; 	
+	localparam 	S_ALERT_40		= 8'd10;	
+	localparam 	S_ALERT_40_ACK	= 8'd11;	
+	localparam 	S_ACT_END_1		= 8'd12;
+	localparam 	S_ACT_END_2		= 8'd13;
 	
     localparam  IRQ_OK          = 8'h51;	//ps ack:OK
     localparam  IRQ_NO_OK       = 8'h52;	//ps ack:NO OK
@@ -152,7 +153,7 @@ module tim_beh_pulmotor_handwheel#(
 		if(rst_i)
 			c_bhv_id <= 8'd1;
 		else
-			c_bhv_id <= 8'd1;
+			c_bhv_id <= 8'd150;
 	end	
 	
 	reg match_10;
@@ -191,11 +192,20 @@ module tim_beh_pulmotor_handwheel#(
             curr_state <= next_state;
     end
 	
+	reg	[31:0]	loop_time_ms;
+	always@(posedge clk_i)
+	begin
+		if(rst_i)
+			loop_time_ms <= 0;
+		else
+			loop_time_ms <=(c_gap_crl << 9) + (c_gap_crl << 8) + (c_gap_crl << 7) + (c_gap_crl << 6) + (c_gap_crl << 5) + (c_gap_crl << 3);	
+	end
+	
+	
 	always @(*) begin
         case (curr_state)
             S_IDLE: begin
-                //if (c_en || c_gap_crl != 20'd0 && !o_wheel_prog)	
-				if(c_en || !o_wheel_prog)	//When the gear is set to off, the timed behavior state machine won't start.
+                if (c_en && c_gap_crl != 20'd0 && !o_axis_number)	
                     next_state = S_BHA_PRE_DET;
                 else
                     next_state = S_IDLE;
@@ -229,7 +239,7 @@ module tim_beh_pulmotor_handwheel#(
             end
 			
 			S_EXE:begin
-				if(task_time_cnt >= 1000 - 1)		//Timer finished
+				if(task_time_cnt >= loop_time_ms - 1)		//Timer finished
 					next_state = S_BHA_POST_DET;
 				else
 					next_state = S_EXE;
@@ -261,7 +271,7 @@ module tim_beh_pulmotor_handwheel#(
 			
 			S_SUCC_30_ACK:begin
 				if(match_30)    //30 response success
-                    next_state = S_IDLE;
+                    next_state = S_ACT_END_1;
                 else if(ack_tx_result == IRQ_NO_OK || timout)
                     next_state = S_ALERT_40;
                 else
@@ -274,9 +284,17 @@ module tim_beh_pulmotor_handwheel#(
 			
 			S_ALERT_40_ACK:begin
 				if(match_40 || timout) //40 response
-                    next_state = S_IDLE;
+                    next_state = S_ACT_END_1;
                 else
                     next_state = S_ALERT_40_ACK;
+			end
+			
+			S_ACT_END_1:begin
+				next_state = S_ACT_END_2;
+			end
+			
+			S_ACT_END_2:begin
+				next_state = S_IDLE;
 			end
 
             default: begin
@@ -330,28 +348,22 @@ module tim_beh_pulmotor_handwheel#(
     end
 	
 	always@(posedge clk_i)begin
-        if(rst_i)
-            c_alm_num <= 8'd0;
-		else if(!c_en)
+        if(rst_i || !c_en)
             c_alm_num <= 8'd0;
         else if(curr_state == S_BHA_PRE_DET && timout)						//The pre - full inspection is not met.
-            c_alm_num <= 8'd1;    
+            c_alm_num <= 8'd100;    
         else if(curr_state == S_READY_10_ACK && ack_tx_result == IRQ_NO_OK)	//Transaction 10 ps response error
             c_alm_num <= ack_ps_alart_num;    
         else if(curr_state == S_READY_10_ACK && timout)						//For Transaction 10, waiting for the ps response timed out.
-            c_alm_num <= 8'd2;    
-		else if(curr_state == S_EXE_20_ACK && ack_tx_result == IRQ_NO_OK)	//Transaction 20 has a ps response error.
-            c_alm_num <= ack_ps_alart_num;    
-        else if(curr_state == S_EXE_20_ACK && timout)						//For Transaction 20, waiting for the ps response timed out.
-            c_alm_num <= 8'd3;    
-		else if(curr_state_1d == S_EXE && curr_state == S_ALERT_40 && c_bhv_id == 8'd1)//The execution of Behavior 1 failed.
-			c_alm_num <= 8'd4; 
-		else if(curr_state_1d == S_EXE && curr_state == S_ALERT_40 && c_bhv_id == 8'd2)//The execution of Behavior 2 failed.
-			c_alm_num <= 8'd5;
+            c_alm_num <= 8'd101;     
+		else if(curr_state == S_BHA_POST_DET && ctimout)//The execution of Behavior 1 failed.
+			c_alm_num <= 8'd102; 
 		else if(curr_state == S_SUCC_30_ACK && ack_tx_result == IRQ_NO_OK)	//Transaction 30 has a ps response error.
 			c_alm_num <= ack_ps_alart_num;
 		else if(curr_state == S_SUCC_30_ACK && timout)						//For Transaction 30, waiting for the ps response timed out.
-            c_alm_num <= 8'd6;
+            c_alm_num <= 8'd103;
+		else if(curr_state == S_ACT_END_1)
+			c_alm_num <= 8'd0;
         else
             c_alm_num <= c_alm_num;
     end
@@ -364,7 +376,7 @@ module tim_beh_pulmotor_handwheel#(
             timout_cnt <= 20'd0;
 		else if(curr_state != curr_state_1d)
 			timout_cnt <= 20'd0;
-        else if(timout_cnt >= c_tx_ot-1)
+        else if(timout_cnt > c_tx_ot)
             timout_cnt <= 20'd0;
         else if(i_time_1s_vld)
             timout_cnt <= timout_cnt+1;
@@ -373,7 +385,7 @@ module tim_beh_pulmotor_handwheel#(
     always@(posedge clk_i)begin
         if(rst_i)
             timout <= 1'b0;
-        else if(timout_cnt >= c_tx_ot-1)
+        else if(timout_cnt > c_tx_ot)
             timout <= 1'b1;
         else
             timout <= 1'b0;
@@ -391,12 +403,17 @@ module tim_beh_pulmotor_handwheel#(
 			task_time_cnt <= task_time_cnt;
 	end
 	
-	wire	sample_vld;
+	reg	sample_vld;
 	
-	//1s 	20 detect
-	assign sample_vld = (task_time_cnt >= 1000/20 - 1)? 1'b1 : 1'b0;
-
-
+	always@(posedge clk_i)
+	begin
+		if(rst_i)
+			sample_vld <= 1'b0;
+		else if(task_time_cnt >= loop_time_ms-1)
+			sample_vld <= 1'b1;
+		else
+			sample_vld <= 1'b0;
+	end
 	
 	//===============================================================================================================
 	//------------------------------------------------ user logic start ---------------------------------------------
@@ -406,7 +423,6 @@ module tim_beh_pulmotor_handwheel#(
 	man_handwheel man_handwheel_u0(
 		.clk             (clk_i			)
 		,.reset          (rst_i			)
-		,.i_estop        (i_estop		)
 		,.i_pulse_a      (i_pulse_a		)
 		,.i_pulse_b      (i_pulse_b		)
 		,.i_stp_x1       (i_stp_x1		)
@@ -419,12 +435,13 @@ module tim_beh_pulmotor_handwheel#(
 		,.i_axis_5       (i_axis_5		)
 		,.i_axis_6       (i_axis_6		)
 		,.i_axis_7       (i_axis_7		)
-		,.o_wheel_prog   (o_wheel_prog	)
+		,.o_axis_number  (o_axis_number	)
+		,.o_speed_gear   (o_speed_gear	)
 		,.o_pulse_cnt    (o_pulse_cnt	)
-		,.o_wheel_run    (				)
-		,.o_wheel_dir	 (o_wheel_dir	)
+		,.o_wheel_dir    (o_wheel_dir	)
 		,.sample_vld     (sample_vld	)
 	);
+				
 	//===============================================================================================================
 	//------------------------------------------------ user logic start ---------------------------------------------
 	//===============================================================================================================

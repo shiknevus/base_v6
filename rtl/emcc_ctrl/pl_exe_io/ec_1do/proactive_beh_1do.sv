@@ -362,8 +362,6 @@ module proactive_beh_1do#(
     always@(posedge clk_i)begin
         if(rst_i || !a_en)
             a_alm_num <= 8'd0;
-		else if(curr_state == S_IDLE)
-			a_alm_num <= 8'd0;
         else if(curr_state == S_BHA_PRE_DET && timout)
             a_alm_num <= 8'd100;    
         else if(curr_state == S_READY_10_ACK && ack_tx_result == IRQ_NO_OK)	
@@ -384,6 +382,8 @@ module proactive_beh_1do#(
 			a_alm_num <= ack_ps_alart_num;
 		else if(curr_state == S_SUCC_30_ACK && timout)						
             a_alm_num <= 8'd103;
+		else if(curr_state == S_ACT_END_1)
+			a_alm_num <= 8'd0;
         else
             a_alm_num <= a_alm_num;
     end

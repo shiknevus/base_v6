@@ -260,7 +260,7 @@ module proactive_beh_4di_2do#(
 						
 			S_EXE:
 			begin		//5								//active Execution
-					next_state = S_BHA_POST_DET;
+				next_state = S_BHA_POST_DET;
 			end
 			
             S_BHA_POST_DET: begin	//curr_state = 7
@@ -355,29 +355,25 @@ module proactive_beh_4di_2do#(
     end
 
     always@(posedge clk_i)begin
-        if(rst_i)
+        if(rst_i || !a_en)
             a_alm_num <= 8'd0;
-		else if(!a_en)
-			a_alm_num <= 8'd0;
         else if(curr_state == S_BHA_PRE_DET && timout)						//The pre - full inspection is not met.
-			a_alm_num <= 8'd101;    
+			a_alm_num <= 8'd100;    
         else if(curr_state == S_READY_10_ACK && ack_tx_result == IRQ_NO_OK)	//Transaction 10 ps response error
             a_alm_num <= ack_ps_alart_num;    
         else if(curr_state == S_READY_10_ACK && timout)						//For Transaction 10, waiting for the ps response timed out.
-            a_alm_num <= 8'd108;    
+            a_alm_num <= 8'd101;    
 		//else if(curr_state == S_EXE_20_ACK && ack_tx_result == IRQ_NO_OK)	//Transaction 20 has a ps response error.
         //    a_alm_num <= ack_ps_alart_num;    
         //else if(curr_state == S_EXE_20_ACK && timout)						//For Transaction 20, waiting for the ps response timed out.
         //    a_alm_num <= 8'd103;    
-		else if(curr_state_1d == S_EXE && curr_state == S_ALERT_40)			//The execution of Behavior 1 failed.
-				a_alm_num <= 8'd109;   
-		else if(curr_state_1d == S_BHA_POST_DET && curr_state == S_ALERT_40)//The post - full inspection is not met.
-				a_alm_num <= 8'd116;    
+		else if(curr_state == S_BHA_POST_DET && timout)//The post - full inspection is not met.
+				a_alm_num <= 8'd102;    
 		else if(curr_state == S_SUCC_30_ACK && ack_tx_result == IRQ_NO_OK)	//Transaction 30 has a ps response error.
 			a_alm_num <= ack_ps_alart_num;
 		else if(curr_state == S_SUCC_30_ACK && timout)						//For Transaction 30, waiting for the ps response timed out.
-            a_alm_num <= 8'd123;
-		else if(match_40)
+            a_alm_num <= 8'd103;
+		else if(curr_state == S_ACT_END_1)
 			a_alm_num <= 8'd0;
         else
             a_alm_num <= a_alm_num;
@@ -420,11 +416,11 @@ module proactive_beh_4di_2do#(
 				8'd1    :	do_o <= 2'b01;
 				8'd2    :	do_o <= 2'b10;
 				8'd3    :	do_o <= 2'b00;
-				8'd4    :	do_o <= 2'b00;
-				8'd5    :	do_o <= 2'b00;
+				8'd4    :	do_o <= do_o;
+				8'd5    :	do_o <= do_o;
 				8'd6    :	do_o <= 2'b01;
 				8'd7    :	do_o <= 2'b10; 
-				default :	do_o <= 2'b00; 
+				default :	do_o <= do_o;
 			endcase
 		else
 			do_o <= do_o; 

@@ -63,8 +63,6 @@ module proactive_beh_trayclaw#(
 	reg [7:0]		ack_tx_result;
 	reg	[7:0]		ack_ps_alart_num;
 	
-	reg	[8:0]		tim_500ms_cnt;
-	
 	//State machine state
 	localparam  S_IDLE          = 8'd0; 	//idle
     localparam  S_BHA_PRE_DET	= 8'd1; 	//Pre-condition check
@@ -414,12 +412,11 @@ module proactive_beh_trayclaw#(
 			o_claw_blow 	<= 1'b0;
 		end else if(curr_state == S_EXE)
 			case(a_bhv_id_r)
-				8'd1:	begin	o_claw_unlock <= 1'b0; o_claw_press <= 1'b1; o_claw_blow <= 1'b0; end
-				8'd2:	begin	o_claw_unlock <= 1'b1; o_claw_press <= 1'b0; o_claw_blow <= 1'b0; end
-				8'd3:	begin	o_claw_unlock <= 1'b0; o_claw_press <= 1'b0; o_claw_blow <= 1'b1; end
-				8'd4:	begin	o_claw_unlock <= 1'b0; o_claw_press <= 1'b0; o_claw_blow <= 1'b0; end
-				8'd5:	begin	o_claw_unlock <= 1'b0; o_claw_press <= 1'b0; o_claw_blow <= 1'b0; end
-				8'd6:	begin	o_claw_unlock <= 1'b0; o_claw_press <= 1'b0; o_claw_blow <= 1'b0; end
+				8'd1	:	begin	o_claw_unlock <= 1'b0; 				o_claw_press <= 1'b1; 			o_claw_blow <= o_claw_blow; end
+				8'd2	:	begin	o_claw_unlock <= 1'b1; 				o_claw_press <= 1'b0; 			o_claw_blow <= o_claw_blow; end
+				8'd3	:	begin	o_claw_unlock <= o_claw_unlock;		o_claw_press <= o_claw_press;	o_claw_blow <= 1'b1; end
+				8'd4	:	begin	o_claw_unlock <= o_claw_unlock;		o_claw_press <= o_claw_press;	o_claw_blow <= 1'b0; end
+				default	:	begin	o_claw_unlock <= o_claw_unlock; 	o_claw_press <= o_claw_press; 	o_claw_blow <= o_claw_blow;end
 			endcase
 		else begin
 			o_claw_unlock 	<= o_claw_unlock 	;

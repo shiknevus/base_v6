@@ -364,8 +364,8 @@ module proactive_beh_2di_2do#(
         //    a_alm_num <= ack_ps_alart_num;    
         //else if(curr_state == S_EXE_20_ACK && timout)						
         //    a_alm_num <= 8'd103;    
-		else if(curr_state_1d == S_BHA_POST_DET && curr_state == S_ALERT_40)//The post - full inspection is not met.
-			a_alm_num 	<= 8'd102;    
+		else if(curr_state == S_BHA_POST_DET && timout)//The post - full inspection is not met.
+			a_alm_num <= 8'd102;    
 		else if(curr_state == S_SUCC_30_ACK && ack_tx_result == IRQ_NO_OK)	
 			a_alm_num <= ack_ps_alart_num;
 		else if(curr_state == S_SUCC_30_ACK && timout)						//Wait 30 timeout				

@@ -18,7 +18,7 @@ void test_ec_3di_2do();
 void test_ec_sf_door();
 void test_ec_trayclaw();
 void test_ec_2di();
-
+void test_ec_3led_bz();
 
 
 

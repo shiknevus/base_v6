@@ -2,9 +2,8 @@ module man_handwheel
 (
      input                      clk
     ,input                      reset
-	
-	//,input  wire             	i_estop
-	,input  wire             	i_pulse_a
+
+	,input  wire             	i_pulse_a	//Handwheel input AB phase pulses
 	,input  wire             	i_pulse_b
 	
 	,input  wire             	i_stp_x1
@@ -19,13 +18,13 @@ module man_handwheel
 	,input  wire             	i_axis_6
 	,input  wire             	i_axis_7
 	
-	,output reg [3:0]       	o_wheel_prog
+	,output reg [3:0]       	o_axis_number
+	,output	reg	[7:0]			o_speed_gear
 	,output	reg	[31:0]			o_pulse_cnt
-	//,output	reg					o_wheel_run
 	,output	reg					o_wheel_dir
 	,input						sample_vld
 );
-    localparam WHOLE_VALUE  = 10000;        //100us
+    localparam WHOLE_VALUE  = 100;       
     localparam TIME_WIDTH   = $clog2(WHOLE_VALUE);
 	
     reg [TIME_WIDTH-1:0]    time_cnt;
@@ -33,52 +32,73 @@ module man_handwheel
     reg                     aclk_r_r;
     reg                     aclk_r_r_r;
     wire                    aclk_pose;
-    wire [1:0]              sigport;
-    wire [15:0]             step_value;
     reg  [1:0]              previ;
-    reg  [3:0]              wheel_prog_d1;
-    reg	 [31:0]       		pulse_cnt_d1;
-    reg	 [31:0]       		pulse_cnt_d2;
+    reg  [3:0]              axis_number_r;
+	
+	wire	i_clk = clk;
+	wire	i_rst = reset;
 
 	
-	//Gear check 
+	//axis check 
 	always @(posedge clk)begin 
        case({1'b0,i_axis_7,i_axis_6,i_axis_5,i_axis_4,i_axis_z,i_axis_y,i_axis_x})
            8'b0000_0000: begin
-               o_wheel_prog <= 4'd0;	//off
+               o_axis_number <= 4'd0;	//off
            end
            8'b0000_0001: begin
-               o_wheel_prog <= 4'd1;
+               o_axis_number <= 4'd1;
            end
            8'b0000_0010: begin
-               o_wheel_prog <= 4'd2;
+               o_axis_number <= 4'd2;
            end
            8'b0000_0100: begin
-               o_wheel_prog <= 4'd3;
+               o_axis_number <= 4'd3;
            end
            8'b0000_1000: begin
-               o_wheel_prog <= 4'd4;
+               o_axis_number <= 4'd4;
            end
            8'b0001_0000: begin
-               o_wheel_prog <= 4'd5;
+               o_axis_number <= 4'd5;
            end
            8'b0010_0000: begin
-               o_wheel_prog <= 4'd6;
+               o_axis_number <= 4'd6;
            end
            8'b0100_0000: begin
-               o_wheel_prog <= 4'd7;
+               o_axis_number <= 4'd7;
            end
            default: begin
-               o_wheel_prog <= 4'd0;
+               o_axis_number <= 4'd0;
            end
        endcase 
    end
    
+   always@(posedge i_clk)
+   begin
+	   if(i_rst)
+		   axis_number_r <= 4'd0;
+	   else
+		   axis_number_r <= o_axis_number;
+   end
+   
+   
+   //speed_gear check 
+   always@(posedge i_clk)
+   begin
+		case({i_stp_x100,i_stp_x10,i_stp_x1})
+			3'b001:o_speed_gear <= 8'd1;
+			3'b010:o_speed_gear <= 8'd10;	
+			3'b100:o_speed_gear <= 8'd100;
+			default:o_speed_gear <= 8'd1;
+		endcase
+   end
+   
+   
+   //------------- 产生检测AB相的pulse ----------
    always@(posedge clk)
 	begin
 		if(reset)
 			time_cnt <= 0;
-		else if(time_cnt < WHOLE_VALUE-1)//100us
+		else if(time_cnt < WHOLE_VALUE-1)
 			time_cnt <= time_cnt + 1'b1;
 		else
 			time_cnt <= 0;
@@ -97,73 +117,65 @@ module man_handwheel
     always @(posedge clk)begin
         aclk_r_r <= aclk_r;
         aclk_r_r_r <= aclk_r_r;
-        wheel_prog_d1 <= o_wheel_prog;	//gear change
     end
 
     assign aclk_pose = aclk_r_r & (~aclk_r_r_r);
-    assign sigport = {i_pulse_a,i_pulse_b};
-    assign step_value = 16'd1;
-	
-    always @(posedge clk)begin
-        if(i_estop | (o_wheel_prog != wheel_prog_d1))begin
-            pulse_cnt_d1 <= 0;
-            pulse_cnt_d2 <= 0;
-            //o_wheel_run <= 1'b0;
-            o_wheel_dir <= o_wheel_dir;
-        end else if(sample_vld)begin
-            pulse_cnt_d1 <= o_pulse_cnt;
-            pulse_cnt_d2 <= pulse_cnt_d1;
-            if((o_pulse_cnt == pulse_cnt_d1) & (o_pulse_cnt == pulse_cnt_d2))begin
-                //o_wheel_run <= 1'b0;
-                o_wheel_dir <= o_wheel_dir;
-            end else if((o_pulse_cnt > pulse_cnt_d1) & (o_pulse_cnt > pulse_cnt_d2)) begin
-                //o_wheel_run <= 1'b1;
-                o_wheel_dir <= 1'b1;     
-            end else if((o_pulse_cnt < pulse_cnt_d1) & (o_pulse_cnt < pulse_cnt_d2)) begin
-                //o_wheel_run <= 1'b1;
-                o_wheel_dir <= 1'b0;
-            end
-        end
-    end
+
+	//----------------------------------------
+
 
     always @(posedge clk)begin
-	    if(reset | i_estop | (o_wheel_prog != wheel_prog_d1))begin
-	        previ <= sigport;
+	    if(reset | (o_axis_number != axis_number_r))begin
+	        previ <= {i_pulse_a,i_pulse_b};
             o_pulse_cnt <= 0;
+			o_wheel_dir <= 1'b0;
+		end else if(sample_vld)begin
+			previ <= {i_pulse_a,i_pulse_b};
+            o_pulse_cnt <= 0;
+			o_wheel_dir <= 1'b0;
 		end else if(aclk_pose)begin
-		    if(sigport != previ)begin
-		        previ <= sigport;
+		    if({i_pulse_a,i_pulse_b} != previ)begin
+		        previ <= {i_pulse_a,i_pulse_b};
 		        case(previ)
                     2'b00: begin
-                        if(sigport == 2'b01)begin
-                            o_pulse_cnt <= o_pulse_cnt - step_value;
-                        end else if(sigport == 2'b10)begin
-                            o_pulse_cnt <= o_pulse_cnt + step_value;
+                        if({i_pulse_a,i_pulse_b} == 2'b01)begin
+                            o_pulse_cnt <= o_pulse_cnt - 1;
+							o_wheel_dir <= 1'b1;
+                        end else if({i_pulse_a,i_pulse_b} == 2'b10)begin
+                            o_pulse_cnt <= o_pulse_cnt + 1;
+							o_wheel_dir <= 1'b0;
                         end
                     end
                     2'b01: begin
-                        if(sigport == 2'b00)begin
-                            o_pulse_cnt <= o_pulse_cnt + step_value;
-                        end else if(sigport == 2'b11)begin
-                            o_pulse_cnt <= o_pulse_cnt - step_value;
+                        if({i_pulse_a,i_pulse_b} == 2'b00)begin
+                            o_pulse_cnt <= o_pulse_cnt + 1;
+							o_wheel_dir <= 1'b0;
+                        end else if({i_pulse_a,i_pulse_b} == 2'b11)begin
+                            o_pulse_cnt <= o_pulse_cnt - 1;
+							o_wheel_dir <= 1'b1;
                         end
                     end
                     2'b10: begin
-                        if(sigport == 2'b00)begin
-                            o_pulse_cnt <= o_pulse_cnt - step_value;
-                        end else if(sigport == 2'b11)begin
-                            o_pulse_cnt <= o_pulse_cnt + step_value;
+                        if({i_pulse_a,i_pulse_b} == 2'b00)begin
+                            o_pulse_cnt <= o_pulse_cnt - 1;
+							o_wheel_dir <= 1'b1;
+                        end else if({i_pulse_a,i_pulse_b} == 2'b11)begin
+                            o_pulse_cnt <= o_pulse_cnt + 1;
+							o_wheel_dir <= 1'b0;
                         end
                     end
                     2'b11: begin
-                        if(sigport == 2'b01)begin
-                            o_pulse_cnt <= o_pulse_cnt + step_value;
-                        end else if(sigport == 2'b10)begin
-                            o_pulse_cnt <= o_pulse_cnt - step_value;
+                        if({i_pulse_a,i_pulse_b} == 2'b01)begin
+                            o_pulse_cnt <= o_pulse_cnt + 1;
+							o_wheel_dir <= 1'b0;
+                        end else if({i_pulse_a,i_pulse_b} == 2'b10)begin
+                            o_pulse_cnt <= o_pulse_cnt - 1;
+							o_wheel_dir <= 1'b1;
                         end
                     end
                     default: begin
                         o_pulse_cnt <= o_pulse_cnt;
+						o_wheel_dir <= o_wheel_dir;
                     end
                 endcase
 		    end

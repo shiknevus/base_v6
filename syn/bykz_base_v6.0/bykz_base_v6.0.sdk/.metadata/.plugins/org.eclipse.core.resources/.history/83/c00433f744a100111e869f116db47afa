@@ -1,0 +1,78 @@
+/*
+ * test_3led_bz.c
+ *
+ *  Created on: 2026年8月26日
+ *      Author: cgliu
+ */
+#include <stdio.h>
+#include <stdint.h>
+#include <stddef.h>   // for uintptr_t
+#include "platform.h"
+#include "xil_printf.h"
+#include "sunny_ctrl_test_func.h"
+#include "param.h"
+
+		uint32_t rd_param;
+		uint32_t irq1;
+		uint32_t irq2;
+		uint32_t debug_reg1;
+		uint32_t debug_reg2;
+
+void test_ec_3led_bz()
+{
+	uint32_t	sc_offset_addr = 0x1600;
+
+	//#################### 调试ec_4di_2do (begin) ###############
+	    //复位寄存器
+	    reg_write32(BUS_base_addr+sc_offset_addr+RST_EN, 0x0);
+	    reg_write32(BUS_base_addr+sc_offset_addr+RST_EN, 0x1);
+	    //通道A超时寄存器
+	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_OT, 0xFF);
+	    rd_param = reg_read32(BUS_base_addr+sc_offset_addr+A_TX_OT);
+
+	    rd_param = reg_read32(BUS_base_addr+sc_offset_addr+EC_CHA_ST);
+
+	    //############### 行为1 ############
+	    //写行为ID
+	    reg_write32(BUS_base_addr+sc_offset_addr+A_BHV_ID, 0x1);
+
+	    rd_param = reg_read32(BUS_base_addr+sc_offset_addr+EC_CHA_ST);
+
+	    //状态机状态
+	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
+	    //中断请求信号
+	    debug_reg2 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG2);
+	    //14bit控件ID + 10bit组件ID + 8bit行为ID
+	    irq1 = reg_read32(BUS_base_addr+sc_offset_addr+IRQ_REG1);
+	    //8bit事务ID + 8bit报警号
+	    irq2 = reg_read32(BUS_base_addr+sc_offset_addr+IRQ_REG2);
+
+	    //写中断应答寄存器（事务10）
+	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_RSULT_RPT, 0x010A5100);
+
+	    //状态机状态
+	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
+	    //中断请求信号
+	    debug_reg2 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG2);
+	    //14bit控件ID + 10bit组件ID + 8bit行为ID
+	    irq1 = reg_read32(BUS_base_addr+sc_offset_addr+IRQ_REG1);
+	    //8bit事务ID + 8bit报警号
+	    irq2 = reg_read32(BUS_base_addr+sc_offset_addr+IRQ_REG2);
+
+	    //写中断应答寄存器（事务30）
+	    reg_write32(BUS_base_addr+sc_offset_addr+A_TX_RSULT_RPT, 0x011E5100);
+
+	    //状态机状态
+	    debug_reg1 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG1);
+	    //中断请求信号
+	    debug_reg2 = reg_read32(BUS_base_addr+sc_offset_addr+DEBUG_REG2);
+	    //14bit控件ID + 10bit组件ID + 8bit行为ID
+	    irq1 = reg_read32(BUS_base_addr+sc_offset_addr+IRQ_REG1);
+	    //8bit事务ID + 8bit报警号
+	    irq2 = reg_read32(BUS_base_addr+sc_offset_addr+IRQ_REG2);
+
+
+	    //#################### 调试ec_4di_2do (end) ###############
+}
+
+
