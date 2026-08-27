@@ -106,7 +106,6 @@ module proactive_beh_pul_axis#(
 	reg [7:0]		ack_tx_result;
 	reg	[7:0]		ack_ps_alart_num;
 	
-	
 	//State machine state
 	localparam  S_IDLE          = 8'd0; 	//idle
     localparam  S_BHA_PRE_DET	= 8'd1; 	//Pre-condition check
@@ -120,10 +119,11 @@ module proactive_beh_pul_axis#(
     localparam  S_SUCC_30_ACK	= 8'd9; 	//success ack
 	localparam 	S_ALERT_40		= 8'd10;	//Alert
 	localparam 	S_ALERT_40_ACK	= 8'd11;	//Alert ack
-
+	localparam 	S_ACT_END_1		= 8'd12;
+	localparam 	S_ACT_END_2		= 8'd13;
+	
     localparam  IRQ_OK          = 8'h51;	//ps ack:OK
     localparam  IRQ_NO_OK       = 8'h52;	//ps ack:NO OK
-	
 	
 	//state monitor
 	reg [7:0]	curr_state_m1;
@@ -146,24 +146,13 @@ module proactive_beh_pul_axis#(
 		end
     end
 	
-	//CDC: ps_reg_clk -> clk_i, 2FF sync + edge detect
-	reg [1:0] a_bhv_vld_sync    = 2'b00;
-	reg [1:0] a_result_vld_sync = 2'b00;
-	always@(posedge clk_i)begin
-		a_bhv_vld_sync     <= {a_bhv_vld_sync[0],     a_bhv_vld};
-		a_result_vld_sync  <= {a_result_vld_sync[0], a_tx_result_vld};
-	end
-	wire a_bhv_vld_i       = ~a_bhv_vld_sync[1]    & a_bhv_vld_sync[0];
-	wire a_tx_result_vld_i = ~a_result_vld_sync[1] & a_result_vld_sync[0];
-
-	//Analyze interrupt response register
 	always@(posedge clk_i)begin
 	if(rst_i)begin
 		ack_beh_id 	 	<=	8'd0;
 		ack_tx_id	 	<=	8'd0;
 		ack_tx_result	<=	8'd0;
 		ack_ps_alart_num<=	8'd0;
-	end else if(a_tx_result_vld_i)begin
+	end else if(a_tx_result_vld)begin
 		ack_beh_id 		<= 	a_tx_result_rpt[31:24];
 		ack_tx_id		<= 	a_tx_result_rpt[23:16];
 		ack_tx_result	<= 	a_tx_result_rpt[15:8];
@@ -181,23 +170,56 @@ module proactive_beh_pul_axis#(
 		end
 	end
 	
+	always@(posedge clk_i)begin
+	if(rst_i)
+		curr_state_1d <= 8'd0;
+	else
+		curr_state_1d <= curr_state;
+	end
 	
-    //Current behavior number 
-    reg         a_bhv_vld_r;
+    reg			a_bhv_vld_r;
+    reg	[7:0]	sta1;
+	 //Current behavior number
     always@(posedge clk_i)begin
         if(rst_i)begin
             a_bhv_id_r <= 8'd0;
 			a_bhv_vld_r <= 1'b0;
-		end else if(a_en && ((a_bhv_id >= 8'd1) && (a_bhv_id <= BHA_NUM)) && a_bhv_vld_i)begin
-            a_bhv_id_r <= a_bhv_id;
-			a_bhv_vld_r <= a_bhv_vld_i;
-		end else if(curr_state == S_IDLE && curr_state_1d != curr_state)begin
-			a_bhv_id_r <= 8'd0;
-			a_bhv_vld_r <= 1'b0;
-		end else begin
-            a_bhv_id_r <= a_bhv_id_r;
-			a_bhv_vld_r <= 1'b0;
-		end
+			sta1 <= 0;
+		end else 
+			case(sta1)
+				0:begin
+					if(a_en && ((a_bhv_id >= 8'd1) && (a_bhv_id <= BHA_NUM)) && a_bhv_vld)begin
+						a_bhv_id_r <= a_bhv_id;
+						a_bhv_vld_r <= 1'b1;
+						sta1 <= 1;
+					end else begin
+						a_bhv_id_r <= 8'd0;
+						a_bhv_vld_r <= 1'b0;
+						sta1 <= 0;
+					end
+				end
+				1:begin
+					a_bhv_id_r <= a_bhv_id;
+					a_bhv_vld_r <= 1'b0;
+					sta1 <= 2;
+				end
+				2:begin
+					if(curr_state == S_ACT_END_1)begin
+						a_bhv_id_r <= 8'd0;
+						a_bhv_vld_r <= 1'b0;
+						sta1 <= 0;
+					end else begin
+						a_bhv_id_r <= a_bhv_id;
+						a_bhv_vld_r <= 1'b0;
+						sta1 <= 2;
+					end
+				end
+				default:begin
+					a_bhv_id_r <= 8'd0;
+				    a_bhv_vld_r <= 1'b0;
+					sta1 <= 0;
+				end
+			endcase
     end
 	
 //------------------------------------------- FSM begin => Control 10/20/30/40 interrupt -----------------------------------------------//
@@ -209,10 +231,10 @@ module proactive_beh_pul_axis#(
 	
 	always @(posedge clk_i) begin
     if(rst_i) begin
-        	match_10 <= 1'b0;
-			//match_20 <= 1'b0;
-			match_30 <= 1'b0;
-			match_40 <= 1'b0;
+        match_10 <= 1'b0;
+		//match_20 <= 1'b0;
+		match_30 <= 1'b0;
+		match_40 <= 1'b0;
     end else if(curr_state == S_READY_10_ACK)
         match_10 <= (ack_tx_result == IRQ_OK && ack_tx_id == 8'd10 && ack_beh_id == a_bhv_id_r);
 		//match_20 <= (ack_tx_result == IRQ_OK && ack_tx_id == 8'd20 && ack_beh_id == a_bhv_id_r);
@@ -221,19 +243,13 @@ module proactive_beh_pul_axis#(
 	else if(curr_state == S_ALERT_40_ACK)
 		match_40 <= (ack_tx_id == 8'd40 && ack_beh_id == a_bhv_id_r);
 	else begin
-			match_10 <= 1'b0;
-			//match_20 <= 1'b0;
-			match_30 <= 1'b0;
-			match_40 <= 1'b0;
-		end
+		match_10 <= 1'b0;
+		//match_20 <= 1'b0;
+		match_30 <= 1'b0;
+		match_40 <= 1'b0;
+	end
 	end
     
-	always@(posedge clk_i)begin
-	if(rst_i)
-		curr_state_1d <= 8'd0;
-	else
-		curr_state_1d <= curr_state;
-	end
 
     always @(posedge clk_i) begin
         if (rst_i)
@@ -241,11 +257,11 @@ module proactive_beh_pul_axis#(
         else
             curr_state <= next_state;
     end
-
-    always @(*) begin
-        case (curr_state)
+	
+    always @(*) begin			
+        case (curr_state)	
             S_IDLE: begin			//curr_state = 0
-                if (a_en && ((a_bhv_id_r >= 8'd1) && (a_bhv_id_r <= BHA_NUM)) && a_bhv_vld_r)	//behavior start
+               if (a_en && ((a_bhv_id_r >= 8'd1) && (a_bhv_id_r <= BHA_NUM)) && a_bhv_vld_r)	//behavior start
                     next_state = S_BHA_PRE_DET;
                 else
                     next_state = S_IDLE;
@@ -253,11 +269,11 @@ module proactive_beh_pul_axis#(
 
             S_BHA_PRE_DET: begin	//curr_state = 1
 				if(pre_sta_allow[a_bhv_id_r - 1'b1]) begin
-                    next_state = S_READY_10;
+					next_state = S_READY_10;
 				end else if(timout) begin
-                    next_state = S_ALERT_40;
+					next_state = S_ALERT_40;			
 				end else begin
-                    next_state = S_BHA_PRE_DET;
+					next_state = S_BHA_PRE_DET;
 				end
             end
 
@@ -277,12 +293,12 @@ module proactive_beh_pul_axis#(
             S_EXE_20: begin			//curr_state = 4						
 				next_state = S_EXE;							//Send 20 interrupt
             end
-						
+			
 			S_EXE:begin				//curr_state = 5								
-					next_state = S_BHA_POST_DET;
+				next_state = S_BHA_POST_DET;
 			end
 			
-			//S_EXE_20_ACK: begin
+			//S_EXE_20_ACK: begin	//curr_state = 6	
 			//	if(match_20) 								//Transaction 20 Acknowledged OK
             //        next_state = S_EXE;
             //    else if(ack_tx_result == IRQ_NO_OK || timout)
@@ -301,30 +317,38 @@ module proactive_beh_pul_axis#(
 				end
             end
 
-            S_SUCC_30: begin		//curr_state = 7					
+            S_SUCC_30: begin		//curr_state = 8					
 				next_state = S_SUCC_30_ACK;					//Send Interrupt 30
             end
 			
-			S_SUCC_30_ACK:begin		//curr_state = 8
+			S_SUCC_30_ACK:begin		//curr_state = 9
 				if(match_30)    							//30 response success
-                    next_state = S_IDLE;
+                    next_state = S_ACT_END_1;
                 else if(ack_tx_result == IRQ_NO_OK || timout)
                     next_state = S_ALERT_40;
                 else
                     next_state = S_SUCC_30_ACK;
 			end
 
-            S_ALERT_40: begin		//curr_state = 9					
+            S_ALERT_40: begin		//curr_state = 10					
 				next_state = S_ALERT_40_ACK;				//Send Interrupt 40
             end
 			
-			S_ALERT_40_ACK:begin	//curr_state = 10
+			S_ALERT_40_ACK:begin	//curr_state = 11
 				if(match_40 || timout) 						//40 Interrupt response
-                    next_state = S_IDLE;
+                    next_state = S_ACT_END_1;
                 else
                     next_state = S_ALERT_40_ACK;
 			end
-
+			
+			S_ACT_END_1:begin
+				next_state = S_ACT_END_2;
+			end
+			
+			S_ACT_END_2:begin
+				next_state = S_IDLE;
+			end
+			
             default: begin
                 next_state = S_IDLE;
             end
@@ -340,9 +364,11 @@ module proactive_beh_pul_axis#(
     //Channel A busy signal
 	assign ec_cha_st = (curr_state != S_IDLE)?1'b1:1'b0;
 
-    //Channel A transaction ID: 10 20 30 40
+    //Channel A transaction ID: 10 30 40
     always@(posedge clk_i)begin
         if(rst_i || !a_en)
+            a_tx_id <= 8'd0;
+		else if(curr_state == S_IDLE)
 			a_tx_id <= 8'd0;
         else if(curr_state == S_READY_10)
             a_tx_id <= 8'd10;
@@ -352,15 +378,13 @@ module proactive_beh_pul_axis#(
             a_tx_id <= 8'd30;
         else if(curr_state == S_ALERT_40)
             a_tx_id <= 8'd40;
-		else if(curr_state == S_IDLE || curr_state == S_BHA_PRE_DET)
-			a_tx_id <= 8'd0;
         else
             a_tx_id <= a_tx_id;
     end
 
     always@(posedge clk_i)begin
         if(rst_i || !a_en)
-			irq_o <= 1'b0;
+            irq_o <= 1'b0;
 		else if(irq_ack_i)    		//interrupt arbiter receives the interrupt.
             irq_o <= 1'b0;
         else if(curr_state == S_READY_10)
@@ -374,8 +398,8 @@ module proactive_beh_pul_axis#(
         else
             irq_o <= irq_o;
     end
-
-    always@(posedge clk_i)begin
+	
+	always@(posedge clk_i)begin
         if(rst_i || !a_en)
             a_alm_num <= 8'd0;
         else if(i_stop && curr_state != S_IDLE)
@@ -403,7 +427,6 @@ module proactive_beh_pul_axis#(
         else
             a_alm_num <= a_alm_num;
     end
-	
 
     //Timeout count
     always@(posedge clk_i)begin

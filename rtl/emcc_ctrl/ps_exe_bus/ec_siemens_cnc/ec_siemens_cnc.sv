@@ -56,8 +56,8 @@ module ec_siemens_cnc#(
 	wire 	[3:0]	m_wk_mod        ;
 	wire 			m_saf_st        ;
 	wire 			link_m_saf_st   ;
-	wire 	[7:0]	sc_id			;
-	wire 	[7:0]	ec_id           ;
+	wire 	[9:0]	sc_id			;		
+	wire 	[13:0]	ec_id           ;       
 	wire 			rst_en_n        ;
 
 	wire	[7:0]	a_bhv_id        ;
@@ -141,7 +141,7 @@ module ec_siemens_cnc#(
 	wire 			param69 ;
 	wire 			param70 ;
 
-	wire	[31:0]	task_time_cnt	;
+	wire	[19:0]	task_time_cnt	;
 
 	wire	[31:0]	debug_reg1 ;
 	wire	[31:0]	debug_reg2 ;
@@ -155,26 +155,40 @@ module ec_siemens_cnc#(
 	wire			b_tx_result_vld;
 	wire			c_tx_result_vld;
 
-	//CDC sync (ps_reg_clk -> clk_i): 2-stage sync + edge detect.
-	reg			a_bhv_vld_r1, a_bhv_vld_r2;
-	reg			a_tx_result_vld_r1, a_tx_result_vld_r2;
-	reg			b_tx_result_vld_r1, b_tx_result_vld_r2;
-	reg			c_tx_result_vld_r1, c_tx_result_vld_r2;
+	//valid signal sync
+	reg 		r_a_tx_result_vld ;
+	reg 		r_b_tx_result_vld ;
+	reg 		r_c_tx_result_vld ;
+	reg 		r_a_bhv_vld       ;
 
-	wire		a_bhv_vld_sync		= a_bhv_vld_r2 & ~a_bhv_vld_r1;
-	wire		a_tx_result_vld_sync	= a_tx_result_vld_r2 & ~a_tx_result_vld_r1;
-	wire		b_tx_result_vld_sync	= b_tx_result_vld_r2 & ~b_tx_result_vld_r1;
-	wire		c_tx_result_vld_sync	= c_tx_result_vld_r2 & ~c_tx_result_vld_r1;
+	reg 		sync_a_tx_result_vld ;
+	reg 		sync_b_tx_result_vld ;
+	reg 		sync_c_tx_result_vld ;
+	reg 		sync_a_bhv_vld       ;
 
-	always @(posedge clk_i) begin
-		a_bhv_vld_r1			<= a_bhv_vld;
-		a_bhv_vld_r2			<= a_bhv_vld_r1;
-		a_tx_result_vld_r1		<= a_tx_result_vld;
-		a_tx_result_vld_r2		<= a_tx_result_vld_r1;
-		b_tx_result_vld_r1		<= b_tx_result_vld;
-		b_tx_result_vld_r2		<= b_tx_result_vld_r1;
-		c_tx_result_vld_r1		<= c_tx_result_vld;
-		c_tx_result_vld_r2		<= c_tx_result_vld_r1;
+always@(posedge clk_i)
+	begin
+		if(!rst_en_n)begin
+			r_a_tx_result_vld 		<= 1'b0;
+			r_b_tx_result_vld 		<= 1'b0;
+			r_c_tx_result_vld 		<= 1'b0;
+			r_a_bhv_vld       		<= 1'b0;
+
+			sync_a_tx_result_vld 	<= 1'b0;
+			sync_b_tx_result_vld 	<= 1'b0;
+			sync_c_tx_result_vld 	<= 1'b0;
+			sync_a_bhv_vld       	<= 1'b0;
+		end else begin
+			r_a_tx_result_vld		<= a_tx_result_vld;
+			r_b_tx_result_vld		<= b_tx_result_vld;
+			r_c_tx_result_vld		<= c_tx_result_vld;
+			r_a_bhv_vld      		<= a_bhv_vld      ;
+
+			sync_a_tx_result_vld 	<= r_a_tx_result_vld;
+			sync_b_tx_result_vld 	<= r_b_tx_result_vld;
+			sync_c_tx_result_vld 	<= r_c_tx_result_vld;
+			sync_a_bhv_vld       	<= r_a_bhv_vld      ;
+		end
 	end
 
 	wire 	[A_BHA_NUM-1:0]	a_pre_sta_allow   ;
@@ -205,7 +219,43 @@ module ec_siemens_cnc#(
 	wire			a_en;
 	wire 	[31:0]	bhv_en;
 
-	wire	[7:0]	a_bhv_id_r;	//driven by proactive_beh output (latched on a_bhv_vld_sync)
+	wire	[7:0]	a_bhv_id_r;
+
+	wire	i_clk = clk_i;
+	wire	i_rst = rst_i;
+
+		reg			ro_intr_irq;
+		reg	[7:0]	irq_posedge_cnt;
+		reg	[7:0]	irq_negedge_cnt;
+
+		always@(posedge i_clk)
+		begin
+			ro_intr_irq <= o_intr_irq;
+		end
+
+
+		always@(posedge i_clk)
+		begin
+			if(i_rst)begin
+				irq_posedge_cnt <= 8'd0;
+				irq_negedge_cnt <= 8'd0;
+			end else if(a_bhv_vld)begin
+				irq_posedge_cnt <= 8'd0;
+				irq_negedge_cnt <= 8'd0;
+			end else begin
+				if({ro_intr_irq,o_intr_irq} == 2'b01)begin	//rising
+					irq_posedge_cnt <= irq_posedge_cnt+1;
+				end else begin
+					irq_posedge_cnt <= irq_posedge_cnt;
+				end
+
+				if({ro_intr_irq,o_intr_irq} == 2'b10)begin	//falling
+					irq_negedge_cnt <= irq_negedge_cnt+1;
+				end else begin
+					irq_negedge_cnt <= irq_negedge_cnt;
+				end
+			end
+		end
 
 	ps_rw_pl_reg#(
 		.REG_SPACE_BIAS 	(REG_SPACE_BIAS		),
@@ -332,10 +382,10 @@ module ec_siemens_cnc#(
     ,.post_sta_allow       	(a_post_sta_allow	)
 	,.a_en			       	(1'b1				)
     ,.a_bhv_id             	(a_bhv_id       	)
-    ,.a_bhv_vld            	(a_bhv_vld_sync 	)
+    ,.a_bhv_vld            	(sync_a_bhv_vld     )
     ,.a_tx_ot              	(a_tx_ot        	)
     ,.a_tx_result_rpt	   	(a_tx_result_rpt	)
-	,.a_tx_result_vld      	(a_tx_result_vld_sync)
+	,.a_tx_result_vld      	(sync_a_tx_result_vld)
     ,.ec_cha_st            	(ec_cha_st			)
     ,.a_tx_id              	(a_tx_id        	)
     ,.a_alm_num            	(a_alm_num      	)
@@ -344,7 +394,6 @@ module ec_siemens_cnc#(
     ,.irq_o                	(irq_a				)
     ,.irq_ack_i       		(irq_a_grant		)
 	,.i_m_wk_mod			(m_wk_mod			)
-	,.i_link_lock			(param26			)
     );
 
 	status_beh_siemens_cnc#(
@@ -360,11 +409,12 @@ module ec_siemens_cnc#(
 	,.b_bhv_id              (b_bhv_id			)
 	,.b_tx_ot               (b_tx_ot			)
 	,.b_tx_result_rpt       (b_tx_result_rpt	)
-	,.b_tx_result_vld       (b_tx_result_vld	)
+	,.b_tx_result_vld       (sync_b_tx_result_vld	)
 	,.ec_chb_st             (ec_chb_st			)
 	,.b_tx_id               (b_tx_id			)
 	,.b_alm_num             (b_alm_num			)
 	,.irq_o			        (irq_b				)
+	,.state_monitor_o		(debug_reg2		)
 	,.irq_ack_i	            (irq_b_grant		)
     );
 
@@ -380,7 +430,7 @@ module ec_siemens_cnc#(
 	,.c_bhv_id                  (c_bhv_id			)
 	,.c_tx_ot          	        (c_tx_ot			)
 	,.c_tx_result_rpt  	        (c_tx_result_rpt	)
-	,.c_tx_result_vld           (c_tx_result_vld	)
+	,.c_tx_result_vld           (sync_c_tx_result_vld	)
 	,.ec_chc_st	                (ec_chc_st			)
 	,.c_tx_id         	        (c_tx_id			)
 	,.c_alm_num                 (c_alm_num			)
@@ -388,6 +438,7 @@ module ec_siemens_cnc#(
 	,.c_gap_crl1				(param9				)
 	,.c_gap_crl2				(param10			)
 	,.irq_o 					(irq_c				)
+	,.state_monitor_o		(debug_reg3		)
 	,.irq_ack_i                 (irq_c_grant		)
    );
 
@@ -451,7 +502,7 @@ module ec_siemens_cnc#(
 		,.irq_reg2_o		(irq_reg2			)
 		,.irq_o				(o_intr_irq			)
 		,.irq_busy_o		(irq_busy_o			)
-		,.irq_receive_ack_i (a_tx_result_vld_sync || b_tx_result_vld_sync || c_tx_result_vld_sync)
+		,.irq_receive_ack_i (sync_a_tx_result_vld || sync_b_tx_result_vld || sync_c_tx_result_vld)
     );
 
 endmodule

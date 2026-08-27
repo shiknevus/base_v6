@@ -5,7 +5,7 @@
 // 
 // Create Date: 2026/06/30 10:25:54
 // Design Name: 
-// Module Name: 
+// Module Name: ec_slv_pul_axis
 // Project Name: 
 // Target Devices: 
 // Tool Versions: 
@@ -58,10 +58,10 @@ module ec_slv_pul_axis#(
 		,output 	[31:0] 		m2s_pulm_msg        //message  master to slave
 		,input 		[31:0] 		s2m_pulm_msg       	//message  slave to master
 //----------------------------------------------------- user logic end -------------------------------------------------------//
-
-		,output 	            o_intr_irq
+		
+		,output 	            o_intr_irq	
     );
-
+	
 //----------------------------------------------------- user logic begin -----------------------------------------------------//
 	localparam		A_BHA_NUM	=	200;	// 1home 2jog 3move 20jog[safe] 21move[safe] 30getpos
 	localparam		B_BHA_NUM	=	200;
@@ -203,6 +203,79 @@ module ec_slv_pul_axis#(
 	wire 	[31:0]	bhv_en;
 
 	wire	[7:0]	a_bhv_id_r;
+	
+	wire	i_clk = clk_i;
+	wire	i_rst = rst_i;
+	
+		reg			ro_intr_irq;
+		reg	[7:0]	irq_posedge_cnt;
+		reg	[7:0]	irq_negedge_cnt;
+		
+		always@(posedge i_clk)
+		begin
+			ro_intr_irq <= o_intr_irq;
+		end
+		
+		
+		always@(posedge i_clk)
+		begin
+			if(i_rst)begin
+				irq_posedge_cnt <= 8'd0;
+				irq_negedge_cnt <= 8'd0;
+			end else if(a_bhv_vld)begin
+				irq_posedge_cnt <= 8'd0;
+				irq_negedge_cnt <= 8'd0;
+			end else begin
+				if({ro_intr_irq,o_intr_irq} == 2'b01)begin	//rising
+					irq_posedge_cnt <= irq_posedge_cnt+1;
+				end else begin
+					irq_posedge_cnt <= irq_posedge_cnt;
+				end
+				
+				if({ro_intr_irq,o_intr_irq} == 2'b10)begin	//falling
+					irq_negedge_cnt <= irq_negedge_cnt+1;
+				end else begin
+					irq_negedge_cnt <= irq_negedge_cnt;
+				end
+			end
+		end
+	
+	//valid signal sync
+	reg 		r_a_tx_result_vld ;
+	reg 		r_b_tx_result_vld ;
+	reg 		r_c_tx_result_vld ;
+	reg 		r_a_bhv_vld       ;
+	
+	reg 		sync_a_tx_result_vld ;
+	reg 		sync_b_tx_result_vld ;
+	reg 		sync_c_tx_result_vld ;
+	reg 		sync_a_bhv_vld       ;
+	
+	always@(posedge clk_i)
+	begin
+		if(rst_i)begin
+			r_a_tx_result_vld 		<= 1'b0;
+			r_b_tx_result_vld 		<= 1'b0;
+			r_c_tx_result_vld 		<= 1'b0;
+			r_a_bhv_vld       		<= 1'b0;
+			
+			sync_a_tx_result_vld 	<= 1'b0;
+			sync_b_tx_result_vld 	<= 1'b0;
+			sync_c_tx_result_vld 	<= 1'b0;
+			sync_a_bhv_vld       	<= 1'b0;
+		end else begin
+			r_a_tx_result_vld		<= a_tx_result_vld;
+			r_b_tx_result_vld		<= b_tx_result_vld;
+			r_c_tx_result_vld		<= c_tx_result_vld;
+			r_a_bhv_vld      		<= a_bhv_vld      ;
+			
+			sync_a_tx_result_vld 	<= r_a_tx_result_vld;
+			sync_b_tx_result_vld 	<= r_b_tx_result_vld;
+			sync_c_tx_result_vld 	<= r_c_tx_result_vld;
+			sync_a_bhv_vld       	<= r_a_bhv_vld      ;
+		end
+	end
+	
 //----------------------------------------------------- user logic begin -----------------------------------------------------//
 	wire 	[31:0]	param31		;
 	wire 	[31:0]	param32		;
@@ -366,28 +439,39 @@ module ec_slv_pul_axis#(
     ,.post_sta_allow       	(a_post_sta_allow	)
 	,.a_en			       	(a_en				)
     ,.a_bhv_id             	(a_bhv_id       	)
-    ,.a_bhv_vld            	(a_bhv_vld 	    	)
+    ,.a_bhv_vld            	(sync_a_bhv_vld      	)
     ,.a_tx_ot              	(a_tx_ot        	)
     ,.a_tx_result_rpt	   	(a_tx_result_rpt	)
-	,.a_tx_result_vld      	(a_tx_result_vld	)
+	,.a_tx_result_vld      	(sync_a_tx_result_vld	)
     ,.ec_cha_st            	(ec_cha_st			)
     ,.a_tx_id              	(a_tx_id        	)
     ,.a_alm_num            	(a_alm_num      	)
-    ,.i_servo_notok			(i_servo_notok		)
-    ,.i_servo_stop			(i_servo_stop		)
-    ,.i_axis_limf			(i_axis_limf		)
-    ,.i_axis_org			(i_axis_org			)
-    ,.i_axis_limb			(i_axis_limb		)
+	,.a_bhv_id_r			(a_bhv_id_r			)
+	,.state_monitor_o		(debug_reg1			)
+    ,.irq_o                	(irq_a				)
+    ,.irq_ack_i       		(irq_a_grant		)
+//----------------------------------------------------- user logic begin -----------------------------------------------------//
+	,.i_servo_notok			(i_servo_notok      )
+    ,.i_servo_stop			(i_servo_stop       )
+    ,.i_axis_limf			(i_axis_limf        )
+    ,.i_axis_org			(i_axis_org         )
+    ,.i_axis_limb			(i_axis_limb        )
     ,.i_emerge_stop_signal	(i_emerge_stop_signal)
-    ,.i_safe_status			(i_safe_status		)
+    ,.i_safe_status			(i_safe_status 		)
     ,.i_axis_point			(i_axis_point		)
     ,.i_axis_reset			(i_axis_reset		)
+    ,.i_dv_alarm			(i_dv_alarm			)
     ,.cur_slv_board_id		(cur_slv_board_id	)
     ,.slv_board_id			(slv_board_id		)
     ,.pul_motor_r_flag		(pul_motor_r_flag	)
     ,.pul_motor_flag		(pul_motor_flag		)
     ,.m2s_pulm_msg			(m2s_pulm_msg		)
     ,.s2m_pulm_msg			(s2m_pulm_msg		)
+    ,.i_pause				(b_pause			)
+    ,.i_stop				(b_stop				)	
+	,.action_busy			(action_busy)
+	,.action_done			(action_done)
+	,.action_error			(action_error)
 
     ,.rserv_dir				(param16[0]			    )
     ,.rserv_step_pulse		(param37				)
@@ -409,16 +493,7 @@ module ec_slv_pul_axis#(
 	,.r_pf_abspos			(param51				)
 	,.i_drive_on			(b_son					)
 	,.i_drive_reset			(b_reset				)
-    ,.i_pause				(b_pause				)
-    ,.i_stop				(b_stop					)
-    ,.action_busy			(action_busy			)
-    ,.action_done			(action_done			)
-    ,.action_error			(action_error			)
-    ,.a_bhv_id_r			(a_bhv_id_r				)
-
-    ,.irq_o                	(irq_a					)
-    ,.irq_ack_i       		(irq_a_grant			)
-	,.state_monitor_o		(debug_reg1				)
+//----------------------------------------------------- user logic end -------------------------------------------------------//
     );
 
 
@@ -436,12 +511,12 @@ module ec_slv_pul_axis#(
 	,.state_monitor_o		(debug_reg2			)
 	,.b_tx_ot               (b_tx_ot			)
 	,.b_tx_result_rpt       (b_tx_result_rpt	)
-	,.b_tx_result_vld       (b_tx_result_vld	)
+	,.b_tx_result_vld       (sync_b_tx_result_vld	)
 	,.ec_chb_st             (ec_chb_st			)
 	,.b_tx_id               (b_tx_id			)
 	,.b_alm_num             (b_alm_num			)
 	,.irq_o			        (irq_b				)
-	,.irq_ack_i	            (irq_b_grant		)
+	,.irq_ack_i	            (irq_b_grant		)	
 
 //----------------------------------------------------- user logic begin -----------------------------------------------------//
     ,.o_dv_reset			(b_reset			)
@@ -551,9 +626,9 @@ module ec_slv_pul_axis#(
 		,.irq_reg2_o		(irq_reg2			)
 		,.irq_o				(o_intr_irq			)
 		,.irq_busy_o		(irq_busy_o			)
-		,.irq_ack_a_i		(a_tx_result_vld	)
-		,.irq_ack_b_i		(b_tx_result_vld	)
-		,.irq_ack_c_i		(c_tx_result_vld	)
+		,.irq_ack_a_i		(sync_a_tx_result_vld	)
+		,.irq_ack_b_i		(sync_b_tx_result_vld	)
+		,.irq_ack_c_i		(sync_c_tx_result_vld	)
     );
 
 endmodule

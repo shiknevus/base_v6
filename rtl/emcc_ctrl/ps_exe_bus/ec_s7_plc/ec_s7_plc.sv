@@ -9,7 +9,7 @@
 // Project Name:
 // Target Devices:
 // Tool Versions:
-// Description: ASS00642 Hexagon CMM Device Control V6.0
+// Description: ASS00588 Yike Line Scan Control V6.0
 //
 // Dependencies:
 //
@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module ec_hex_coordinate#(
+module ec_s7_plc#(
 		parameter  				REG_SPACE_BIAS 		= 	2000	,
 		parameter  				REG_SPACE_SIZE 		= 	512
 )(
@@ -42,7 +42,7 @@ module ec_hex_coordinate#(
 		output 	            	o_intr_irq
     );
 
-	localparam		A_BHA_NUM	=	7;	// behaviors 2-7
+	localparam		A_BHA_NUM	=	2;	// behavior 2
 	localparam		B_BHA_NUM	=	1;
 	localparam		C_BHA_NUM	=	1;
 
@@ -56,8 +56,8 @@ module ec_hex_coordinate#(
 	wire 	[3:0]	m_wk_mod        ;
 	wire 			m_saf_st        ;
 	wire 			link_m_saf_st   ;
-	wire 	[9:0]	sc_id			;		
-	wire 	[13:0]	ec_id           ;       
+	wire 	[7:0]	sc_id			;
+	wire 	[7:0]	ec_id           ;
 	wire 			rst_en_n        ;
 
 	wire	[7:0]	a_bhv_id        ;
@@ -371,9 +371,9 @@ always@(posedge clk_i)
 	,.debug_reg5			(debug_reg5		)
 	);
 
-	proactive_beh_hex_coordinate#(
+	proactive_beh_s7_plc#(
 	.BHA_NUM 				(A_BHA_NUM  	 	)	//Number of active behaviors
-)proactive_beh_hex_coordinate_u0(
+)proactive_beh_s7_plc_u0(
     .clk_i                 	(clk_i				)
     ,.rst_i                	(rst_i				)
     ,.i_time_1ms_vld       	(i_time_1ms_vld 	)
@@ -397,9 +397,9 @@ always@(posedge clk_i)
 	,.i_link_lock			(param26			)
     );
 
-	status_beh_hex_coordinate#(
+	status_beh_s7_plc#(
 		.BHA_NUM(B_BHA_NUM	)
-)status_beh_hex_coordinate_u0(
+)status_beh_s7_plc_u0(
 	.clk_i			        (clk_i				)
 	,.rst_i			        (rst_i				)
 	,.i_time_1ms_vld		(i_time_1ms_vld 	)
@@ -419,7 +419,7 @@ always@(posedge clk_i)
 	,.irq_ack_i	            (irq_b_grant		)
     );
 
-	tim_beh_hex_coordinate tim_beh_hex_coordinate_u0(
+	tim_beh_s7_plc tim_beh_s7_plc_u0(
     .clk_i                      (clk_i          	)
 	,.rst_i              	    (rst_i         		)
 	,.i_time_1ms_vld   	        (i_time_1ms_vld 	)
@@ -441,11 +441,11 @@ always@(posedge clk_i)
 	,.irq_ack_i                 (irq_c_grant		)
    );
 
-		pre_post_sta_check_hex_coordinate#(
+		pre_post_sta_check_s7_plc#(
 			.A_BHA_NUM			(A_BHA_NUM	 		)    ,
 			.B_BHA_NUM			(B_BHA_NUM	 		)    ,
 			.C_BHA_NUM			(C_BHA_NUM	 		)
-)pre_post_sta_check_hex_coordinate_u0(
+)pre_post_sta_check_s7_plc_u0(
 			.clk_i				(clk_i			),
 			.rst_i				(rst_i			),
 			.unit_id         	(unit_id        ),

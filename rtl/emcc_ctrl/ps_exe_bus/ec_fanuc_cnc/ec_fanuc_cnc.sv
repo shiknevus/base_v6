@@ -1,34 +1,34 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
+// Company:
+// Engineer:
+//
 // Create Date: 2026/06/30 10:25:54
-// Design Name: 
-// Module Name: ec_can_servo
-// Project Name: 
-// Target Devices: 
-// Tool Versions: 
-// Description: ASS00583 Linear/3DI/CAN Inovance Servo Control V6.0
-// 
-// Dependencies: 
-// 
+// Design Name:
+// Module Name:
+// Project Name:
+// Target Devices:
+// Tool Versions:
+// Description: ASS00656 Siemens System Machining Center V6.0
+//
+// Dependencies:
+//
 // Revision:
 // Revision 0.01 - File Created
 // Additional Comments:
-// 
+//
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module ec_can_servo#(
+module ec_fanuc_cnc#(
 		parameter  				REG_SPACE_BIAS 		= 	2000	,
-		parameter  				REG_SPACE_SIZE 		= 	512	
+		parameter  				REG_SPACE_SIZE 		= 	512
 )(
 		input					clk_i			,
 		input					rst				,
 		input                   i_time_1ms_vld  ,
 		input                   i_time_1s_vld   ,
-		
+
 		input					ps_reg_clk		,
 		input					ps_reg_reset	,
 		input  		            i_st_wr_en		,
@@ -38,61 +38,55 @@ module ec_can_servo#(
 		input  		 [19:0]     i_st_rd_addr    ,
 		output 		 [31:0]     o_st_rd_data    ,
 		output 		            o_st_rd_vld     ,
-//----------------------------------------------------- user logic begin -----------------------------------------------------//
-		input		 			i_servo_limf	,
-		input		 			i_servo_limb	,
-		input		 			i_servo_zero	
-//----------------------------------------------------- user logic end -------------------------------------------------------//
-		
-		,output 	            o_intr_irq	
-    );
-	
-//----------------------------------------------------- user logic begin -----------------------------------------------------//
-	localparam		A_BHA_NUM	=	30 ;	// beh: 1home 2zero 3pos 4point 5rel 6vel 7vstop 8vread 9pread 10status 15torque 16tread
-	localparam		B_BHA_NUM	=	108;	
-	localparam		C_BHA_NUM	=	150;
-//----------------------------------------------------- user logic end -------------------------------------------------------//
-	//PS-PL    
-	wire 	[7:0]	unit_id         ;     	
-	wire 	[3:0]	unit_ectrl      ;       
-	wire 	[3:0]	unit_st         ;       
-	wire 	[7:0]	m_id            ;     	
-	wire 	[3:0]	m_ectrl         ;       
-	wire 	[3:0]	m_st            ;       
-	wire 	[3:0]	m_wk_mod        ;       
-	wire 			m_saf_st        ;       
-	wire 			link_m_saf_st   ;     
-	wire 	[9:0]	sc_id			;		
-	wire 	[13:0]	ec_id           ;       
-	wire 			rst_en_n        ;	
 
-	wire	[7:0]	a_bhv_id        ;       
-	wire			a_bhv_vld        ;       
-	wire	[31:0]	a_task_id       ;       
-	wire	[19:0]	a_tx_ot         ;       
-	wire	[31:0]	a_tx_result_rpt ;       
-	wire	[19:0]	b_tx_ot         ;       
-	wire	[31:0]	b_tx_result_rpt ;       
+		output 	            	o_intr_irq
+    );
+
+	localparam		A_BHA_NUM	=	62;	//generic behaviors 1-128
+	localparam		B_BHA_NUM	=	1;
+	localparam		C_BHA_NUM	=	1;
+
+	//PS-PL
+	wire 	[7:0]	unit_id         ;
+	wire 	[3:0]	unit_ectrl      ;
+	wire 	[3:0]	unit_st         ;
+	wire 	[7:0]	m_id            ;
+	wire 	[3:0]	m_ectrl         ;
+	wire 	[3:0]	m_st            ;
+	wire 	[3:0]	m_wk_mod        ;
+	wire 			m_saf_st        ;
+	wire 			link_m_saf_st   ;
+	wire 	[7:0]	sc_id			;
+	wire 	[7:0]	ec_id           ;
+	wire 			rst_en_n        ;
+
+	wire	[7:0]	a_bhv_id        ;
+	wire			a_bhv_vld        ;
+	wire	[31:0]	a_task_id       ;
+	wire	[19:0]	a_tx_ot         ;
+	wire	[31:0]	a_tx_result_rpt ;
+	wire	[19:0]	b_tx_ot         ;
+	wire	[31:0]	b_tx_result_rpt ;
 	wire			b_en			;
-	wire	[19:0]	c_tx_ot         ;       
-	wire	[19:0]	c_gap_crl       ;       
-	wire	[31:0]	c_tx_result_rpt ;    
+	wire	[19:0]	c_tx_ot         ;
+	wire	[19:0]	c_gap_crl       ;
+	wire	[31:0]	c_tx_result_rpt ;
 	wire			c_en			;
-	
+
 	//PL-PS
-	wire 			ec_cha_st     ;		
-	wire 			ec_chb_st     ;     
-	wire 			ec_chc_st     ;     
-	wire	[7:0]	a_bhv_typ     ;       
-	wire	[7:0]	a_tx_id       ;     
-	wire	[7:0]	a_alm_num     ;     
-	wire	[7:0]	b_bhv_id      ;            
-	wire	[7:0]	b_tx_id       ;     
-	wire	[7:0]	b_alm_num     ;     
-	wire	[7:0]	c_bhv_id      ;        
-	wire	[7:0]	c_tx_id       ;     
-	wire	[7:0]	c_alm_num     ;  
-	
+	wire 			ec_cha_st     ;
+	wire 			ec_chb_st     ;
+	wire 			ec_chc_st     ;
+	wire	[7:0]	a_bhv_typ     ;
+	wire	[7:0]	a_tx_id       ;
+	wire	[7:0]	a_alm_num     ;
+	wire	[7:0]	b_bhv_id      ;
+	wire	[7:0]	b_tx_id       ;
+	wire	[7:0]	b_alm_num     ;
+	wire	[7:0]	c_bhv_id      ;
+	wire	[7:0]	c_tx_id       ;
+	wire	[7:0]	c_alm_num     ;
+
 	//PS-PL
 	wire [31:0]		param1			;
 	wire [31:0]		param2			;
@@ -124,7 +118,7 @@ module ec_can_servo#(
 	wire 			param28			;
 	wire 			param29			;
 	wire 			param30			;
-	
+
 	//PL-PS
 	wire 	[31:0]	param51 ;
 	wire 	[31:0]	param52 ;
@@ -147,50 +141,122 @@ module ec_can_servo#(
 	wire 			param69 ;
 	wire 			param70 ;
 
+	wire	[19:0]	task_time_cnt	;
+
 	wire	[31:0]	debug_reg1 ;
 	wire	[31:0]	debug_reg2 ;
 	wire	[31:0]	debug_reg3 ;
 	wire	[31:0]	debug_reg4 ;
 	wire	[31:0]	debug_reg5 ;
 
-	wire	[31:0]	task_time_cnt	;
-	
+	assign param52 = {26'd0, ec_chc_st, ec_chb_st, ec_cha_st};	//component status readback
+
 	wire			a_tx_result_vld;
 	wire			b_tx_result_vld;
 	wire			c_tx_result_vld;
-	
+
+	//valid signal sync
+	reg 		r_a_tx_result_vld ;
+	reg 		r_b_tx_result_vld ;
+	reg 		r_c_tx_result_vld ;
+	reg 		r_a_bhv_vld       ;
+
+	reg 		sync_a_tx_result_vld ;
+	reg 		sync_b_tx_result_vld ;
+	reg 		sync_c_tx_result_vld ;
+	reg 		sync_a_bhv_vld       ;
+
+always@(posedge clk_i)
+	begin
+		if(!rst_en_n)begin
+			r_a_tx_result_vld 		<= 1'b0;
+			r_b_tx_result_vld 		<= 1'b0;
+			r_c_tx_result_vld 		<= 1'b0;
+			r_a_bhv_vld       		<= 1'b0;
+
+			sync_a_tx_result_vld 	<= 1'b0;
+			sync_b_tx_result_vld 	<= 1'b0;
+			sync_c_tx_result_vld 	<= 1'b0;
+			sync_a_bhv_vld       	<= 1'b0;
+		end else begin
+			r_a_tx_result_vld		<= a_tx_result_vld;
+			r_b_tx_result_vld		<= b_tx_result_vld;
+			r_c_tx_result_vld		<= c_tx_result_vld;
+			r_a_bhv_vld      		<= a_bhv_vld      ;
+
+			sync_a_tx_result_vld 	<= r_a_tx_result_vld;
+			sync_b_tx_result_vld 	<= r_b_tx_result_vld;
+			sync_c_tx_result_vld 	<= r_c_tx_result_vld;
+			sync_a_bhv_vld       	<= r_a_bhv_vld      ;
+		end
+	end
+
 	wire 	[A_BHA_NUM-1:0]	a_pre_sta_allow   ;
 	wire 	[A_BHA_NUM-1:0]	a_post_sta_allow  ;
 	wire 	[B_BHA_NUM-1:0]	b_pre_sta_allow   ;
 	wire 	[B_BHA_NUM-1:0]	b_post_sta_allow  ;
-	wire 	[B_BHA_NUM-1:0] c_pre_sta_allow   ;
-	wire 	[B_BHA_NUM-1:0] c_post_sta_allow  ;
-	
+	wire 					c_pre_sta_allow   ;
+	wire 					c_post_sta_allow  ;
+
 	wire	irq_a  ;
 	wire	irq_b  ;
 	wire	irq_c  ;
-	
+
 	wire 	irq_a_grant;
 	wire 	irq_b_grant;
 	wire 	irq_c_grant;
-	
+
 	wire	irq_busy_o	;
-	
+
 	wire 	[31:0]	irq_reg1 ;
 	wire 	[31:0]	irq_reg2 ;
-	
+
 	wire	rst_i;
 	assign	rst_i = !rst_en_n;
-	
+
 	wire	[3:0]	chl_priority;
 	wire	[31:0]	a_task_bhv_id;
 	wire			a_en;
 	wire 	[31:0]	bhv_en;
-	
+
 	wire	[7:0]	a_bhv_id_r;
-//----------------------------------------------------- user logic begin -----------------------------------------------------//
-//----------------------------------------------------- user logic end -------------------------------------------------------//
-	
+
+	wire	i_clk = clk_i;
+	wire	i_rst = rst_i;
+
+		reg			ro_intr_irq;
+		reg	[7:0]	irq_posedge_cnt;
+		reg	[7:0]	irq_negedge_cnt;
+
+		always@(posedge i_clk)
+		begin
+			ro_intr_irq <= o_intr_irq;
+		end
+
+
+		always@(posedge i_clk)
+		begin
+			if(i_rst)begin
+				irq_posedge_cnt <= 8'd0;
+				irq_negedge_cnt <= 8'd0;
+			end else if(a_bhv_vld)begin
+				irq_posedge_cnt <= 8'd0;
+				irq_negedge_cnt <= 8'd0;
+			end else begin
+				if({ro_intr_irq,o_intr_irq} == 2'b01)begin	//rising
+					irq_posedge_cnt <= irq_posedge_cnt+1;
+				end else begin
+					irq_posedge_cnt <= irq_posedge_cnt;
+				end
+
+				if({ro_intr_irq,o_intr_irq} == 2'b10)begin	//falling
+					irq_negedge_cnt <= irq_negedge_cnt+1;
+				end else begin
+					irq_negedge_cnt <= irq_negedge_cnt;
+				end
+			end
+		end
+
 	ps_rw_pl_reg#(
 		.REG_SPACE_BIAS 	(REG_SPACE_BIAS		),
 		.REG_SPACE_SIZE 	(REG_SPACE_SIZE		)
@@ -305,64 +371,54 @@ module ec_can_servo#(
 	,.debug_reg5			(debug_reg5		)
 	);
 
-	proactive_beh_can_servo#(
+	proactive_beh_fanuc_cnc#(
 	.BHA_NUM 				(A_BHA_NUM  	 	)	//Number of active behaviors
-)proactive_beh_can_servo_u0(
+)proactive_beh_fanuc_cnc_u0(
     .clk_i                 	(clk_i				)
     ,.rst_i                	(rst_i				)
     ,.i_time_1ms_vld       	(i_time_1ms_vld 	)
     ,.i_time_1s_vld        	(i_time_1s_vld  	)
     ,.pre_sta_allow        	(a_pre_sta_allow	)
     ,.post_sta_allow       	(a_post_sta_allow	)
-	,.a_en			       	(a_en				)
+	,.a_en			       	(1'b1				)
     ,.a_bhv_id             	(a_bhv_id       	)
-    ,.a_bhv_vld            	(a_bhv_vld      	)
+    ,.a_bhv_vld            	(sync_a_bhv_vld     )
     ,.a_tx_ot              	(a_tx_ot        	)
     ,.a_tx_result_rpt	   	(a_tx_result_rpt	)
-	,.a_tx_result_vld      	(a_tx_result_vld	)
+	,.a_tx_result_vld      	(sync_a_tx_result_vld)
     ,.ec_cha_st            	(ec_cha_st			)
     ,.a_tx_id              	(a_tx_id        	)
     ,.a_alm_num            	(a_alm_num      	)
 	,.a_bhv_id_r			(a_bhv_id_r			)
-	,.state_monitor_o		(debug_reg1			)
+	,.state_monitor_o		(param51			)
     ,.irq_o                	(irq_a				)
     ,.irq_ack_i       		(irq_a_grant		)
-//----------------------------------------------------- user logic begin -----------------------------------------------------//
-//	,.i_servo_limf			(i_servo_limf		)
-//	,.i_servo_limb			(i_servo_limb		)
-//	,.i_servo_zero			(i_servo_zero		)
-//----------------------------------------------------- user logic end -------------------------------------------------------//
+	,.i_m_wk_mod			(m_wk_mod			)
     );
 
-	status_beh_can_servo#(
+	status_beh_fanuc_cnc#(
 		.BHA_NUM(B_BHA_NUM	)
-)status_beh_can_servo_u0(
+)status_beh_fanuc_cnc_u0(
 	.clk_i			        (clk_i				)
 	,.rst_i			        (rst_i				)
 	,.i_time_1ms_vld		(i_time_1ms_vld 	)
 	,.i_time_1s_vld 		(i_time_1s_vld  	)
 	,.pre_sta_allow	        (b_pre_sta_allow	)
 	,.post_sta_allow	    (b_post_sta_allow	)
-	,.b_en	                (b_en				)
+	,.b_en	                (1'b0				)
 	,.b_bhv_id              (b_bhv_id			)
-	,.state_monitor_o		(debug_reg2			)
 	,.b_tx_ot               (b_tx_ot			)
 	,.b_tx_result_rpt       (b_tx_result_rpt	)
-	,.b_tx_result_vld       (b_tx_result_vld	)
+	,.b_tx_result_vld       (sync_b_tx_result_vld	)
 	,.ec_chb_st             (ec_chb_st			)
 	,.b_tx_id               (b_tx_id			)
 	,.b_alm_num             (b_alm_num			)
 	,.irq_o			        (irq_b				)
-	,.irq_ack_i	            (irq_b_grant		)	
-
-//----------------------------------------------------- user logic begin -----------------------------------------------------//
-
-//----------------------------------------------------- user logic end -------------------------------------------------------//
+	,.state_monitor_o		(debug_reg2		)
+	,.irq_ack_i	            (irq_b_grant		)
     );
-	 
-	tim_beh_can_servo#(
-		.BHA_NUM(C_BHA_NUM	)
-	) tim_beh_can_servo_u0(
+
+	tim_beh_fanuc_cnc tim_beh_fanuc_cnc_u0(
     .clk_i                      (clk_i          	)
 	,.rst_i              	    (rst_i         		)
 	,.i_time_1ms_vld   	        (i_time_1ms_vld 	)
@@ -370,25 +426,27 @@ module ec_can_servo#(
 	,.task_time_cnt	            (task_time_cnt		)
 	,.pre_sta_allow		        (c_pre_sta_allow	)
 	,.post_sta_allow	        (c_post_sta_allow	)
-	,.c_en				        (c_en				)
+	,.c_en				        (1'b1				)
 	,.c_bhv_id                  (c_bhv_id			)
-	,.state_monitor_o			(debug_reg3			)
 	,.c_tx_ot          	        (c_tx_ot			)
 	,.c_tx_result_rpt  	        (c_tx_result_rpt	)
-	,.c_tx_result_vld           (c_tx_result_vld	)
+	,.c_tx_result_vld           (sync_c_tx_result_vld	)
 	,.ec_chc_st	                (ec_chc_st			)
 	,.c_tx_id         	        (c_tx_id			)
 	,.c_alm_num                 (c_alm_num			)
-	,.c_gap_crl                 (c_gap_crl			)
+	,.c_gap_crl0				(param8				)
+	,.c_gap_crl1				(param9				)
+	,.c_gap_crl2				(param10			)
 	,.irq_o 					(irq_c				)
+	,.state_monitor_o		(debug_reg3		)
 	,.irq_ack_i                 (irq_c_grant		)
    );
-	
-		pre_post_sta_check_can_servo#(
-			.A_BHA_NUM			(A_BHA_NUM	 )    ,	
-			.B_BHA_NUM			(B_BHA_NUM	 )    ,
-			.C_BHA_NUM			(C_BHA_NUM	 )
-	)pre_post_sta_check_can_servo_u0(
+
+		pre_post_sta_check_fanuc_cnc#(
+			.A_BHA_NUM			(A_BHA_NUM	 		)    ,
+			.B_BHA_NUM			(B_BHA_NUM	 		)    ,
+			.C_BHA_NUM			(C_BHA_NUM	 		)
+)pre_post_sta_check_fanuc_cnc_u0(
 			.clk_i				(clk_i			),
 			.rst_i				(rst_i			),
 			.unit_id         	(unit_id        ),
@@ -400,30 +458,25 @@ module ec_can_servo#(
 			.m_wk_mod        	(m_wk_mod       ),
 			.m_saf_st        	(m_saf_st       ),
 			.link_m_saf_st   	(link_m_saf_st  ),
-			.a_en				(a_en			),
-			.b_en				(b_en			),	
-			.c_en				(c_en			),	
 			.a_bhv_id			(a_bhv_id_r		),
 			.b_bhv_id			(b_bhv_id		),
 			.c_bhv_id			(c_bhv_id		),
+			.a_en				(1'b1			),
+			.b_en				(1'b0			),
+			.c_en				(1'b1			),
 			.ec_cha_st			(ec_cha_st		),
 			.ec_chb_st       	(ec_chb_st		),
 			.ec_chc_st       	(ec_chc_st		),
-			.c_circle_time		(c_gap_crl		),	
-			.task_time_cnt		(task_time_cnt	),	
-			.a_pre_sta_allow	(a_pre_sta_allow),	
-			.a_post_sta_allow	(a_post_sta_allow),	
-			.b_pre_sta_allow	(b_pre_sta_allow),	
-			.b_post_sta_allow	(b_post_sta_allow),	
-			.c_pre_sta_allow	(c_pre_sta_allow),	
-			.c_post_sta_allow	(c_post_sta_allow)	
-//----------------------------------------------------- user logic begin -----------------------------------------------------//
-			,.i_servo_limf		(i_servo_limf	 )
-			,.i_servo_limb		(i_servo_limb	 )
-			,.i_servo_zero		(i_servo_zero	 )
-//----------------------------------------------------- user logic end -------------------------------------------------------//
-		);
-		
+			.c_circle_time		(c_gap_crl		),
+			.task_time_cnt		(task_time_cnt	),
+			.a_pre_sta_allow	(a_pre_sta_allow),
+			.a_post_sta_allow	(a_post_sta_allow),
+			.b_pre_sta_allow	(b_pre_sta_allow),
+			.b_post_sta_allow	(b_post_sta_allow),
+			.c_pre_sta_allow	(c_pre_sta_allow),
+			.c_post_sta_allow	(c_post_sta_allow)
+    );
+
 	irq_3i1o_arbitrator irq_3i1o_arbitrator_u0(
 		.clk_i              (clk_i            	)
 		,.rst_i             (rst_i           	)
@@ -449,10 +502,7 @@ module ec_can_servo#(
 		,.irq_reg2_o		(irq_reg2			)
 		,.irq_o				(o_intr_irq			)
 		,.irq_busy_o		(irq_busy_o			)
-		,.irq_receive_ack_i (a_tx_result_vld || b_tx_result_vld || c_tx_result_vld)	
-	  );
-	
-	
-	
-	
+		,.irq_receive_ack_i (sync_a_tx_result_vld || sync_b_tx_result_vld || sync_c_tx_result_vld)
+    );
+
 endmodule

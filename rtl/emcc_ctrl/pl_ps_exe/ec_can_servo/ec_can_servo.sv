@@ -5,11 +5,11 @@
 // 
 // Create Date: 2026/06/30 10:25:54
 // Design Name: 
-// Module Name: ec_1di_check
+// Module Name: ec_can_servo
 // Project Name: 
 // Target Devices: 
 // Tool Versions: 
-// Description: 
+// Description: ASS00583 Linear/3DI/CAN Inovance Servo Control V6.0
 // 
 // Dependencies: 
 // 
@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module ec_hw_sdcx#(
+module ec_can_servo#(
 		parameter  				REG_SPACE_BIAS 		= 	2000	,
 		parameter  				REG_SPACE_SIZE 		= 	512	
 )(
@@ -38,17 +38,20 @@ module ec_hw_sdcx#(
 		input  		 [19:0]     i_st_rd_addr    ,
 		output 		 [31:0]     o_st_rd_data    ,
 		output 		            o_st_rd_vld     ,
-
-		input		 [1:0]		di_i			,	//In - position sensor signal
-		output		 [3:0]		do_o			,	//switch
+//----------------------------------------------------- user logic begin -----------------------------------------------------//
+		input		 			i_servo_limf	,
+		input		 			i_servo_limb	,
+		input		 			i_servo_zero	
+//----------------------------------------------------- user logic end -------------------------------------------------------//
 		
-		output 	            	o_intr_irq	
+		,output 	            o_intr_irq	
     );
 	
-	
-	localparam		A_BHA_NUM		=	3;	
-	localparam		B_BHA_NUM		=	1;	
-	
+//----------------------------------------------------- user logic begin -----------------------------------------------------//
+	localparam		A_BHA_NUM	=	30 ;	// beh: 1home 2zero 3pos 4point 5rel 6vel 7vstop 8vread 9pread 10status 15torque 16tread
+	localparam		B_BHA_NUM	=	108;	
+	localparam		C_BHA_NUM	=	150;
+//----------------------------------------------------- user logic end -------------------------------------------------------//
 	//PS-PL    
 	wire 	[7:0]	unit_id         ;     	
 	wire 	[3:0]	unit_ectrl      ;       
@@ -59,8 +62,8 @@ module ec_hw_sdcx#(
 	wire 	[3:0]	m_wk_mod        ;       
 	wire 			m_saf_st        ;       
 	wire 			link_m_saf_st   ;     
-	wire 	[7:0]	sc_id			;		
-	wire 	[7:0]	ec_id           ;       
+	wire 	[9:0]	sc_id			;		
+	wire 	[13:0]	ec_id           ;       
 	wire 			rst_en_n        ;	
 
 	wire	[7:0]	a_bhv_id        ;       
@@ -150,7 +153,8 @@ module ec_hw_sdcx#(
 	wire	[31:0]	debug_reg4 ;
 	wire	[31:0]	debug_reg5 ;
 
-	wire	[31:0]	task_time_cnt	;
+
+	wire	[19:0]	task_time_cnt	;
 	
 	wire			a_tx_result_vld;
 	wire			b_tx_result_vld;
@@ -160,8 +164,8 @@ module ec_hw_sdcx#(
 	wire 	[A_BHA_NUM-1:0]	a_post_sta_allow  ;
 	wire 	[B_BHA_NUM-1:0]	b_pre_sta_allow   ;
 	wire 	[B_BHA_NUM-1:0]	b_post_sta_allow  ;
-	wire 					c_pre_sta_allow   ;
-	wire 					c_post_sta_allow  ;
+	wire 	[B_BHA_NUM-1:0] c_pre_sta_allow   ;
+	wire 	[B_BHA_NUM-1:0] c_post_sta_allow  ;
 	
 	wire	irq_a  ;
 	wire	irq_b  ;
@@ -184,18 +188,82 @@ module ec_hw_sdcx#(
 	wire			a_en;
 	wire 	[31:0]	bhv_en;
 	
-	reg		[7:0]	a_bhv_id_r;
+	wire	[7:0]	a_bhv_id_r;
+	
+	wire	i_clk = clk_i;
+	wire	i_rst = rst_i;
+	
+		reg			ro_intr_irq;
+		reg	[7:0]	irq_posedge_cnt;
+		reg	[7:0]	irq_negedge_cnt;
+		
+		always@(posedge i_clk)
+		begin
+			ro_intr_irq <= o_intr_irq;
+		end
+		
+		
+		always@(posedge i_clk)
+		begin
+			if(i_rst)begin
+				irq_posedge_cnt <= 8'd0;
+				irq_negedge_cnt <= 8'd0;
+			end else if(a_bhv_vld)begin
+				irq_posedge_cnt <= 8'd0;
+				irq_negedge_cnt <= 8'd0;
+			end else begin
+				if({ro_intr_irq,o_intr_irq} == 2'b01)begin	//rising
+					irq_posedge_cnt <= irq_posedge_cnt+1;
+				end else begin
+					irq_posedge_cnt <= irq_posedge_cnt;
+				end
+				
+				if({ro_intr_irq,o_intr_irq} == 2'b10)begin	//falling
+					irq_negedge_cnt <= irq_negedge_cnt+1;
+				end else begin
+					irq_negedge_cnt <= irq_negedge_cnt;
+				end
+			end
+		end
+	
+	//valid signal sync
+	reg 		r_a_tx_result_vld ;
+	reg 		r_b_tx_result_vld ;
+	reg 		r_c_tx_result_vld ;
+	reg 		r_a_bhv_vld       ;
+	
+	reg 		sync_a_tx_result_vld ;
+	reg 		sync_b_tx_result_vld ;
+	reg 		sync_c_tx_result_vld ;
+	reg 		sync_a_bhv_vld       ;
 	
 	always@(posedge clk_i)
 	begin
-		if(rst_i)
-			a_bhv_id_r <= 8'd0;
-		else if(a_bhv_vld)
-			a_bhv_id_r <= a_bhv_id;
-		else
-			a_bhv_id_r <= a_bhv_id_r;
+		if(rst_i)begin
+			r_a_tx_result_vld 		<= 1'b0;
+			r_b_tx_result_vld 		<= 1'b0;
+			r_c_tx_result_vld 		<= 1'b0;
+			r_a_bhv_vld       		<= 1'b0;
+			
+			sync_a_tx_result_vld 	<= 1'b0;
+			sync_b_tx_result_vld 	<= 1'b0;
+			sync_c_tx_result_vld 	<= 1'b0;
+			sync_a_bhv_vld       	<= 1'b0;
+		end else begin
+			r_a_tx_result_vld		<= a_tx_result_vld;
+			r_b_tx_result_vld		<= b_tx_result_vld;
+			r_c_tx_result_vld		<= c_tx_result_vld;
+			r_a_bhv_vld      		<= a_bhv_vld      ;
+			
+			sync_a_tx_result_vld 	<= r_a_tx_result_vld;
+			sync_b_tx_result_vld 	<= r_b_tx_result_vld;
+			sync_c_tx_result_vld 	<= r_c_tx_result_vld;
+			sync_a_bhv_vld       	<= r_a_bhv_vld      ;
+		end
 	end
 	
+//----------------------------------------------------- user logic begin -----------------------------------------------------//
+//----------------------------------------------------- user logic end -------------------------------------------------------//
 	
 	ps_rw_pl_reg#(
 		.REG_SPACE_BIAS 	(REG_SPACE_BIAS		),
@@ -299,8 +367,8 @@ module ec_hw_sdcx#(
 	,.param63               (param63		)
 	,.param64               (param64		)
 	,.param65               (param65		)
-	,.param66               (di_i[0]		)
-	,.param67               (di_i[1]		)
+	,.param66               (param66		)
+	,.param67               (param67		)
 	,.param68               (param68		)
 	,.param69               (param69		)
 	,.param70               (param70		)
@@ -311,35 +379,39 @@ module ec_hw_sdcx#(
 	,.debug_reg5			(debug_reg5		)
 	);
 
-	proactive_beh_hw_sdcx#(	
+	proactive_beh_can_servo#(
 	.BHA_NUM 				(A_BHA_NUM  	 	)	//Number of active behaviors
-)proactive_beh_hw_sdcx_u0(
+)proactive_beh_can_servo_u0(
     .clk_i                 	(clk_i				)
     ,.rst_i                	(rst_i				)
     ,.i_time_1ms_vld       	(i_time_1ms_vld 	)
     ,.i_time_1s_vld        	(i_time_1s_vld  	)
     ,.pre_sta_allow        	(a_pre_sta_allow	)
     ,.post_sta_allow       	(a_post_sta_allow	)
-    ,.mode_sel				(param16[1:0]		)
 	,.a_en			       	(a_en				)
     ,.a_bhv_id             	(a_bhv_id       	)
-    ,.a_bhv_vld            	(a_bhv_vld      	)
+    ,.a_bhv_vld            	(sync_a_bhv_vld      	)
     ,.a_tx_ot              	(a_tx_ot        	)
     ,.a_tx_result_rpt	   	(a_tx_result_rpt	)
-	,.a_tx_result_vld      	(a_tx_result_vld	)
+	,.a_tx_result_vld      	(sync_a_tx_result_vld	)
     ,.ec_cha_st            	(ec_cha_st			)
     ,.a_tx_id              	(a_tx_id        	)
     ,.a_alm_num            	(a_alm_num      	)
-    ,.di_i                  (di_i				)
-	,.do_o					(do_o				)
+	,.a_bhv_id_r			(a_bhv_id_r			)
+	,.state_monitor_o		(debug_reg1			)
     ,.irq_o                	(irq_a				)
     ,.irq_ack_i       		(irq_a_grant		)
+//----------------------------------------------------- user logic begin -----------------------------------------------------//
+//	,.i_servo_limf			(i_servo_limf		)
+//	,.i_servo_limb			(i_servo_limb		)
+//	,.i_servo_zero			(i_servo_zero		)
+//----------------------------------------------------- user logic end -------------------------------------------------------//
     );
 
 	 
-	status_beh_hw_sdcx#(
+	status_beh_can_servo#(
 		.BHA_NUM(B_BHA_NUM	)
-)status_beh_hw_sdcx_u0(
+)status_beh_can_servo_u0(
 	.clk_i			        (clk_i				)
 	,.rst_i			        (rst_i				)
 	,.i_time_1ms_vld		(i_time_1ms_vld 	)
@@ -348,18 +420,24 @@ module ec_hw_sdcx#(
 	,.post_sta_allow	    (b_post_sta_allow	)
 	,.b_en	                (b_en				)
 	,.b_bhv_id              (b_bhv_id			)
+	,.state_monitor_o		(debug_reg2			)
 	,.b_tx_ot               (b_tx_ot			)
 	,.b_tx_result_rpt       (b_tx_result_rpt	)
-	,.b_tx_result_vld       (b_tx_result_vld	)
+	,.b_tx_result_vld       (sync_b_tx_result_vld	)
 	,.ec_chb_st             (ec_chb_st			)
 	,.b_tx_id               (b_tx_id			)
 	,.b_alm_num             (b_alm_num			)
-	,.di				    (di_i				)
-	,.irq_o			        (irq_o				)
-	,.irq_ack_i	            (irq_ack_i			)	
+	,.irq_o			        (irq_b				)
+	,.irq_ack_i	            (irq_b_grant		)	
+
+//----------------------------------------------------- user logic begin -----------------------------------------------------//
+
+//----------------------------------------------------- user logic end -------------------------------------------------------//
     );
 	 
-	tim_beh_hw_sdcx tim_beh_hw_sdcx_u0(
+	tim_beh_can_servo#(
+		.BHA_NUM(C_BHA_NUM	)
+	) tim_beh_can_servo_u0(
     .clk_i                      (clk_i          	)
 	,.rst_i              	    (rst_i         		)
 	,.i_time_1ms_vld   	        (i_time_1ms_vld 	)
@@ -369,25 +447,25 @@ module ec_hw_sdcx#(
 	,.post_sta_allow	        (c_post_sta_allow	)
 	,.c_en				        (c_en				)
 	,.c_bhv_id                  (c_bhv_id			)
+	,.state_monitor_o			(debug_reg3			)
 	,.c_tx_ot          	        (c_tx_ot			)
 	,.c_tx_result_rpt  	        (c_tx_result_rpt	)
-	,.c_tx_result_vld           (c_tx_result_vld	)
+	,.c_tx_result_vld           (sync_c_tx_result_vld	)
 	,.ec_chc_st	                (ec_chc_st			)
 	,.c_tx_id         	        (c_tx_id			)
 	,.c_alm_num                 (c_alm_num			)
 	,.c_gap_crl                 (c_gap_crl			)
-	,.irq_o 					(irq_o				)
-	,.irq_ack_i                 (irq_ack_i			)
+	,.irq_o 					(irq_c				)
+	,.irq_ack_i                 (irq_c_grant		)
    );
 	
-		pre_post_sta_check_hw_sdcx#(
-			.A_BHA_NUM			(A_BHA_NUM	 		)    ,	
-			.B_BHA_NUM			(B_BHA_NUM	 		)  
-	)pre_post_sta_check_hw_sdcx_u0(
+		pre_post_sta_check_can_servo#(
+			.A_BHA_NUM			(A_BHA_NUM	 )    ,	
+			.B_BHA_NUM			(B_BHA_NUM	 )    ,
+			.C_BHA_NUM			(C_BHA_NUM	 )
+	)pre_post_sta_check_can_servo_u0(
 			.clk_i				(clk_i			),
 			.rst_i				(rst_i			),
-			.i_time_1ms_vld		(i_time_1ms_vld	),
-			.i_time_1s_vld 		(i_time_1s_vld 	),
 			.unit_id         	(unit_id        ),
 			.unit_ectrl      	(unit_ectrl     ),
 			.unit_st         	(unit_st        ),
@@ -397,9 +475,6 @@ module ec_hw_sdcx#(
 			.m_wk_mod        	(m_wk_mod       ),
 			.m_saf_st        	(m_saf_st       ),
 			.link_m_saf_st   	(link_m_saf_st  ),
-			.sc_id				(sc_id			),
-			.ec_id           	(ec_id          ),
-			.di_i				(di_i			),
 			.a_en				(a_en			),
 			.b_en				(b_en			),	
 			.c_en				(c_en			),	
@@ -417,6 +492,11 @@ module ec_hw_sdcx#(
 			.b_post_sta_allow	(b_post_sta_allow),	
 			.c_pre_sta_allow	(c_pre_sta_allow),	
 			.c_post_sta_allow	(c_post_sta_allow)	
+//----------------------------------------------------- user logic begin -----------------------------------------------------//
+			,.i_servo_limf		(i_servo_limf	 )
+			,.i_servo_limb		(i_servo_limb	 )
+			,.i_servo_zero		(i_servo_zero	 )
+//----------------------------------------------------- user logic end -------------------------------------------------------//
 		);
 		
 	irq_3i1o_arbitrator irq_3i1o_arbitrator_u0(
@@ -444,12 +524,7 @@ module ec_hw_sdcx#(
 		,.irq_reg2_o		(irq_reg2			)
 		,.irq_o				(o_intr_irq			)
 		,.irq_busy_o		(irq_busy_o			)
-		,.irq_receive_ack_i (a_tx_result_vld || b_tx_result_vld || c_tx_result_vld)	
+		,.irq_receive_ack_i (sync_a_tx_result_vld || sync_b_tx_result_vld || sync_c_tx_result_vld)	
     );
-	
-	
-	
-	
-	
 	
 endmodule

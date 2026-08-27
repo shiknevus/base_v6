@@ -75,6 +75,8 @@ module proactive_beh_siemens_plc_modbus_tcp#(
     localparam  S_SUCC_30_ACK	= 8'd9; 	//success ack
 	localparam 	S_ALERT_40		= 8'd10;	//Alert
 	localparam 	S_ALERT_40_ACK	= 8'd11;	//Alert ack
+	localparam 	S_ACT_END_1		= 8'd12;
+	localparam 	S_ACT_END_2		= 8'd13;
 
     localparam  IRQ_OK          = 8'h51;	//ps ack:OK
     localparam  IRQ_NO_OK       = 8'h52;	//ps ack:NO OK
@@ -132,23 +134,56 @@ module proactive_beh_siemens_plc_modbus_tcp#(
 		end
 	end
 
-    reg			a_bhv_vld_r;
+	always@(posedge clk_i)begin
+	if(rst_i)
+		curr_state_1d <= 8'd0;
+	else
+		curr_state_1d <= curr_state;
+	end
 
-    //Current behavior number
+    reg			a_bhv_vld_r;
+    reg	[7:0]	sta1;
+	 //Current behavior number
     always@(posedge clk_i)begin
         if(rst_i)begin
             a_bhv_id_r <= 8'd0;
 			a_bhv_vld_r <= 1'b0;
-		end else if(a_en && ((a_bhv_id >= 8'd1) && (a_bhv_id <= BHA_NUM)) && a_bhv_vld)begin
-			a_bhv_id_r <= a_bhv_id;
-			a_bhv_vld_r <= a_bhv_vld;
-		end else if(curr_state == S_IDLE && curr_state_1d != curr_state)begin
-			a_bhv_id_r <= 8'd0;
-			a_bhv_vld_r <= 1'b0;
-		end else begin
-			a_bhv_id_r <= a_bhv_id_r;
-			a_bhv_vld_r <= 1'b0;
-		end
+			sta1 <= 0;
+		end else
+			case(sta1)
+				0:begin
+					if(a_en && ((a_bhv_id >= 8'd1) && (a_bhv_id <= BHA_NUM)) && a_bhv_vld)begin
+						a_bhv_id_r <= a_bhv_id;
+						a_bhv_vld_r <= 1'b1;
+						sta1 <= 1;
+					end else begin
+						a_bhv_id_r <= 8'd0;
+						a_bhv_vld_r <= 1'b0;
+						sta1 <= 0;
+					end
+				end
+				1:begin
+					a_bhv_id_r <= a_bhv_id;
+					a_bhv_vld_r <= 1'b0;
+					sta1 <= 2;
+				end
+				2:begin
+					if(curr_state == S_ACT_END_1)begin
+						a_bhv_id_r <= 8'd0;
+						a_bhv_vld_r <= 1'b0;
+						sta1 <= 0;
+					end else begin
+						a_bhv_id_r <= a_bhv_id;
+						a_bhv_vld_r <= 1'b0;
+						sta1 <= 2;
+					end
+				end
+				default:begin
+					a_bhv_id_r <= 8'd0;
+				    a_bhv_vld_r <= 1'b0;
+					sta1 <= 0;
+				end
+			endcase
     end
 
 //------------------------------------------- FSM begin => Control 10/20/30/40 interrupt -----------------------------------------------//
@@ -177,13 +212,6 @@ module proactive_beh_siemens_plc_modbus_tcp#(
 		match_30 <= 1'b0;
 		match_40 <= 1'b0;
 	end
-	end
-
-	always@(posedge clk_i)begin
-	if(rst_i)
-		curr_state_1d <= 8'd0;
-	else
-		curr_state_1d <= curr_state;
 	end
 
     always @(posedge clk_i) begin
@@ -256,28 +284,36 @@ module proactive_beh_siemens_plc_modbus_tcp#(
 				end
             end
 
-            S_SUCC_30: begin		//curr_state = 7
+            S_SUCC_30: begin		//curr_state = 8
 				next_state = S_SUCC_30_ACK;					//Send Interrupt 30
             end
 
-			S_SUCC_30_ACK:begin		//curr_state = 8
+			S_SUCC_30_ACK:begin		//curr_state = 9
 				if(match_30)    							//30 response success
-                    next_state = S_IDLE;
+                    next_state = S_ACT_END_1;
                 else if(ack_tx_result == IRQ_NO_OK || timout)
                     next_state = S_ALERT_40;
                 else
                     next_state = S_SUCC_30_ACK;
 			end
 
-            S_ALERT_40: begin		//curr_state = 9
+            S_ALERT_40: begin		//curr_state = 10
 				next_state = S_ALERT_40_ACK;				//Send Interrupt 40
             end
 
-			S_ALERT_40_ACK:begin	//curr_state = 10
+			S_ALERT_40_ACK:begin	//curr_state = 11
 				if(match_40 || timout) 						//40 Interrupt response
-                    next_state = S_IDLE;
+                    next_state = S_ACT_END_1;
                 else
                     next_state = S_ALERT_40_ACK;
+			end
+
+			S_ACT_END_1:begin
+				next_state = S_ACT_END_2;
+			end
+
+			S_ACT_END_2:begin
+				next_state = S_IDLE;
 			end
 
             default: begin
@@ -296,6 +332,8 @@ module proactive_beh_siemens_plc_modbus_tcp#(
     always@(posedge clk_i)begin
         if(rst_i || !a_en)
             a_tx_id <= 8'd0;
+		else if(curr_state == S_IDLE)
+			a_tx_id <= 8'd0;
         else if(curr_state == S_READY_10)
             a_tx_id <= 8'd10;
         //else if(curr_state == S_EXE_20)
@@ -304,8 +342,6 @@ module proactive_beh_siemens_plc_modbus_tcp#(
             a_tx_id <= 8'd30;
         else if(curr_state == S_ALERT_40)
             a_tx_id <= 8'd40;
-		else if(curr_state == S_IDLE || curr_state == S_BHA_PRE_DET)
-			a_tx_id <= 8'd0;
         else
             a_tx_id <= a_tx_id;
     end
@@ -365,7 +401,7 @@ module proactive_beh_siemens_plc_modbus_tcp#(
 			timout_cnt <= 20'd0;
 		else if(curr_state != curr_state_1d)
 			timout_cnt <= 20'd0;
-        else if(timout_cnt >= a_tx_ot-1)
+        else if(timout_cnt > a_tx_ot)
             timout_cnt <= 20'd0;
         else if(i_time_1s_vld)
             timout_cnt <= timout_cnt+1;

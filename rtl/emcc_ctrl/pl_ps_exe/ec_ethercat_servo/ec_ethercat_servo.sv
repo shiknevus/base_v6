@@ -9,7 +9,7 @@
 // Project Name: 
 // Target Devices: 
 // Tool Versions: 
-// Description: ASS00583 Linear/3DI/EtherCAT Inovance Servo Control V6.0
+// Description: ASS00583 Linear/3DI/ethercat Inovance Servo Control V6.0
 // 
 // Dependencies: 
 // 
@@ -21,8 +21,8 @@
 
 
 module ec_ethercat_servo#(
-		parameter  				REG_SPACE_BIAS 		= 	2000	,	//Component offset address
-		parameter  				REG_SPACE_SIZE 		= 	512			//Component register size
+		parameter  				REG_SPACE_BIAS 		= 	2000	,
+		parameter  				REG_SPACE_SIZE 		= 	512	
 )(
 		input					clk_i			,
 		input					rst				,
@@ -38,18 +38,20 @@ module ec_ethercat_servo#(
 		input  		 [19:0]     i_st_rd_addr    ,
 		output 		 [31:0]     o_st_rd_data    ,
 		output 		            o_st_rd_vld     ,
-
+//----------------------------------------------------- user logic begin -----------------------------------------------------//
 		input		 			i_servo_limf	,
 		input		 			i_servo_limb	,
-		input		 			i_servo_zero	,
-
-		output 	            	o_intr_irq
+		input		 			i_servo_zero	
+//----------------------------------------------------- user logic end -------------------------------------------------------//
+		
+		,output 	            o_intr_irq	
     );
 	
-	localparam		A_BHA_NUM	=	16;	// beh: 1home 2zero 3pos 4point 5rel 6vel 7vstop 8vread 9pread 10status 15torque 16tread
-	localparam		B_BHA_NUM	=	1;	
-	localparam		C_BHA_NUM	=	1;
-	
+//----------------------------------------------------- user logic begin -----------------------------------------------------//
+	localparam		A_BHA_NUM	=	30 ;	// beh: 1home 2zero 3pos 4point 5rel 6vel 7vstop 8vread 9pread 10status 15torque 16tread
+	localparam		B_BHA_NUM	=	108;	
+	localparam		C_BHA_NUM	=	150;
+//----------------------------------------------------- user logic end -------------------------------------------------------//
 	//PS-PL    
 	wire 	[7:0]	unit_id         ;     	
 	wire 	[3:0]	unit_ectrl      ;       
@@ -151,42 +153,19 @@ module ec_ethercat_servo#(
 	wire	[31:0]	debug_reg4 ;
 	wire	[31:0]	debug_reg5 ;
 
-	wire	[31:0]	task_time_cnt	;
+
+	wire	[19:0]	task_time_cnt	;
 	
 	wire			a_tx_result_vld;
 	wire			b_tx_result_vld;
 	wire			c_tx_result_vld;
-
-	//CDC sync (ps_reg_clk -> clk_i): 2-stage sync + edge detect.
-	//ps_rw_pl_reg outputs single-cycle pulses; behavior FSM & arbitrator run on clk_i.
-	reg			a_bhv_vld_r1, a_bhv_vld_r2;
-	reg			a_tx_result_vld_r1, a_tx_result_vld_r2;
-	reg			b_tx_result_vld_r1, b_tx_result_vld_r2;
-	reg			c_tx_result_vld_r1, c_tx_result_vld_r2;
-
-	wire		a_bhv_vld_sync		= a_bhv_vld_r2 & ~a_bhv_vld_r1;
-	wire		a_tx_result_vld_sync	= a_tx_result_vld_r2 & ~a_tx_result_vld_r1;
-	wire		b_tx_result_vld_sync	= b_tx_result_vld_r2 & ~b_tx_result_vld_r1;
-	wire		c_tx_result_vld_sync	= c_tx_result_vld_r2 & ~c_tx_result_vld_r1;
-
-	always @(posedge clk_i) begin
-		a_bhv_vld_r1			<= a_bhv_vld;
-		a_bhv_vld_r2			<= a_bhv_vld_r1;
-		a_tx_result_vld_r1		<= a_tx_result_vld;
-		a_tx_result_vld_r2		<= a_tx_result_vld_r1;
-		b_tx_result_vld_r1		<= b_tx_result_vld;
-		b_tx_result_vld_r2		<= b_tx_result_vld_r1;
-		c_tx_result_vld_r1		<= c_tx_result_vld;
-		c_tx_result_vld_r2		<= c_tx_result_vld_r1;
-	end
-
+	
 	wire 	[A_BHA_NUM-1:0]	a_pre_sta_allow   ;
 	wire 	[A_BHA_NUM-1:0]	a_post_sta_allow  ;
-	wire					pre_sta_fail	  ;
 	wire 	[B_BHA_NUM-1:0]	b_pre_sta_allow   ;
 	wire 	[B_BHA_NUM-1:0]	b_post_sta_allow  ;
-	wire 					c_pre_sta_allow   ;
-	wire 					c_post_sta_allow  ;
+	wire 	[B_BHA_NUM-1:0] c_pre_sta_allow   ;
+	wire 	[B_BHA_NUM-1:0] c_post_sta_allow  ;
 	
 	wire	irq_a  ;
 	wire	irq_b  ;
@@ -210,6 +189,79 @@ module ec_ethercat_servo#(
 	wire 	[31:0]	bhv_en;
 	
 	wire	[7:0]	a_bhv_id_r;
+	
+	wire	i_clk = clk_i;
+	wire	i_rst = rst_i;
+	
+		reg			ro_intr_irq;
+		reg	[7:0]	irq_posedge_cnt;
+		reg	[7:0]	irq_negedge_cnt;
+		
+		always@(posedge i_clk)
+		begin
+			ro_intr_irq <= o_intr_irq;
+		end
+		
+		
+		always@(posedge i_clk)
+		begin
+			if(i_rst)begin
+				irq_posedge_cnt <= 8'd0;
+				irq_negedge_cnt <= 8'd0;
+			end else if(a_bhv_vld)begin
+				irq_posedge_cnt <= 8'd0;
+				irq_negedge_cnt <= 8'd0;
+			end else begin
+				if({ro_intr_irq,o_intr_irq} == 2'b01)begin	//rising
+					irq_posedge_cnt <= irq_posedge_cnt+1;
+				end else begin
+					irq_posedge_cnt <= irq_posedge_cnt;
+				end
+				
+				if({ro_intr_irq,o_intr_irq} == 2'b10)begin	//falling
+					irq_negedge_cnt <= irq_negedge_cnt+1;
+				end else begin
+					irq_negedge_cnt <= irq_negedge_cnt;
+				end
+			end
+		end
+	
+	//valid signal sync
+	reg 		r_a_tx_result_vld ;
+	reg 		r_b_tx_result_vld ;
+	reg 		r_c_tx_result_vld ;
+	reg 		r_a_bhv_vld       ;
+	
+	reg 		sync_a_tx_result_vld ;
+	reg 		sync_b_tx_result_vld ;
+	reg 		sync_c_tx_result_vld ;
+	reg 		sync_a_bhv_vld       ;
+	
+	always@(posedge clk_i)
+	begin
+		if(rst_i)begin
+			r_a_tx_result_vld 		<= 1'b0;
+			r_b_tx_result_vld 		<= 1'b0;
+			r_c_tx_result_vld 		<= 1'b0;
+			r_a_bhv_vld       		<= 1'b0;
+			
+			sync_a_tx_result_vld 	<= 1'b0;
+			sync_b_tx_result_vld 	<= 1'b0;
+			sync_c_tx_result_vld 	<= 1'b0;
+			sync_a_bhv_vld       	<= 1'b0;
+		end else begin
+			r_a_tx_result_vld		<= a_tx_result_vld;
+			r_b_tx_result_vld		<= b_tx_result_vld;
+			r_c_tx_result_vld		<= c_tx_result_vld;
+			r_a_bhv_vld      		<= a_bhv_vld      ;
+			
+			sync_a_tx_result_vld 	<= r_a_tx_result_vld;
+			sync_b_tx_result_vld 	<= r_b_tx_result_vld;
+			sync_c_tx_result_vld 	<= r_c_tx_result_vld;
+			sync_a_bhv_vld       	<= r_a_bhv_vld      ;
+		end
+	end
+	
 	
 	ps_rw_pl_reg#(
 		.REG_SPACE_BIAS 	(REG_SPACE_BIAS		),
@@ -298,7 +350,7 @@ module ec_ethercat_servo#(
 	,.c_alm_num             (c_alm_num 		)
 	,.c_tsc_id              (c_tx_id  		)
 	,.c_bhv_id              (c_bhv_id 		)
-	,.param51               (debug_reg1		)
+	,.param51               (param51		)
 	,.param52               (param52		)
 	,.param53               (param53		)
 	,.param54               (param54		)
@@ -326,7 +378,7 @@ module ec_ethercat_servo#(
 	);
 
 	proactive_beh_ethercat_servo#(
-	.BHA_NUM 				(A_BHA_NUM  	 )	//Number of active behaviors
+	.BHA_NUM 				(A_BHA_NUM  	 	)	//Number of active behaviors
 )proactive_beh_ethercat_servo_u0(
     .clk_i                 	(clk_i				)
     ,.rst_i                	(rst_i				)
@@ -336,10 +388,10 @@ module ec_ethercat_servo#(
     ,.post_sta_allow       	(a_post_sta_allow	)
 	,.a_en			       	(a_en				)
     ,.a_bhv_id             	(a_bhv_id       	)
-    ,.a_bhv_vld            	(a_bhv_vld_sync 	)
+    ,.a_bhv_vld            	(sync_a_bhv_vld      	)
     ,.a_tx_ot              	(a_tx_ot        	)
     ,.a_tx_result_rpt	   	(a_tx_result_rpt	)
-	,.a_tx_result_vld      	(a_tx_result_vld_sync)
+	,.a_tx_result_vld      	(sync_a_tx_result_vld	)
     ,.ec_cha_st            	(ec_cha_st			)
     ,.a_tx_id              	(a_tx_id        	)
     ,.a_alm_num            	(a_alm_num      	)
@@ -347,10 +399,11 @@ module ec_ethercat_servo#(
 	,.state_monitor_o		(debug_reg1			)
     ,.irq_o                	(irq_a				)
     ,.irq_ack_i       		(irq_a_grant		)
-	,.i_servo_limf			(i_servo_limf		)
-	,.i_servo_limb			(i_servo_limb		)
-	,.i_servo_zero			(i_servo_zero		)
-	,.i_pre_sta_fail		(pre_sta_fail		)
+//----------------------------------------------------- user logic begin -----------------------------------------------------//
+//	,.i_servo_limf			(i_servo_limf		)
+//	,.i_servo_limb			(i_servo_limb		)
+//	,.i_servo_zero			(i_servo_zero		)
+//----------------------------------------------------- user logic end -------------------------------------------------------//
     );
 
 	status_beh_ethercat_servo#(
@@ -364,17 +417,24 @@ module ec_ethercat_servo#(
 	,.post_sta_allow	    (b_post_sta_allow	)
 	,.b_en	                (b_en				)
 	,.b_bhv_id              (b_bhv_id			)
+	,.state_monitor_o		(debug_reg2			)
 	,.b_tx_ot               (b_tx_ot			)
 	,.b_tx_result_rpt       (b_tx_result_rpt	)
-	,.b_tx_result_vld       (b_tx_result_vld_sync)
+	,.b_tx_result_vld       (sync_b_tx_result_vld	)
 	,.ec_chb_st             (ec_chb_st			)
 	,.b_tx_id               (b_tx_id			)
 	,.b_alm_num             (b_alm_num			)
 	,.irq_o			        (irq_b				)
-	,.irq_ack_i	            (irq_b_grant		)
-    );
+	,.irq_ack_i	            (irq_b_grant		)	
 
-	tim_beh_ethercat_servo tim_beh_ethercat_servo_u0(
+//----------------------------------------------------- user logic begin -----------------------------------------------------//
+
+//----------------------------------------------------- user logic end -------------------------------------------------------//
+    );
+	 
+	tim_beh_ethercat_servo#(
+		.BHA_NUM(C_BHA_NUM	)
+	) tim_beh_ethercat_servo_u0(
     .clk_i                      (clk_i          	)
 	,.rst_i              	    (rst_i         		)
 	,.i_time_1ms_vld   	        (i_time_1ms_vld 	)
@@ -384,9 +444,10 @@ module ec_ethercat_servo#(
 	,.post_sta_allow	        (c_post_sta_allow	)
 	,.c_en				        (c_en				)
 	,.c_bhv_id                  (c_bhv_id			)
+	,.state_monitor_o			(debug_reg3			)
 	,.c_tx_ot          	        (c_tx_ot			)
 	,.c_tx_result_rpt  	        (c_tx_result_rpt	)
-	,.c_tx_result_vld           (c_tx_result_vld_sync)
+	,.c_tx_result_vld           (sync_c_tx_result_vld	)
 	,.ec_chc_st	                (ec_chc_st			)
 	,.c_tx_id         	        (c_tx_id			)
 	,.c_alm_num                 (c_alm_num			)
@@ -394,9 +455,9 @@ module ec_ethercat_servo#(
 	,.irq_o 					(irq_c				)
 	,.irq_ack_i                 (irq_c_grant		)
    );
-
+	
 		pre_post_sta_check_ethercat_servo#(
-			.A_BHA_NUM			(A_BHA_NUM	 )    ,
+			.A_BHA_NUM			(A_BHA_NUM	 )    ,	
 			.B_BHA_NUM			(B_BHA_NUM	 )    ,
 			.C_BHA_NUM			(C_BHA_NUM	 )
 	)pre_post_sta_check_ethercat_servo_u0(
@@ -411,30 +472,30 @@ module ec_ethercat_servo#(
 			.m_wk_mod        	(m_wk_mod       ),
 			.m_saf_st        	(m_saf_st       ),
 			.link_m_saf_st   	(link_m_saf_st  ),
-			.i_servo_limf		(i_servo_limf	),
-			.i_servo_limb		(i_servo_limb	),
-			.i_servo_zero		(i_servo_zero	),
+			.a_en				(a_en			),
+			.b_en				(b_en			),	
+			.c_en				(c_en			),	
 			.a_bhv_id			(a_bhv_id_r		),
-			.a_bhv_vld			(a_bhv_vld_sync	),
 			.b_bhv_id			(b_bhv_id		),
 			.c_bhv_id			(c_bhv_id		),
-			.a_en				(a_en			),
-			.b_en				(b_en			),
-			.c_en				(c_en			),
 			.ec_cha_st			(ec_cha_st		),
 			.ec_chb_st       	(ec_chb_st		),
 			.ec_chc_st       	(ec_chc_st		),
-			.c_circle_time		(c_gap_crl		),
-			.task_time_cnt		(task_time_cnt	),
-			.a_pre_sta_allow	(a_pre_sta_allow),
-			.a_post_sta_allow	(a_post_sta_allow),
-			.b_pre_sta_allow	(b_pre_sta_allow),
-			.b_post_sta_allow	(b_post_sta_allow),
-			.c_pre_sta_allow	(c_pre_sta_allow),
-			.c_post_sta_allow	(c_post_sta_allow),
-			.o_pre_sta_fail		(pre_sta_fail	)
+			.c_circle_time		(c_gap_crl		),	
+			.task_time_cnt		(task_time_cnt	),	
+			.a_pre_sta_allow	(a_pre_sta_allow),	
+			.a_post_sta_allow	(a_post_sta_allow),	
+			.b_pre_sta_allow	(b_pre_sta_allow),	
+			.b_post_sta_allow	(b_post_sta_allow),	
+			.c_pre_sta_allow	(c_pre_sta_allow),	
+			.c_post_sta_allow	(c_post_sta_allow)	
+//----------------------------------------------------- user logic begin -----------------------------------------------------//
+			,.i_servo_limf		(i_servo_limf	 )
+			,.i_servo_limb		(i_servo_limb	 )
+			,.i_servo_zero		(i_servo_zero	 )
+//----------------------------------------------------- user logic end -------------------------------------------------------//
 		);
-
+		
 	irq_3i1o_arbitrator irq_3i1o_arbitrator_u0(
 		.clk_i              (clk_i            	)
 		,.rst_i             (rst_i           	)
@@ -460,12 +521,7 @@ module ec_ethercat_servo#(
 		,.irq_reg2_o		(irq_reg2			)
 		,.irq_o				(o_intr_irq			)
 		,.irq_busy_o		(irq_busy_o			)
-		,.irq_receive_ack_i (a_tx_result_vld_sync || b_tx_result_vld_sync || c_tx_result_vld_sync)
+		,.irq_receive_ack_i (sync_a_tx_result_vld || sync_b_tx_result_vld || sync_c_tx_result_vld)	
     );
-	
-	
-	
-	
-	
 	
 endmodule

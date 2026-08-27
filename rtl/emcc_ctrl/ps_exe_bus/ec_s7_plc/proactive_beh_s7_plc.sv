@@ -19,8 +19,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////////
 
-module proactive_beh_feijie_marker#(
-    parameter                 	BHA_NUM = 5  		//Number of active behaviors (1-128 generic)
+module proactive_beh_s7_plc#(
+    parameter                 	BHA_NUM = 2  		//Number of active behaviors (1-128 generic)
 )(
     input                       clk_i
     ,input                      rst_i

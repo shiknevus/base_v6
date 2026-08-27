@@ -133,6 +133,13 @@ module proactive_beh_siemens_cnc#(
 		end
 	end
 
+	always@(posedge clk_i)begin
+	if(rst_i)
+		curr_state_1d <= 8'd0;
+	else
+		curr_state_1d <= curr_state;
+	end
+
     reg			a_bhv_vld_r;
 
     reg	[7:0]	sta1;
@@ -205,13 +212,6 @@ module proactive_beh_siemens_cnc#(
 		match_30 <= 1'b0;
 		match_40 <= 1'b0;
 	end
-	end
-
-	always@(posedge clk_i)begin
-	if(rst_i)
-		curr_state_1d <= 8'd0;
-	else
-		curr_state_1d <= curr_state;
 	end
 
     always @(posedge clk_i) begin
@@ -330,6 +330,8 @@ module proactive_beh_siemens_cnc#(
     always@(posedge clk_i)begin
         if(rst_i || !a_en)
             a_tx_id <= 8'd0;
+		else if(curr_state == S_IDLE)
+			a_tx_id <= 8'd0;
         else if(curr_state == S_READY_10)
             a_tx_id <= 8'd10;
         //else if(curr_state == S_EXE_20)
@@ -338,8 +340,6 @@ module proactive_beh_siemens_cnc#(
             a_tx_id <= 8'd30;
         else if(curr_state == S_ALERT_40)
             a_tx_id <= 8'd40;
-		else if(curr_state == S_IDLE || curr_state == S_BHA_PRE_DET)
-			a_tx_id <= 8'd0;
         else
             a_tx_id <= a_tx_id;
     end
@@ -366,8 +366,6 @@ module proactive_beh_siemens_cnc#(
             a_alm_num <= 8'd0;
         else if(curr_state == S_BHA_PRE_DET && auto_manual && !pre_sta_allow[a_bhv_id_r - 1'b1])
             a_alm_num <= ALARM_MANUAL;	//hard alarm: manual mode
-        else if(curr_state == S_BHA_PRE_DET && i_link_lock && !pre_sta_allow[a_bhv_id_r - 1'b1])
-            a_alm_num <= ALARM_LOCK;	//hard alarm: link lock
         else if(curr_state == S_BHA_PRE_DET && timout)
             a_alm_num <= ALARM_BEHATMOUT;
         else if(curr_state == S_READY_10_ACK && ack_tx_result == IRQ_NO_OK)
@@ -403,12 +401,14 @@ module proactive_beh_siemens_cnc#(
             timout_cnt <= 20'd0;
         else if(i_time_1s_vld)
             timout_cnt <= timout_cnt+1;
+		else
+			timout_cnt <= timout_cnt;
     end
 
     always@(posedge clk_i)begin
         if(rst_i)
             timout <= 1'b0;
-        else if(timout_cnt > a_tx_ot)
+        else if(timout_cnt >= a_tx_ot-1)
             timout <= 1'b1;
         else
             timout <= 1'b0;
