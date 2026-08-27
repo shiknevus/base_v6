@@ -205,14 +205,14 @@ module tim_beh_pulmotor_handwheel#(
 	always @(*) begin
         case (curr_state)
             S_IDLE: begin
-                if (c_en && c_gap_crl != 20'd0 && !o_axis_number)	
+                if (c_en && c_gap_crl != 20'd0 && (o_axis_number != 0))	
                     next_state = S_BHA_PRE_DET;
                 else
                     next_state = S_IDLE;
             end
 			
 			S_BHA_PRE_DET: begin	//curr_state = 1
-				if(pre_sta_allow[c_bhv_id - 1'b1]) begin
+				if(pre_sta_allow[0]) begin	//行为id 150
 					next_state = S_READY_10;
 				end else if(timout) begin
 					next_state = S_ALERT_40;			
@@ -221,12 +221,12 @@ module tim_beh_pulmotor_handwheel#(
 				end
             end
 			
-			S_READY_10: begin        //Send 10 interrupt
+			S_READY_10: begin        //2
 				next_state = S_READY_10_ACK;
             end
 			
-			S_READY_10_ACK: begin
-				if(match_10)  //Transaction 10 Acknowledged OK
+			S_READY_10_ACK: begin	//3
+				if(match_10)  
                     next_state = S_EXE_20;
                 else if(ack_tx_result == IRQ_NO_OK || timout)
                     next_state = S_ALERT_40;
@@ -234,11 +234,11 @@ module tim_beh_pulmotor_handwheel#(
                     next_state = S_READY_10_ACK;
 			end
 			
-			S_EXE_20: begin	//Send 20 interrupt
+			S_EXE_20: begin	//4
 				next_state = S_EXE;
             end
 			
-			S_EXE:begin
+			S_EXE:begin	//5
 				if(task_time_cnt >= loop_time_ms - 1)		//Timer finished
 					next_state = S_BHA_POST_DET;
 				else
@@ -256,7 +256,7 @@ module tim_beh_pulmotor_handwheel#(
 
 			
 			S_BHA_POST_DET: begin	//curr_state = 6
-				if(post_sta_allow[c_bhv_id - 1'b1]) begin
+				if(post_sta_allow[0]) begin
 					next_state = S_SUCC_30;
 				end else if(timout) begin
 					next_state = S_ALERT_40;			
@@ -356,7 +356,7 @@ module tim_beh_pulmotor_handwheel#(
             c_alm_num <= ack_ps_alart_num;    
         else if(curr_state == S_READY_10_ACK && timout)						//For Transaction 10, waiting for the ps response timed out.
             c_alm_num <= 8'd101;     
-		else if(curr_state == S_BHA_POST_DET && ctimout)//The execution of Behavior 1 failed.
+		else if(curr_state == S_BHA_POST_DET && timout)//The execution of Behavior 1 failed.
 			c_alm_num <= 8'd102; 
 		else if(curr_state == S_SUCC_30_ACK && ack_tx_result == IRQ_NO_OK)	//Transaction 30 has a ps response error.
 			c_alm_num <= ack_ps_alart_num;

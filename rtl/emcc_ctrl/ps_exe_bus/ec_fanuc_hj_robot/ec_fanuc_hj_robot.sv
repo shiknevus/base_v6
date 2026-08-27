@@ -42,7 +42,7 @@ module ec_fanuc_hj_robot#(
 		output 	            	o_intr_irq
     );
 
-	localparam		A_BHA_NUM	=	7;	// behaviors 1-7
+	localparam		A_BHA_NUM	=	2;	// behaviors 1-7
 	localparam		B_BHA_NUM	=	1;
 	localparam		C_BHA_NUM	=	1;
 
