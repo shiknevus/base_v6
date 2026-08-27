@@ -140,7 +140,7 @@ module emcc_mst_app
     wire    [7:0]  	app_err_type;        //the error type of slave station
     wire    [15:0]  each_dg_len;
 //    wire    [7:0]   slv_sta_num;         //this signals only update during first initial datagram.It indicate the number of slave station
-    wire    [7:0]  	hb_err_slvsta;       //indicate the index of the error station //Ö¸Ê¾²úÉúÁ´½Ó´íÎóµÄ´ÓÕ¾
+    wire    [7:0]  	hb_err_slvsta;       //indicate the index of the error station //Ö¸Ê¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó´ï¿½ï¿½ï¿½Ä´ï¿½Õ¾
 
     wire    [3:0]   slv_id_we;
     wire    [15:0]  slv_id_addr;
@@ -148,8 +148,7 @@ module emcc_mst_app
     wire    [31:0]  slv_fpga_version;
     wire            ping_pong_flag;//0:aurora link is success;1:aurora link is fail
 	wire            mst_sta_trsf_flag;
-	reg [31:0]  	wk_cnt  =   'd0;
-	
+
 	wire            init_err_clr;
 	wire            init_err;
 	wire            cnt_err_clr;
@@ -158,17 +157,8 @@ module emcc_mst_app
 	wire			init_error;
 	wire			run_en;
 
-    always @(posedge clk)begin
-        if(reset)begin
-            wk_cnt  <=  0;
-        end else if (mst_sta_trsf_flag) begin
-            wk_cnt  <=  wk_cnt  + 1;
-        end else begin
-            wk_cnt  <=  0;
-        end
-    end
-
-    assign  each_dg_len         =   ps_tst_trsf_port ? (`DEPOT_ACTIVE_BYTE_NUM * 2) : (`DEPOT_ACTIVE_BYTE_NUM * 2);//unit:BYTE  datagram length contain the length of tx region and rx region,so the active value must multiply 2.
+    // wk_cnt removed 20260826: counted but never read
+    assign  each_dg_len         =   `DEPOT_ACTIVE_BYTE_NUM * 2; //unit:BYTE  datagram length contain the length of tx region and rx region,so the active value must multiply 2.
     
     always @( * )begin
         if(ps_loopback_flag)begin
@@ -228,15 +218,15 @@ module emcc_mst_app
 		,.cnt_err_clr		(cnt_err_clr		)
 		,.cnt_err			(cnt_err			)
 		,.init_finish		(init_finish		)
-		,.downstream_lane_up(downstream_lane_up	)
-		,.downstream_link   (downstream_link	)
+		,.downstream_lane_up_i(downstream_lane_up)
+		,.downstream_link_i (downstream_link	)
 
         ,.link_success      (link_success       )
         ,.loop_link_success (loop_link_success  )
         ,.slv_sta_num       (slv_sta_num        )   //this signals only update during first initial datagram.It indicate the number of slave station
         ,.app_err_flag      (app_err_flag       )   //optical fiber link errors type
-        ,.app_err_type      (app_err_type       )   //optical fiber link errors type
-        ,.hb_err_slvsta     (hb_err_slvsta      )   //indicate the index of the error station //Ö¸Ê¾²úÉúÁ´½Ó´íÎóµÄ´ÓÕ¾
+        ,.app_err_type_i    (app_err_type       )   //optical fiber link errors type
+        ,.hb_err_slvsta_i   (hb_err_slvsta      )   //indicate the index of the error station //Ö¸Ê¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó´ï¿½ï¿½ï¿½Ä´ï¿½Õ¾
         ,.ps_tst_trsf_port  (ps_tst_trsf_port   )
         ,.ps_trsf_port_en   (ps_trsf_port_en    )
         ,.stat_rslt         (stat_rslt          )

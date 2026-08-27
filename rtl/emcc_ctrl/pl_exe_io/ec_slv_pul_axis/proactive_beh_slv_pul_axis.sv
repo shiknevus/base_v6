@@ -155,6 +155,16 @@ module proactive_beh_slv_pul_axis#(
 		end
     end
 	
+	//CDC: ps_reg_clk -> clk_i, 2FF sync + edge detect
+	reg [1:0] a_bhv_vld_sync    = 2'b00;
+	reg [1:0] a_result_vld_sync = 2'b00;
+	always@(posedge clk_i)begin
+		a_bhv_vld_sync     <= {a_bhv_vld_sync[0],     a_bhv_vld};
+		a_result_vld_sync  <= {a_result_vld_sync[0], a_tx_result_vld};
+	end
+	wire a_bhv_vld_i       = ~a_bhv_vld_sync[1]    & a_bhv_vld_sync[0];
+	wire a_tx_result_vld_i = ~a_result_vld_sync[1] & a_result_vld_sync[0];
+
 	//Analyze interrupt response register
 	always@(posedge clk_i)begin
 	if(rst_i)begin
@@ -162,7 +172,7 @@ module proactive_beh_slv_pul_axis#(
 		ack_tx_id	 	<=	8'd0;
 		ack_tx_result	<=	8'd0;
 		ack_ps_alart_num<=	8'd0;
-	end else if(a_tx_result_vld)begin
+	end else if(a_tx_result_vld_i)begin
 		ack_beh_id 		<= 	a_tx_result_rpt[31:24];
 		ack_tx_id		<= 	a_tx_result_rpt[23:16];
 		ack_tx_result	<= 	a_tx_result_rpt[15:8];
@@ -187,9 +197,9 @@ module proactive_beh_slv_pul_axis#(
         if(rst_i)begin
             a_bhv_id_r <= 8'd0;
 			a_bhv_vld_r <= 1'b0;
-		end else if(a_en && ((a_bhv_id >= 8'd1) && (a_bhv_id <= BHA_NUM)) && a_bhv_vld)begin
+		end else if(a_en && ((a_bhv_id >= 8'd1) && (a_bhv_id <= BHA_NUM)) && a_bhv_vld_i)begin
             a_bhv_id_r <= a_bhv_id;
-			a_bhv_vld_r <= a_bhv_vld;
+			a_bhv_vld_r <= a_bhv_vld_i;
 		end else if(curr_state == S_IDLE && curr_state_1d != curr_state)begin
 			a_bhv_id_r <= 8'd0;
 			a_bhv_vld_r <= 1'b0;

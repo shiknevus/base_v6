@@ -376,8 +376,7 @@ module app_mst_rx_ctrl(
             end
         endcase
     end
-    
-    wire    [47:0]  jump_dg_size;
+
     always @(posedge clk)begin
         case(wk_state)
             STM_IDLE:begin
@@ -403,22 +402,9 @@ module app_mst_rx_ctrl(
             end
         endcase
     end
-    
-    wire    [17:0]  each_rl_dg_size;//real datagram each buffer size
-    wire    [17:0]  each_dg_head_size;
-    wire    [17:0]  jump_dg_number;
-    assign  each_rl_dg_size[17:0]   =   {4'd0,datagram_len[15:2]};
-    assign  each_dg_head_size       =   4;
-    assign  jump_dg_number          =   {18'd1};
-    DSP_sumAD_multC_plusC calc_jump_dg_size_u (
-      .CLK(clk),  // input wire CLK
-      .A(each_rl_dg_size),      // input wire [17 : 0] A
-      .B(jump_dg_number),      // input wire [17 : 0] B
-      .C(48'd0),      // input wire [47 : 0] C
-      .D(each_dg_head_size),      // input wire [17 : 0] D
-      .P(jump_dg_size)      // output wire [47 : 0] P
-    );
-    
+
+    // jump_dg_size DSP removed 20260826: output never read, saved one DSP48
+
     always @(posedge clk) begin
         case(wk_state)
             STM_DG_PRCS:begin
@@ -464,7 +450,7 @@ module app_mst_rx_ctrl(
                 if(ethcat_type !== `ETHCAT_TYPE_DATAGRAM)begin
                     cache_addr  <=  cache_addr_nxt_bias + rd_cache_cnt;
                 end else begin
-                    cache_addr  <=  cache_addr_nxt_bias + rd_cache_cnt + (datagram_len[15:2] >> 1);//Êý¾Ý°üÖ»ÐèÒª¶Á³ö½ÓÊÕÇøµÄÊý¾Ý±¨ÎÄ
+                    cache_addr  <=  cache_addr_nxt_bias + rd_cache_cnt + (datagram_len[15:2] >> 1);//ï¿½ï¿½ï¿½Ý°ï¿½Ö»ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý±ï¿½ï¿½ï¿½
                 end
             end
 //            STM_DG_PRCS:begin//no use
@@ -555,7 +541,7 @@ module app_mst_rx_ctrl(
             STM_RD_DATAGRAM_L:begin
                 if((ethcat_type == `ETHCAT_TYPE_INITIAL) & latency_cnt_done)begin
                     slv_id_we               <=  4'hf;
-                    slv_id_addr             <=  data_buf[2-1][23:16];//´ÓÕ¾µØÖ·
+                    slv_id_addr             <=  data_buf[2-1][23:16];//ï¿½ï¿½Õ¾ï¿½ï¿½Ö·
                     slv_id_din              <=  data_buf[2-2][31:0];//slave station id
                 end else begin
                     slv_id_we               <=  4'h0;

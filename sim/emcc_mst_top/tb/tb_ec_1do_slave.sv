@@ -1,8 +1,5 @@
 
 `timescale 1 ns / 1 ns
-`include "../../../rtl/include_files/components_param.vh"
-`include "../../../rtl/include_files/reg_addr_pl.vh"
-`include "../../../rtl/include_files/globe_includes.vh"
 
 module tb_ec_1do_slave;
 //********************************Defines*********************************

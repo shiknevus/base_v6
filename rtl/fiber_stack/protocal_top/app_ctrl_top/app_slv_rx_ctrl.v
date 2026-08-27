@@ -314,10 +314,10 @@ module app_slv_rx_ctrl(
                 end
                 STM_WKC2DG_JUMP_ADDR:begin
                     if(ping_pong_flag & (ethcat_type == `ETHCAT_TYPE_DATAGRAM))begin
-                        //接受到包的UUID相同，因此不需要将cache的包内容搬移到仓库，直接将从站的备份仓库中的值搬移到cache中准备发送.
+                        //锟斤拷锟杰碉拷锟斤拷锟斤拷UUID锟斤拷同锟斤拷锟斤拷瞬锟斤拷锟揭拷锟絚ache锟侥帮拷锟斤拷锟捷帮拷锟狡碉拷锟街库，直锟接斤拷锟斤拷站锟侥憋拷锟捷仓匡拷锟叫碉拷值锟斤拷锟狡碉拷cache锟斤拷准锟斤拷锟斤拷锟斤拷.
                         wk_state  <=  STM_RD_DEPOT_SH;
                     end else if((~ping_pong_flag) & (ethcat_type == `ETHCAT_TYPE_DATAGRAM))begin
-                        //接受到包的UUID不同，需要先将cache包中配置内容搬移到仓库，然后再将从站的状态内容从仓库中搬移到cache中准备发送.
+                        //锟斤拷锟杰碉拷锟斤拷锟斤拷UUID锟斤拷同锟斤拷锟斤拷要锟饺斤拷cache锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟捷帮拷锟狡碉拷锟街库，然锟斤拷锟劫斤拷锟斤拷站锟斤拷状态锟斤拷锟捷从仓匡拷锟叫帮拷锟狡碉拷cache锟斤拷准锟斤拷锟斤拷锟斤拷.
                         wk_state  <=  STM_WR_DEPOT_SH;
                     end else begin
                         wk_state  <=  STM_RD_DATAGRAM;
@@ -553,8 +553,7 @@ module app_slv_rx_ctrl(
             end
         endcase
     end
-    
-    wire    [47:0]  jump_dg_size;
+
     always @(posedge clk)begin
         case(wk_state)
             STM_IDLE:begin
@@ -580,23 +579,9 @@ module app_slv_rx_ctrl(
             end
         endcase
     end
-    
-    wire    [17:0]  each_rl_dg_size;//real datagram each buffer size
-    wire    [17:0]  each_dg_head_size;
-    wire    [17:0]  jump_dg_number;
-    assign  each_rl_dg_size[17:0]   =   {4'd0,datagram_len[15:2]};
-    assign  each_dg_head_size       =   4;
-//    assign  jump_dg_number          =   {10'd0,datagram_wkc[7:0]};
-    assign  jump_dg_number          =   {18'd1};
-    DSP_sumAD_multC_plusC calc_jump_dg_size_u (
-      .CLK(clk),  // input wire CLK
-      .A(each_rl_dg_size),      // input wire [17 : 0] A
-      .B(jump_dg_number),      // input wire [17 : 0] B
-      .C(48'd0),      // input wire [47 : 0] C
-      .D(each_dg_head_size),      // input wire [17 : 0] D
-      .P(jump_dg_size)      // output wire [47 : 0] P
-    );
-    
+
+    // jump_dg_size DSP removed 20260826: output never read, saved one DSP48
+
     always @(posedge clk) begin
         case(wk_state)
             STM_DG_PRCS:begin

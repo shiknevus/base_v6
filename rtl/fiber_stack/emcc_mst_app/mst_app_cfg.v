@@ -48,8 +48,8 @@ module mst_app_cfg
 	,output reg             			cnt_err_clr
 	,input wire	[31:0]  				cnt_err
 	,input wire            				init_finish
-	,input              				downstream_lane_up
-    ,input              				downstream_link
+	,input              				downstream_lane_up_i
+    ,input              				downstream_link_i
     
     ,input  wire    [15:0]              board_temp_82130
     
@@ -63,8 +63,8 @@ module mst_app_cfg
     ,input                              link_success
     ,input  wire                        loop_link_success
     ,input  wire                        app_err_flag        //the error type of slave station is valid
-    ,input  wire    [7:0]              	app_err_type        //the error type of slave station
-    ,input  wire    [7:0]              	hb_err_slvsta       //indicate the index of the error station //指示产生链接错误的从站
+    ,input  wire    [7:0]              	app_err_type_i      //the error type of slave station (prot_clk domain)
+    ,input  wire    [7:0]              	hb_err_slvsta_i     //index of the error station (prot_clk domain)
     ,input  wire    [7:0]               slv_sta_num     //this signals only update during first initial datagram.It indicate the number of slave station
 
     ,output wire                        ps_tst_trsf_port
@@ -104,13 +104,36 @@ module mst_app_cfg
 	reg		[1:0]				wk_state;
 	reg		[1:0]				nstate;
 	reg		[23:0]				cycle;
-	reg		[7:0]				data_reg;
 	reg		[7:0]				data_reg1;
 	reg		[7:0]				data_reg2;
 	reg		[2:0]				err_code;
 	(* MARK_DEBUG="true" *)reg		[1:0]				f_wk_state;
 	(* MARK_DEBUG="true" *)reg		[1:0]				f_nstate;
-	
+
+	//CDC: prot_clk -> ps_reg_clk, 2FF sync (slv_sta_num quasi-static, left unsynced)
+	reg							downstream_lane_up_s1, downstream_lane_up_s2;
+	reg							downstream_link_s1, downstream_link_s2;
+	reg		[7:0]				app_err_type_s1, app_err_type_s2;
+	reg		[7:0]				hb_err_slvsta_s1, hb_err_slvsta_s2;
+	reg							downstream_lane_up;
+	reg							downstream_link;
+	reg		[7:0]				app_err_type;
+	reg		[7:0]				hb_err_slvsta;
+	always @(posedge ps_reg_clk)begin
+		downstream_lane_up_s1	<= downstream_lane_up_i;
+		downstream_lane_up_s2	<= downstream_lane_up_s1;
+		downstream_lane_up		<= downstream_lane_up_s2;
+		downstream_link_s1		<= downstream_link_i;
+		downstream_link_s2		<= downstream_link_s1;
+		downstream_link			<= downstream_link_s2;
+		app_err_type_s1			<= app_err_type_i;
+		app_err_type_s2			<= app_err_type_s1;
+		app_err_type			<= app_err_type_s2;
+		hb_err_slvsta_s1		<= hb_err_slvsta_i;
+		hb_err_slvsta_s2		<= hb_err_slvsta_s1;
+		hb_err_slvsta			<= hb_err_slvsta_s2;
+	end
+
     assign  wr_space_select =   ((ps_reg_addr >= REG_SPACE_BIAS) & (ps_reg_addr < (REG_SPACE_BIAS + REG_SPACE_SIZE))) ? 1'd1 : 1'd0;
     assign  rd_space_select =   ((ps_reg_rd_addr >= REG_SPACE_BIAS) & (ps_reg_rd_addr < (REG_SPACE_BIAS + REG_SPACE_SIZE))) ? 1'd1 : 1'd0;
     assign  wr_reg_addr     =   ps_reg_addr     - REG_SPACE_BIAS;
@@ -451,7 +474,6 @@ module mst_app_cfg
 	
 	always @(posedge ps_reg_clk) begin
         if(ps_reg_reset)begin
-			data_reg  	<=  'h0;
 			data_reg1  	<=  'h0;
 			data_reg2  	<=  'h0;
         end else begin

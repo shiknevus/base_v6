@@ -93,8 +93,8 @@ module app_mst_tx_ctrl(
     wire            last_ck_hb_sta; 
 	reg             mst_sta_restart_d1  =   'd0;//master station restart transfer
     reg             mst_sta_restart_r   =   'd0;
-    reg             latch_sta_rs_flag;
-	
+	// latch_sta_rs_flag removed 20260826: set/cleared but never read
+
 	always @(posedge clk)begin
         mst_sta_restart_d1  <=  mst_sta_restart;
         mst_sta_restart_r   <=  mst_sta_restart & !mst_sta_restart_d1;
@@ -109,18 +109,6 @@ module app_mst_tx_ctrl(
 			init_finish   <=  'h0;
         end else begin
             init_finish   <=  init_finish;
-        end
-    end
-	
-	always @(posedge clk)begin
-        if(reset)begin
-            latch_sta_rs_flag   <=  'd0;
-        end else if(mst_sta_restart_r)begin
-            latch_sta_rs_flag   <=  'd1;
-        end else if(app_trsf_en &(wk_state == STM_IDLE))begin
-            latch_sta_rs_flag   <=  'd0;
-        end else begin
-            latch_sta_rs_flag   <=  latch_sta_rs_flag;
         end
     end
 	

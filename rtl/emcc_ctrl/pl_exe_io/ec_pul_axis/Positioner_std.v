@@ -1,5 +1,7 @@
 /////////////////////////// MODULE //////////////////////////////
-module Positioner_std
+module Positioner_std #(
+    parameter BASE_REFCLK = 156_250_000 
+)
 (
     input                   clk
    ,input                   reset
@@ -37,11 +39,10 @@ module Positioner_std
    localparam  P_DIV_WIDTH    = 46;
    localparam  P_SPD_WIDTH    = 23; // 0 ~ 8M
    localparam  P_PERIOD_WIDTH = 28; // 0 ~ 256M
-   localparam  CLK_HZ         = 156_250_000;   
    localparam  P_JERK_WIDTH   = 65-P_SPD_WIDTH;
 
    localparam  SIM_PERIOD_DIV = 512; // simulation only // add by szzhang 20260813
-   localparam  SIM_RAMP_K     = (SIM_PERIOD_DIV*10**8)/CLK_HZ; // add by szzhang 20260813
+   localparam  SIM_RAMP_K     = (SIM_PERIOD_DIV*10**8)/BASE_REFCLK; // add by szzhang 20260813
 
    localparam  ST_POS_IDLE = 0;
    localparam  ST_POS_INIT = 1;
@@ -555,6 +556,12 @@ module Positioner_std
                            r_pf_done <= 1'b1;
                         end
                      end
+                     default: begin // unknown mode: stop at mini speed, never hang busy
+                        if(r_pf_spd<=P_SPD_MIN) begin
+                           fsm_st <= ST_POS_IDLE;
+                           r_pf_done <= 1'b1;
+                        end
+                     end
                   endcase
                end
 
@@ -626,9 +633,9 @@ module Positioner_std
                spd_div_den    <= r_pf_spd[P_SPD_WIDTH-1:0]; // Speed: 0 ~ 8M, 23-bit
                period_div_start  <= r_pf_pulse_first ? (r_div_ready&r_pf_pulse_count<=r_pf_pulse_period-1'b1) : r_pf_pulse_count==0;
 `ifdef PF_SIM
-               period_div_nom <= CLK_HZ[P_PERIOD_WIDTH-1:0] / SIM_PERIOD_DIV; //add by szzhang 20260813
+               period_div_nom <= BASE_REFCLK[P_PERIOD_WIDTH-1:0] / SIM_PERIOD_DIV; //add by szzhang 20260813
 `else
-               period_div_nom <= CLK_HZ[P_PERIOD_WIDTH-1:0];
+               period_div_nom <= BASE_REFCLK[P_PERIOD_WIDTH-1:0];
 `endif
                period_div_den <= r_pf_spd[P_SPD_WIDTH-1:0]; // Speed: 0 ~ 8M, 23-bit;
             end
@@ -642,9 +649,9 @@ module Positioner_std
                spd_div_den    <= r_pf_spd[P_SPD_WIDTH-1:0]; // Speed: 0 ~ 8M, 23-bit
                period_div_start  <= r_pf_pulse_count==0;
 `ifdef PF_SIM
-               period_div_nom <= CLK_HZ[P_PERIOD_WIDTH-1:0] / SIM_PERIOD_DIV;
+               period_div_nom <= BASE_REFCLK[P_PERIOD_WIDTH-1:0] / SIM_PERIOD_DIV;
 `else
-               period_div_nom <= CLK_HZ[P_PERIOD_WIDTH-1:0];
+               period_div_nom <= BASE_REFCLK[P_PERIOD_WIDTH-1:0];
 `endif
                period_div_den <= r_pf_spd[P_SPD_WIDTH-1:0]; // Speed: 0 ~ 8M, 23-bit;    
             end

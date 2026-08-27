@@ -15,8 +15,13 @@
 /////////////////////////////////////////////////////////////////
 
 /////////////////////////////////////////////////////////////////
-//          选择机型，起效的define对应相应的机型               //
+//          选锟斤拷锟斤拷停锟斤拷锟叫э拷锟絛efine锟斤拷应锟斤拷应锟侥伙拷锟斤拷               //
 /////////////////////////////////////////////////////////////////
+// SLAVE station config. MASTER mirror: ../globe_includes.vh
+// (values differ on purpose: ETHCAT_INIT_DG_LEN / DEFAULT_SUPPORT_SLV_NUM)
+`ifndef GLOBAL_INCLUDES_SLV_VH
+`define GLOBAL_INCLUDES_SLV_VH
+
 //TEST DEFINE
 `define LOOPBACK_MODE   0
 `define TESE_HEARTBEAT_MODE  0
@@ -33,8 +38,8 @@
 `define ETHCAT_TYPE_DATAGRAM     13
 
 //ethcat operation command
-`define ETHCAT_CMD_APRW     8'h3    //主站使用顺序寻址与从站交互数据
-`define ETHCAT_CMD_FPRW     8'h6    //主站使用设置寻址与从站交互数据
+`define ETHCAT_CMD_APRW     8'h3    
+`define ETHCAT_CMD_FPRW     8'h6    
 
 //ethcat frame process result
 `define ETHCAT_PRCS_CRC_FAIL    1
@@ -46,3 +51,4 @@
 
 `define ETHCAT_HB_DG_LEN      8   //ethcat initial datagram package length  unit:1BYTE
 
+`endif //GLOBAL_INCLUDES_SLV_VH

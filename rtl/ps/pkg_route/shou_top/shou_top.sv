@@ -38,7 +38,7 @@ genvar j;
                  slv_1_msg_addr_s[j]<=0; 
             end else begin
                 if(slv_sta_msg_vld)begin
-                    if ((LOW_ADDR[j]<=slv_sta_msg_addr)&&(slv_sta_msg_addr< LOW_ADDR[j]+BAG_LENGTH-1)) begin
+                    if ((LOW_ADDR[j]<=slv_sta_msg_addr)&&(slv_sta_msg_addr< LOW_ADDR[j]+BAG_LENGTH)) begin // fix off-by-one: word 511 dropped
                         slv_1_msg_vld_s[j]<=slv_sta_msg_vld;  
                         slv_1_msg_addr_s[j]<=slv_sta_msg_addr-j*512;
                     end else begin
@@ -57,7 +57,7 @@ genvar j;
     always @(posedge clk)begin
         slv_sta_msg_dat <= 0;
         for (int k = 0; k < RAM_DWIDTH; k++) begin
-            if ((LOW_ADDR[k]<=slv_sta_msg_addr)&&(slv_sta_msg_addr< LOW_ADDR[k]+BAG_LENGTH-1)) begin
+            if ((LOW_ADDR[k]<=slv_sta_msg_addr)&&(slv_sta_msg_addr< LOW_ADDR[k]+BAG_LENGTH)) begin // fix off-by-one
                 slv_sta_msg_dat<=slv_1_msg_dat_s[k];
             end
         end

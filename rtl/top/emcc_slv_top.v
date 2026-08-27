@@ -15,6 +15,8 @@
 `timescale 1 ns / 1 ps
 (* core_generation_info = "aurora_8b10b_0,aurora_8b10b_v11_1_6,{user_interface=AXI_4_Streaming,backchannel_mode=Sidebands,c_aurora_lanes=1,c_column_used=left,c_gt_clock_1=GTHQ0,c_gt_clock_2=None,c_gt_loc_1=1,c_gt_loc_10=X,c_gt_loc_11=X,c_gt_loc_12=X,c_gt_loc_13=X,c_gt_loc_14=X,c_gt_loc_15=X,c_gt_loc_16=X,c_gt_loc_17=X,c_gt_loc_18=X,c_gt_loc_19=X,c_gt_loc_2=X,c_gt_loc_20=X,c_gt_loc_21=X,c_gt_loc_22=X,c_gt_loc_23=X,c_gt_loc_24=X,c_gt_loc_25=X,c_gt_loc_26=X,c_gt_loc_27=X,c_gt_loc_28=X,c_gt_loc_29=X,c_gt_loc_3=X,c_gt_loc_30=X,c_gt_loc_31=X,c_gt_loc_32=X,c_gt_loc_33=X,c_gt_loc_34=X,c_gt_loc_35=X,c_gt_loc_36=X,c_gt_loc_37=X,c_gt_loc_38=X,c_gt_loc_39=X,c_gt_loc_4=X,c_gt_loc_40=X,c_gt_loc_41=X,c_gt_loc_42=X,c_gt_loc_43=X,c_gt_loc_44=X,c_gt_loc_45=X,c_gt_loc_46=X,c_gt_loc_47=X,c_gt_loc_48=X,c_gt_loc_5=X,c_gt_loc_6=X,c_gt_loc_7=X,c_gt_loc_8=X,c_gt_loc_9=X,c_lane_width=4,c_line_rate=31250,c_nfc=false,c_nfc_mode=IMM,c_refclk_frequency=125000,c_simplex=false,c_simplex_mode=TX,c_stream=false,c_ufc=false,flow_mode=None,interface_mode=Framing,dataflow_config=Duplex}" *)
 (* DowngradeIPIdentifiedWarnings="yes" *)
+`include "global_includes.vh"
+`include "depot_addr_map.vh"
 module emcc_slv_top #
 (
     parameter   STATION_ID = 32'habcd_dc00
@@ -440,14 +442,12 @@ module emcc_slv_top #
     //this signal is used to decidet how the downstream bus is connected
     reg downstream_lane_up = 'd0;
     always @ (posedge prot_clk)begin
-        if(slvsta_rcv_hb_flag[1])begin  //slave station has receive heart beat package
+        if(slvsta_rcv_hb_flag[1])begin  //update only on heartbeat result, hold between heartbeats
             if(slvsta_rcv_hb_flag[0])begin   //if address match,package is return
                 downstream_lane_up  <=  'd0;
             end else begin//package continues to downstream
                 downstream_lane_up  <=  'd1;
             end
-        end else begin//other package which isn't heart package
-            downstream_lane_up  <=  1;
         end
     end
 
@@ -591,7 +591,7 @@ module emcc_slv_top #
          ,.rd_msg_addr_en    (rd_msg_addr_en    ) 
          ,.rd_msg_addr       (rd_msg_addr       ) 
          ,.driver_cfg_msg_wr_req (driver_cfg_msg_wr_req  )
-         ,.driver_cfg_msg_wr_ack (driver_cfg_msg_wr_req  )
+         ,.driver_cfg_msg_wr_ack (1'b1                   ) // cfg stream is fire-and-forget, ack tied high (was fake self-echo)
 
          ,.do_regoin_msg     (do_regoin_msg     )
          ,.di_regoin_msg     (di_regoin_msg     )
@@ -708,5 +708,23 @@ module emcc_slv_top #
     assign  ai_regoin_msg   =   {1'b0,1'b0,1'b0,ch_1,1'b0,1'b0,1'b0,ch_2};
 `endif
 
-	assign  led = ~(LANE_UP_0&CHANNEL_UP_0);	
+	//status LED: solid=link idle, fast blink=data flowing, dark=link down
+	wire            slv_link_up  = LANE_UP_0 & CHANNEL_UP_0;
+	wire            slv_data_act = m_app_tx_tvalid | s_app_rx_tvalid
+	                             | s_axi_tx_tvalid_0 | m_axi_rx_tvalid_0
+	                             | s_axi_tx_tvalid_1 | m_axi_rx_tvalid_1;
+	(* ASYNC_REG = "TRUE" *) reg [1:0]  led_act_sync;
+	reg [22:0]      led_act_hold;
+	reg [22:0]      led_free_cnt;
+
+	always @(posedge clk_10m) begin
+	    led_act_sync    <= {led_act_sync[0], slv_data_act};
+	    led_free_cnt    <= led_free_cnt + 1'b1;
+	    if (led_act_sync[1])
+	        led_act_hold <= 23'd5_000_000;          //0.5s stretch @10MHz
+	    else if (led_act_hold != 0)
+	        led_act_hold <= led_act_hold - 1'b1;
+	end
+
+	assign  led = ~(slv_link_up & ((led_act_hold != 0) ? led_free_cnt[20] : 1'b1)); //~5Hz blink on activity, keep active-low drive
 endmodule

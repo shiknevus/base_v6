@@ -185,7 +185,7 @@ module slv_pul_axis
    wire         pos_pf_done;
    wire         pos_pf_error;
 
-   Positioner_std	pos_u
+   Positioner_std #(.BASE_REFCLK(100_000_000)) pos_u
    (
       .clk            ( clk                ),
       .reset          ( reset              ),

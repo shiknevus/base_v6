@@ -82,9 +82,10 @@ module Jog_fa_std
                    r_pf_quickstop <= 1'b0;
                    r_st_error <= 1'b0;
                    if(i_start) begin
-                       if((~i_lim_f& i_lim_b& i_org)|( i_lim_f&~i_lim_b& i_org)|
-                           ( i_lim_f& i_lim_b&~i_org)|( i_lim_f& i_lim_b& i_org)|
-                           ( i_lim_f& i_pf_dir==DIR_POS)|( i_lim_b& i_pf_dir==DIR_NEG)) begin 
+                       // only block when moving INTO an active limit; allow jog away
+                       if((i_lim_f & i_lim_b) |
+                           (i_lim_f & (i_pf_dir == DIR_POS)) |
+                           (i_lim_b & (i_pf_dir == DIR_NEG))) begin
                            fsm_st <= ST_JOG_ERROR;
                        end else begin
                            fsm_st <= ST_JOG_START;

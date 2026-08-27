@@ -16,6 +16,7 @@
 (* core_generation_info = "aurora_8b10b_0,aurora_8b10b_v11_1_6,{user_interface=AXI_4_Streaming,backchannel_mode=Sidebands,c_aurora_lanes=1,c_column_used=left,c_gt_clock_1=GTHQ0,c_gt_clock_2=None,c_gt_loc_1=1,c_gt_loc_10=X,c_gt_loc_11=X,c_gt_loc_12=X,c_gt_loc_13=X,c_gt_loc_14=X,c_gt_loc_15=X,c_gt_loc_16=X,c_gt_loc_17=X,c_gt_loc_18=X,c_gt_loc_19=X,c_gt_loc_2=X,c_gt_loc_20=X,c_gt_loc_21=X,c_gt_loc_22=X,c_gt_loc_23=X,c_gt_loc_24=X,c_gt_loc_25=X,c_gt_loc_26=X,c_gt_loc_27=X,c_gt_loc_28=X,c_gt_loc_29=X,c_gt_loc_3=X,c_gt_loc_30=X,c_gt_loc_31=X,c_gt_loc_32=X,c_gt_loc_33=X,c_gt_loc_34=X,c_gt_loc_35=X,c_gt_loc_36=X,c_gt_loc_37=X,c_gt_loc_38=X,c_gt_loc_39=X,c_gt_loc_4=X,c_gt_loc_40=X,c_gt_loc_41=X,c_gt_loc_42=X,c_gt_loc_43=X,c_gt_loc_44=X,c_gt_loc_45=X,c_gt_loc_46=X,c_gt_loc_47=X,c_gt_loc_48=X,c_gt_loc_5=X,c_gt_loc_6=X,c_gt_loc_7=X,c_gt_loc_8=X,c_gt_loc_9=X,c_lane_width=4,c_line_rate=31250,c_nfc=false,c_nfc_mode=IMM,c_refclk_frequency=125000,c_simplex=false,c_simplex_mode=TX,c_stream=false,c_ufc=false,flow_mode=None,interface_mode=Framing,dataflow_config=Duplex}" *)
 (* DowngradeIPIdentifiedWarnings="yes" *)
 `include  "base_addr.vh"
+`include  "globe_includes.vh"
 module emcc_mst_top #
 (
     parameter   STATION_ID = 0
@@ -229,7 +230,25 @@ module emcc_mst_top #
         );
     assign  GT_RESET_IN = rst_aurora_init_clk;
     assign  prot_clk = axi_clk_0;
-    assign led = LANE_UP_1&CHANNEL_UP_1;
+    //status LED: solid=link idle, fast blink=data flowing, dark=link down
+    wire            mst_link_up  = LANE_UP_1 & CHANNEL_UP_1;
+    wire            mst_data_act = m_app_tx_tvalid | s_app_rx_tvalid
+                                 | s_axi_tx_tvalid_0 | m_axi_rx_tvalid_0
+                                 | s_axi_tx_tvalid_1 | m_axi_rx_tvalid_1;
+    (* ASYNC_REG = "TRUE" *) reg [1:0]  led_act_sync;
+    reg [22:0]      led_act_hold;
+    reg [22:0]      led_free_cnt;
+
+    always @(posedge clk_10m) begin
+        led_act_sync    <= {led_act_sync[0], mst_data_act};
+        led_free_cnt    <= led_free_cnt + 1'b1;
+        if (led_act_sync[1])
+            led_act_hold <= 23'd5_000_000;              //0.5s stretch @10MHz
+        else if (led_act_hold != 0)
+            led_act_hold <= led_act_hold - 1'b1;
+    end
+
+    assign led = mst_link_up & ((led_act_hold != 0) ? led_free_cnt[20] : 1'b1); //~5Hz blink on activity
 
     always @(posedge axi_clk_0)begin
         axi_clk_rst_0_d1    <=  axi_clk_rst_0;

@@ -68,7 +68,6 @@ module slv_app_rcv
     reg [4:0]   wk_state_d1 = 'd0;
     reg [4:0]   wk_state_d2 = 'd0;
     reg         work_cnt_done;
-    reg [RAM_DWIDTH-1:0]    rcv_buf_douta_d1;
     reg [15:0]  slv_dg_index;
     reg [7:0]   slv_sta_num_d1;
     reg [7:0]   slv_sta_num_d2;
@@ -88,21 +87,8 @@ module slv_app_rcv
     reg [3:0]               app_rslt_wea;
     reg [RAM_AWIDTH-1:0]    app_rslt_addra;
     reg [RAM_DWIDTH-1:0]    app_rslt_dina;
-    reg [31:0]              cur_uuid_d1;
-    reg                     err_flag  =   'd0;
+    reg [31:0]              rcv_uid_seen = 32'hffff_ffff; // uuid of last processed frame
     reg [31:0]              work_cnt = 0;
-    
-    always @(posedge clk)begin
-        cur_uuid_d1 <=  cur_uuid;
-    end
-
-    always @(posedge clk)begin
-        if(((cur_uuid[15:8] - cur_uuid_d1[15:8]) > 1) & (cur_uuid_d1[15:8] !== 0))begin
-            err_flag    <=  1;
-        end else begin
-            err_flag    <=  0;
-        end
-    end
 
     always @(posedge clk)begin
         slv_sta_num_d1  <=  slv_sta_num;
@@ -112,10 +98,6 @@ module slv_app_rcv
     always @(posedge clk)begin
         rcv_buf_addra_d1  <=  rcv_buf_addra;
         rcv_buf_addra_d2  <=  rcv_buf_addra_d1;
-    end
-
-    always @(posedge clk)begin
-        rcv_buf_douta_d1    <=  rcv_buf_douta;
     end
 
     always @(posedge clk)begin
@@ -143,8 +125,9 @@ module slv_app_rcv
                     end
                 end
                 STM_CK_RCV_UID:begin
-                    if(rcv_buf_douta !== rcv_buf_douta_d1)begin
-                        wk_state  <=  STM_GEN_TX_START;
+                    if(rcv_buf_douta != rcv_uid_seen)begin // numeric compare vs last processed uuid, no miss window
+                        rcv_uid_seen <= rcv_buf_douta;
+                        wk_state     <=  STM_GEN_TX_START;
                     end else begin
                         wk_state  <=  wk_state;
                     end
@@ -317,7 +300,7 @@ module slv_app_rcv
                 intf_tst_flag   <=  0;
             end
             STM_CK_RCV_UID:begin
-                if(rcv_buf_douta !== rcv_buf_douta_d1)begin
+                if(rcv_buf_douta != rcv_uid_seen)begin
                     intf_tst_flag       <=  (rcv_buf_douta[31:28] == 4'd1) ? 1'b1 : 1'b0;
                 end else begin
                     intf_tst_flag   <=  intf_tst_flag;

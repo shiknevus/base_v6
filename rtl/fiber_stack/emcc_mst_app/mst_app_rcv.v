@@ -53,6 +53,8 @@ module mst_app_rcv
 );
 
     reg [31:0]  work_cnt = 0;
+    reg [31:0]  rcv_uid_seen = 32'hffff_ffff; // uuid of last processed frame
+    reg [3:0]   id_unmatch_cnt = 4'd0; // diagnostic: consecutive id-unmatched frames
 
     localparam  STM_IDLE        = 'd0;
     localparam  STM_RD_RCV_UID  = 'd1;
@@ -69,8 +71,7 @@ module mst_app_rcv
     reg [4:0] wk_state_d1 = 'd0;
     reg [4:0] wk_state_d2 = 'd0;
     reg         gen_dat_done;
-	reg [RAM_DWIDTH-1:0]    rcv_buf_douta_d1;
-    reg [15:0]  slv_dg_index;
+	reg [15:0]  slv_dg_index;
     reg [7:0]   slv_sta_num_d1;
     reg [7:0]   slv_sta_num_d2;
     reg [RAM_AWIDTH-1:0]    rcv_buf_addra_d1;
@@ -93,10 +94,6 @@ module mst_app_rcv
     always @(posedge clk)begin
         rcv_buf_addra_d1  <=  rcv_buf_addra;
         rcv_buf_addra_d2  <=  rcv_buf_addra_d1;
-    end
-
-    always @(posedge clk)begin
-        rcv_buf_douta_d1    <=  rcv_buf_douta;
     end
 
     always @(posedge clk)begin
@@ -124,7 +121,8 @@ module mst_app_rcv
                     end
                 end
                 STM_CK_RCV_UID:begin
-                    if(rcv_buf_douta !== rcv_buf_douta_d1)begin
+                    if(rcv_buf_douta != rcv_uid_seen)begin // numeric compare vs last processed uuid, no miss window
+                        rcv_uid_seen <= rcv_buf_douta;
                         if(rcv_buf_douta == cur_tx_trsf_pkg_id)begin
                             wk_state  <=  STM_TX_HS;
                         end else begin
@@ -188,7 +186,7 @@ module mst_app_rcv
                 intf_tst_flag   <=  0;
             end
             STM_CK_RCV_UID:begin
-                if(rcv_buf_douta !== rcv_buf_douta_d1)begin
+                if(rcv_buf_douta != rcv_uid_seen)begin
                     intf_tst_flag       <=  (rcv_buf_douta[31:28] == 4'd1) ? 1'b1 : 1'b0;
                 end else begin
                     intf_tst_flag   <=  intf_tst_flag;
@@ -198,6 +196,16 @@ module mst_app_rcv
                 intf_tst_flag   <=  intf_tst_flag;
             end
         endcase
+    end
+
+    always @(posedge clk) begin // clear on matched frame, count unmatched rounds
+        if(reset)begin
+            id_unmatch_cnt <= 4'd0;
+        end else if(wk_state == STM_CK_RCV_UID && rcv_buf_douta != rcv_uid_seen && rcv_buf_douta == cur_tx_trsf_pkg_id)begin
+            id_unmatch_cnt <= 4'd0;
+        end else if(wk_state == STM_ID_UNMATCH)begin
+            id_unmatch_cnt <= id_unmatch_cnt + 4'd1;
+        end
     end
 
     always @(posedge clk) begin
