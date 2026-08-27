@@ -1,6 +1,0 @@
-#include <stdio.h>
-#include <stdint.h>
-#include <stddef.h>   // for uintptr_t
-#include "platform.h"
-#include "xil_printf.h"
-
