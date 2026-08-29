@@ -162,64 +162,97 @@ module status_beh_sys_sf#(
 	reg			b_bhv_id_vld;
 	
 	always @(posedge clk_i) begin
-		if(rst_i)
+		if(rst_i)begin
 			b_bhv_id <= 8'd0;
-		else begin
-			if(negedge_i_start)
+			b_bhv_id_vld <= 1'b0;
+		end else begin
+			if(negedge_i_start)begin
 				b_bhv_id <= 8'd100;
-			else if(curr_state == S_ACTIVE_END2)
+				b_bhv_id_vld <= 1'b1;
+			end else if(curr_state == S_ACTIVE_END2)begin
 				b_bhv_id <= 8'd0;
-			else
+				b_bhv_id_vld <= 1'b0;
+			end else begin
 				b_bhv_id <= b_bhv_id;
+				b_bhv_id_vld <= 1'b0;
+			end
 			
-			if(negedge_i_stop)
+			if(negedge_i_stop)begin
 				b_bhv_id <= 8'd101;
-			else if(curr_state == S_ACTIVE_END2)
+				b_bhv_id_vld <= 1'b1;
+			end else if(curr_state == S_ACTIVE_END2)begin
 				b_bhv_id <= 8'd0;
-			else
+				b_bhv_id_vld <= 1'b0;
+			end else begin
 				b_bhv_id <= b_bhv_id;
+				b_bhv_id_vld <= 1'b0;
+			end 
 			
-			if(negedge_i_rst)
+			if(negedge_i_rst)begin
 				b_bhv_id <= 8'd102;
-			else if(curr_state == S_ACTIVE_END2)
+				b_bhv_id_vld <= 1'b1;
+			end else if(curr_state == S_ACTIVE_END2)begin
 				b_bhv_id <= 8'd0;
-			else
+				b_bhv_id_vld <= 1'b0;
+			end else begin
 				b_bhv_id <= b_bhv_id;
+				b_bhv_id_vld <= 1'b0;
+			end
 			
-			if(edge_i_estop && i_estop)
+			if(edge_i_estop && i_estop)begin
 				b_bhv_id <= 8'd103;
-			else if(curr_state == S_ACTIVE_END2)
+				b_bhv_id_vld <= 1'b1;
+			end else if(curr_state == S_ACTIVE_END2)begin
 				b_bhv_id <= 8'd0;
-			else
+				b_bhv_id_vld <= 1'b0;
+			end else begin
 				b_bhv_id <= b_bhv_id;
+				b_bhv_id_vld <= 1'b0;
+			end
 			
-			if(edge_i_estop && !i_estop)
+			if(edge_i_estop && !i_estop)begin
 				b_bhv_id <= 8'd107;
-			else if(curr_state == S_ACTIVE_END2)
+				b_bhv_id_vld <= 1'b1;
+			end else if(curr_state == S_ACTIVE_END2)begin
 				b_bhv_id <= 8'd0;
-			else
+				b_bhv_id_vld <= 1'b0;
+			end else begin
 				b_bhv_id <= b_bhv_id;
+				b_bhv_id_vld <= 1'b0;
+			end 
 			
-			if(edge_i_manul && !i_manul)
+			if(edge_i_manul && !i_manul)begin
 				b_bhv_id <= 8'd104;
-			else if(curr_state == S_ACTIVE_END2)
+				b_bhv_id_vld <= 1'b1;
+			end else if(curr_state == S_ACTIVE_END2)begin
 				b_bhv_id <= 8'd0;
-			else
+				b_bhv_id_vld <= 1'b0;
+			end else begin
 				b_bhv_id <= b_bhv_id;
+				b_bhv_id_vld <= 1'b0;
+			end
 			
-			if((edge_i_manul && i_manul && i_auto) || (edge_i_auto && i_manul && i_auto))
+			if((edge_i_manul && i_manul && i_auto) || (edge_i_auto && i_manul && i_auto))begin
 				b_bhv_id <= 8'd105;
-			else if(curr_state == S_ACTIVE_END2)
+				b_bhv_id_vld <= 1'b1;
+			end else if(curr_state == S_ACTIVE_END2)begin
 				b_bhv_id <= 8'd0;
-			else
+				b_bhv_id_vld <= 1'b0;
+			end else begin
 				b_bhv_id <= b_bhv_id;
+				b_bhv_id_vld <= 1'b0;
+			end
 				
-			if(edge_i_auto && !i_auto)
+			if(edge_i_auto && !i_auto)begin
 				b_bhv_id <= 8'd106;
-			else if(curr_state == S_ACTIVE_END2)
+				b_bhv_id_vld <= 1'b1;
+			end else if(curr_state == S_ACTIVE_END2)begin
 				b_bhv_id <= 8'd0;
-			else
+				b_bhv_id_vld <= 1'b0;
+			end else begin
 				b_bhv_id <= b_bhv_id;
+				b_bhv_id_vld <= 1'b0;
+			end
 		end
 	end
 
@@ -260,7 +293,7 @@ module status_beh_sys_sf#(
         next_state = curr_state;
         case (curr_state)
             S_IDLE: begin
-                if (b_en && ((b_bhv_id >= 8'd1) && (b_bhv_id <= BHA_NUM)) && beh_vld)
+                if (b_en && ((b_bhv_id >= 8'd1) && (b_bhv_id <= BHA_NUM)) && b_bhv_id_vld)
                     next_state = S_READY_10;
                 else
                     next_state = S_IDLE;

@@ -138,6 +138,7 @@ module proactive_beh_hw_sdcx#(
 	end
 	
     reg			a_bhv_vld_r;
+	reg		[7:0]	sta1;
      //Current behavior number
     always@(posedge clk_i)begin
         if(rst_i)begin
@@ -425,7 +426,7 @@ module proactive_beh_hw_sdcx#(
 	//------------------------------------------- Single-Key begin -------------------------------------------
 	//do_o = {KA3,KA2,KA1};
 	
-	always@(posedge i_clk)
+	always@(posedge clk_i)
 	begin
 		if(rst_i || !a_en)
 			do_o <= 3'b000;

@@ -135,6 +135,7 @@ module proactive_beh_sys_sf#(
 	end
 	
     reg			a_bhv_vld_r;
+	reg		[7:0]	sta1;
      //Current behavior number
     always@(posedge clk_i)begin
         if(rst_i)begin

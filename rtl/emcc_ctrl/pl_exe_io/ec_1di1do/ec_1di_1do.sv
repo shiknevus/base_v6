@@ -142,7 +142,7 @@ module ec_1di_1do#(
 	wire 			param67 ;
 	wire 			param68 ;
 	wire 			param69 ;
-	wire 			param70 ;
+	wire 			param70 ; 
 
 
 	wire	[31:0]	task_time_cnt	;
@@ -192,15 +192,15 @@ module ec_1di_1do#(
 		reg	[7:0]	irq_posedge_cnt;
 		reg	[7:0]	irq_negedge_cnt;
 		
-		always@(posedge i_clk)
+		always@(posedge clk_i)
 		begin
 			ro_intr_irq <= o_intr_irq;
 		end
 		
 		
-		always@(posedge i_clk)
+		always@(posedge clk_i)
 		begin
-			if(i_rst)begin
+			if(rst_i)begin
 				irq_posedge_cnt <= 8'd0;
 				irq_negedge_cnt <= 8'd0;
 			end else if(a_bhv_vld)begin

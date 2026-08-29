@@ -38,9 +38,10 @@ module ec_1di_2do#(
 		input  		 [19:0]     i_st_rd_addr    ,
 		output 		 [31:0]     o_st_rd_data    ,
 		output 		            o_st_rd_vld     ,
-
-		input		 			di_i			,	//In - position sensor signal
-		output		 [1:0]		do_o			,	//switch
+		
+		input					i_pos			,
+		output					o_dri1			,
+		output					o_dri2			,
 		
 		output 	            	o_intr_irq	
     );
@@ -186,20 +187,28 @@ module ec_1di_2do#(
 	
 	wire		[7:0]	a_bhv_id_r;
 	
+	
+	wire 			di_i ;
+	wire 	[1:0]	do_o ;
+	
+	
+	assign {o_dri2,o_dri1} = do_o;
+	assign	di_i = i_pos;
+	
 	`ifdef DEBUG
 		reg			ro_intr_irq;
 		reg	[7:0]	irq_posedge_cnt;
 		reg	[7:0]	irq_negedge_cnt;
 		
-		always@(posedge i_clk)
+		always@(posedge clk_i)
 		begin
 			ro_intr_irq <= o_intr_irq;
 		end
 		
 		
-		always@(posedge i_clk)
+		always@(posedge clk_i)
 		begin
-			if(i_rst)begin
+			if(rst_i)begin
 				irq_posedge_cnt <= 8'd0;
 				irq_negedge_cnt <= 8'd0;
 			end else if(a_bhv_vld)begin

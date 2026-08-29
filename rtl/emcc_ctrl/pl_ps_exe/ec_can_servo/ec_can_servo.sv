@@ -39,9 +39,9 @@ module ec_can_servo#(
 		output 		 [31:0]     o_st_rd_data    ,
 		output 		            o_st_rd_vld     ,
 //----------------------------------------------------- user logic begin -----------------------------------------------------//
-		input		 			i_servo_limf	,
-		input		 			i_servo_limb	,
-		input		 			i_servo_zero	
+		input		 			i_axis_limf	,
+		input		 			i_axis_limb	,
+		input		 			i_axis_zero	
 //----------------------------------------------------- user logic end -------------------------------------------------------//
 		
 		,output 	            o_intr_irq	
@@ -402,9 +402,9 @@ module ec_can_servo#(
     ,.irq_o                	(irq_a				)
     ,.irq_ack_i       		(irq_a_grant		)
 //----------------------------------------------------- user logic begin -----------------------------------------------------//
-//	,.i_servo_limf			(i_servo_limf		)
-//	,.i_servo_limb			(i_servo_limb		)
-//	,.i_servo_zero			(i_servo_zero		)
+//	,.i_axis_limf			(i_axis_limf		)
+//	,.i_axis_limb			(i_axis_limb		)
+//	,.i_axis_zero			(i_axis_zero		)
 //----------------------------------------------------- user logic end -------------------------------------------------------//
     );
 
@@ -493,9 +493,9 @@ module ec_can_servo#(
 			.c_pre_sta_allow	(c_pre_sta_allow),	
 			.c_post_sta_allow	(c_post_sta_allow)	
 //----------------------------------------------------- user logic begin -----------------------------------------------------//
-			,.i_servo_limf		(i_servo_limf	 )
-			,.i_servo_limb		(i_servo_limb	 )
-			,.i_servo_zero		(i_servo_zero	 )
+			,.i_servo_limf		(i_axis_limf	 )
+			,.i_servo_limb		(i_axis_limb	 )
+			,.i_servo_zero		(i_axis_zero	 )
 //----------------------------------------------------- user logic end -------------------------------------------------------//
 		);
 		

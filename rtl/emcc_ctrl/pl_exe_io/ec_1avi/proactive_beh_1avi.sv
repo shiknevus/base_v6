@@ -422,9 +422,9 @@ module proactive_beh_1avi#(
 		,.i_spi_miso           (spi_di_i			)
 		//user
 		,.o_adc_ch0_data_vld   	(adc_ch0_data_vld	)
-		,.o_adc_ch0_data      	(adc_ch0_data		)
+		,.ov_adc_ch0_data      	(adc_ch0_data		)
 		,.o_adc_ch1_data_vld   	(					)
-		,.o_adc_ch1_data      	(					)
+		,.ov_adc_ch1_data      	(					)
 	);
 
 	

@@ -61,9 +61,11 @@ module irq_3i1o_arbitrator(
 	reg	[1:0]	irq_receive_ack_i_r;
 
 	localparam	S_IDLE			=	8'd0;
-	localparam	S_WAIT_IRQ_ACK1	=	8'd1;
-	localparam	S_WAIT_IRQ_ACK2	=	8'd2;
-	localparam	S_END_DELAY		=	8'd3;
+	localparam	S_DELAY1		=	8'd1;
+	localparam	S_DELAY2		=	8'd2;
+	localparam	S_WAIT_IRQ_ACK1	=	8'd3;
+	localparam	S_WAIT_IRQ_ACK2	=	8'd4;
+	localparam	S_END_DELAY		=	8'd5;
 	
 	reg		[7:0]	s_sta;
 	
@@ -94,17 +96,17 @@ always @(posedge clk_i) begin
 							irq_a_grant_o <= 1'b1;
 							irq_b_grant_o <= 1'b0;
 							irq_c_grant_o <= 1'b0;
-							s_sta <= S_WAIT_IRQ_ACK1;
+							s_sta <= S_DELAY1;
 						end else if(irq_b_i)begin
 							irq_a_grant_o <= 1'b0;
 							irq_b_grant_o <= 1'b1;
 							irq_c_grant_o <= 1'b0;
-							s_sta <= S_WAIT_IRQ_ACK1;
+							s_sta <= S_DELAY1;
 						end else if(irq_c_i)begin
 							irq_a_grant_o <= 1'b0;
 							irq_b_grant_o <= 1'b0;
 							irq_c_grant_o <= 1'b1;
-							s_sta <= S_WAIT_IRQ_ACK1;
+							s_sta <= S_DELAY1;
 						end else begin
 							irq_a_grant_o <= 1'b0;
 							irq_b_grant_o <= 1'b0;
@@ -117,17 +119,17 @@ always @(posedge clk_i) begin
 							irq_a_grant_o <= 1'b1;
 							irq_b_grant_o <= 1'b0;
 							irq_c_grant_o <= 1'b0;
-							s_sta <= S_WAIT_IRQ_ACK1;
+							s_sta <= S_DELAY1;
 						end else if(irq_c_i)begin
 							irq_a_grant_o <= 1'b0;
 							irq_b_grant_o <= 1'b0;
 							irq_c_grant_o <= 1'b1;
-							s_sta <= S_WAIT_IRQ_ACK1;
+							s_sta <= S_DELAY1;
 						end else if(irq_b_i)begin
 							irq_a_grant_o <= 1'b0;
 							irq_b_grant_o <= 1'b1;
 							irq_c_grant_o <= 1'b0;
-							s_sta <= S_WAIT_IRQ_ACK1;
+							s_sta <= S_DELAY1;
 						end else begin
 							irq_a_grant_o <= 1'b0;
 							irq_b_grant_o <= 1'b0;
@@ -140,17 +142,17 @@ always @(posedge clk_i) begin
 							irq_a_grant_o <= 1'b0;
 							irq_b_grant_o <= 1'b1;
 							irq_c_grant_o <= 1'b0;
-							s_sta <= S_WAIT_IRQ_ACK1;
+							s_sta <= S_DELAY1;
 						end else if(irq_a_i)begin
 							irq_a_grant_o <= 1'b1;
 							irq_b_grant_o <= 1'b0;
 							irq_c_grant_o <= 1'b0;
-							s_sta <= S_WAIT_IRQ_ACK1;
+							s_sta <= S_DELAY1;
 						end else if(irq_c_i)begin
 							irq_a_grant_o <= 1'b0;
 							irq_b_grant_o <= 1'b0;
 							irq_c_grant_o <= 1'b1;
-							s_sta <= S_WAIT_IRQ_ACK1;
+							s_sta <= S_DELAY1;
 						end else begin
 							irq_a_grant_o <= 1'b0;
 							irq_b_grant_o <= 1'b0;
@@ -163,17 +165,17 @@ always @(posedge clk_i) begin
 							irq_a_grant_o <= 1'b0;
 							irq_b_grant_o <= 1'b1;
 							irq_c_grant_o <= 1'b0;
-							s_sta <= S_WAIT_IRQ_ACK1;
+							s_sta <= S_DELAY1;
 						end else if(irq_c_i)begin
 							irq_a_grant_o <= 1'b0;
 							irq_b_grant_o <= 1'b0;
 							irq_c_grant_o <= 1'b1;
-							s_sta <= S_WAIT_IRQ_ACK1;
+							s_sta <= S_DELAY1;
 						end else if(irq_a_i)begin
 							irq_a_grant_o <= 1'b1;
 							irq_b_grant_o <= 1'b0;
 							irq_c_grant_o <= 1'b0;
-							s_sta <= S_WAIT_IRQ_ACK1;
+							s_sta <= S_DELAY1;
 						end else begin
 							irq_a_grant_o <= 1'b0;
 							irq_b_grant_o <= 1'b0;
@@ -186,17 +188,17 @@ always @(posedge clk_i) begin
 							irq_a_grant_o <= 1'b0;
 							irq_b_grant_o <= 1'b0;
 							irq_c_grant_o <= 1'b1;
-							s_sta <= S_WAIT_IRQ_ACK1;
+							s_sta <= S_DELAY1;
 						end else if(irq_a_i)begin
 							irq_a_grant_o <= 1'b1;
 							irq_b_grant_o <= 1'b0;
 							irq_c_grant_o <= 1'b0;
-							s_sta <= S_WAIT_IRQ_ACK1;
+							s_sta <= S_DELAY1;
 						end else if(irq_b_i)begin
 							irq_a_grant_o <= 1'b0;
 							irq_b_grant_o <= 1'b1;
 							irq_c_grant_o <= 1'b0;
-							s_sta <= S_WAIT_IRQ_ACK1;
+							s_sta <= S_DELAY1;
 						end else begin
 							irq_a_grant_o <= 1'b0;
 							irq_b_grant_o <= 1'b0;
@@ -209,17 +211,17 @@ always @(posedge clk_i) begin
 							irq_a_grant_o <= 1'b0;
 							irq_b_grant_o <= 1'b0;
 							irq_c_grant_o <= 1'b1;
-							s_sta <= S_WAIT_IRQ_ACK1;
+							s_sta <= S_DELAY1;
 						end else if(irq_b_i)begin
 							irq_a_grant_o <= 1'b0;
 							irq_b_grant_o <= 1'b1;
 							irq_c_grant_o <= 1'b0;
-							s_sta <= S_WAIT_IRQ_ACK1;
+							s_sta <= S_DELAY1;
 						end else if(irq_a_i)begin
 							irq_a_grant_o <= 1'b1;
 							irq_b_grant_o <= 1'b0;
 							irq_c_grant_o <= 1'b0;
-							s_sta <= S_WAIT_IRQ_ACK1;
+							s_sta <= S_DELAY1;
 						end else begin
 							irq_a_grant_o <= 1'b0;
 							irq_b_grant_o <= 1'b0;
@@ -232,17 +234,17 @@ always @(posedge clk_i) begin
 							irq_a_grant_o <= 1'b0;
 							irq_b_grant_o <= 1'b1;
 							irq_c_grant_o <= 1'b0;
-							s_sta <= S_WAIT_IRQ_ACK1;
+							s_sta <= S_DELAY1;
 						end else if(irq_a_i)begin
 							irq_a_grant_o <= 1'b1;
 							irq_b_grant_o <= 1'b0;
 							irq_c_grant_o <= 1'b0;
-							s_sta <= S_WAIT_IRQ_ACK1;
+							s_sta <= S_DELAY1;
 						end else if(irq_c_i)begin
 							irq_a_grant_o <= 1'b0;
 							irq_b_grant_o <= 1'b0;
 							irq_c_grant_o <= 1'b1;
-							s_sta <= S_WAIT_IRQ_ACK1;
+							s_sta <= S_DELAY1;
 						end else begin
 							irq_a_grant_o <= 1'b0;
 							irq_b_grant_o <= 1'b0;
@@ -251,6 +253,14 @@ always @(posedge clk_i) begin
 						end
 					end
 				endcase
+			end
+			
+			S_DELAY1:begin
+				s_sta <= S_DELAY2;
+			end
+			
+			S_DELAY2:begin
+				s_sta <= S_WAIT_IRQ_ACK1;
 			end
 			
 			S_WAIT_IRQ_ACK1:begin
