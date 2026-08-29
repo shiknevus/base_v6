@@ -79,6 +79,98 @@ module irq_3i1o_arbitrator(
 		irq_receive_ack 	<= (~irq_receive_ack_i_r[1]) && irq_receive_ack_i_r[0];
 	end
 	end
+	
+	//sync register
+	reg 			r_irq_a_i	 ;
+	reg 	[7:0]	r_a_bhv_id   ;
+	reg 	[7:0]	r_a_tx_id    ;
+	reg 	[7:0]	r_a_alm_num  ;
+	
+	reg 			r_irq_b_i	 ;
+	reg 	[7:0]	r_b_bhv_id   ;
+	reg 	[7:0]	r_b_tx_id    ;
+	reg 	[7:0]	r_b_alm_num  ;
+	
+	reg 			r_irq_c_i	 ;
+	reg 	[7:0]	r_c_bhv_id   ;
+	reg 	[7:0]	r_c_tx_id    ;
+	reg 	[7:0]	r_c_alm_num  ;
+	
+	always@(posedge clk_i)
+	begin
+		if(rst_i)
+			r_irq_a_i <= 1'b0;
+		else
+			r_irq_a_i <= irq_a_i;
+	end
+	
+	always@(posedge clk_i)
+	begin
+		if(rst_i)begin
+			r_a_bhv_id  <= 8'd0;
+			r_a_tx_id   <= 8'd0;
+			r_a_alm_num <= 8'd0;
+		end else if({r_irq_a_i,irq_a_i} == 2'b01)begin
+			r_a_bhv_id  <= a_bhv_id ;
+			r_a_tx_id   <= a_tx_id  ;
+			r_a_alm_num <= a_alm_num;
+		end else begin
+			r_a_bhv_id  <= r_a_bhv_id ;
+			r_a_tx_id   <= r_a_tx_id  ;
+			r_a_alm_num <= r_a_alm_num;
+		end	
+	end
+	
+	always@(posedge clk_i)
+	begin
+		if(rst_i)
+			r_irq_b_i <= 1'b0;
+		else
+			r_irq_b_i <= irq_b_i;
+	end
+	
+	always@(posedge clk_i)
+	begin
+		if(rst_i)begin
+			r_b_bhv_id  <= 8'd0;
+			r_b_tx_id   <= 8'd0;
+			r_b_alm_num <= 8'd0;
+		end else if({r_irq_b_i,irq_b_i} == 2'b01)begin
+			r_b_bhv_id  <= b_bhv_id ;
+			r_b_tx_id   <= b_tx_id  ;
+			r_b_alm_num <= b_alm_num;
+		end else begin
+			r_b_bhv_id  <= r_b_bhv_id ;
+			r_b_tx_id   <= r_b_tx_id  ;
+			r_b_alm_num <= r_b_alm_num;
+		end	
+	end
+	
+	always@(posedge clk_i)
+	begin
+		if(rst_i)
+			r_irq_c_i <= 1'b0;
+		else
+			r_irq_c_i <= irq_c_i;
+	end
+	
+	always@(posedge clk_i)
+	begin
+		if(rst_i)begin
+			r_c_bhv_id  <= 8'd0;
+			r_c_tx_id   <= 8'd0;
+			r_c_alm_num <= 8'd0;
+		end else if({r_irq_a_i,irq_a_i} == 2'b01)begin
+			r_c_bhv_id  <= c_bhv_id ;
+			r_c_tx_id   <= c_tx_id  ;
+			r_c_alm_num <= c_alm_num;
+		end else begin
+			r_c_bhv_id  <= r_c_bhv_id ;
+			r_c_tx_id   <= r_c_tx_id  ;
+			r_c_alm_num <= r_c_alm_num;
+		end	
+	end
+	
 
 always @(posedge clk_i) begin
 	if(rst_i) begin
@@ -339,14 +431,14 @@ begin
         irq_reg1_o <= 32'd0;
         irq_reg2_o <= 32'd0;
     end else if(irq_a_grant_o)begin
-        irq_reg1_o <= {ec_id,sc_id,a_bhv_id};
-        irq_reg2_o <= {a_tx_id,a_alm_num,16'd0};
+        irq_reg1_o <= {ec_id,sc_id,r_a_bhv_id};
+        irq_reg2_o <= {r_a_tx_id,r_a_alm_num,16'd0};
 	end else if(irq_b_grant_o)begin
-        irq_reg1_o <= {ec_id,sc_id,b_bhv_id};
-        irq_reg2_o <= {b_tx_id,b_alm_num,16'd0};
+        irq_reg1_o <= {ec_id,sc_id,r_b_bhv_id};
+        irq_reg2_o <= {r_b_tx_id,r_b_alm_num,16'd0};
 	end else if(irq_c_grant_o)begin
-        irq_reg1_o <= {ec_id,sc_id,c_bhv_id};
-        irq_reg2_o <= {c_tx_id,c_alm_num,16'd0};
+        irq_reg1_o <= {ec_id,sc_id,r_c_bhv_id};
+        irq_reg2_o <= {r_c_tx_id,r_c_alm_num,16'd0};
 	end else if(s_sta == S_END_DELAY)begin
 		irq_reg1_o <= 32'd0;
         irq_reg2_o <= 32'd0;
