@@ -274,7 +274,7 @@ module ec_4di_2do#(
 	end
 
 	
-	ps_rw_pl_reg#(
+	(* dont_touch = "true" *) ps_rw_pl_reg#(
 		.REG_SPACE_BIAS 	(REG_SPACE_BIAS		),
 		.REG_SPACE_SIZE 	(REG_SPACE_SIZE		)
 )ps_rw_pl_reg_u0(

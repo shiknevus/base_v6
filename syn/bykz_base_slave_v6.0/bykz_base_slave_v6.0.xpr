@@ -588,7 +588,7 @@
       <File Path="$PSRCDIR/utils_1/imports/slv_impl/emcc_slv_top_routed.dcp">
         <FileInfo>
           <Attr Name="ImportPath" Val="$PRUNDIR/slv_impl/emcc_slv_top_routed.dcp"/>
-          <Attr Name="ImportTime" Val="1787790603"/>
+          <Attr Name="ImportTime" Val="1787972405"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedInSteps" Val="slv_impl"/>
@@ -621,9 +621,7 @@
   <Runs Version="1" Minor="10">
     <Run Id="slv_synth" Type="Ft3:Synth" SrcSet="sources_1" Part="xc7a75tfgg484-2" ConstrsSet="slv_constrs" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" State="current" Dir="$PRUNDIR/slv_synth" IncludeInArchive="true">
       <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2018">
-          <Desc>Vivado Synthesis Defaults</Desc>
-        </StratHandle>
+        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2018"/>
         <Step Id="synth_design"/>
       </Strategy>
       <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
@@ -632,9 +630,7 @@
     </Run>
     <Run Id="slv_impl" Type="Ft2:EntireDesign" Part="xc7a75tfgg484-2" ConstrsSet="slv_constrs" Description="Default settings for Implementation." AutoIncrementalCheckpoint="true" IncrementalCheckpoint="$PSRCDIR/utils_1/imports/slv_impl/emcc_slv_top_routed.dcp" WriteIncrSynthDcp="false" State="current" Dir="$PRUNDIR/slv_impl" SynthRun="slv_synth" IncludeInArchive="true" GenFullBitstream="true">
       <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2018">
-          <Desc>Default settings for Implementation.</Desc>
-        </StratHandle>
+        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2018"/>
         <Step Id="init_design"/>
         <Step Id="opt_design"/>
         <Step Id="power_opt_design"/>
