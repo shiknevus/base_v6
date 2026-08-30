@@ -171,6 +171,9 @@ module irq_3i1o_arbitrator(
 		end	
 	end
 	
+	//The channel currently being handled by the state machine
+	reg	[3:0]	cur_chan;
+	
 
 always @(posedge clk_i) begin
 	if(rst_i) begin
@@ -178,6 +181,7 @@ always @(posedge clk_i) begin
 		irq_a_grant_o <= 1'b0;
         irq_b_grant_o <= 1'b0;
         irq_c_grant_o <= 1'b0;
+		cur_chan <= 4'h0;
 	end else
 		case(s_sta)
 			S_IDLE:begin
@@ -188,21 +192,25 @@ always @(posedge clk_i) begin
 							irq_a_grant_o <= 1'b1;
 							irq_b_grant_o <= 1'b0;
 							irq_c_grant_o <= 1'b0;
+							cur_chan <= 4'hA;
 							s_sta <= S_DELAY1;
 						end else if(irq_b_i)begin
 							irq_a_grant_o <= 1'b0;
 							irq_b_grant_o <= 1'b1;
 							irq_c_grant_o <= 1'b0;
+							cur_chan <= 4'hB;
 							s_sta <= S_DELAY1;
 						end else if(irq_c_i)begin
 							irq_a_grant_o <= 1'b0;
 							irq_b_grant_o <= 1'b0;
 							irq_c_grant_o <= 1'b1;
+							cur_chan <= 4'hC;
 							s_sta <= S_DELAY1;
 						end else begin
 							irq_a_grant_o <= 1'b0;
 							irq_b_grant_o <= 1'b0;
 							irq_c_grant_o <= 1'b0;
+							cur_chan <= 4'h0;
 							s_sta <= S_IDLE;
 						end
 					end
@@ -211,21 +219,25 @@ always @(posedge clk_i) begin
 							irq_a_grant_o <= 1'b1;
 							irq_b_grant_o <= 1'b0;
 							irq_c_grant_o <= 1'b0;
+							cur_chan <= 4'hA;
 							s_sta <= S_DELAY1;
 						end else if(irq_c_i)begin
 							irq_a_grant_o <= 1'b0;
 							irq_b_grant_o <= 1'b0;
 							irq_c_grant_o <= 1'b1;
+							cur_chan <= 4'hC;
 							s_sta <= S_DELAY1;
 						end else if(irq_b_i)begin
 							irq_a_grant_o <= 1'b0;
 							irq_b_grant_o <= 1'b1;
 							irq_c_grant_o <= 1'b0;
+							cur_chan <= 4'hB;
 							s_sta <= S_DELAY1;
 						end else begin
 							irq_a_grant_o <= 1'b0;
 							irq_b_grant_o <= 1'b0;
 							irq_c_grant_o <= 1'b0;
+							cur_chan <= 4'h0;
 							s_sta <= S_IDLE;
 						end
 					end
@@ -234,21 +246,25 @@ always @(posedge clk_i) begin
 							irq_a_grant_o <= 1'b0;
 							irq_b_grant_o <= 1'b1;
 							irq_c_grant_o <= 1'b0;
+							cur_chan <= 4'hB;
 							s_sta <= S_DELAY1;
 						end else if(irq_a_i)begin
 							irq_a_grant_o <= 1'b1;
 							irq_b_grant_o <= 1'b0;
 							irq_c_grant_o <= 1'b0;
+							cur_chan <= 4'hA;
 							s_sta <= S_DELAY1;
 						end else if(irq_c_i)begin
 							irq_a_grant_o <= 1'b0;
 							irq_b_grant_o <= 1'b0;
 							irq_c_grant_o <= 1'b1;
+							cur_chan <= 4'hC;
 							s_sta <= S_DELAY1;
 						end else begin
 							irq_a_grant_o <= 1'b0;
 							irq_b_grant_o <= 1'b0;
 							irq_c_grant_o <= 1'b0;
+							cur_chan <= 4'h0;
 							s_sta <= S_IDLE;
 						end
 					end
@@ -257,21 +273,25 @@ always @(posedge clk_i) begin
 							irq_a_grant_o <= 1'b0;
 							irq_b_grant_o <= 1'b1;
 							irq_c_grant_o <= 1'b0;
+							cur_chan <= 4'hB;
 							s_sta <= S_DELAY1;
 						end else if(irq_c_i)begin
 							irq_a_grant_o <= 1'b0;
 							irq_b_grant_o <= 1'b0;
 							irq_c_grant_o <= 1'b1;
+							cur_chan <= 4'hC;
 							s_sta <= S_DELAY1;
 						end else if(irq_a_i)begin
 							irq_a_grant_o <= 1'b1;
 							irq_b_grant_o <= 1'b0;
 							irq_c_grant_o <= 1'b0;
+							cur_chan <= 4'hA;
 							s_sta <= S_DELAY1;
 						end else begin
 							irq_a_grant_o <= 1'b0;
 							irq_b_grant_o <= 1'b0;
 							irq_c_grant_o <= 1'b0;
+							cur_chan <= 4'h0;
 							s_sta <= S_IDLE;
 						end
 					end
@@ -280,21 +300,25 @@ always @(posedge clk_i) begin
 							irq_a_grant_o <= 1'b0;
 							irq_b_grant_o <= 1'b0;
 							irq_c_grant_o <= 1'b1;
+							cur_chan <= 4'hC;
 							s_sta <= S_DELAY1;
 						end else if(irq_a_i)begin
 							irq_a_grant_o <= 1'b1;
 							irq_b_grant_o <= 1'b0;
 							irq_c_grant_o <= 1'b0;
+							cur_chan <= 4'hA;
 							s_sta <= S_DELAY1;
 						end else if(irq_b_i)begin
 							irq_a_grant_o <= 1'b0;
 							irq_b_grant_o <= 1'b1;
 							irq_c_grant_o <= 1'b0;
+							cur_chan <= 4'hB;
 							s_sta <= S_DELAY1;
 						end else begin
 							irq_a_grant_o <= 1'b0;
 							irq_b_grant_o <= 1'b0;
 							irq_c_grant_o <= 1'b0;
+							cur_chan <= 4'h0;
 							s_sta <= S_IDLE;
 						end
 					end
@@ -303,21 +327,25 @@ always @(posedge clk_i) begin
 							irq_a_grant_o <= 1'b0;
 							irq_b_grant_o <= 1'b0;
 							irq_c_grant_o <= 1'b1;
+							cur_chan <= 4'hC;
 							s_sta <= S_DELAY1;
 						end else if(irq_b_i)begin
 							irq_a_grant_o <= 1'b0;
 							irq_b_grant_o <= 1'b1;
 							irq_c_grant_o <= 1'b0;
+							cur_chan <= 4'hB;
 							s_sta <= S_DELAY1;
 						end else if(irq_a_i)begin
 							irq_a_grant_o <= 1'b1;
 							irq_b_grant_o <= 1'b0;
 							irq_c_grant_o <= 1'b0;
+							cur_chan <= 4'hA;
 							s_sta <= S_DELAY1;
 						end else begin
 							irq_a_grant_o <= 1'b0;
 							irq_b_grant_o <= 1'b0;
 							irq_c_grant_o <= 1'b0;
+							cur_chan <= 4'h0;
 							s_sta <= S_IDLE;
 						end
 					end
@@ -326,21 +354,25 @@ always @(posedge clk_i) begin
 							irq_a_grant_o <= 1'b0;
 							irq_b_grant_o <= 1'b1;
 							irq_c_grant_o <= 1'b0;
+							cur_chan <= 4'hB;
 							s_sta <= S_DELAY1;
 						end else if(irq_a_i)begin
 							irq_a_grant_o <= 1'b1;
 							irq_b_grant_o <= 1'b0;
 							irq_c_grant_o <= 1'b0;
+							cur_chan <= 4'hA;
 							s_sta <= S_DELAY1;
 						end else if(irq_c_i)begin
 							irq_a_grant_o <= 1'b0;
 							irq_b_grant_o <= 1'b0;
 							irq_c_grant_o <= 1'b1;
+							cur_chan <= 4'hC;
 							s_sta <= S_DELAY1;
 						end else begin
 							irq_a_grant_o <= 1'b0;
 							irq_b_grant_o <= 1'b0;
 							irq_c_grant_o <= 1'b0;
+							cur_chan <= 4'h0;
 							s_sta <= S_IDLE;
 						end
 					end
@@ -379,17 +411,23 @@ always @(posedge clk_i) begin
 			S_WAIT_IRQ_ACK2:begin
 				if(irq_receive_ack)// Interrupt acknowledge received successfully
 					s_sta <= S_END_DELAY;
-				else if(irq_cnt >= 8'd64)begin
+				else if(cur_chan == 4'hA && a_tx_id == 8'd40)	//A channel timeout
 					s_sta <= S_END_DELAY;
-				end else
+				else if(cur_chan == 4'hB && b_tx_id == 8'd40)	//B channel timeout
+					s_sta <= S_END_DELAY;
+				else if(cur_chan == 4'hC && c_tx_id == 8'd40)	//C channel timeout
+					s_sta <= S_END_DELAY;
+				else
 					s_sta <= S_WAIT_IRQ_ACK2;
 			end
 			
 			S_END_DELAY: begin
-				if(end_cnt >= 4'd8)
+				if(end_cnt >= 4'd8)begin
+					cur_chan <= 4'h0;
 					s_sta <= S_IDLE; 
-				else
+				end else begin
 					s_sta <= S_END_DELAY;
+				end
 			end
 			
 			default:
