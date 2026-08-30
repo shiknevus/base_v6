@@ -109,10 +109,6 @@ module ps_rw_pl_reg#(
 	,output		reg 	[31:0]		param38	
 	,output		reg 	[31:0]		param39	
 	,output		reg 	[31:0]		param40	
-	,input						clr_pause	= 1'b0
-	,input						clr_resume	= 1'b0
-	,input						clr_stop	= 1'b0
-
 	,input 				[31:0]		irq_reg1	
 	,input 				[31:0]		irq_reg2	
 
@@ -341,9 +337,9 @@ module ps_rw_pl_reg#(
 			param23			<=	(wr_task_vld && wr_task_addr == `PARAM23		) ? i_st_wr_data[7:0] 	: param23	;
 			param24			<=	(wr_task_vld && wr_task_addr == `PARAM24		) ? i_st_wr_data[7:0] 	: param24	;
 			param25			<=	(wr_task_vld && wr_task_addr == `PARAM25		) ? i_st_wr_data[7:0] 	: param25	;
-			param26			<=	(wr_task_vld && wr_task_addr == `PARAM26		) ? i_st_wr_data[0]		: (clr_pause ? 1'b0 : param26)	;
-			param27			<=	(wr_task_vld && wr_task_addr == `PARAM27		) ? i_st_wr_data[0]		: (clr_stop ? 1'b0 : param27)	;
-			param28			<=	(wr_task_vld && wr_task_addr == `PARAM28		) ? i_st_wr_data[0]		: (clr_resume ? 1'b0 : param28)	;
+			param26			<=	(wr_task_vld && wr_task_addr == `PARAM26		) ? i_st_wr_data[0]		: param26	;
+			param27			<=	(wr_task_vld && wr_task_addr == `PARAM27		) ? i_st_wr_data[0]		: param27	;
+			param28			<=	(wr_task_vld && wr_task_addr == `PARAM28		) ? i_st_wr_data[0]		: param28	;
 			param29			<=	(wr_task_vld && wr_task_addr == `PARAM29		) ? i_st_wr_data[0]		: param29	;
 			param30			<=	(wr_task_vld && wr_task_addr == `PARAM30		) ? i_st_wr_data[0]		: param30	;
 			param31         <= 	(wr_task_vld && wr_task_addr == `PARAM31		) ? i_st_wr_data		: param31	;
