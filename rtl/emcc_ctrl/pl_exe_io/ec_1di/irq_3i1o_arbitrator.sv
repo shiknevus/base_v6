@@ -160,7 +160,7 @@ module irq_3i1o_arbitrator(
 			r_c_bhv_id  <= 8'd0;
 			r_c_tx_id   <= 8'd0;
 			r_c_alm_num <= 8'd0;
-		end else if({r_irq_a_i,irq_a_i} == 2'b01)begin
+		end else if({r_irq_c_i,irq_c_i} == 2'b01)begin
 			r_c_bhv_id  <= c_bhv_id ;
 			r_c_tx_id   <= c_tx_id  ;
 			r_c_alm_num <= c_alm_num;
@@ -348,10 +348,16 @@ always @(posedge clk_i) begin
 			end
 			
 			S_DELAY1:begin
+				irq_a_grant_o <= 1'b0;
+				irq_b_grant_o <= 1'b0;
+				irq_c_grant_o <= 1'b0;
 				s_sta <= S_DELAY2;
 			end
 			
 			S_DELAY2:begin
+				irq_a_grant_o <= 1'b0;
+				irq_b_grant_o <= 1'b0;
+				irq_c_grant_o <= 1'b0;
 				s_sta <= S_WAIT_IRQ_ACK1;
 			end
 			
@@ -373,12 +379,14 @@ always @(posedge clk_i) begin
 			S_WAIT_IRQ_ACK2:begin
 				if(irq_receive_ack)// Interrupt acknowledge received successfully
 					s_sta <= S_END_DELAY;
-				else
+				else if(irq_cnt >= 8'd64)begin
+					s_sta <= S_END_DELAY;
+				end else
 					s_sta <= S_WAIT_IRQ_ACK2;
 			end
 			
 			S_END_DELAY: begin
-				if(irq_cnt >= 8)
+				if(end_cnt >= 4'd8)
 					s_sta <= S_IDLE; 
 				else
 					s_sta <= S_END_DELAY;
@@ -397,15 +405,28 @@ end
 			irq_cnt <= irq_cnt;
 		else
 			irq_cnt <= irq_cnt +1;
-	end else if(s_sta == S_END_DELAY) begin
-		if(irq_cnt >= 8'd8)
+	end else if(s_sta == S_WAIT_IRQ_ACK2) begin
+		if(irq_cnt >= 8'd64)
 			irq_cnt <= irq_cnt;
 		else
 			irq_cnt <= irq_cnt +1;
 	end else
 		irq_cnt <= 8'd0;
 	end
-	
+
+
+	reg [3:0] end_cnt;
+	always@(posedge clk_i)begin
+	if(rst_i)
+		end_cnt <= 4'd0;
+	else if(s_sta == S_END_DELAY) begin
+		if(end_cnt >= 4'd8)
+			end_cnt <= end_cnt;
+		else
+			end_cnt <= end_cnt + 4'd1;
+	end else
+		end_cnt <= 4'd0;
+	end	
 	always@(posedge clk_i)begin
 	if(rst_i)
 		irq_busy_o <= 1'b0;

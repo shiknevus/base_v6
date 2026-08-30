@@ -712,13 +712,6 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_ps_exe/ec_can_servo/ec_can_servo.sv">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_ps_exe/ec_ethercat_servo/ec_ethercat_servo.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -999,13 +992,6 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_ps_exe/ec_can_servo/pre_post_sta_check_can_servo.sv">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_ps_exe/ec_ethercat_servo/pre_post_sta_check_ethercat_servo.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -1259,13 +1245,6 @@
         </FileInfo>
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_8do/proactive_beh_8do.sv">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_ps_exe/ec_can_servo/proactive_beh_can_servo.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
@@ -1566,13 +1545,6 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_ps_exe/ec_can_servo/status_beh_can_servo.sv">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_ps_exe/ec_ethercat_servo/status_beh_ethercat_servo.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -1832,13 +1804,6 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_ps_exe/ec_can_servo/tim_beh_can_servo.sv">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_ps_exe/ec_ethercat_servo/tim_beh_ethercat_servo.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -1988,6 +1953,46 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/top/emcc_mst_top.sv">
         <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_ps_exe/ec_can_servo/ec_can_servo.sv">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_ps_exe/ec_can_servo/pre_post_sta_check_can_servo.sv">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_ps_exe/ec_can_servo/proactive_beh_can_servo.sv">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_ps_exe/ec_can_servo/tim_beh_can_servo.sv">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_ps_exe/ec_can_servo/status_beh_can_servo.sv">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -2192,7 +2197,7 @@
       <File Path="$PSRCDIR/utils_1/imports/mst_impl/emcc_mst_top_routed.dcp">
         <FileInfo>
           <Attr Name="ImportPath" Val="$PRUNDIR/mst_impl/emcc_mst_top_routed.dcp"/>
-          <Attr Name="ImportTime" Val="1787972374"/>
+          <Attr Name="ImportTime" Val="1788055662"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedInSteps" Val="mst_impl"/>

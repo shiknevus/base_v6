@@ -65,6 +65,14 @@ module pre_post_sta_check_can_servo#(
 		,input							i_servo_limf
 		,input							i_servo_limb
 		,input							i_servo_zero
+		,input						rctrl_drive_on
+		,input						rctrl_drive_reset
+		,input						rctrl_resume
+		,input						rctrl_pause
+		,input						rctrl_stop
+		,output	reg					b_clr_pause
+		,output	reg					b_clr_resume
+		,output	reg					b_clr_stop
 //----------------------------------------------------- user logic end -------------------------------------------------------//
     );
 
@@ -130,25 +138,98 @@ module pre_post_sta_check_can_servo#(
 	//---------------------------------  Channel B check -------------------------------------//
 	//========================================================================================//
 
-	always@(posedge clk_i)
-	begin
-		if(rst_i) begin
-			b_pre_sta_allow <= {B_BHA_NUM{1'b0}};
-		end else if(b_en) begin
-			b_pre_sta_allow <= {B_BHA_NUM{1'b1}};
+	//pre status
+	//行为100~105前置条件(与ec_slv_pul_axis B通道一致,寄存器PARAM26~30驱动)
+	wire [B_BHA_NUM-1:0]	b_pre_sta	;
+
+	assign	b_pre_sta[99 ] = rctrl_pause && ~rctrl_resume && ~rctrl_stop && ec_cha_st; // pause 行为100
+	assign	b_pre_sta[100] = rctrl_pause && rctrl_resume && ec_cha_st; // resume 行为101
+	assign	b_pre_sta[101] = rctrl_drive_reset;    // reset 行为102
+	assign	b_pre_sta[102] = rctrl_pause && rctrl_stop && ec_cha_st;  // stop 行为103
+	assign	b_pre_sta[103] = rctrl_drive_on;       // son 行为104
+	assign	b_pre_sta[104] = ~rctrl_drive_on;      // soff 行为105
+
+	reg ec_chb_st_d1;
+	always@(posedge clk_i) begin
+		if(rst_i || !b_en) begin
+			ec_chb_st_d1 <= 1'b0;
+			b_clr_pause  <= 1'b0;
+			b_clr_resume <= 1'b0;
+			b_clr_stop   <= 1'b0;
 		end else begin
-			b_pre_sta_allow <= {B_BHA_NUM{1'b0}};
+			ec_chb_st_d1 <= ec_chb_st;
+			if(!rctrl_pause)  b_clr_pause  <= 1'b0;
+			if(!rctrl_resume) b_clr_resume <= 1'b0;
+			if(!rctrl_stop)   b_clr_stop   <= 1'b0;
+			if(ec_chb_st_d1 && ~ec_chb_st) begin
+				if(b_bhv_id == 8'd100)
+					b_clr_pause  <= 1'b1;
+				else if(b_bhv_id == 8'd103) begin
+					b_clr_pause  <= 1'b1;
+					b_clr_stop   <= 1'b1;
+				end
+				else if(b_bhv_id == 8'd101) begin
+					b_clr_pause  <= 1'b1;
+					b_clr_resume <= 1'b1;
+				end
+			end
+		end
+	end
+
+	reg [B_BHA_NUM-1:0]	b_executed;
+	always@(posedge clk_i) begin
+		if(rst_i || !b_en) begin
+			b_executed <= {B_BHA_NUM{1'b0}};
+		end else begin
+			if(ec_chb_st && ~ec_chb_st_d1) begin
+				if(b_bhv_id >= 8'd100 && b_bhv_id <= 8'd105)
+					b_executed[b_bhv_id - 8'd1] <= 1'b1;
+			end
+			for(integer i = 0; i < B_BHA_NUM; i = i + 1) begin
+				if(!b_pre_sta[i])
+					b_executed[i] <= 1'b0;
+			end
 		end
 	end
 
 	always@(posedge clk_i)
 	begin
-		if(rst_i) begin
+		integer i;
+		if(rst_i)
+			b_pre_sta_allow <= {B_BHA_NUM{1'b0}};
+		else if(!b_en)
+			b_pre_sta_allow <= {B_BHA_NUM{1'b0}};
+		else begin
+			b_pre_sta_allow <= {B_BHA_NUM{1'b0}};
+			for(i = 0; i < B_BHA_NUM; i = i + 1) begin
+				if(b_pre_sta[i] && ~b_executed[i])
+					b_pre_sta_allow[i] <= 1'b1;
+			end
+		end
+	end
+
+	//post status
+	wire [B_BHA_NUM-1:0]	b_post_sta	;
+	assign	b_post_sta[99 ] = (b_bhv_id == 100);
+	assign	b_post_sta[100] = (b_bhv_id == 101);
+	assign	b_post_sta[101] = (b_bhv_id == 102);
+	assign	b_post_sta[102] = (b_bhv_id == 103);
+	assign	b_post_sta[103] = (b_bhv_id == 104);
+	assign	b_post_sta[104] = (b_bhv_id == 105);
+
+	always@(posedge clk_i)
+	begin
+		integer i;
+		if(rst_i)
 			b_post_sta_allow <= {B_BHA_NUM{1'b0}};
-		end else if(b_en) begin
-			b_post_sta_allow <= {B_BHA_NUM{1'b1}};
-		end else begin
+		else if(!b_en)
 			b_post_sta_allow <= {B_BHA_NUM{1'b0}};
+		else begin
+			b_post_sta_allow <= {B_BHA_NUM{1'b0}};
+			for(i = 0; i < B_BHA_NUM; i = i + 1) begin
+				if(b_post_sta[i])
+					b_post_sta_allow[i] <= 1'b1;
+			end
 		end
 	end
 

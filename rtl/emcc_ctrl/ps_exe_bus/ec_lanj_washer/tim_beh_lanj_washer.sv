@@ -173,11 +173,17 @@ module tim_beh_lanj_washer(
 	always @(*) begin
         case (curr_state)
             S_IDLE: begin
-                if (c_en || c_gap_crl != 20'd0)
-                    next_state = S_BHA_PRE_DET;
+                if (c_en && c_gap_crl != 20'd0)
+                    next_state = S_EXE;
                 else
                     next_state = S_IDLE;
             end
+			S_EXE:begin
+				if(task_time_cnt >= c_gap_crl - 1)		//Timer finished
+					next_state = S_BHA_PRE_DET;
+				else
+					next_state = S_EXE;
+			end
 
 			S_BHA_PRE_DET: begin	//curr_state = 1
 				if(pre_sta_allow) begin
@@ -185,7 +191,7 @@ module tim_beh_lanj_washer(
 				end else if(timout) begin
 					next_state = S_ALERT_40;
 				end else begin
-					next_state = S_BHA_PRE_DET;
+					next_state = S_READY_10;
 				end
             end
 
@@ -203,15 +209,9 @@ module tim_beh_lanj_washer(
 			end
 
 			S_EXE_20: begin	//Send 20 interrupt
-				next_state = S_EXE;
+				next_state = S_BHA_POST_DET;
             end
 
-			S_EXE:begin
-				if(task_time_cnt >= c_gap_crl - 1)		//Timer finished
-					next_state = S_BHA_POST_DET;
-				else
-					next_state = S_EXE;
-			end
 
 			S_BHA_POST_DET: begin	//curr_state = 6
 				if(post_sta_allow) begin
@@ -330,7 +330,7 @@ module tim_beh_lanj_washer(
             timout_cnt <= 20'd0;
 		else if(curr_state != curr_state_1d)
 			timout_cnt <= 20'd0;
-        else if(timout_cnt >= c_tx_ot-1)
+        else if(timout_cnt > c_tx_ot)
             timout_cnt <= 20'd0;
         else if(i_time_1s_vld)
             timout_cnt <= timout_cnt+1;
@@ -339,7 +339,7 @@ module tim_beh_lanj_washer(
     always@(posedge clk_i)begin
         if(rst_i)
             timout <= 1'b0;
-        else if(timout_cnt >= c_tx_ot-1)
+        else if(timout_cnt > c_tx_ot)
             timout <= 1'b1;
         else
             timout <= 1'b0;

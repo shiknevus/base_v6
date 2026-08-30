@@ -72,6 +72,8 @@ module pre_post_sta_check_8do#(
 	begin
 		if(rst_i || !a_en) begin
 			a_pre_sta_allow <= {A_BHA_NUM{1'b0}};
+		end else if(a_en) begin
+			a_pre_sta_allow <= {A_BHA_NUM{1'b1}};
 		end else begin
 			a_pre_sta_allow <= {A_BHA_NUM{1'b0}};
 		end
@@ -82,7 +84,7 @@ module pre_post_sta_check_8do#(
 	
 	always@(posedge clk_i)
 	begin
-		if(rst_i) begin
+		if(rst_i || !a_en) begin
 			a_post_sta_allow <= {A_BHA_NUM{1'b0}};
 		end else if(a_en) begin
 			a_post_sta_allow <= {A_BHA_NUM{1'b1}};
