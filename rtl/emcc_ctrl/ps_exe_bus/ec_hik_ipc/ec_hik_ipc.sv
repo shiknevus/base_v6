@@ -9,7 +9,7 @@
 // Project Name:
 // Target Devices:
 // Tool Versions:
-// Description:  Hik_ipc Control V6.0
+// Description: ASS00658 Hik_ipc Control V6.1
 //
 // Dependencies:
 //
