@@ -164,8 +164,8 @@ module ec_can_servo#(
 	wire 	[A_BHA_NUM-1:0]	a_post_sta_allow  ;
 	wire 	[B_BHA_NUM-1:0]	b_pre_sta_allow   ;
 	wire 	[B_BHA_NUM-1:0]	b_post_sta_allow  ;
-	wire 	[B_BHA_NUM-1:0] c_pre_sta_allow   ;
-	wire 	[B_BHA_NUM-1:0] c_post_sta_allow  ;
+	wire 	[C_BHA_NUM-1:0] c_pre_sta_allow   ;
+	wire 	[C_BHA_NUM-1:0] c_post_sta_allow  ;
 	
 	wire	irq_a  ;
 	wire	irq_b  ;
@@ -346,9 +346,6 @@ module ec_can_servo#(
 	,.param28			    (param28		)
 	,.param29			    (param29		)
 	,.param30				(param30		)
-	,.clr_pause				(b_clr_pause		)
-	,.clr_resume				(b_clr_resume		)
-	,.clr_stop				(b_clr_stop		)
 	,.irq_reg1	            (irq_reg1		)
 	,.irq_reg2	            (irq_reg2		)
 	,.a_st                  (ec_cha_st		)

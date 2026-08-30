@@ -188,13 +188,17 @@ module tim_beh_siemens_cnc(
 
 			S_BHA_PRE_DET: begin	//curr_state = 1
 				if(pre_sta_allow) begin
-					next_state = S_READY_10;
+					next_state = S_EXE;
 				end else if(timout) begin
 					next_state = S_ALERT_40;
 				end else begin
 					next_state = S_BHA_PRE_DET;
 				end
             end
+
+			S_EXE:begin
+				next_state = S_READY_10;
+			end
 
 			S_READY_10: begin        //Send 10 interrupt
 				next_state = S_READY_10_ACK;
@@ -210,13 +214,8 @@ module tim_beh_siemens_cnc(
 			end
 
 			S_EXE_20: begin	//Send 20 interrupt
-				next_state = S_EXE;
-            end
-
-			S_EXE:begin
-				//already expired when the transaction started: pass through
 				next_state = S_BHA_POST_DET;
-			end
+            end
 
 			S_BHA_POST_DET: begin	//curr_state = 6
 				if(post_sta_allow) begin

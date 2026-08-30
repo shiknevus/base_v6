@@ -175,7 +175,7 @@ module tim_beh_can_servo#(
 	always @(*) begin
         case (curr_state)
             S_IDLE: begin
-                if (c_en || c_gap_crl != 20'd0)	
+                if (c_en && c_gap_crl != 20'd0)	
                     next_state = S_BHA_PRE_DET;
                 else
                     next_state = S_IDLE;
@@ -183,13 +183,19 @@ module tim_beh_can_servo#(
 			
 			S_BHA_PRE_DET: begin	//curr_state = 1
 				if(pre_sta_allow[c_bhv_id - 1'b1]) begin
-					next_state = S_READY_10;
+					next_state = S_EXE;
 				end else if(timout) begin
 					next_state = S_ALERT_40;			
 				end else begin
 					next_state = S_BHA_PRE_DET;
 				end
             end
+			S_EXE:begin
+				if(task_time_cnt >= c_gap_crl - 1)		//Timer finished
+					next_state = S_READY_10;
+				else
+					next_state = S_EXE;
+			end
 			
 			S_READY_10: begin        //Send 10 interrupt
 				next_state = S_READY_10_ACK;
@@ -205,15 +211,8 @@ module tim_beh_can_servo#(
 			end
 			
 			S_EXE_20: begin	//Send 20 interrupt
-				next_state = S_EXE;
+				next_state = S_BHA_POST_DET;
             end
-			
-			S_EXE:begin
-				if(task_time_cnt >= c_gap_crl - 1)		//Timer finished
-					next_state = S_BHA_POST_DET;
-				else
-					next_state = S_EXE;
-			end
 			
 			//S_EXE_20_ACK: begin
 			//	if(match_20) 	//Transaction 20 Acknowledged OK
