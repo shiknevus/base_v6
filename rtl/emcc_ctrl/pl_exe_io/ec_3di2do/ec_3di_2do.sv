@@ -124,6 +124,16 @@ module ec_3di_2do#(
 	wire 			param28			;
 	wire 			param29			;
 	wire 			param30			;
+	wire	[31:0]	param31			;
+	wire	[31:0]	param32			;
+	wire	[31:0]	param33			;
+	wire	[31:0]	param34			;
+	wire	[31:0]	param35			;
+	wire	[31:0]	param36			;
+	wire	[31:0]	param37			;
+	wire	[31:0]	param38			;
+	wire	[31:0]	param39			;
+	wire	[31:0]	param40			;
 	
 	//PL-PS
 	wire 	[31:0]	param51 ;
@@ -345,6 +355,16 @@ module ec_3di_2do#(
 	,.param28			    (param28		)
 	,.param29			    (param29		)
 	,.param30				(param30		)
+	,.param31	            (param31		)
+	,.param32	            (param32		)
+	,.param33	            (param33		)
+	,.param34	            (param34		)
+	,.param35	            (param35		)
+	,.param36	            (param36		)
+	,.param37	            (param37		)
+	,.param38	            (param38		)
+	,.param39	            (param39		)
+	,.param40	            (param40		)
 	,.irq_reg1	            (irq_reg1		)
 	,.irq_reg2	            (irq_reg2		)
 	,.a_st                  (ec_cha_st		)
@@ -428,7 +448,7 @@ module ec_3di_2do#(
 	,.ec_chb_st             (ec_chb_st			)
 	,.b_tx_id               (b_tx_id			)
 	,.b_alm_num             (b_alm_num			)
-	,.di				    ( 					)
+	,.di				    (1'b0				)
 	,.irq_o			        (irq_b				)
 	,.irq_ack_i	            (irq_b_grant		)	
     );

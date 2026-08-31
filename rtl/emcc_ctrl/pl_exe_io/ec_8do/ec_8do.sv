@@ -127,6 +127,16 @@ module ec_8do#(
 	wire 			param28			;
 	wire 			param29			;
 	wire 			param30			;
+	wire	[31:0]	param31			;
+	wire	[31:0]	param32			;
+	wire	[31:0]	param33			;
+	wire	[31:0]	param34			;
+	wire	[31:0]	param35			;
+	wire	[31:0]	param36			;
+	wire	[31:0]	param37			;
+	wire	[31:0]	param38			;
+	wire	[31:0]	param39			;
+	wire	[31:0]	param40			;
 	
 	//PL-PS
 	wire 	[31:0]	param51 ;
@@ -351,6 +361,16 @@ module ec_8do#(
 	,.param28			    (param28		)
 	,.param29			    (param29		)
 	,.param30				(param30		)
+	,.param31	            (param31		)
+	,.param32	            (param32		)
+	,.param33	            (param33		)
+	,.param34	            (param34		)
+	,.param35	            (param35		)
+	,.param36	            (param36		)
+	,.param37	            (param37		)
+	,.param38	            (param38		)
+	,.param39	            (param39		)
+	,.param40	            (param40		)
 	,.irq_reg1	            (irq_reg1		)
 	,.irq_reg2	            (irq_reg2		)
 	,.a_st                  (ec_cha_st		)
@@ -434,8 +454,8 @@ module ec_8do#(
 	,.b_tx_id               (b_tx_id			)
 	,.b_alm_num             (b_alm_num			)
 	//,.do_o				    (do_o				)
-	,.irq_o			        (irq_o				)
-	,.irq_ack_i	            (irq_ack_i			)	
+	,.irq_o			        (irq_b				)
+	,.irq_ack_i	            (irq_b_grant			)	
     );
 	 
 	tim_beh_8do tim_beh_8do_u0(
@@ -455,8 +475,8 @@ module ec_8do#(
 	,.c_tx_id         	        (c_tx_id			)
 	,.c_alm_num                 (c_alm_num			)
 	,.c_gap_crl                 (c_gap_crl			)
-	,.irq_o 					(irq_o				)
-	,.irq_ack_i                 (irq_ack_i			)
+	,.irq_o 					(irq_c				)
+	,.irq_ack_i                 (irq_c_grant			)
 	);
 	
 	pre_post_sta_check_8do#(
@@ -474,9 +494,9 @@ module ec_8do#(
 		.m_wk_mod        	(m_wk_mod       ),
 		.m_saf_st        	(m_saf_st       ),
 		.link_m_saf_st   	(link_m_saf_st  ),
-		.di					(di				),
-		.a_bhv_id			(c_bhv_id_r		),
-		.b_bhv_id			(c_bhv_id		),
+		.di					(1'b0			),
+		.a_bhv_id			(a_bhv_id_r		),
+		.b_bhv_id			(b_bhv_id		),
 		.c_bhv_id			(c_bhv_id		),
 		.a_en				(1'b1			),
 		.b_en				(1'b0			),	
