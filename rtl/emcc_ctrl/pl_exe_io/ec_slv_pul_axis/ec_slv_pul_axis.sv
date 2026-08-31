@@ -41,9 +41,9 @@ module ec_slv_pul_axis#(
 //----------------------------------------------------- user logic begin -----------------------------------------------------//
     	input					i_servo_ok       //servo not ok
     	,input					i_servo_stop        //servo stop
-    	,input					i_limf         //axis limit forward
-    	,input					i_zero          //axis origin
-    	,input					i_limb         //axis limit backward
+    	,input					i_axis_limf         //axis limit forward
+    	,input					i_axis_zero          //axis origin
+    	,input					i_axis_limb         //axis limit backward
     	,input					i_emerge_stop_signal//emergency stop signal
 
    		,input  	            i_safe_status 		//safe status
@@ -454,7 +454,7 @@ module ec_slv_pul_axis#(
 	,.i_servo_notok			(i_servo_notok      )
     ,.i_servo_stop			(i_servo_stop       )
     ,.i_axis_limf			(i_axis_limf        )
-    ,.i_axis_org			(i_axis_org         )
+    ,.i_axis_zero			(i_axis_zero         )
     ,.i_axis_limb			(i_axis_limb        )
     ,.i_emerge_stop_signal	(i_emerge_stop_signal)
     ,.i_safe_status			(i_safe_status 		)

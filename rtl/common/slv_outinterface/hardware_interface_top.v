@@ -102,7 +102,7 @@ module hardware_interface_top
     wire [31:0]      rcfg_touch_spd[3:0];
     wire             i_axis_limf[3:0];
     wire             i_axis_limb[3:0];
-    wire             i_axis_org[3:0];
+    wire             i_axis_zero[3:0];
     wire             i_axis_abspos0[3:0]; 
     wire [31:0]      rs232_uart_id[7:0];            //uart_id
     wire [3:0]       rs232_baud_rate[7:0];          
@@ -190,10 +190,10 @@ module hardware_interface_top
     assign i_axis_limb[1] = pul_motor1_buf[0][4];
     assign i_axis_limb[2] = pul_motor2_buf[0][4];
     assign i_axis_limb[3] = pul_motor3_buf[0][4];
-    assign i_axis_org[0] = pul_motor0_buf[0][5];
-    assign i_axis_org[1] = pul_motor1_buf[0][5];
-    assign i_axis_org[2] = pul_motor2_buf[0][5];
-    assign i_axis_org[3] = pul_motor3_buf[0][5];
+    assign i_axis_zero[0] = pul_motor0_buf[0][5];
+    assign i_axis_zero[1] = pul_motor1_buf[0][5];
+    assign i_axis_zero[2] = pul_motor2_buf[0][5];
+    assign i_axis_zero[3] = pul_motor3_buf[0][5];
     assign action_beat[0] = pul_motor0_buf[0][6];
     assign action_beat[1] = pul_motor1_buf[0][6];
     assign action_beat[2] = pul_motor2_buf[0][6];
@@ -645,7 +645,7 @@ assign rs232_uart_id[0] = rs232_ch0_buf[0];
 
 		   ,.i_axis_limf             ( i_axis_limf[i]       )
 		   ,.i_axis_limb             ( i_axis_limb[i]       )
-           ,.i_axis_org              ( i_axis_org[i]        )
+           ,.i_axis_zero             ( i_axis_zero[i]       )
            ,.i_axis_abspos0          ( i_axis_abspos0[i]    )
            ,.i_pause                 ( i_pause[i]           )
            ,.i_device_alarm          ( i_dv_alarm[i]        )

@@ -503,9 +503,9 @@ module ec_can_servo#(
 			.c_pre_sta_allow	(c_pre_sta_allow),	
 			.c_post_sta_allow	(c_post_sta_allow)	
 //----------------------------------------------------- user logic begin -----------------------------------------------------//
-			,.i_servo_limf		(i_axis_limf	 )
-			,.i_servo_limb		(i_axis_limb	 )
-			,.i_servo_zero		(i_axis_zero	 )
+			,.i_axis_limf		(i_axis_limf	 )
+			,.i_axis_limb		(i_axis_limb	 )
+			,.i_axis_zero		(i_axis_zero	 )
 			,.rctrl_drive_on		(param30			)
 			,.rctrl_drive_reset	(param29			)
 			,.rctrl_resume		(param28			)

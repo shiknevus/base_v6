@@ -62,9 +62,9 @@ module pre_post_sta_check_can_servo#(
 		,output	reg	[C_BHA_NUM-1:0]		c_post_sta_allow
 
 //----------------------------------------------------- user logic begin -----------------------------------------------------//
-		,input							i_servo_limf
-		,input							i_servo_limb
-		,input							i_servo_zero
+		,input							i_axis_limf
+		,input							i_axis_limb
+		,input							i_axis_zero
 		,input						rctrl_drive_on
 		,input						rctrl_drive_reset
 		,input						rctrl_resume
@@ -84,7 +84,7 @@ module pre_post_sta_check_can_servo#(
 	wire device_safe;
 	assign device_safe =(~unit_st && ~m_st && ~m_saf_st && ~link_m_saf_st);
 	wire axis_safe;
-	assign axis_safe = (~i_servo_limf && ~i_servo_limb );
+	assign axis_safe = (~i_axis_limf && ~i_axis_limb );
 	wire [A_BHA_NUM-1:0]	a_pre_sta	;
 
 	assign	a_pre_sta[0 ] = (a_bhv_id == 1 );    // HOME: always allowed

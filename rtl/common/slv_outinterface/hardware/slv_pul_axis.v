@@ -72,7 +72,7 @@ module slv_pul_axis
 
    ,input  wire             i_axis_limf     //forward limit
    ,input  wire             i_axis_limb     //backward limit
-   ,input  wire             i_axis_org
+   ,input  wire             i_axis_zero
    ,input  wire             i_axis_abspos0
    ,input  wire             i_pause
    ,input  wire             i_device_alarm
@@ -234,7 +234,7 @@ module slv_pul_axis
       .i_drv_son      ( action_son         ),
       .i_lim_f        ( i_axis_limf        ),
       .i_lim_b        ( i_axis_limb        ),
-      .i_org          ( i_axis_org         ),
+      .i_org          ( i_axis_zero         ),
       .i_pf_spd       ( home_spd_eff       ),
       .i_pf_acc       ( home_acc_eff       ),
       .i_pf_dec       ( home_dec_eff       ),
@@ -280,7 +280,7 @@ module slv_pul_axis
       .i_drv_son      ( 1'b1               ),
       .i_lim_f        ( i_axis_limf        ),
       .i_lim_b        ( i_axis_limb        ),
-      .i_org          ( i_axis_org         ),
+      .i_org          ( i_axis_zero         ),
       .i_pf_spd       ( jog_spd_eff        ),
       .i_pf_acc       ( jog_acc_eff        ),
       .i_pf_dec       ( jog_dec_eff        ),
@@ -326,7 +326,7 @@ module slv_pul_axis
       .i_drv_son      ( action_son         ),
       .i_lim_f        ( i_axis_limf        ),
       .i_lim_b        ( i_axis_limb        ),
-      .i_org          ( i_axis_org         ),
+      .i_org          ( i_axis_zero         ),
       .i_abspos       ( r_pf_abspos        ),
        .i_pf_spd      ( move_spd_eff       ),
        .i_pf_acc      ( move_acc_eff       ),

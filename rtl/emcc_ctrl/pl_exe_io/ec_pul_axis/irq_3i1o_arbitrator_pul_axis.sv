@@ -5,7 +5,7 @@
 // 
 // Create Date: 2026/06/29 22:42:53
 // Design Name: 
-// Module Name: irq_3i1o_arbitrator
+// Module Name: irq_3i1o_arbitrator_pul_axis
 // Project Name: 
 // Target Devices: 
 // Tool Versions: 
@@ -22,8 +22,9 @@
 module irq_3i1o_arbitrator_pul_axis(
 	input                   clk_i              
 	,input                  rst_i             
-	,input		[9:0]		sc_id
-	,input		[13:0]		ec_id
+	
+	,input		[9:0]		sc_id              
+	,input		[13:0]		ec_id   
 		
 	,input		[3:0]		chl_priority
 		
@@ -48,307 +49,476 @@ module irq_3i1o_arbitrator_pul_axis(
 	,output	reg	[31:0]		irq_reg1_o			// Interrupt Request Register 1
 	,output	reg	[31:0]		irq_reg2_o			// Interrupt Request Register 2
 	
-	,output	reg				irq_o
-	,output	reg				irq_busy_o
-	,input					irq_ack_a_i			// PS interrupt receive acknowledge
-	,input					irq_ack_b_i
-	,input					irq_ack_c_i
+	,output	reg				irq_o			
+	,output	reg				irq_busy_o		
+	,input					irq_ack_a_i			// PS interrupt receive acknowledge (channel A)
+	,input					irq_ack_b_i			// PS interrupt receive acknowledge (channel B)
+	,input					irq_ack_c_i			// PS interrupt receive acknowledge (channel C)
 );
-	
-	reg	[7:0]	curr_state		;
-	reg	[7:0]	curr_state_1d	;
-	reg	[7:0]	next_state		;
 	
 	reg [7:0] 	irq_cnt;
 	
 	reg			irq_receive_ack	;
-	reg	[1:0]	irq_receive_ack_i_r;
 	reg	[1:0]	ack_a_r;
 	reg	[1:0]	ack_b_r;
 	reg	[1:0]	ack_c_r;
 	reg			ack_a;
 	reg			ack_b;
 	reg			ack_c;
-	reg	[1:0]	grant_sel;	// granted channel of the current session
-
-reg sel_irq_a;
-reg sel_irq_b;
-reg sel_irq_c;
+	reg	[1:0]	grant_sel;	// granted channel of the current session (0:A 1:B 2:C)
 
 	localparam	S_IDLE			=	8'd0;
-	localparam	S_WAIT_IRQ_ACK1	=	8'd1;
-	localparam	S_WAIT_IRQ_ACK2	=	8'd2;
-	localparam	S_END_DELAY		=	8'd3;
-
-always @(*) begin
-    sel_irq_a = 1'b0;
-    sel_irq_b = 1'b0;
-    sel_irq_c = 1'b0;
-    case(chl_priority)
-        4'd0: begin // abc
-            if(irq_a_i && curr_state == S_IDLE)
-                sel_irq_a = 1'b1;
-            else if(irq_b_i && curr_state == S_IDLE)
-                sel_irq_b = 1'b1;
-            else if(irq_c_i && curr_state == S_IDLE)
-                sel_irq_c = 1'b1;
-        end
-        4'd1: begin // acb
-            if(irq_a_i && curr_state == S_IDLE)
-                sel_irq_a = 1'b1;
-            else if(irq_c_i && curr_state == S_IDLE)
-                sel_irq_c = 1'b1;
-            else if(irq_b_i && curr_state == S_IDLE)
-                sel_irq_b = 1'b1;
-        end
-        4'd2: begin // bac
-            if(irq_b_i && curr_state == S_IDLE)
-                sel_irq_b = 1'b1;
-            else if(irq_a_i && curr_state == S_IDLE)
-                sel_irq_a = 1'b1;
-            else if(irq_c_i && curr_state == S_IDLE)
-                sel_irq_c = 1'b1;
-        end
-        4'd3: begin // bca
-            if(irq_b_i && curr_state == S_IDLE)
-                sel_irq_b = 1'b1;
-            else if(irq_c_i && curr_state == S_IDLE)
-                sel_irq_c = 1'b1;
-            else if(irq_a_i && curr_state == S_IDLE)
-                sel_irq_a = 1'b1;
-        end
-        4'd4: begin // cab
-            if(irq_c_i && curr_state == S_IDLE)
-                sel_irq_c = 1'b1;
-            else if(irq_a_i && curr_state == S_IDLE)
-                sel_irq_a = 1'b1;
-            else if(irq_b_i && curr_state == S_IDLE)
-                sel_irq_b = 1'b1;
-        end
-        4'd5: begin // cba
-            if(irq_c_i && curr_state == S_IDLE)
-                sel_irq_c = 1'b1;
-            else if(irq_b_i && curr_state == S_IDLE)
-                sel_irq_b = 1'b1;
-            else if(irq_a_i && curr_state == S_IDLE)
-                sel_irq_a = 1'b1;
-        end
-        default: begin // default bac
-            if(irq_b_i && curr_state == S_IDLE)
-                sel_irq_b = 1'b1;
-            else if(irq_a_i && curr_state == S_IDLE)
-                sel_irq_a = 1'b1;
-            else if(irq_c_i && curr_state == S_IDLE)
-                sel_irq_c = 1'b1;
-        end
-    endcase
-end
-
-reg sel_irq_a_d;
-reg sel_irq_b_d;
-reg sel_irq_c_d;
-
-always @(posedge clk_i) begin
-    if(rst_i) begin
-        sel_irq_a_d <= 1'b0;
-        sel_irq_b_d <= 1'b0;
-        sel_irq_c_d <= 1'b0;
-    end else begin
-        sel_irq_a_d <= sel_irq_a;
-        sel_irq_b_d <= sel_irq_b;
-        sel_irq_c_d <= sel_irq_c;
-    end
-end
-
-always @(posedge clk_i) begin
-    if(rst_i) begin
-        irq_a_grant_o <= 1'b0;
-        irq_b_grant_o <= 1'b0;
-        irq_c_grant_o <= 1'b0;
-        grant_sel   <= 2'd0;
-    end else begin
-        irq_a_grant_o <= 1'b0;
-        irq_b_grant_o <= 1'b0;
-        irq_c_grant_o <= 1'b0;
-        if(sel_irq_a && !sel_irq_a_d) begin
-            irq_a_grant_o <= 1'b1;
-            grant_sel   <= 2'd0;
-        end else if(sel_irq_b && !sel_irq_b_d) begin
-            irq_b_grant_o <= 1'b1;
-            grant_sel   <= 2'd1;
-        end else if(sel_irq_c && !sel_irq_c_d) begin
-            irq_c_grant_o <= 1'b1;
-            grant_sel   <= 2'd2;
-        end
-    end
-end
-// ======================================================================
-
-	always@(posedge clk_i)begin
-	if(rst_i)
-		curr_state_1d <= 8'd0;
-	else
-		curr_state_1d <= curr_state;
-	end
-
+	localparam	S_DELAY1		=	8'd1;
+	localparam	S_DELAY2		=	8'd2;
+	localparam	S_WAIT_IRQ_ACK1	=	8'd3;
+	localparam	S_WAIT_IRQ_ACK2	=	8'd4;
+	localparam	S_END_DELAY		=	8'd5;
+	
+	reg		[7:0]	s_sta;
+	
+	//detect posedge of per-channel PS acknowledge, muxed by granted channel
 	always@(posedge clk_i)begin
 	if(rst_i)begin
-		ack_a_r <= 2'b00;
-		ack_b_r <= 2'b00;
-		ack_c_r <= 2'b00;
-		ack_a <= 1'b0;
-		ack_b <= 1'b0;
-		ack_c <= 1'b0;
+		ack_a_r 	<= 2'b00;
+		ack_b_r 	<= 2'b00;
+		ack_c_r 	<= 2'b00;
+		ack_a   	<= 1'b0;
+		ack_b   	<= 1'b0;
+		ack_c   	<= 1'b0;
 		irq_receive_ack <= 1'b0;
 	end else begin
-		ack_a_r <= {ack_a_r[0],irq_ack_a_i};
-		ack_b_r <= {ack_b_r[0],irq_ack_b_i};
-		ack_c_r <= {ack_c_r[0],irq_ack_c_i};
-		ack_a <= (~ack_a_r[1]) && ack_a_r[0];
-		ack_b <= (~ack_b_r[1]) && ack_b_r[0];
-		ack_c <= (~ack_c_r[1]) && ack_c_r[0];
+		ack_a_r 	<= {ack_a_r[0],irq_ack_a_i};
+		ack_b_r 	<= {ack_b_r[0],irq_ack_b_i};
+		ack_c_r 	<= {ack_c_r[0],irq_ack_c_i};
+		ack_a   	<= (~ack_a_r[1]) && ack_a_r[0];
+		ack_b   	<= (~ack_b_r[1]) && ack_b_r[0];
+		ack_c   	<= (~ack_c_r[1]) && ack_c_r[0];
 		irq_receive_ack <= (grant_sel == 2'd0) ? ack_a :
 		                   (grant_sel == 2'd1) ? ack_b : ack_c;
 	end
 	end
-
-	always @(posedge clk_i) begin
-        if (rst_i)
-            curr_state <= S_IDLE;
-        else
-            curr_state <= next_state;
-    end
 	
-	always @(*) begin
-        case (curr_state)
-            S_IDLE: begin
-				if(chl_priority == 4'd0)begin
-					if(irq_a_i) 
-						next_state = S_WAIT_IRQ_ACK1;
-					else if(irq_b_i)
-						next_state = S_WAIT_IRQ_ACK1;
-					else if(irq_c_i)
-						next_state = S_WAIT_IRQ_ACK1;
-					else
-						next_state = S_IDLE;
-				end else if(chl_priority == 4'd1)begin
-					if(irq_a_i)
-						next_state = S_WAIT_IRQ_ACK1;
-					else if(irq_c_i)
-						next_state = S_WAIT_IRQ_ACK1;
-					else if(irq_b_i)
-						next_state = S_WAIT_IRQ_ACK1;
-					else begin
-						next_state = S_IDLE;
-					end
-				end else if(chl_priority == 4'd2)begin
-					if(irq_b_i)		
-						next_state = S_WAIT_IRQ_ACK1;		
-					else if(irq_a_i)		
-						next_state = S_WAIT_IRQ_ACK1;		
-					else if(irq_c_i)		
-						next_state = S_WAIT_IRQ_ACK1;		
-					else		
-						next_state = S_IDLE;		
-				end else if(chl_priority == 4'd3)begin
-					if(irq_b_i)		
-						next_state = S_WAIT_IRQ_ACK1;		
-					else if(irq_c_i)		
-						next_state = S_WAIT_IRQ_ACK1;		
-					else if(irq_a_i)		
-						next_state = S_WAIT_IRQ_ACK1;		
-					else		
-						next_state = S_IDLE;
-				end else if(chl_priority == 4'd4)begin
-					if(irq_c_i)		
-						next_state = S_WAIT_IRQ_ACK1;		
-					else if(irq_a_i)		
-						next_state = S_WAIT_IRQ_ACK1;		
-					else if(irq_b_i)		
-						next_state = S_WAIT_IRQ_ACK1;		
-					else		
-						next_state = S_IDLE;		
-				end else if(chl_priority == 4'd5)begin
-					if(irq_c_i)		
-						next_state = S_WAIT_IRQ_ACK1;		
-					else if(irq_b_i)		
-						next_state = S_WAIT_IRQ_ACK1;		
-					else if(irq_a_i)		
-						next_state = S_WAIT_IRQ_ACK1;		
-					else		
-						next_state = S_IDLE;		
-				end else begin
-					if(irq_b_i)		
-						next_state = S_WAIT_IRQ_ACK1;		
-					else if(irq_a_i)		
-						next_state = S_WAIT_IRQ_ACK1;		
-					else if(irq_c_i)		
-						next_state = S_WAIT_IRQ_ACK1;		
-					else		
-						next_state = S_IDLE;	
-				end
-			end
+	//sync register (capture channel info at irq posedge)
+	reg 			r_irq_a_i	 ;
+	reg 	[7:0]	r_a_bhv_id   ;
+	reg 	[7:0]	r_a_tx_id    ;
+	reg 	[7:0]	r_a_alm_num  ;
+	
+	reg 			r_irq_b_i	 ;
+	reg 	[7:0]	r_b_bhv_id   ;
+	reg 	[7:0]	r_b_tx_id    ;
+	reg 	[7:0]	r_b_alm_num  ;
+	
+	reg 			r_irq_c_i	 ;
+	reg 	[7:0]	r_c_bhv_id   ;
+	reg 	[7:0]	r_c_tx_id    ;
+	reg 	[7:0]	r_c_alm_num  ;
+	
+	always@(posedge clk_i)
+	begin
+		if(rst_i)
+			r_irq_a_i <= 1'b0;
+		else
+			r_irq_a_i <= irq_a_i;
+	end
+	
+	always@(posedge clk_i)
+	begin
+		if(rst_i)begin
+			r_a_bhv_id  <= 8'd0;
+			r_a_tx_id   <= 8'd0;
+			r_a_alm_num <= 8'd0;
+		end else if({r_irq_a_i,irq_a_i} == 2'b01)begin
+			r_a_bhv_id  <= a_bhv_id ;
+			r_a_tx_id   <= a_tx_id  ;
+			r_a_alm_num <= a_alm_num;
+		end else begin
+			r_a_bhv_id  <= r_a_bhv_id ;
+			r_a_tx_id   <= r_a_tx_id  ;
+			r_a_alm_num <= r_a_alm_num;
+		end	
+	end
+	
+	always@(posedge clk_i)
+	begin
+		if(rst_i)
+			r_irq_b_i <= 1'b0;
+		else
+			r_irq_b_i <= irq_b_i;
+	end
+	
+	always@(posedge clk_i)
+	begin
+		if(rst_i)begin
+			r_b_bhv_id  <= 8'd0;
+			r_b_tx_id   <= 8'd0;
+			r_b_alm_num <= 8'd0;
+		end else if({r_irq_b_i,irq_b_i} == 2'b01)begin
+			r_b_bhv_id  <= b_bhv_id ;
+			r_b_tx_id   <= b_tx_id  ;
+			r_b_alm_num <= b_alm_num;
+		end else begin
+			r_b_bhv_id  <= r_b_bhv_id ;
+			r_b_tx_id   <= r_b_tx_id  ;
+			r_b_alm_num <= r_b_alm_num;
+		end	
+	end
+	
+	always@(posedge clk_i)
+	begin
+		if(rst_i)
+			r_irq_c_i <= 1'b0;
+		else
+			r_irq_c_i <= irq_c_i;
+	end
+	
+	always@(posedge clk_i)
+	begin
+		if(rst_i)begin
+			r_c_bhv_id  <= 8'd0;
+			r_c_tx_id   <= 8'd0;
+			r_c_alm_num <= 8'd0;
+		end else if({r_irq_c_i,irq_c_i} == 2'b01)begin
+			r_c_bhv_id  <= c_bhv_id ;
+			r_c_tx_id   <= c_tx_id  ;
+			r_c_alm_num <= c_alm_num;
+		end else begin
+			r_c_bhv_id  <= r_c_bhv_id ;
+			r_c_tx_id   <= r_c_tx_id  ;
+			r_c_alm_num <= r_c_alm_num;
+		end	
+	end
+	
+	//The channel currently being handled by the state machine
+	reg	[3:0]	cur_chan;
+	
 
-			S_WAIT_IRQ_ACK1: begin
+always @(posedge clk_i) begin
+	if(rst_i) begin
+		s_sta <= S_IDLE;
+		irq_a_grant_o <= 1'b0;
+		irq_b_grant_o <= 1'b0;
+		irq_c_grant_o <= 1'b0;
+		cur_chan <= 4'h0;
+		grant_sel <= 2'd0;
+	end else
+		case(s_sta)
+			S_IDLE:begin
+			
+				case(chl_priority)
+					4'd0: begin // abc
+						if(irq_a_i)begin
+							irq_a_grant_o <= 1'b1;
+							irq_b_grant_o <= 1'b0;
+							irq_c_grant_o <= 1'b0;
+							cur_chan <= 4'hA;
+							grant_sel <= 2'd0;
+							s_sta <= S_DELAY1;
+						end else if(irq_b_i)begin
+							irq_a_grant_o <= 1'b0;
+							irq_b_grant_o <= 1'b1;
+							irq_c_grant_o <= 1'b0;
+							cur_chan <= 4'hB;
+							grant_sel <= 2'd1;
+							s_sta <= S_DELAY1;
+						end else if(irq_c_i)begin
+							irq_a_grant_o <= 1'b0;
+							irq_b_grant_o <= 1'b0;
+							irq_c_grant_o <= 1'b1;
+							cur_chan <= 4'hC;
+							grant_sel <= 2'd2;
+							s_sta <= S_DELAY1;
+						end else begin
+							irq_a_grant_o <= 1'b0;
+							irq_b_grant_o <= 1'b0;
+							irq_c_grant_o <= 1'b0;
+							cur_chan <= 4'h0;
+							grant_sel <= 2'd0;
+							s_sta <= S_IDLE;
+						end
+					end
+					4'd1: begin // acb
+						if(irq_a_i)begin
+							irq_a_grant_o <= 1'b1;
+							irq_b_grant_o <= 1'b0;
+							irq_c_grant_o <= 1'b0;
+							cur_chan <= 4'hA;
+							grant_sel <= 2'd0;
+							s_sta <= S_DELAY1;
+						end else if(irq_c_i)begin
+							irq_a_grant_o <= 1'b0;
+							irq_b_grant_o <= 1'b0;
+							irq_c_grant_o <= 1'b1;
+							cur_chan <= 4'hC;
+							grant_sel <= 2'd2;
+							s_sta <= S_DELAY1;
+						end else if(irq_b_i)begin
+							irq_a_grant_o <= 1'b0;
+							irq_b_grant_o <= 1'b1;
+							irq_c_grant_o <= 1'b0;
+							cur_chan <= 4'hB;
+							grant_sel <= 2'd1;
+							s_sta <= S_DELAY1;
+						end else begin
+							irq_a_grant_o <= 1'b0;
+							irq_b_grant_o <= 1'b0;
+							irq_c_grant_o <= 1'b0;
+							cur_chan <= 4'h0;
+							grant_sel <= 2'd0;
+							s_sta <= S_IDLE;
+						end
+					end
+					4'd2: begin // bac
+						if(irq_b_i)begin
+							irq_a_grant_o <= 1'b0;
+							irq_b_grant_o <= 1'b1;
+							irq_c_grant_o <= 1'b0;
+							cur_chan <= 4'hB;
+							grant_sel <= 2'd1;
+							s_sta <= S_DELAY1;
+						end else if(irq_a_i)begin
+							irq_a_grant_o <= 1'b1;
+							irq_b_grant_o <= 1'b0;
+							irq_c_grant_o <= 1'b0;
+							cur_chan <= 4'hA;
+							grant_sel <= 2'd0;
+							s_sta <= S_DELAY1;
+						end else if(irq_c_i)begin
+							irq_a_grant_o <= 1'b0;
+							irq_b_grant_o <= 1'b0;
+							irq_c_grant_o <= 1'b1;
+							cur_chan <= 4'hC;
+							grant_sel <= 2'd2;
+							s_sta <= S_DELAY1;
+						end else begin
+							irq_a_grant_o <= 1'b0;
+							irq_b_grant_o <= 1'b0;
+							irq_c_grant_o <= 1'b0;
+							cur_chan <= 4'h0;
+							grant_sel <= 2'd0;
+							s_sta <= S_IDLE;
+						end
+					end
+					4'd3: begin // bca
+						if(irq_b_i)begin
+							irq_a_grant_o <= 1'b0;
+							irq_b_grant_o <= 1'b1;
+							irq_c_grant_o <= 1'b0;
+							cur_chan <= 4'hB;
+							grant_sel <= 2'd1;
+							s_sta <= S_DELAY1;
+						end else if(irq_c_i)begin
+							irq_a_grant_o <= 1'b0;
+							irq_b_grant_o <= 1'b0;
+							irq_c_grant_o <= 1'b1;
+							cur_chan <= 4'hC;
+							grant_sel <= 2'd2;
+							s_sta <= S_DELAY1;
+						end else if(irq_a_i)begin
+							irq_a_grant_o <= 1'b1;
+							irq_b_grant_o <= 1'b0;
+							irq_c_grant_o <= 1'b0;
+							cur_chan <= 4'hA;
+							grant_sel <= 2'd0;
+							s_sta <= S_DELAY1;
+						end else begin
+							irq_a_grant_o <= 1'b0;
+							irq_b_grant_o <= 1'b0;
+							irq_c_grant_o <= 1'b0;
+							cur_chan <= 4'h0;
+							grant_sel <= 2'd0;
+							s_sta <= S_IDLE;
+						end
+					end
+					4'd4: begin // cab
+						if(irq_c_i)begin
+							irq_a_grant_o <= 1'b0;
+							irq_b_grant_o <= 1'b0;
+							irq_c_grant_o <= 1'b1;
+							cur_chan <= 4'hC;
+							grant_sel <= 2'd2;
+							s_sta <= S_DELAY1;
+						end else if(irq_a_i)begin
+							irq_a_grant_o <= 1'b1;
+							irq_b_grant_o <= 1'b0;
+							irq_c_grant_o <= 1'b0;
+							cur_chan <= 4'hA;
+							grant_sel <= 2'd0;
+							s_sta <= S_DELAY1;
+						end else if(irq_b_i)begin
+							irq_a_grant_o <= 1'b0;
+							irq_b_grant_o <= 1'b1;
+							irq_c_grant_o <= 1'b0;
+							cur_chan <= 4'hB;
+							grant_sel <= 2'd1;
+							s_sta <= S_DELAY1;
+						end else begin
+							irq_a_grant_o <= 1'b0;
+							irq_b_grant_o <= 1'b0;
+							irq_c_grant_o <= 1'b0;
+							cur_chan <= 4'h0;
+							grant_sel <= 2'd0;
+							s_sta <= S_IDLE;
+						end
+					end
+					4'd5: begin // cba
+						if(irq_c_i)begin
+							irq_a_grant_o <= 1'b0;
+							irq_b_grant_o <= 1'b0;
+							irq_c_grant_o <= 1'b1;
+							cur_chan <= 4'hC;
+							grant_sel <= 2'd2;
+							s_sta <= S_DELAY1;
+						end else if(irq_b_i)begin
+							irq_a_grant_o <= 1'b0;
+							irq_b_grant_o <= 1'b1;
+							irq_c_grant_o <= 1'b0;
+							cur_chan <= 4'hB;
+							grant_sel <= 2'd1;
+							s_sta <= S_DELAY1;
+						end else if(irq_a_i)begin
+							irq_a_grant_o <= 1'b1;
+							irq_b_grant_o <= 1'b0;
+							irq_c_grant_o <= 1'b0;
+							cur_chan <= 4'hA;
+							grant_sel <= 2'd0;
+							s_sta <= S_DELAY1;
+						end else begin
+							irq_a_grant_o <= 1'b0;
+							irq_b_grant_o <= 1'b0;
+							irq_c_grant_o <= 1'b0;
+							cur_chan <= 4'h0;
+							grant_sel <= 2'd0;
+							s_sta <= S_IDLE;
+						end
+					end
+					default: begin // default bac
+						if(irq_b_i)begin
+							irq_a_grant_o <= 1'b0;
+							irq_b_grant_o <= 1'b1;
+							irq_c_grant_o <= 1'b0;
+							cur_chan <= 4'hB;
+							grant_sel <= 2'd1;
+							s_sta <= S_DELAY1;
+						end else if(irq_a_i)begin
+							irq_a_grant_o <= 1'b1;
+							irq_b_grant_o <= 1'b0;
+							irq_c_grant_o <= 1'b0;
+							cur_chan <= 4'hA;
+							grant_sel <= 2'd0;
+							s_sta <= S_DELAY1;
+						end else if(irq_c_i)begin
+							irq_a_grant_o <= 1'b0;
+							irq_b_grant_o <= 1'b0;
+							irq_c_grant_o <= 1'b1;
+							cur_chan <= 4'hC;
+							grant_sel <= 2'd2;
+							s_sta <= S_DELAY1;
+						end else begin
+							irq_a_grant_o <= 1'b0;
+							irq_b_grant_o <= 1'b0;
+							irq_c_grant_o <= 1'b0;
+							cur_chan <= 4'h0;
+							grant_sel <= 2'd0;
+							s_sta <= S_IDLE;
+						end
+					end
+				endcase
+			end
+			
+			S_DELAY1:begin
+				irq_a_grant_o <= 1'b0;
+				irq_b_grant_o <= 1'b0;
+				irq_c_grant_o <= 1'b0;
+				s_sta <= S_DELAY2;
+			end
+			
+			S_DELAY2:begin
+				irq_a_grant_o <= 1'b0;
+				irq_b_grant_o <= 1'b0;
+				irq_c_grant_o <= 1'b0;
+				s_sta <= S_WAIT_IRQ_ACK1;
+			end
+			
+			S_WAIT_IRQ_ACK1:begin
+				irq_a_grant_o <= 1'b0;
+				irq_b_grant_o <= 1'b0;
+				irq_c_grant_o <= 1'b0;
+				
 				if(irq_cnt <= 8'd31)begin
 					if(irq_receive_ack)// Interrupt acknowledge received successfully
-						next_state = S_END_DELAY;
+						s_sta <= S_END_DELAY;
 					else
-						next_state = S_WAIT_IRQ_ACK1;
+						s_sta <= S_WAIT_IRQ_ACK1;
 				end else begin
-						next_state = S_WAIT_IRQ_ACK2;
+						s_sta <= S_WAIT_IRQ_ACK2;
 				end
 			end
 			
-			S_WAIT_IRQ_ACK2: begin	//irq_
+			S_WAIT_IRQ_ACK2:begin
 				if(irq_receive_ack)// Interrupt acknowledge received successfully
-					next_state = S_END_DELAY;
-				else if(irq_cnt >= 8'd200)	//escape: PS ack lost (CDC), re-arbitrate instead of hang
-					next_state = S_IDLE;
+					s_sta <= S_END_DELAY;
+				else if(cur_chan == 4'hA && a_tx_id == 8'd40)	//A channel timeout
+					s_sta <= S_END_DELAY;
+				else if(cur_chan == 4'hB && b_tx_id == 8'd40)	//B channel timeout
+					s_sta <= S_END_DELAY;
+				else if(cur_chan == 4'hC && c_tx_id == 8'd40)	//C channel timeout
+					s_sta <= S_END_DELAY;
+				else if(irq_cnt >= 8'd200)	//pul: PS ack lost (CDC), re-arbitrate instead of hang
+					s_sta <= S_IDLE;
 				else
-					next_state = S_WAIT_IRQ_ACK2;
+					s_sta <= S_WAIT_IRQ_ACK2;
 			end
-						
+			
 			S_END_DELAY: begin
-				if(irq_cnt >= 8)
-					next_state = S_IDLE; 
-				else
-					next_state = S_END_DELAY;
+				if(end_cnt >= 4'd8)begin
+					cur_chan <= 4'h0;
+					grant_sel <= 2'd0;
+					s_sta <= S_IDLE; 
+				end else begin
+					s_sta <= S_END_DELAY;
+				end
 			end
 			
 			default:
-				next_state = S_IDLE;
+				s_sta <= S_IDLE;
 		endcase
-	end
-	
+end
+
 	always@(posedge clk_i)begin
 	if(rst_i)
 		irq_cnt <= 8'd0;
-	else if(curr_state != curr_state_1d)
-		irq_cnt <= 8'd0;
-	else if(curr_state == S_WAIT_IRQ_ACK1) begin
-		if(irq_cnt > 8'd31)
+	else if(s_sta == S_WAIT_IRQ_ACK1) begin
+		if(irq_cnt >= 8'd32) 
 			irq_cnt <= irq_cnt;
 		else
 			irq_cnt <= irq_cnt +1;
-	end else if(curr_state == S_WAIT_IRQ_ACK2) begin
-		if(irq_cnt > 8'd200)
-			irq_cnt <= irq_cnt;
-		else
-			irq_cnt <= irq_cnt +1;
-	end else if(curr_state == S_END_DELAY) begin
-		if(irq_cnt >= 8'd8)
+	end else if(s_sta == S_WAIT_IRQ_ACK2) begin
+		if(irq_cnt >= 8'd200)
 			irq_cnt <= irq_cnt;
 		else
 			irq_cnt <= irq_cnt +1;
 	end else
 		irq_cnt <= 8'd0;
 	end
-	
+
+
+	reg [3:0] end_cnt;
+	always@(posedge clk_i)begin
+	if(rst_i)
+		end_cnt <= 4'd0;
+	else if(s_sta == S_END_DELAY) begin
+		if(end_cnt >= 4'd8)
+			end_cnt <= end_cnt;
+		else
+			end_cnt <= end_cnt + 4'd1;
+	end else
+		end_cnt <= 4'd0;
+	end
 	always@(posedge clk_i)begin
 	if(rst_i)
 		irq_busy_o <= 1'b0;
-	else if(curr_state == S_IDLE)
+	else if(s_sta == S_IDLE)
 		irq_busy_o <= 1'b0;
 	else
 		irq_busy_o <= 1'b1;
@@ -358,9 +528,7 @@ end
 	always@(posedge clk_i)begin
 	if(rst_i)
 		irq_o <= 1'b0;
-	else if(curr_state == S_IDLE && (sel_irq_a || sel_irq_b || sel_irq_c))
-		irq_o <= 1'b1;
-	else if(curr_state == S_WAIT_IRQ_ACK1)
+	else if(s_sta == S_WAIT_IRQ_ACK1)
 		irq_o <= 1'b1;
 	else
 		irq_o <= 1'b0;
@@ -372,22 +540,22 @@ begin
         irq_reg1_o <= 32'd0;
         irq_reg2_o <= 32'd0;
     end else if(irq_a_grant_o)begin
-        irq_reg1_o <= {ec_id,sc_id,a_bhv_id};
-        irq_reg2_o <= {a_tx_id,a_alm_num,16'd0};
+        irq_reg1_o <= {ec_id,sc_id,r_a_bhv_id};
+        irq_reg2_o <= {r_a_tx_id,r_a_alm_num,16'd0};
 	end else if(irq_b_grant_o)begin
-        irq_reg1_o <= {ec_id,sc_id,b_bhv_id};
-        irq_reg2_o <= {b_tx_id,b_alm_num,16'd0};
+        irq_reg1_o <= {ec_id,sc_id,r_b_bhv_id};
+        irq_reg2_o <= {r_b_tx_id,r_b_alm_num,16'd0};
 	end else if(irq_c_grant_o)begin
-        irq_reg1_o <= {ec_id,sc_id,c_bhv_id};
-        irq_reg2_o <= {c_tx_id,c_alm_num,16'd0};
-	end else if(curr_state == S_END_DELAY)begin
-        irq_reg1_o <= 32'd0;
+        irq_reg1_o <= {ec_id,sc_id,r_c_bhv_id};
+        irq_reg2_o <= {r_c_tx_id,r_c_alm_num,16'd0};
+	end else if(s_sta == S_END_DELAY)begin
+		irq_reg1_o <= 32'd0;
         irq_reg2_o <= 32'd0;
 	end else begin
 		irq_reg1_o <= irq_reg1_o;
         irq_reg2_o <= irq_reg2_o;
     end
 end
+
 	
 endmodule
-
