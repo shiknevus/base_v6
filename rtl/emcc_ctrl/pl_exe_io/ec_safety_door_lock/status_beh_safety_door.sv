@@ -345,8 +345,10 @@ module status_beh_safety_door#(
             b_tx_id <= 8'd30;
         else if(curr_state == S_ALERT_40)
             b_tx_id <= 8'd40;
+		else if(match_40)
+			b_tx_id <= 8'd0;
         else
-            b_tx_id <= b_tx_id;
+               b_tx_id <= b_tx_id;
     end
 
 		always@(posedge clk_i)begin
@@ -386,8 +388,10 @@ module status_beh_safety_door#(
             b_alm_num <= 8'd103;
 		else if(curr_state == S_ACT_END_1)
 			b_alm_num <= 8'd0;
+		else if(curr_state == S_IDLE)
+			b_alm_num <= 8'd0;
         else
-            b_alm_num <= b_alm_num;
+               b_alm_num <= b_alm_num;
     end
 	
 

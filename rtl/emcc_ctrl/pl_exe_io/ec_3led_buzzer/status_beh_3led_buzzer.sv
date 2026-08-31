@@ -294,8 +294,10 @@ module status_beh_3led_buzzer#(
             b_tx_id <= 8'd30;
         else if(curr_state == S_ALERT_40)
             b_tx_id <= 8'd40;
+		else if(match_40)
+			b_tx_id <= 8'd0;
         else
-            b_tx_id <= b_tx_id;
+               b_tx_id <= b_tx_id;
     end
 
 	always@(posedge clk_i)begin
@@ -335,8 +337,10 @@ module status_beh_3led_buzzer#(
 			b_alm_num <= ack_ps_alart_num;
 		else if(curr_state == S_SUCC_30_ACK && timout)						//For Transaction 30, waiting for the ps response timed out.
             b_alm_num <= 8'd103;
+		else if(curr_state == S_IDLE)
+			b_alm_num <= 8'd0;
         else
-            b_alm_num <= b_alm_num;
+               b_alm_num <= b_alm_num;
     end
 	
 

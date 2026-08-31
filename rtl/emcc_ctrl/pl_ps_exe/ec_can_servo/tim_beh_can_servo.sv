@@ -365,7 +365,7 @@ module tim_beh_can_servo#(
 		else if(curr_state != S_EXE)
 			task_time_cnt <= 'd0;
 		else
-			task_time_cnt <= task_time_cnt + i_time_1ms_vld;
+			task_time_cnt <= task_time_cnt + i_time_1s_vld;
 	end
 	
 	wire	sample_vld;

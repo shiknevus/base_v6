@@ -227,14 +227,16 @@ module status_beh_16di#(
 			b_tx_id <= 8'd0;
         else if(curr_state == S_READY_10)
             b_tx_id <= 8'd10;
-        else if(curr_state == S_EXE_20)
-            b_tx_id <= 8'd20;
+        // else if(curr_state == S_EXE_20)
+            //     b_tx_id <= 8'd20;
         else if(curr_state == S_SUCC_30)
             b_tx_id <= 8'd30;
         else if(curr_state == S_ALERT_40)
             b_tx_id <= 8'd40;
+		else if(match_40)
+			b_tx_id <= 8'd0;
         else
-            b_tx_id <= b_tx_id;
+               b_tx_id <= b_tx_id;
     end
 
 	always@(posedge clk_i)begin
@@ -246,8 +248,8 @@ module status_beh_16di#(
             irq_o <= 1'b0;
         else if(curr_state == S_READY_10)
             irq_o <= 1'b1;
-		else if(curr_state == S_EXE_20)
-			irq_o <= 1'b1;
+		// else if(curr_state == S_EXE_20)
+			// 	irq_o <= 1'b1;
 		else if(curr_state == S_SUCC_30)
 			irq_o <= 1'b1;
 		else if(curr_state == S_ALERT_40)
@@ -268,8 +270,8 @@ module status_beh_16di#(
             b_alm_num <= ack_ps_alart_num;    
         else if(curr_state == S_READY_10_ACK && timout)						//For Transaction 10, waiting for the ps response timed out.
             b_alm_num <= 8'd2;    
-		else if(curr_state == S_EXE_20_ACK && ack_tx_result == IRQ_NO_OK)	//Transaction 20 has a ps response error.
-            b_alm_num <= ack_ps_alart_num;    
+		// else if(curr_state == S_EXE_20_ACK && ack_tx_result == IRQ_NO_OK)	//Transaction 20 has a ps response error.
+            //     b_alm_num <= ack_ps_alart_num;
         else if(curr_state == S_EXE_20_ACK && timout)						//For Transaction 20, waiting for the ps response timed out.
             b_alm_num <= 8'd3;    
 		else if(curr_state_1d == S_EXE && curr_state == S_ALERT_40 && b_bhv_id == 8'd1)//The execution of Behavior 1 failed.
@@ -280,8 +282,10 @@ module status_beh_16di#(
 			b_alm_num <= ack_ps_alart_num;
 		else if(curr_state == S_SUCC_30_ACK && timout)						//For Transaction 30, waiting for the ps response timed out.
             b_alm_num <= 8'd6;
+		else if(curr_state == S_IDLE)
+			b_alm_num <= 8'd0;
         else
-            b_alm_num <= b_alm_num;
+               b_alm_num <= b_alm_num;
     end
 	
 

@@ -37,7 +37,7 @@ module tim_beh_pul_axis#(
 	,input 		[19:0]			c_tx_ot          	
 	,input 		[31:0]			c_tx_result_rpt  	
 	,input						c_tx_result_vld
-	,output		 [3:0]			ec_chc_st	
+	,output						ec_chc_st
 	,output reg [7:0]			c_tx_id         	
 	,output reg [7:0]			c_alm_num
 	
@@ -175,7 +175,7 @@ module tim_beh_pul_axis#(
 	always @(*) begin
         case (curr_state)
             S_IDLE: begin
-                if (c_en || c_gap_crl != 20'd0)	
+                if (c_en && c_gap_crl != 20'd0)
                     next_state = S_BHA_PRE_DET;
                 else
                     next_state = S_IDLE;
@@ -183,13 +183,20 @@ module tim_beh_pul_axis#(
 			
 			S_BHA_PRE_DET: begin	//curr_state = 1
 				if(pre_sta_allow[c_bhv_id - 1'b1]) begin
-					next_state = S_READY_10;
+					next_state = S_EXE;
 				end else if(timout) begin
 					next_state = S_ALERT_40;			
 				end else begin
 					next_state = S_BHA_PRE_DET;
 				end
             end
+			
+			S_EXE:begin
+				if(task_time_cnt >= c_gap_crl - 1)		//Timer finished
+					next_state = S_READY_10;
+				else
+					next_state = S_EXE;
+			end
 			
 			S_READY_10: begin        //Send 10 interrupt
 				next_state = S_READY_10_ACK;
@@ -205,15 +212,8 @@ module tim_beh_pul_axis#(
 			end
 			
 			S_EXE_20: begin	//Send 20 interrupt
-				next_state = S_EXE;
+				next_state = S_BHA_POST_DET;
             end
-			
-			S_EXE:begin
-				if(task_time_cnt >= c_gap_crl - 1)		//Timer finished
-					next_state = S_BHA_POST_DET;
-				else
-					next_state = S_EXE;
-			end
 			
 			//S_EXE_20_ACK: begin
 			//	if(match_20) 	//Transaction 20 Acknowledged OK
@@ -222,7 +222,7 @@ module tim_beh_pul_axis#(
             //        next_state = S_ALERT_40;
             //    else
             //        next_state = S_EXE_20_ACK;
-			//end
+				//end
 
 			
 			S_BHA_POST_DET: begin	//curr_state = 6
@@ -366,7 +366,7 @@ module tim_beh_pul_axis#(
 		else if(curr_state != S_EXE)
 			task_time_cnt <= 'd0;
 		else
-			task_time_cnt <= task_time_cnt + i_time_1ms_vld;
+			task_time_cnt <= task_time_cnt + i_time_1s_vld;
 	end
 	
 	wire	sample_vld;

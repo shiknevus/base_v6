@@ -158,10 +158,10 @@ module ps_rw_pl_reg#(
 	wire 		rd_space_select;
 	wire 		wr_space_select;
 	wire 		wr_task_vld;
-	reg  [19:0] rd_addr_d1;
-	reg  [19:0] rd_addr_d2;
-	wire [19:0] rd_task_addr;
-	wire [19:0] wr_task_addr;
+	reg  [8:0]  rd_addr_d1;
+	reg  [8:0]  rd_addr_d2;
+	wire [8:0]  rd_task_addr;
+	wire [8:0]  wr_task_addr;
 	
 	//================================================================================================//
 	//---------------------------------Component address is selected --------------------------------//
@@ -234,7 +234,7 @@ module ps_rw_pl_reg#(
 			c_bhv_ot 			<= 	20'd0		   	;
 			c_tsc_result_rpt	<=	32'd0		   	;
 			c_tsc_result_vld	<= 	1'b0			;	
-			c_bhv_gap_crl      	<=	20'd0		   	;
+			c_bhv_gap_crl      	<=	20'd5		   	;
 
 			param1				<=	32'd0	  	;
 			param2				<=	32'd0	  	;
@@ -362,7 +362,7 @@ module ps_rw_pl_reg#(
 
 	always @(posedge clk_i) begin
 		
-    case ( rd_addr_d2 )		
+    case ( rd_addr_d2[8:0] )		
 		`IRQ_REG1		:	o_st_rd_data <= 		irq_reg1	;
 		`IRQ_REG2		:	o_st_rd_data <= 		irq_reg2	;
 
