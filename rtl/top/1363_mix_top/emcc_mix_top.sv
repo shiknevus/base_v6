@@ -478,10 +478,10 @@ module emcc_mix_top
        ,.i_servo_ok        ( ~di_regoin_msg[0][23]           )   // 伺服就绪
 				,.cur_slv_board_id		(1'b0                   )
 				,.slv_board_id			(slv_board_id           )
-				,.pul_motor_r_flag		(pul_motor2_r_flag      )
-		    	,.pul_motor_flag		(pul_motor2_flag	    )
-				,.m2s_pulm_msg			(pul_motor2_r_msg[0]    )
-				,.s2m_pulm_msg			(pul_motor2_msg[0]      )
+				,.pul_motor_r_flag		(pul_motor0_r_flag      )
+		    	,.pul_motor_flag		(pul_motor0_flag	    )
+				,.m2s_pulm_msg			(pul_motor0_r_msg[0]    )
+				,.s2m_pulm_msg			(pul_motor0_msg[0]      )
     );
 
 	
@@ -1653,10 +1653,10 @@ module emcc_mix_top
        ,.i_axis_limb        ( ~di_mst_msg[31]           )   // 负限位到位开关
        ,.i_axis_zero        ( ~di_mst_msg[30]           )   // 零位到位开关
 
-		    	,.o_dv_pulse			(o_dv_pulse[2]		    )
-		    	,.o_dv_dir				(o_dv_dir[2]		    )
-		    	,.o_dv_reset			(o_dv_reset[2]		    )
-		    	,.o_dv_son				(o_dv_son[2]		    )
+		    	,.o_dv_pulse			(o_dv_pulse[0]		    )
+		    	,.o_dv_dir				(o_dv_dir[0]		    )
+		    	,.o_dv_reset			(o_dv_reset[0]		    )
+		    	,.o_dv_son				(o_dv_son[0]		    )
     );
 
 	
