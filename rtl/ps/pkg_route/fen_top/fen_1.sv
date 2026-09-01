@@ -98,7 +98,7 @@ module fen_1
   ////di_regoin_msg       
      always @(posedge clk)begin
         if(reset)begin
-           di_regoin_msg<=0;
+           di_regoin_msg<={RAM_DWIDTH*3{1'b1}};
         end else if (!accept_buf_wea)begin
            di_regoin_msg <=di_regoin_msg;
         end else if ((accept_buf_addra >= `DEPOT_BIAS_DI) & (accept_buf_addra < `DEPOT_BIAS_AI))begin
