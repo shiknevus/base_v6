@@ -233,7 +233,7 @@ spi_module#(
 
   
 
-wire 	o_dac_load = 0;
+assign 	o_dac_load = 0;
 
 
 
