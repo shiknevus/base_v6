@@ -127,9 +127,9 @@ module irq_3i1o_arbitrator(
 		end	
 	end
 	
-	always@(posedge i_clk)
+	always@(posedge clk_i)
 	begin
-		if(i_rst)begin
+		if(rst_i)begin
 			a_tx_id_1d <= 8'd0;
 			b_tx_id_1d <= 8'd0;
 			c_tx_id_1d <= 8'd0;
