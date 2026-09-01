@@ -96,6 +96,12 @@ module irq_3i1o_arbitrator(
 	reg 	[7:0]	r_c_tx_id    ;
 	reg 	[7:0]	r_c_alm_num  ;
 	
+	reg 	[7:0]	a_tx_id_1d   ;
+	reg 	[7:0]	b_tx_id_1d   ;
+	reg 	[7:0]	c_tx_id_1d   ;
+	
+	reg [3:0] end_cnt;
+	
 	always@(posedge clk_i)
 	begin
 		if(rst_i)
@@ -120,6 +126,20 @@ module irq_3i1o_arbitrator(
 			r_a_alm_num <= r_a_alm_num;
 		end	
 	end
+	
+	always@(posedge clk_i)
+	begin
+		if(rst_i)begin
+			a_tx_id_1d <= 8'd0;
+			b_tx_id_1d <= 8'd0;
+			c_tx_id_1d <= 8'd0;
+		end else begin
+			a_tx_id_1d <= a_tx_id;
+			b_tx_id_1d <= b_tx_id;
+			c_tx_id_1d <= c_tx_id;
+		end
+	end
+	
 	
 	always@(posedge clk_i)
 	begin
@@ -404,11 +424,13 @@ always @(posedge clk_i) begin
 			S_WAIT_IRQ_ACK2:begin
 				if(irq_receive_ack)// Interrupt acknowledge received successfully
 					s_sta <= S_END_DELAY;
-				else if(cur_chan == 4'hA && a_tx_id == 8'd40)	//A channel timeout
+				else if(a_tx_id == 8'd0 || b_tx_id == 8'd0 || c_tx_id == 8'd0)//A/B/C channel 40 timeout
 					s_sta <= S_END_DELAY;
-				else if(cur_chan == 4'hB && b_tx_id == 8'd40)	//B channel timeout
+				else if(cur_chan == 4'hA && a_tx_id == 8'd40 && a_tx_id_1d != a_tx_id)	//A channel 10/30 timeout
 					s_sta <= S_END_DELAY;
-				else if(cur_chan == 4'hC && c_tx_id == 8'd40)	//C channel timeout
+				else if(cur_chan == 4'hB && b_tx_id == 8'd40 && b_tx_id_1d != b_tx_id)	//B channel 10/30 timeout
+					s_sta <= S_END_DELAY;
+				else if(cur_chan == 4'hC && c_tx_id == 8'd40 && b_tx_id_1d != b_tx_id)	//C channel 10/30 timeout
 					s_sta <= S_END_DELAY;
 				else
 					s_sta <= S_WAIT_IRQ_ACK2;
@@ -444,9 +466,7 @@ end
 	end else
 		irq_cnt <= 8'd0;
 	end
-
-
-	reg [3:0] end_cnt;
+	
 	always@(posedge clk_i)begin
 	if(rst_i)
 		end_cnt <= 4'd0;
