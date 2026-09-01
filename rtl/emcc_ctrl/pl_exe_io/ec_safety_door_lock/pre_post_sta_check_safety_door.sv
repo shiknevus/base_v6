@@ -98,7 +98,7 @@ module pre_post_sta_check_safety_door#(
 	begin
 		if(i_rst)
 			ec_chb_st_negedge <= 0;
-		else if({ri_open_req_key,i_open_req_key} == 2'b01)
+		else if({ec_chb_st_r,ec_chb_st} == 2'b10)
 			ec_chb_st_negedge <= 1;
 		else
 			ec_chb_st_negedge <= 0;
@@ -186,8 +186,6 @@ module pre_post_sta_check_safety_door#(
 		//else if(safe_allow && open_req_key_posedge)
 		else if(!link_m_saf_st)
 			b_pre_sta_allow_act100 <= 1'b1;
-		//else if(ec_chb_st_negedge)
-		//	b_pre_sta_allow_act100 <= 1'b0;
 		else
 			b_pre_sta_allow_act100 <= 1'b0;
 	end
@@ -200,8 +198,6 @@ module pre_post_sta_check_safety_door#(
 		//else if(safe_allow && close_confirm_key_posedge)
 		else if(!link_m_saf_st)
 			b_pre_sta_allow_act101 <= 1'b1;
-		//else if(ec_chb_st_negedge)
-		//	b_pre_sta_allow_act101 <= 1'b0;
 		else
 			b_pre_sta_allow_act101 <= 1'b0;
 	end
