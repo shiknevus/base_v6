@@ -425,7 +425,7 @@ module ec_sys_sf#(
 	,.i_estop               (i_estop   			)
 	,.i_manul	            (i_manul			)
 	,.i_auto	            (i_auto				)
-	,.state_monitor_o		(debug_reg1			)
+	,.state_monitor_o		(			)
 	,.irq_o			        (irq_o				)
 	,.irq_ack_i	            (irq_ack_i			)	
     );

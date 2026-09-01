@@ -4,7 +4,7 @@
       "boundary_crc": "0x576F00A13EA223B3",
       "device": "xczu5eg-sfvc784-2-i",
       "name": "mststa_mpsoc_v2",
-      "synth_flow_mode": "Singular",
+      "synth_flow_mode": "None",
       "tool_version": "2018.3",
       "validated": "true"
     },
