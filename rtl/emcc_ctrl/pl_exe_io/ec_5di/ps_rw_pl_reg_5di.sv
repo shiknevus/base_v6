@@ -403,9 +403,9 @@ module ps_rw_pl_reg_5di#(
 		
 		`DEBUG_REG1		:	o_st_rd_data <= debug_reg1			;
 		`DEBUG_REG2		:	o_st_rd_data <= debug_reg2			;
-		`DEBUG_REG3		:	o_st_rd_data <= debug_reg3			;
-		`DEBUG_REG4		:	o_st_rd_data <= debug_reg4			;
-        `DEBUG_REG5		:	o_st_rd_data <= debug_reg5			;
+		// `DEBUG_REG3		:	o_st_rd_data <= debug_reg3			;
+		// `DEBUG_REG4		:	o_st_rd_data <= debug_reg4			;
+        // `DEBUG_REG5		:	o_st_rd_data <= debug_reg5			;
 
 		`RST_EN        	:	o_st_rd_data <= {31'd0,rst_en_n		};
 		`EC_ID         	:	o_st_rd_data <= {18'd0,ec_id		};   

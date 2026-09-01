@@ -287,10 +287,10 @@ module ec_8do#(
 		end
 	end
 
-	ps_rw_pl_reg#(
+	ps_rw_pl_reg_8do#(
 		.REG_SPACE_BIAS 	(REG_SPACE_BIAS		),
 		.REG_SPACE_SIZE 	(REG_SPACE_SIZE		)
-)ps_rw_pl_reg_u0(
+)ps_rw_pl_reg_8do_u0(
 	.clk_i			        (ps_reg_clk		)
 	,.rst_i			        (ps_reg_reset	)
 	,.i_st_wr_en		    (i_st_wr_en		)
