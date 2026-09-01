@@ -387,17 +387,10 @@ always @(posedge clk_i) begin
 			end
 			
 			S_DELAY2:begin
-				irq_a_grant_o <= 1'b0;
-				irq_b_grant_o <= 1'b0;
-				irq_c_grant_o <= 1'b0;
 				s_sta <= S_WAIT_IRQ_ACK1;
 			end
 			
 			S_WAIT_IRQ_ACK1:begin
-				irq_a_grant_o <= 1'b0;
-				irq_b_grant_o <= 1'b0;
-				irq_c_grant_o <= 1'b0;
-				
 				if(irq_cnt <= 8'd31)begin
 					if(irq_receive_ack)// Interrupt acknowledge received successfully
 						s_sta <= S_END_DELAY;
@@ -498,9 +491,9 @@ begin
 	end else if(irq_c_grant_o)begin
         irq_reg1_o <= {ec_id,sc_id,r_c_bhv_id};
         irq_reg2_o <= {r_c_tx_id,r_c_alm_num,16'd0};
-	// end else if(s_sta == S_END_DELAY)begin
-	// 	irq_reg1_o <= 32'd0;
-    //     irq_reg2_o <= 32'd0;
+	//end else if(s_sta == S_END_DELAY)begin
+	//	irq_reg1_o <= 32'd0;
+    //    irq_reg2_o <= 32'd0;
 	end else begin
 		irq_reg1_o <= irq_reg1_o;
         irq_reg2_o <= irq_reg2_o;
