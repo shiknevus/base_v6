@@ -91,7 +91,7 @@ module ps_rw_pl_reg_pul_axis#(
 	//,output		reg 	[7:0]		param18			
 	//,output		reg 	[7:0]		param19			
 	//,output		reg 	[7:0]		param20			
-	//,output		reg 	[7:0]		param21			
+	,output		reg 	[7:0]		param21			
 	//,output		reg 	[7:0]		param22			
 	//,output		reg 	[7:0]		param23			
 	//,output		reg 	[7:0]		param24			
@@ -100,7 +100,7 @@ module ps_rw_pl_reg_pul_axis#(
 	,output		reg 				param27			
 	,output		reg 				param28			
 	,output		reg 				param29			
-	,output		reg 				param30		
+	// ,output		reg 				param30		
 	//,output		reg 	[31:0]		param31	
 	//,output		reg 	[31:0]		param32	
 	,output		reg 	[31:0]		param33	
@@ -269,7 +269,7 @@ module ps_rw_pl_reg_pul_axis#(
 			//param18				<=	8'd0	   	;
 			//param19				<=	8'd0	   	;
 			//param20				<=	8'd0	   	;
-			//param21				<=	8'd0	   	;
+			param21				<=	8'd0	   	;
 			//param22				<=	8'd0	   	;
 			//param23				<=	8'd0	   	;
 			//param24				<=	8'd0	   	;
@@ -278,7 +278,7 @@ module ps_rw_pl_reg_pul_axis#(
 			param27				<=	1'd0	   	;
 			param28				<=	1'd0	   	;
 			param29				<=	1'd0	   	;
-			param30				<=	1'd0	   	;
+			// param30				<=	1'd0	   	;
 			//param31             <=	32'd0		;
 			//param32             <=	32'd0		;
 			param33             <=	32'd0		;
@@ -348,7 +348,7 @@ module ps_rw_pl_reg_pul_axis#(
 			//param18			<=	(wr_task_vld && wr_task_addr == `PARAM18		) ? i_st_wr_data[7:0] 	: param18	;
 			//param19			<=	(wr_task_vld && wr_task_addr == `PARAM19		) ? i_st_wr_data[7:0] 	: param19	;
 			//param20			<=	(wr_task_vld && wr_task_addr == `PARAM20		) ? i_st_wr_data[7:0] 	: param20	;
-			//param21			<=	(wr_task_vld && wr_task_addr == `PARAM21		) ? i_st_wr_data[7:0] 	: param21	;
+			param21			<=	(wr_task_vld && wr_task_addr == `PARAM21		) ? i_st_wr_data[7:0] 	: param21	;
 			//param22			<=	(wr_task_vld && wr_task_addr == `PARAM22		) ? i_st_wr_data[7:0] 	: param22	;
 			//param23			<=	(wr_task_vld && wr_task_addr == `PARAM23		) ? i_st_wr_data[7:0] 	: param23	;
 			//param24			<=	(wr_task_vld && wr_task_addr == `PARAM24		) ? i_st_wr_data[7:0] 	: param24	;
@@ -357,7 +357,7 @@ module ps_rw_pl_reg_pul_axis#(
 			param27			<=	(wr_task_vld && wr_task_addr == `PARAM27		) ? i_st_wr_data[0]		: (clr_stop ? 1'b0 : param27)	;
 			param28			<=	(wr_task_vld && wr_task_addr == `PARAM28		) ? i_st_wr_data[0]		: (clr_resume ? 1'b0 : param28)	;
 			param29			<=	(wr_task_vld && wr_task_addr == `PARAM29		) ? i_st_wr_data[0]		: param29	;
-			param30			<=	(wr_task_vld && wr_task_addr == `PARAM30		) ? i_st_wr_data[0]		: param30	;
+			// param30			<=	(wr_task_vld && wr_task_addr == `PARAM30		) ? i_st_wr_data[0]		: param30	;
 			//param31         <= 	(wr_task_vld && wr_task_addr == `PARAM31		) ? i_st_wr_data		: param31	;
 			//param32         <= 	(wr_task_vld && wr_task_addr == `PARAM32		) ? i_st_wr_data		: param32	;
 			param33         <= 	(wr_task_vld && wr_task_addr == `PARAM33		) ? i_st_wr_data		: param33	;
@@ -470,7 +470,7 @@ module ps_rw_pl_reg_pul_axis#(
 		//`PARAM18		:	o_st_rd_data <= {24'd0,param18		};
 		//`PARAM19		:	o_st_rd_data <= {24'd0,param19		};
 		//`PARAM20		:	o_st_rd_data <= {24'd0,param20		};
-		//`PARAM21		:	o_st_rd_data <= {24'd0,param21		};
+		`PARAM21		:	o_st_rd_data <= {24'd0,param21		};
 		//`PARAM22		:	o_st_rd_data <= {24'd0,param22		};
 		//`PARAM23		:	o_st_rd_data <= {24'd0,param23		};
 		//`PARAM24		:	o_st_rd_data <= {24'd0,param24		};
@@ -479,7 +479,7 @@ module ps_rw_pl_reg_pul_axis#(
 		`PARAM27		:	o_st_rd_data <= {31'd0,param27		};
 		`PARAM28		:	o_st_rd_data <= {31'd0,param28		};
 		`PARAM29		:	o_st_rd_data <= {31'd0,param29		};
-		`PARAM30		:	o_st_rd_data <= {31'd0,param30		};
+		// `PARAM30		:	o_st_rd_data <= {31'd0,param30		};
 		//`PARAM31		:	o_st_rd_data <= param31				;
 		//`PARAM32		:	o_st_rd_data <= param32				;
 		`PARAM33		:	o_st_rd_data <= param33				;

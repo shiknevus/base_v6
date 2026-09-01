@@ -363,7 +363,7 @@ module ec_slv_pul_axis#(
 	//,.param18			    (param18		)
 	//,.param19			    (param19		)
 	//,.param20			    (param20		)
-	//,.param21			    (param21		)
+	,.param21			    (param21		)
 	//,.param22			    (param22		)
 	//,.param23			    (param23		)
 	//,.param24			    (param24		)
@@ -372,7 +372,7 @@ module ec_slv_pul_axis#(
 	,.param27			    (param27		)
 	,.param28			    (param28		)
 	,.param29			    (param29		)
-	,.param30				(param30		)
+	// ,.param30				(param30		)
 //----------------------------------------------------- user logic begin -----------------------------------------------------//
 	//,.param31				(param31		)
 	//,.param32				(param32		)
@@ -589,7 +589,7 @@ module ec_slv_pul_axis#(
 		,.action_done			(action_done		)
 		,.action_error			(action_error		)
 
-		,.rctrl_drive_on		(param30			)
+		,.rctrl_drive_on		(param21			)
 		,.rctrl_drive_reset		(param29			)
 		,.rctrl_resume			(param28			)
 		,.rctrl_pause			(param26			)

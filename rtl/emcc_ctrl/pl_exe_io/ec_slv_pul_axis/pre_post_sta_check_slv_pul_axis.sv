@@ -66,7 +66,7 @@ module pre_post_sta_check_slv_pul_axis#(
 		,input							action_done
 		,input							action_error
 
-		,input							rctrl_drive_on
+		,input		[7:0]				rctrl_drive_on  //1.on 2.off
 		,input							rctrl_drive_reset
 		,input							rctrl_resume
 		,input							rctrl_pause
@@ -154,8 +154,8 @@ module pre_post_sta_check_slv_pul_axis#(
 	assign	b_pre_sta[100] = rctrl_pause && rctrl_resume && ec_cha_st; // resume
 	assign	b_pre_sta[101] = rctrl_drive_reset;    // reset
 	assign	b_pre_sta[102] = rctrl_pause && rctrl_stop && ec_cha_st;  // stop
-	assign	b_pre_sta[103] = rctrl_drive_on;       // enable
-	assign	b_pre_sta[104] = ~rctrl_drive_on;      // disable
+	assign	b_pre_sta[103] = rctrl_drive_on==8'd1;       // enable
+	assign	b_pre_sta[104] = rctrl_drive_on==8'd2;      // disable
 
 	reg ec_chb_st_d1;
 	always@(posedge clk_i) begin
