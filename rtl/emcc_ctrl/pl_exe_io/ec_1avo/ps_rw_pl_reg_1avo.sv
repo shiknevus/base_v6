@@ -19,7 +19,7 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 `include"reg_addr_pl.vh"
-module ps_rw_pl_reg#(
+module ps_rw_pl_reg_1avo#(
     parameter  						REG_SPACE_BIAS 	= 	200	,
     parameter  						REG_SPACE_SIZE 	= 	512	
 )(
@@ -47,7 +47,7 @@ module ps_rw_pl_reg#(
 	,output		reg 	[3:0]	 	m_wk_mod       
 	,output		reg 	 			m_saf_st       
 	,output		reg 	 			link_m_saf_st  
-	,output		reg		[31:0]		bhv_en
+	//,output		reg		[31:0]		bhv_en
 	
 	,output		reg 	[31:0]	 	a_task_id      	
 	,output		reg 	[31:0]	 	a_task_bhv_id	
@@ -70,45 +70,45 @@ module ps_rw_pl_reg#(
 	,output		reg 	[19:0]	 	c_bhv_gap_crl     
  	
 	,output		reg 	[31:0]	 	param1			
-	,output		reg 	[31:0]	 	param2			
-	,output		reg 	[31:0]		param3			
-	,output		reg 	[31:0]		param4			
-	,output		reg 	[31:0]		param5			
-	,output		reg 	[19:0]		param6			
-	,output		reg 	[19:0]		param7			
-	,output		reg 	[19:0]		param8			
-	,output		reg 	[19:0]		param9			
-	,output		reg 	[19:0]		param10			
-	,output		reg 	[19:0]		param11			
-	,output		reg 	[19:0]		param12			
-	,output		reg 	[19:0]		param13			
-	,output		reg 	[19:0]		param14			
-	,output		reg 	[19:0]		param15			
-	,output		reg 	[7:0]		param16			
-	,output		reg 	[7:0]		param17			
-	,output		reg 	[7:0]		param18			
-	,output		reg 	[7:0]		param19			
-	,output		reg 	[7:0]		param20			
-	,output		reg 	[7:0]		param21			
-	,output		reg 	[7:0]		param22			
-	,output		reg 	[7:0]		param23			
-	,output		reg 	[7:0]		param24			
-	,output		reg 	[7:0]		param25			
-	,output		reg 				param26			
-	,output		reg 				param27			
-	,output		reg 				param28			
-	,output		reg 				param29			
-	,output		reg 				param30		
-	,output		reg 	[31:0]		param31	
-	,output		reg 	[31:0]		param32	
-	,output		reg 	[31:0]		param33	
-	,output		reg 	[31:0]		param34	
-	,output		reg 	[31:0]		param35	
-	,output		reg 	[31:0]		param36	
-	,output		reg 	[31:0]		param37	
-	,output		reg 	[31:0]		param38	
-	,output		reg 	[31:0]		param39	
-	,output		reg 	[31:0]		param40	
+	//,output		reg 	[31:0]	 	param2			
+	//,output		reg 	[31:0]		param3			
+	//,output		reg 	[31:0]		param4			
+	//,output		reg 	[31:0]		param5			
+	//,output		reg 	[19:0]		param6			
+	//,output		reg 	[19:0]		param7			
+	//,output		reg 	[19:0]		param8			
+	//,output		reg 	[19:0]		param9			
+	//,output		reg 	[19:0]		param10			
+	//,output		reg 	[19:0]		param11			
+	//,output		reg 	[19:0]		param12			
+	//,output		reg 	[19:0]		param13			
+	//,output		reg 	[19:0]		param14			
+	//,output		reg 	[19:0]		param15			
+	//,output		reg 	[7:0]		param16			
+	//,output		reg 	[7:0]		param17			
+	//,output		reg 	[7:0]		param18			
+	//,output		reg 	[7:0]		param19			
+	//,output		reg 	[7:0]		param20			
+	//,output		reg 	[7:0]		param21			
+	//,output		reg 	[7:0]		param22			
+	//,output		reg 	[7:0]		param23			
+	//,output		reg 	[7:0]		param24			
+	//,output		reg 	[7:0]		param25			
+	//,output		reg 				param26			
+	//,output		reg 				param27			
+	//,output		reg 				param28			
+	//,output		reg 				param29			
+	//,output		reg 				param30		
+	//,output		reg 	[31:0]		param31	
+	//,output		reg 	[31:0]		param32	
+	//,output		reg 	[31:0]		param33	
+	//,output		reg 	[31:0]		param34	
+	//,output		reg 	[31:0]		param35	
+	//,output		reg 	[31:0]		param36	
+	//,output		reg 	[31:0]		param37	
+	//,output		reg 	[31:0]		param38	
+	//,output		reg 	[31:0]		param39	
+	//,output		reg 	[31:0]		param40	
 	,input 				[31:0]		irq_reg1	
 	,input 				[31:0]		irq_reg2	
 
@@ -126,31 +126,31 @@ module ps_rw_pl_reg#(
 	,input 				[7:0]		c_tsc_id   
 	,input 				[7:0]		c_bhv_id    
 
-	,input 				[31:0]		param51 
-	,input 				[31:0]		param52 
-	,input 				[31:0]		param53   
-	,input 				[31:0]		param54   
-	,input 				[31:0]		param55   
-	,input 				[19:0]		param56   
-	,input 				[19:0]		param57   
-	,input 				[19:0]		param58   
-	,input 				[19:0]		param59   
-	,input 				[19:0]		param60   
-	,input 				[7:0]		param61   
-	,input 				[7:0]		param62   
-	,input 				[7:0]		param63   
-	,input 				[7:0]		param64   
-	,input 				[7:0]		param65   
-	,input 							param66   
-	,input 							param67   
-	,input 							param68   
-	,input 							param69   
-	,input 							param70   
+	//,input 				[31:0]		param51 
+	//,input 				[31:0]		param52 
+	//,input 				[31:0]		param53   
+	//,input 				[31:0]		param54   
+	//,input 				[31:0]		param55   
+	//,input 				[19:0]		param56   
+	//,input 				[19:0]		param57   
+	//,input 				[19:0]		param58   
+	//,input 				[19:0]		param59   
+	//,input 				[19:0]		param60   
+	//,input 				[7:0]		param61   
+	//,input 				[7:0]		param62   
+	//,input 				[7:0]		param63   
+	//,input 				[7:0]		param64   
+	//,input 				[7:0]		param65   
+	//,input 							param66   
+	//,input 							param67   
+	//,input 							param68   
+	//,input 							param69   
+	//,input 							param70   
 	,input 				[31:0]		debug_reg1
 	,input 				[31:0]		debug_reg2
-	,input 				[31:0]		debug_reg3
-	,input 				[31:0]		debug_reg4
-	,input 				[31:0]		debug_reg5
+	//,input 				[31:0]		debug_reg3
+	//,input 				[31:0]		debug_reg4
+	//,input 				[31:0]		debug_reg5
 	);
 
 	reg  		rd_en_d1;
@@ -214,7 +214,7 @@ module ps_rw_pl_reg#(
 			m_wk_mod       		<=	4'h0     		;
 			m_saf_st       		<=	1'b0     		;
 			link_m_saf_st  		<=	1'b0     		;
-			bhv_en				<=	32'd0			;
+			//bhv_en				<=	32'd0			;
 			
 			a_task_id      		<=	32'd0		  	;
 			a_task_bhv_id		<=	32'd0		  	;
@@ -290,7 +290,7 @@ module ps_rw_pl_reg#(
 			m_wk_mod       	<=	(wr_task_vld && wr_task_addr == `M_WK_MOD      	) ? i_st_wr_data[3:0] 	: m_wk_mod      ;
 			m_saf_st       	<=	(wr_task_vld && wr_task_addr == `M_SAF_ST      	) ? i_st_wr_data[0] 	: m_saf_st      ;
 			link_m_saf_st  	<=	(wr_task_vld && wr_task_addr == `LINK_M_SAF_ST 	) ? i_st_wr_data[0] 	: link_m_saf_st ;
-			bhv_en  		<=	(wr_task_vld && wr_task_addr == `BHV_EN	 		) ? i_st_wr_data	 	: bhv_en 		;
+			//bhv_en  		<=	(wr_task_vld && wr_task_addr == `BHV_EN	 		) ? i_st_wr_data	 	: bhv_en 		;
 			
 			a_task_id      	<=	(wr_task_vld && wr_task_addr == `A_TASK_ID     	) ? i_st_wr_data	 	: a_task_id     ;
 			a_task_bhv_id   <=	(wr_task_vld && wr_task_addr == `A_TASK_BHV_ID  ) ? i_st_wr_data	 	: a_task_bhv_id ;
@@ -313,45 +313,45 @@ module ps_rw_pl_reg#(
 			c_bhv_gap_crl   <=	(wr_task_vld && wr_task_addr == `C_GAP_CRL     	) ? i_st_wr_data[19:0] 	: c_bhv_gap_crl	;
 			
 			param1			<=	(wr_task_vld && wr_task_addr == `PARAM1			) ? i_st_wr_data 		: param1	;
-			param2			<=	(wr_task_vld && wr_task_addr == `PARAM2			) ? i_st_wr_data 		: param2	;
-			param3			<=	(wr_task_vld && wr_task_addr == `PARAM3			) ? i_st_wr_data 		: param3	;
-			param4			<=	(wr_task_vld && wr_task_addr == `PARAM4			) ? i_st_wr_data 		: param4	;
-			param5			<=	(wr_task_vld && wr_task_addr == `PARAM5			) ? i_st_wr_data 		: param5	;
-			param6			<=	(wr_task_vld && wr_task_addr == `PARAM6			) ? i_st_wr_data[19:0]	: param6	;
-			param7			<=	(wr_task_vld && wr_task_addr == `PARAM7			) ? i_st_wr_data[19:0]	: param7	;
-			param8			<=	(wr_task_vld && wr_task_addr == `PARAM8			) ? i_st_wr_data[19:0]	: param8	;
-			param9			<=	(wr_task_vld && wr_task_addr == `PARAM9			) ? i_st_wr_data[19:0]	: param9	;
-			param10			<=	(wr_task_vld && wr_task_addr == `PARAM10		) ? i_st_wr_data[19:0]	: param10	;
-			param11			<=	(wr_task_vld && wr_task_addr == `PARAM11		) ? i_st_wr_data[19:0]	: param11	;
-			param12			<=	(wr_task_vld && wr_task_addr == `PARAM12		) ? i_st_wr_data[19:0]	: param12	;
-			param13			<=	(wr_task_vld && wr_task_addr == `PARAM13		) ? i_st_wr_data[19:0]	: param13	;
-			param14			<=	(wr_task_vld && wr_task_addr == `PARAM14		) ? i_st_wr_data[19:0]	: param14	;
-			param15			<=	(wr_task_vld && wr_task_addr == `PARAM15		) ? i_st_wr_data[19:0]	: param15	;
-			param16			<=	(wr_task_vld && wr_task_addr == `PARAM16		) ? i_st_wr_data[7:0] 	: param16	;
-			param17			<=	(wr_task_vld && wr_task_addr == `PARAM17		) ? i_st_wr_data[7:0] 	: param17	;
-			param18			<=	(wr_task_vld && wr_task_addr == `PARAM18		) ? i_st_wr_data[7:0] 	: param18	;
-			param19			<=	(wr_task_vld && wr_task_addr == `PARAM19		) ? i_st_wr_data[7:0] 	: param19	;
-			param20			<=	(wr_task_vld && wr_task_addr == `PARAM20		) ? i_st_wr_data[7:0] 	: param20	;
-			param21			<=	(wr_task_vld && wr_task_addr == `PARAM21		) ? i_st_wr_data[7:0] 	: param21	;
-			param22			<=	(wr_task_vld && wr_task_addr == `PARAM22		) ? i_st_wr_data[7:0] 	: param22	;
-			param23			<=	(wr_task_vld && wr_task_addr == `PARAM23		) ? i_st_wr_data[7:0] 	: param23	;
-			param24			<=	(wr_task_vld && wr_task_addr == `PARAM24		) ? i_st_wr_data[7:0] 	: param24	;
-			param25			<=	(wr_task_vld && wr_task_addr == `PARAM25		) ? i_st_wr_data[7:0] 	: param25	;
-			param26			<=	(wr_task_vld && wr_task_addr == `PARAM26		) ? i_st_wr_data[0]		: param26	;
-			param27			<=	(wr_task_vld && wr_task_addr == `PARAM27		) ? i_st_wr_data[0]		: param27	;
-			param28			<=	(wr_task_vld && wr_task_addr == `PARAM28		) ? i_st_wr_data[0]		: param28	;
-			param29			<=	(wr_task_vld && wr_task_addr == `PARAM29		) ? i_st_wr_data[0]		: param29	;
-			param30			<=	(wr_task_vld && wr_task_addr == `PARAM30		) ? i_st_wr_data[0]		: param30	;
-			param31         <= 	(wr_task_vld && wr_task_addr == `PARAM31		) ? i_st_wr_data		: param31	;
-			param32         <= 	(wr_task_vld && wr_task_addr == `PARAM32		) ? i_st_wr_data		: param32	;
-			param33         <= 	(wr_task_vld && wr_task_addr == `PARAM33		) ? i_st_wr_data		: param33	;
-			param34         <= 	(wr_task_vld && wr_task_addr == `PARAM34		) ? i_st_wr_data		: param34	;
-			param35         <= 	(wr_task_vld && wr_task_addr == `PARAM35		) ? i_st_wr_data		: param35	;
-			param36         <= 	(wr_task_vld && wr_task_addr == `PARAM36		) ? i_st_wr_data		: param36	;
-			param37         <= 	(wr_task_vld && wr_task_addr == `PARAM37		) ? i_st_wr_data		: param37	;
-			param38         <= 	(wr_task_vld && wr_task_addr == `PARAM38		) ? i_st_wr_data		: param38	;
-			param39         <= 	(wr_task_vld && wr_task_addr == `PARAM39		) ? i_st_wr_data		: param39	;
-			param40         <= 	(wr_task_vld && wr_task_addr == `PARAM40		) ? i_st_wr_data		: param40	;
+			//param2			<=	(wr_task_vld && wr_task_addr == `PARAM2			) ? i_st_wr_data 		: param2	;
+			//param3			<=	(wr_task_vld && wr_task_addr == `PARAM3			) ? i_st_wr_data 		: param3	;
+			//param4			<=	(wr_task_vld && wr_task_addr == `PARAM4			) ? i_st_wr_data 		: param4	;
+			//param5			<=	(wr_task_vld && wr_task_addr == `PARAM5			) ? i_st_wr_data 		: param5	;
+			//param6			<=	(wr_task_vld && wr_task_addr == `PARAM6			) ? i_st_wr_data[19:0]	: param6	;
+			//param7			<=	(wr_task_vld && wr_task_addr == `PARAM7			) ? i_st_wr_data[19:0]	: param7	;
+			//param8			<=	(wr_task_vld && wr_task_addr == `PARAM8			) ? i_st_wr_data[19:0]	: param8	;
+			//param9			<=	(wr_task_vld && wr_task_addr == `PARAM9			) ? i_st_wr_data[19:0]	: param9	;
+			//param10			<=	(wr_task_vld && wr_task_addr == `PARAM10		) ? i_st_wr_data[19:0]	: param10	;
+			//param11			<=	(wr_task_vld && wr_task_addr == `PARAM11		) ? i_st_wr_data[19:0]	: param11	;
+			//param12			<=	(wr_task_vld && wr_task_addr == `PARAM12		) ? i_st_wr_data[19:0]	: param12	;
+			//param13			<=	(wr_task_vld && wr_task_addr == `PARAM13		) ? i_st_wr_data[19:0]	: param13	;
+			//param14			<=	(wr_task_vld && wr_task_addr == `PARAM14		) ? i_st_wr_data[19:0]	: param14	;
+			//param15			<=	(wr_task_vld && wr_task_addr == `PARAM15		) ? i_st_wr_data[19:0]	: param15	;
+			//param16			<=	(wr_task_vld && wr_task_addr == `PARAM16		) ? i_st_wr_data[7:0] 	: param16	;
+			//param17			<=	(wr_task_vld && wr_task_addr == `PARAM17		) ? i_st_wr_data[7:0] 	: param17	;
+			//param18			<=	(wr_task_vld && wr_task_addr == `PARAM18		) ? i_st_wr_data[7:0] 	: param18	;
+			//param19			<=	(wr_task_vld && wr_task_addr == `PARAM19		) ? i_st_wr_data[7:0] 	: param19	;
+			//param20			<=	(wr_task_vld && wr_task_addr == `PARAM20		) ? i_st_wr_data[7:0] 	: param20	;
+			//param21			<=	(wr_task_vld && wr_task_addr == `PARAM21		) ? i_st_wr_data[7:0] 	: param21	;
+			//param22			<=	(wr_task_vld && wr_task_addr == `PARAM22		) ? i_st_wr_data[7:0] 	: param22	;
+			//param23			<=	(wr_task_vld && wr_task_addr == `PARAM23		) ? i_st_wr_data[7:0] 	: param23	;
+			//param24			<=	(wr_task_vld && wr_task_addr == `PARAM24		) ? i_st_wr_data[7:0] 	: param24	;
+			//param25			<=	(wr_task_vld && wr_task_addr == `PARAM25		) ? i_st_wr_data[7:0] 	: param25	;
+			//param26			<=	(wr_task_vld && wr_task_addr == `PARAM26		) ? i_st_wr_data[0]		: param26	;
+			//param27			<=	(wr_task_vld && wr_task_addr == `PARAM27		) ? i_st_wr_data[0]		: param27	;
+			//param28			<=	(wr_task_vld && wr_task_addr == `PARAM28		) ? i_st_wr_data[0]		: param28	;
+			//param29			<=	(wr_task_vld && wr_task_addr == `PARAM29		) ? i_st_wr_data[0]		: param29	;
+			//param30			<=	(wr_task_vld && wr_task_addr == `PARAM30		) ? i_st_wr_data[0]		: param30	;
+			//param31         <= 	(wr_task_vld && wr_task_addr == `PARAM31		) ? i_st_wr_data		: param31	;
+			//param32         <= 	(wr_task_vld && wr_task_addr == `PARAM32		) ? i_st_wr_data		: param32	;
+			//param33         <= 	(wr_task_vld && wr_task_addr == `PARAM33		) ? i_st_wr_data		: param33	;
+			//param34         <= 	(wr_task_vld && wr_task_addr == `PARAM34		) ? i_st_wr_data		: param34	;
+			//param35         <= 	(wr_task_vld && wr_task_addr == `PARAM35		) ? i_st_wr_data		: param35	;
+			//param36         <= 	(wr_task_vld && wr_task_addr == `PARAM36		) ? i_st_wr_data		: param36	;
+			//param37         <= 	(wr_task_vld && wr_task_addr == `PARAM37		) ? i_st_wr_data		: param37	;
+			//param38         <= 	(wr_task_vld && wr_task_addr == `PARAM38		) ? i_st_wr_data		: param38	;
+			//param39         <= 	(wr_task_vld && wr_task_addr == `PARAM39		) ? i_st_wr_data		: param39	;
+			//param40         <= 	(wr_task_vld && wr_task_addr == `PARAM40		) ? i_st_wr_data		: param40	;
 		end
 	end
 	
@@ -380,32 +380,32 @@ module ps_rw_pl_reg#(
 		`C_TX_ID		: 	o_st_rd_data <= {24'd0,	c_tsc_id   	};
 		`C_BHV_ID 		: 	o_st_rd_data <= {24'd0,	c_bhv_id  	}; 
 
-		`PARAM51		:	o_st_rd_data <= param51     		;
-		`PARAM52		:	o_st_rd_data <= param52     		;
-		`PARAM53		:	o_st_rd_data <= param53     		;
-		`PARAM54		:	o_st_rd_data <= param54     		;
-		`PARAM55		:	o_st_rd_data <= param55     		;
-		`PARAM56		:	o_st_rd_data <= {12'd0,param56		};
-		`PARAM57		:	o_st_rd_data <= {12'd0,param57		};
-		`PARAM58		:	o_st_rd_data <= {12'd0,param58		};
-		`PARAM59		:	o_st_rd_data <= {12'd0,param59		};
-		`PARAM60		:	o_st_rd_data <= {12'd0,param60		};
-		`PARAM61		:	o_st_rd_data <= {24'd0,param61  	};
-		`PARAM62		:	o_st_rd_data <= {24'd0,param62  	};
-		`PARAM63		:	o_st_rd_data <= {24'd0,param63  	};
-		`PARAM64		:	o_st_rd_data <= {24'd0,param64  	};
-		`PARAM65		:	o_st_rd_data <= {24'd0,param65  	};
-		`PARAM66		:	o_st_rd_data <= {31'd0,param66  	};
-		`PARAM67		:	o_st_rd_data <= {31'd0,param67  	};
-		`PARAM68		:	o_st_rd_data <= {31'd0,param68  	};
-		`PARAM69		:	o_st_rd_data <= {31'd0,param69  	};
-		`PARAM70		:	o_st_rd_data <= {31'd0,param70  	};
+		//`PARAM51		:	o_st_rd_data <= param51     		;
+		//`PARAM52		:	o_st_rd_data <= param52     		;
+		//`PARAM53		:	o_st_rd_data <= param53     		;
+		//`PARAM54		:	o_st_rd_data <= param54     		;
+		//`PARAM55		:	o_st_rd_data <= param55     		;
+		//`PARAM56		:	o_st_rd_data <= {12'd0,param56		};
+		//`PARAM57		:	o_st_rd_data <= {12'd0,param57		};
+		//`PARAM58		:	o_st_rd_data <= {12'd0,param58		};
+		//`PARAM59		:	o_st_rd_data <= {12'd0,param59		};
+		//`PARAM60		:	o_st_rd_data <= {12'd0,param60		};
+		//`PARAM61		:	o_st_rd_data <= {24'd0,param61  	};
+		//`PARAM62		:	o_st_rd_data <= {24'd0,param62  	};
+		//`PARAM63		:	o_st_rd_data <= {24'd0,param63  	};
+		//`PARAM64		:	o_st_rd_data <= {24'd0,param64  	};
+		//`PARAM65		:	o_st_rd_data <= {24'd0,param65  	};
+		//`PARAM66		:	o_st_rd_data <= {31'd0,param66  	};
+		//`PARAM67		:	o_st_rd_data <= {31'd0,param67  	};
+		//`PARAM68		:	o_st_rd_data <= {31'd0,param68  	};
+		//`PARAM69		:	o_st_rd_data <= {31'd0,param69  	};
+		//`PARAM70		:	o_st_rd_data <= {31'd0,param70  	};
 		
 		`DEBUG_REG1		:	o_st_rd_data <= debug_reg1			;
 		`DEBUG_REG2		:	o_st_rd_data <= debug_reg2			;
-		`DEBUG_REG3		:	o_st_rd_data <= debug_reg3			;
-		`DEBUG_REG4		:	o_st_rd_data <= debug_reg4			;
-        `DEBUG_REG5		:	o_st_rd_data <= debug_reg5			;
+		//`DEBUG_REG3		:	o_st_rd_data <= debug_reg3			;
+		//`DEBUG_REG4		:	o_st_rd_data <= debug_reg4			;
+        //`DEBUG_REG5		:	o_st_rd_data <= debug_reg5			;
 
 		`RST_EN        	:	o_st_rd_data <= {31'd0,rst_en_n		};
 		`EC_ID         	:	o_st_rd_data <= {18'd0,ec_id		};   
@@ -420,7 +420,7 @@ module ps_rw_pl_reg#(
 		`M_WK_MOD      	:	o_st_rd_data <= {28'd0,m_wk_mod 	}; 
 		`M_SAF_ST      	:	o_st_rd_data <= {31'd0,m_saf_st 	}; 
 		`LINK_M_SAF_ST 	:	o_st_rd_data <= {31'd0,link_m_saf_st};
-		`BHV_EN			:	o_st_rd_data <= bhv_en				;
+		//`BHV_EN			:	o_st_rd_data <= bhv_en				;
 		`A_TASK_ID     	:	o_st_rd_data <= a_task_id 			;
 		`A_TASK_BHV_ID  :	o_st_rd_data <= a_task_bhv_id		; 
 		`A_EN			:	o_st_rd_data <= {31'd0,a_en			};
@@ -435,45 +435,45 @@ module ps_rw_pl_reg#(
 		`C_TX_RSULT_RPT	:	o_st_rd_data <= c_tsc_result_rpt	;
 		`C_GAP_CRL     	:	o_st_rd_data <= {12'd0,c_bhv_gap_crl};
 		`PARAM1			:	o_st_rd_data <= param1				;
-		`PARAM2			:	o_st_rd_data <= param2				;
-		`PARAM3			:	o_st_rd_data <= param3				;
-		`PARAM4			:	o_st_rd_data <= param4				;
-		`PARAM5			:	o_st_rd_data <= param5				;
-		`PARAM6			:	o_st_rd_data <= {12'd0,param6		};
-		`PARAM7			:	o_st_rd_data <= {12'd0,param7		};
-		`PARAM8			:	o_st_rd_data <= {12'd0,param8		};
-		`PARAM9			:	o_st_rd_data <= {12'd0,param9		};
-		`PARAM10		:	o_st_rd_data <= {12'd0,param10		};
-		`PARAM11		:	o_st_rd_data <= {12'd0,param11		};
-		`PARAM12		:	o_st_rd_data <= {12'd0,param12		};
-		`PARAM13		:	o_st_rd_data <= {12'd0,param13		};
-		`PARAM14		:	o_st_rd_data <= {12'd0,param14		};
-		`PARAM15		:	o_st_rd_data <= {12'd0,param15		};
-		`PARAM16		:	o_st_rd_data <= {24'd0,param16		};
-		`PARAM17		:	o_st_rd_data <= {24'd0,param17		};
-		`PARAM18		:	o_st_rd_data <= {24'd0,param18		};
-		`PARAM19		:	o_st_rd_data <= {24'd0,param19		};
-		`PARAM20		:	o_st_rd_data <= {24'd0,param20		};
-		`PARAM21		:	o_st_rd_data <= {24'd0,param21		};
-		`PARAM22		:	o_st_rd_data <= {24'd0,param22		};
-		`PARAM23		:	o_st_rd_data <= {24'd0,param23		};
-		`PARAM24		:	o_st_rd_data <= {24'd0,param24		};
-		`PARAM25		:	o_st_rd_data <= {24'd0,param25		};
-		`PARAM26		:	o_st_rd_data <= {31'd0,param26		};
-		`PARAM27		:	o_st_rd_data <= {31'd0,param27		};
-		`PARAM28		:	o_st_rd_data <= {31'd0,param28		};
-		`PARAM29		:	o_st_rd_data <= {31'd0,param29		};
-		`PARAM30		:	o_st_rd_data <= {31'd0,param30		};
-		`PARAM31		:	o_st_rd_data <= param31				;
-		`PARAM32		:	o_st_rd_data <= param32				;
-		`PARAM33		:	o_st_rd_data <= param33				;
-		`PARAM34		:	o_st_rd_data <= param34				;
-		`PARAM35		:	o_st_rd_data <= param35				;
-		`PARAM36		:	o_st_rd_data <= param36				;
-		`PARAM37		:	o_st_rd_data <= param37				;
-		`PARAM38		:	o_st_rd_data <= param38				;
-		`PARAM39		:	o_st_rd_data <= param39				;
-		`PARAM40 		:	o_st_rd_data <= param40				;
+		//`PARAM2			:	o_st_rd_data <= param2				;
+		//`PARAM3			:	o_st_rd_data <= param3				;
+		//`PARAM4			:	o_st_rd_data <= param4				;
+		//`PARAM5			:	o_st_rd_data <= param5				;
+		//`PARAM6			:	o_st_rd_data <= {12'd0,param6		};
+		//`PARAM7			:	o_st_rd_data <= {12'd0,param7		};
+		//`PARAM8			:	o_st_rd_data <= {12'd0,param8		};
+		//`PARAM9			:	o_st_rd_data <= {12'd0,param9		};
+		//`PARAM10		:	o_st_rd_data <= {12'd0,param10		};
+		//`PARAM11		:	o_st_rd_data <= {12'd0,param11		};
+		//`PARAM12		:	o_st_rd_data <= {12'd0,param12		};
+		//`PARAM13		:	o_st_rd_data <= {12'd0,param13		};
+		//`PARAM14		:	o_st_rd_data <= {12'd0,param14		};
+		//`PARAM15		:	o_st_rd_data <= {12'd0,param15		};
+		//`PARAM16		:	o_st_rd_data <= {24'd0,param16		};
+		//`PARAM17		:	o_st_rd_data <= {24'd0,param17		};
+		//`PARAM18		:	o_st_rd_data <= {24'd0,param18		};
+		//`PARAM19		:	o_st_rd_data <= {24'd0,param19		};
+		//`PARAM20		:	o_st_rd_data <= {24'd0,param20		};
+		//`PARAM21		:	o_st_rd_data <= {24'd0,param21		};
+		//`PARAM22		:	o_st_rd_data <= {24'd0,param22		};
+		//`PARAM23		:	o_st_rd_data <= {24'd0,param23		};
+		//`PARAM24		:	o_st_rd_data <= {24'd0,param24		};
+		//`PARAM25		:	o_st_rd_data <= {24'd0,param25		};
+		//`PARAM26		:	o_st_rd_data <= {31'd0,param26		};
+		//`PARAM27		:	o_st_rd_data <= {31'd0,param27		};
+		//`PARAM28		:	o_st_rd_data <= {31'd0,param28		};
+		//`PARAM29		:	o_st_rd_data <= {31'd0,param29		};
+		//`PARAM30		:	o_st_rd_data <= {31'd0,param30		};
+		//`PARAM31		:	o_st_rd_data <= param31				;
+		//`PARAM32		:	o_st_rd_data <= param32				;
+		//`PARAM33		:	o_st_rd_data <= param33				;
+		//`PARAM34		:	o_st_rd_data <= param34				;
+		//`PARAM35		:	o_st_rd_data <= param35				;
+		//`PARAM36		:	o_st_rd_data <= param36				;
+		//`PARAM37		:	o_st_rd_data <= param37				;
+		//`PARAM38		:	o_st_rd_data <= param38				;
+		//`PARAM39		:	o_st_rd_data <= param39				;
+		//`PARAM40 		:	o_st_rd_data <= param40				;
 		
        default : o_st_rd_data <= 32'h7FFFFFFF;
    endcase    

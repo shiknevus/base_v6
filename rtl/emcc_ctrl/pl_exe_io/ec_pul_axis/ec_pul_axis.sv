@@ -318,7 +318,7 @@ module ec_pul_axis#(
 	,.m_wk_mod              (m_wk_mod		)
 	,.m_saf_st              (m_saf_st		)
 	,.link_m_saf_st         (link_m_saf_st	)
-	,.bhv_en                (bhv_en			)
+	//,.bhv_en                (bhv_en			)
 	,.a_task_id      	    (a_task_id		)
 	,.a_task_bhv_id	        (a_task_bhv_id	)
 	,.a_en				    (a_en			)
@@ -413,9 +413,9 @@ module ec_pul_axis#(
 	,.param70               (param70		)
 	,.debug_reg1			(debug_reg1		)
 	,.debug_reg2			(debug_reg2		)
-	,.debug_reg3			(debug_reg3		)
-	,.debug_reg4			(debug_reg4		)
-	,.debug_reg5			(debug_reg5		)
+	//,.debug_reg3			(debug_reg3		)
+	//,.debug_reg4			(debug_reg4		)
+	//,.debug_reg5			(debug_reg5		)
 	);
 
 	proactive_beh_pul_axis#(
