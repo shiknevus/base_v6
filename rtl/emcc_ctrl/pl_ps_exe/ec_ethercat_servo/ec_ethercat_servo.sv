@@ -164,8 +164,8 @@ module ec_ethercat_servo#(
 	wire 	[A_BHA_NUM-1:0]	a_post_sta_allow  ;
 	wire 	[B_BHA_NUM-1:0]	b_pre_sta_allow   ;
 	wire 	[B_BHA_NUM-1:0]	b_post_sta_allow  ;
-	wire 	[B_BHA_NUM-1:0] c_pre_sta_allow   ;
-	wire 	[B_BHA_NUM-1:0] c_post_sta_allow  ;
+	wire 	[C_BHA_NUM-1:0] c_pre_sta_allow   ;
+	wire 	[C_BHA_NUM-1:0] c_post_sta_allow  ;
 	
 	wire	irq_a  ;
 	wire	irq_b  ;
@@ -262,6 +262,11 @@ module ec_ethercat_servo#(
 		end
 	end
 	
+//----------------------------------------------------- user logic begin -----------------------------------------------------//
+	wire 			b_clr_pause	;
+	wire 			b_clr_resume	;
+	wire 			b_clr_stop	;
+//----------------------------------------------------- user logic end -------------------------------------------------------//
 	
 	ps_rw_pl_reg_ethercat_servo#(
 		.REG_SPACE_BIAS 	(REG_SPACE_BIAS		),
@@ -327,16 +332,19 @@ module ec_ethercat_servo#(
 	//,.param18			    (param18		)
 	//,.param19			    (param19		)
 	//,.param20			    (param20		)
-	//,.param21			    (param21		)
+	,.param21			    (param21		)
 	//,.param22			    (param22		)
 	//,.param23			    (param23		)
 	//,.param24			    (param24		)
 	//,.param25			    (param25		)
-	//,.param26			    (param26		)
-	//,.param27			    (param27		)
-	//,.param28			    (param28		)
-	//,.param29			    (param29		)
+	,.param26			    (param26		)
+	,.param27			    (param27		)
+	,.param28			    (param28		)
+	,.param29			    (param29		)
 	//,.param30				(param30		)
+	,.clr_pause				(b_clr_pause	)
+	,.clr_resume			(b_clr_resume	)
+	,.clr_stop				(b_clr_stop		)
 	,.irq_reg1	            (irq_reg1		)
 	,.irq_reg2	            (irq_reg2		)
 	,.a_st                  (ec_cha_st		)
@@ -365,9 +373,9 @@ module ec_ethercat_servo#(
 	//,.param63               (param63		)
 	//,.param64               (param64		)
 	//,.param65               (param65		)
-	//,.param66               (param66		)
-	//,.param67               (param67		)
-	//,.param68               (param68		)
+	,.param66               (i_axis_limf		)
+	,.param67               (i_axis_zero		)
+	,.param68               (i_axis_limb		)
 	//,.param69               (param69		)
 	//,.param70               (param70		)
 	,.debug_reg1			(debug_reg1		)
@@ -400,9 +408,6 @@ module ec_ethercat_servo#(
     ,.irq_o                	(irq_a				)
     ,.irq_ack_i       		(irq_a_grant		)
 //----------------------------------------------------- user logic begin -----------------------------------------------------//
-//	,.i_axis_limf			(i_axis_limf		)
-//	,.i_axis_limb			(i_axis_limb		)
-//	,.i_axis_zero			(i_axis_zero		)
 //----------------------------------------------------- user logic end -------------------------------------------------------//
     );
 
@@ -493,6 +498,14 @@ module ec_ethercat_servo#(
 			,.i_axis_limf		(i_axis_limf	 )
 			,.i_axis_limb		(i_axis_limb	 )
 			,.i_axis_zero		(i_axis_zero	 )
+			,.rctrl_drive_on		(param21			)
+			,.rctrl_drive_reset	(param29			)
+			,.rctrl_resume		(param28			)
+			,.rctrl_pause		(param26			)
+			,.rctrl_stop		(param27			)
+			,.b_clr_pause		(b_clr_pause		)
+			,.b_clr_resume	(b_clr_resume	)
+			,.b_clr_stop		(b_clr_stop		)
 //----------------------------------------------------- user logic end -------------------------------------------------------//
 		);
 		

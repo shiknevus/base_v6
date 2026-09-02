@@ -263,10 +263,6 @@ module ec_can_servo#(
 	end
 	
 //----------------------------------------------------- user logic begin -----------------------------------------------------//
-	wire 			b_reset		;
-	wire 			b_son		;
-	wire 			b_pause		;
-	wire 			b_stop		;
 	wire 			b_clr_pause	;
 	wire 			b_clr_resume	;
 	wire 			b_clr_stop	;
@@ -336,7 +332,7 @@ module ec_can_servo#(
 	//,.param18			    (param18		)
 	//,.param19			    (param19		)
 	//,.param20			    (param20		)
-	//,.param21			    (param21		)
+	,.param21			    (param21		)
 	//,.param22			    (param22		)
 	//,.param23			    (param23		)
 	//,.param24			    (param24		)
@@ -345,7 +341,10 @@ module ec_can_servo#(
 	,.param27			    (param27		)
 	,.param28			    (param28		)
 	,.param29			    (param29		)
-	,.param30				(param30		)
+	//,.param30				(param30		)
+	,.clr_pause				(b_clr_pause	)
+	,.clr_resume			(b_clr_resume	)
+	,.clr_stop				(b_clr_stop		)
 	,.irq_reg1	            (irq_reg1		)
 	,.irq_reg2	            (irq_reg2		)
 	,.a_st                  (ec_cha_st		)
@@ -374,9 +373,9 @@ module ec_can_servo#(
 	//,.param63               (param63		)
 	//,.param64               (param64		)
 	//,.param65               (param65		)
-	//,.param66               (param66		)
-	//,.param67               (param67		)
-	//,.param68               (param68		)
+	,.param66               (i_axis_limf		)
+	,.param67               (i_axis_zero		)
+	,.param68               (i_axis_limb		)
 	//,.param69               (param69		)
 	//,.param70               (param70		)
 	,.debug_reg1			(debug_reg1		)
@@ -409,9 +408,6 @@ module ec_can_servo#(
     ,.irq_o                	(irq_a				)
     ,.irq_ack_i       		(irq_a_grant		)
 //----------------------------------------------------- user logic begin -----------------------------------------------------//
-//	,.i_axis_limf			(i_axis_limf		)
-//	,.i_axis_limb			(i_axis_limb		)
-//	,.i_axis_zero			(i_axis_zero		)
 //----------------------------------------------------- user logic end -------------------------------------------------------//
     );
 
@@ -438,10 +434,6 @@ module ec_can_servo#(
 	,.irq_ack_i	            (irq_b_grant		)	
 
 //----------------------------------------------------- user logic begin -----------------------------------------------------//
-    ,.o_dv_reset			(b_reset			)
-    ,.o_dv_son				(b_son				)
-    ,.o_pause				(b_pause			)
-    ,.o_stop				(b_stop				)
 //----------------------------------------------------- user logic end -------------------------------------------------------//
     );
 	 
@@ -506,7 +498,7 @@ module ec_can_servo#(
 			,.i_axis_limf		(i_axis_limf	 )
 			,.i_axis_limb		(i_axis_limb	 )
 			,.i_axis_zero		(i_axis_zero	 )
-			,.rctrl_drive_on		(param30			)
+			,.rctrl_drive_on		(param21			)
 			,.rctrl_drive_reset	(param29			)
 			,.rctrl_resume		(param28			)
 			,.rctrl_pause		(param26			)

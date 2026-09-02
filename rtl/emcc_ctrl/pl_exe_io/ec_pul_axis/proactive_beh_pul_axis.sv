@@ -50,7 +50,7 @@ module proactive_beh_pul_axis#(
     ,input					    i_servo_notok       //servo not ok
     ,input					    i_servo_stop        //servo stop
     ,input					    i_axis_limf         //axis limit forward
-    ,input					    i_axis_org          //axis origin
+    ,input					    i_axis_zero          //axis origin
     ,input					    i_axis_limb         //axis limit backward
     ,input					    i_emerge_stop_signal//emergency stop signal
 
@@ -497,7 +497,7 @@ always@(posedge clk_i) begin
     if(rst_i)
         axis_org <= 1'b0;
     else
-        axis_org <= i_axis_org;
+        axis_org <= i_axis_zero;
 end
 
 // common params
