@@ -2523,9 +2523,9 @@ module emcc_mix_top
 	  .o_intr_irq            ( map_irq[56]       )
 
     //    ,.o_key_light        ( o_key_light_111           )   // 
-       ,.i_lock_monitor        ( ~di_mst_msg[63]           )   // 锁监控常闭DO端口
+       ,.i_lock_monitor        ( di_regoin_msg[0][16]           )   // 锁监控常闭DO端口
        ,.i_close_confirm_key        ( ~di_regoin_msg[0][18]           )   // 门关确认黄色按钮
-       ,.i_open_req_key        ( ~di_mst_msg[64]           )   // 开门请求绿色按钮
+       ,.i_open_req_key        ( ~di_regoin_msg[0][17]           )   // 开门请求绿色按钮
     //    ,.i_door_monitor        ( di_regoin_msg[0][15]           )   // 门监控常闭DO端口
        ,.o_lock_open        ( o_lock_open_111           )   // 电磁锁A1
     );
