@@ -53,7 +53,7 @@ module status_beh_safety_door#(
 	,input						irq_ack_i	
 	
 	//debug reg
-	,output reg					debug_r
+	,output [31:0]					debug_r
     );
 	
 	wire	i_clk = clk_i;
