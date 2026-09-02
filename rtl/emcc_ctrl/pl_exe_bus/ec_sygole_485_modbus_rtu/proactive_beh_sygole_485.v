@@ -20,8 +20,8 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module proactive_beh_hw_sdcx#(
-    parameter                 	BHA_NUM 		= 3   //Number of active behaviors
+module proactive_beh_sygole_485#(
+    parameter                 	BHA_NUM = 4   //Number of active behaviors
 )(
     input                       clk_i
     ,input                      rst_i
@@ -30,8 +30,6 @@ module proactive_beh_hw_sdcx#(
 
     ,input      [BHA_NUM-1:0]   pre_sta_allow   //Pre - sufficient condition satisfied signal. 0: Not satisfied. 1: Satisfied.
     ,input      [BHA_NUM-1:0]   post_sta_allow  //Post - sufficient condition satisfied signal
-
-    //,input      [1:0]           mode_sel 		//1: Single-key mode 2: Double-key mode
 	
 	,input						a_en			//A enable
     ,input      [7:0]           a_bhv_id
@@ -42,16 +40,22 @@ module proactive_beh_hw_sdcx#(
     ,output		                ec_cha_st
     ,output reg [7:0]           a_tx_id
     ,output reg	[7:0]           a_alm_num
+    // user logic
+	,input      [31:0]          target_value//目标值
+    ,output reg                 o_data_send_req
+	,input      [2:0]           i_execu_result
+    ,input wire [31:0]          i_rcv_data
+	,input                      i_rcv_data_finish_p//接收数据完成
+	,output	reg					o_exe_suc
+	,output	reg					o_mat_err
 
-	,output	reg	[2:0]			do_o
-
-	,output reg	[7:0]           a_bhv_id_r
+	,output reg [7:0]      		a_bhv_id_r
 	,output	reg	[31:0]			state_monitor_o
     ,output reg                 irq_o
-    ,input                      irq_ack_i       //Interrupt response
+    ,input                      irq_ack_i       //Interrupt response pulse
     );
-	
-	reg	[7:0]		curr_state;
+
+    reg [7:0]    	curr_state;
 	reg [7:0]    	curr_state_1d;
     reg [7:0]    	next_state;
 
@@ -63,23 +67,21 @@ module proactive_beh_hw_sdcx#(
 	reg [7:0]		ack_tx_result;
 	reg	[7:0]		ack_ps_alart_num;
 	
-	reg	[8:0]		tim_500ms_cnt;
+    wire            user_signal_start; // add user signal hera
 	
 	//State machine state
-	localparam  S_IDLE          = 8'd0; 	
-    localparam  S_BHA_PRE_DET	= 8'd1; 	
-	localparam	S_READY_10		= 8'd2;		
-    localparam  S_READY_10_ACK  = 8'd3; 	
-    localparam  S_EXE_20     	= 8'd4; 	
-	localparam	S_EXE			= 8'd5;		
-    localparam  S_EXE_20_ACK	= 8'd6;		
-    localparam  S_BHA_POST_DET  = 8'd7; 	
-    localparam  S_SUCC_30       = 8'd8; 	
-    localparam  S_SUCC_30_ACK	= 8'd9; 	
-	localparam 	S_ALERT_40		= 8'd10;	
-	localparam 	S_ALERT_40_ACK	= 8'd11;	
-	localparam 	S_ACT_END_1		= 8'd12;
-	localparam 	S_ACT_END_2		= 8'd13;
+	localparam  S_IDLE          = 8'd0; 	//idle
+    localparam  S_BHA_PRE_DET	= 8'd1; 	//Pre-condition check
+	localparam	S_READY_10		= 8'd2;		//ready
+    localparam  S_READY_10_ACK  = 8'd3; 	//ready ok/no ok
+    localparam  S_EXE_20     	= 8'd4; 	//Action begin
+	localparam	S_EXE			= 8'd5;		//Action execute
+    localparam  S_EXE_20_ACK	= 8'd6;		//Action end
+    localparam  S_BHA_POST_DET  = 8'd7; 	//Post-condition check
+    localparam  S_SUCC_30       = 8'd8; 	//success
+    localparam  S_SUCC_30_ACK	= 8'd9; 	//success ack
+	localparam 	S_ALERT_40		= 8'd10;	//Alert
+	localparam 	S_ALERT_40_ACK	= 8'd11;	//Alert ack
 	
     localparam  IRQ_OK          = 8'h51;	//ps ack:OK
     localparam  IRQ_NO_OK       = 8'h52;	//ps ack:NO OK
@@ -106,6 +108,7 @@ module proactive_beh_hw_sdcx#(
 		end
     end
 	
+	//Analyze interrupt response register
 	always@(posedge clk_i)begin
 	if(rst_i)begin
 		ack_beh_id 	 	<=	8'd0;
@@ -129,58 +132,27 @@ module proactive_beh_hw_sdcx#(
 		ack_ps_alart_num<=	ack_ps_alart_num;
 		end
 	end
-	
-	always@(posedge clk_i)begin
-	if(rst_i)
-		curr_state_1d <= 8'd0;
-	else
-		curr_state_1d <= curr_state;
-	end
-	
+
     reg			a_bhv_vld_r;
-	reg		[7:0]	sta1;
-     //Current behavior number
+	
+    //Current behavior number
     always@(posedge clk_i)begin
         if(rst_i)begin
             a_bhv_id_r <= 8'd0;
 			a_bhv_vld_r <= 1'b0;
-			sta1 <= 0;
-		end else 
-			case(sta1)
-				0:begin
-					if(a_en && ((a_bhv_id >= 8'd1) && (a_bhv_id <= BHA_NUM)) && a_bhv_vld)begin
-						a_bhv_id_r <= a_bhv_id;
-						a_bhv_vld_r <= 1'b1;
-						sta1 <= 1;
-					end else begin
-						a_bhv_id_r <= 8'd0;
-						a_bhv_vld_r <= 1'b0;
-						sta1 <= 0;
-					end
-				end
-				1:begin
-					a_bhv_id_r <= a_bhv_id;
-					a_bhv_vld_r <= 1'b0;
-					sta1 <= 2;
-				end
-				2:begin
-					if(curr_state == S_ACT_END_1)begin
-						a_bhv_id_r <= 8'd0;
-						a_bhv_vld_r <= 1'b0;
-						sta1 <= 0;
-					end else begin
-						a_bhv_id_r <= a_bhv_id;
-						a_bhv_vld_r <= 1'b0;
-						sta1 <= 2;
-					end
-				end
-				default:begin
-					a_bhv_id_r <= 8'd0;
-				    a_bhv_vld_r <= 1'b0;
-					sta1 <= 0;
-				end
-			endcase
+		end else if(a_en && ((a_bhv_id >= 8'd1) && (a_bhv_id <= BHA_NUM)) && a_bhv_vld)begin
+			a_bhv_id_r <= a_bhv_id;
+			a_bhv_vld_r <= a_bhv_vld;
+		end else if(curr_state == S_IDLE && curr_state_1d != curr_state)begin
+			a_bhv_id_r <= 8'd0;
+			a_bhv_vld_r <= 1'b0;
+		end else begin
+			a_bhv_id_r <= a_bhv_id_r;
+			a_bhv_vld_r <= 1'b0;
+		end
     end
+	
+//------------------------------------------- FSM begin => Control 10/20/30/40 interrupt -----------------------------------------------//
 
 	reg match_10;
 	//reg match_20;
@@ -207,7 +179,13 @@ module proactive_beh_hw_sdcx#(
 		match_40 <= 1'b0;
 	end
 	end
-    
+	
+	always@(posedge clk_i)begin
+	if(rst_i)
+		curr_state_1d <= 8'd0;
+	else
+		curr_state_1d <= curr_state;
+	end
 
     always @(posedge clk_i) begin
         if (rst_i)
@@ -218,7 +196,7 @@ module proactive_beh_hw_sdcx#(
 	
     always @(*) begin			
         case (curr_state)	
-            S_IDLE: begin	//0
+            S_IDLE: begin			//curr_state = 0
                 if (a_en && ((a_bhv_id_r >= 8'd1) && (a_bhv_id_r <= BHA_NUM)) && a_bhv_vld_r)	//behavior start
                     next_state = S_BHA_PRE_DET;
                 else
@@ -235,11 +213,11 @@ module proactive_beh_hw_sdcx#(
 				end
             end
 
-            S_READY_10: begin  //2      						//Send 10 interrupt
-				next_state = S_READY_10_ACK;
+            S_READY_10: begin  		//curr_state = 2    					
+				next_state = S_READY_10_ACK;				//Send 10 interrupt
             end
 
-			S_READY_10_ACK: begin	//3
+			S_READY_10_ACK: begin	//curr_state = 3
 				if(match_10) 								//Transaction 10 Acknowledged OK
                     next_state = S_EXE_20;
                 else if(ack_tx_result == IRQ_NO_OK || timout)
@@ -248,17 +226,14 @@ module proactive_beh_hw_sdcx#(
                     next_state = S_READY_10_ACK;
 			end
 
-            S_EXE_20: begin		//4							//Send 20 interrupt
-				next_state = S_EXE;
+            S_EXE_20: begin			//curr_state = 4						
+				next_state = S_EXE;							//Send 20 interrupt
             end
-			
-			S_EXE:begin		//11								//active Execution
-				if(tim_500ms_cnt >= 499)
-					next_state = S_BHA_POST_DET;
-				else
-					next_state = S_EXE;
+
+			S_EXE:begin				//curr_state = 5								
+                next_state = S_BHA_POST_DET;
 			end
-			
+		
 			//S_EXE_20_ACK: begin
 			//	if(match_20) 								//Transaction 20 Acknowledged OK
             //        next_state = S_EXE;
@@ -267,47 +242,48 @@ module proactive_beh_hw_sdcx#(
             //    else
             //        next_state = S_EXE_20_ACK;
 			//end
-
-            S_BHA_POST_DET: begin	//curr_state = 6
-				if(post_sta_allow[a_bhv_id_r - 1'b1]) begin
-					next_state = S_SUCC_30;
-				end else if(timout) begin
+			
+            S_BHA_POST_DET: begin	//curr_state = 7
+				if(user_signal_start)begin
+					if(a_bhv_id_r==4)begin
+						if(o_mat_err)
+							next_state = S_ALERT_40;
+						else
+							next_state = S_SUCC_30;
+					end
+					else begin
+						next_state = S_SUCC_30;
+					end	
+				end
+				else if(timout) begin
 					next_state = S_ALERT_40;			
 				end else begin
 					next_state = S_BHA_POST_DET;
 				end
             end
 
-            S_SUCC_30: begin		//7						//Send Interrupt 30
-				next_state = S_SUCC_30_ACK;
+            S_SUCC_30: begin		//curr_state = 7					
+				next_state = S_SUCC_30_ACK;					//Send Interrupt 30
             end
 			
-			S_SUCC_30_ACK:begin	//8
+			S_SUCC_30_ACK:begin		//curr_state = 8
 				if(match_30)    							//30 response success
-                    next_state = S_ACT_END_1;
+                    next_state = S_IDLE;
                 else if(ack_tx_result == IRQ_NO_OK || timout)
                     next_state = S_ALERT_40;
                 else
                     next_state = S_SUCC_30_ACK;
 			end
 
-            S_ALERT_40: begin		//9						//Send Interrupt 40
-				next_state = S_ALERT_40_ACK;
+            S_ALERT_40: begin		//curr_state = 9					
+				next_state = S_ALERT_40_ACK;				//Send Interrupt 40
             end
 			
-			S_ALERT_40_ACK:begin	//10
-				if(match_40 || timout) 						//40 response
-                    next_state = S_ACT_END_1;
+			S_ALERT_40_ACK:begin	//curr_state = 10
+				if(match_40 || timout) 						//40 Interrupt response
+                    next_state = S_IDLE;
                 else
                     next_state = S_ALERT_40_ACK;
-			end
-			
-			S_ACT_END_1:begin
-				next_state = S_ACT_END_2;
-			end
-			
-			S_ACT_END_2:begin
-				next_state = S_IDLE;
 			end
 
             default: begin
@@ -316,6 +292,8 @@ module proactive_beh_hw_sdcx#(
 
         endcase
     end
+	
+//----------------------------------------------------------- FSM end ------------------------------------------------------//
 
     //Channel A busy signal
 	assign ec_cha_st = (curr_state != S_IDLE)?1'b1:1'b0;
@@ -332,7 +310,7 @@ module proactive_beh_hw_sdcx#(
             a_tx_id <= 8'd30;
         else if(curr_state == S_ALERT_40)
             a_tx_id <= 8'd40;
-		else if(match_40)
+		else if(curr_state == S_IDLE || curr_state == S_BHA_PRE_DET)
 			a_tx_id <= 8'd0;
         else
             a_tx_id <= a_tx_id;
@@ -358,23 +336,28 @@ module proactive_beh_hw_sdcx#(
     always@(posedge clk_i)begin
         if(rst_i || !a_en)
             a_alm_num <= 8'd0;
-        else if(curr_state == S_BHA_PRE_DET && timout)						
-			a_alm_num <= 8'd100;
-        else if(curr_state == S_READY_10_ACK && ack_tx_result == IRQ_NO_OK)	
+        else if(curr_state == S_BHA_PRE_DET && timout)			
+            a_alm_num <= 8'd151;     
+        else if(curr_state == S_READY_10_ACK && ack_tx_result == IRQ_NO_OK)				
             a_alm_num <= ack_ps_alart_num;    
-        else if(curr_state == S_READY_10_ACK && timout)						
-            a_alm_num <= 8'd101;    
-		else if(curr_state == S_BHA_POST_DET && timout)
-			a_alm_num <= 8'd102;  
-		else if(curr_state == S_SUCC_30_ACK && ack_tx_result == IRQ_NO_OK)	
+        else if(curr_state == S_READY_10_ACK && timout)									
+            a_alm_num <= 8'd152;    
+		//else if(curr_state == S_EXE_20_ACK && ack_tx_result == IRQ_NO_OK)				
+        //    a_alm_num <= ack_ps_alart_num;    
+        //else if(curr_state == S_EXE_20_ACK && timout)									
+        //    a_alm_num <= 8'd103;    
+		else if(curr_state == S_BHA_POST_DET && timout)			
+            a_alm_num <= 8'd153;     
+		else if(curr_state == S_SUCC_30_ACK && ack_tx_result == IRQ_NO_OK)				
 			a_alm_num <= ack_ps_alart_num;
-		else if(curr_state == S_SUCC_30_ACK && timout)						
-            a_alm_num <= 8'd103;
+		else if(curr_state == S_SUCC_30_ACK && timout)									
+            a_alm_num <= 8'd154;
 		else if(curr_state == S_IDLE)
 			a_alm_num <= 8'd0;
         else
             a_alm_num <= a_alm_num;
     end
+	
 
     //Timeout count
     always@(posedge clk_i)begin
@@ -384,103 +367,70 @@ module proactive_beh_hw_sdcx#(
 			timout_cnt <= 20'd0;
 		else if(curr_state != curr_state_1d)
 			timout_cnt <= 20'd0;
-        else if(timout_cnt > a_tx_ot)
+        else if(timout_cnt >= a_tx_ot-1)
             timout_cnt <= 20'd0;
         else if(i_time_1s_vld)
             timout_cnt <= timout_cnt+1;
+		else
+			timout_cnt <= timout_cnt;
     end
 
     always@(posedge clk_i)begin
         if(rst_i)
             timout <= 1'b0;
-        else if(timout_cnt > a_tx_ot)
+        else if(timout_cnt >= a_tx_ot-1)
             timout <= 1'b1;
         else
             timout <= 1'b0;
     end
-	
-	
-	//===============================================================================================================
-	//------------------------------------------------ user logic start ---------------------------------------------
-	//===============================================================================================================
-
-	//Count 500ms
-	always@(posedge clk_i)
-	begin
-		if(rst_i || !a_en)
-			tim_500ms_cnt <= 9'd0;
-		else if(curr_state == S_EXE)
-			if(tim_500ms_cnt >= 499)					
-				tim_500ms_cnt <= tim_500ms_cnt;
-			else
-				tim_500ms_cnt <= tim_500ms_cnt+i_time_1ms_vld;		//actual
-				//tim_500ms_cnt <= tim_500ms_cnt+1;						//sim
-		else
-			tim_500ms_cnt <= 9'd0;
-	end
-	
-	//------------------------------------------- Single-Key begin -------------------------------------------
-	//do_o = {KA3,KA2,KA1};
-	
-	always@(posedge clk_i)
-	begin
-		if(rst_i || !a_en)
-			do_o <= 3'b000;
-		else if(curr_state == S_EXE)
-			case(a_bhv_id_r)
-				8'd1:do_o <= 3'b010;
-				8'd2:do_o <= 3'b001;
-				8'd3:do_o <= 3'b100;
-				default:do_o <= 3'b000;
-			endcase
-		else
-			do_o <= 3'b000;
-	end
-
-	//------------------------------------------- Single-Key begin -------------------------------------------
-	
-	
-	
-	//------------------------------------------- Single-Key and double-Key begin -------------------------------------------
-	//	reg	[1:0]	mode_sel_r;
-	//	
-	//	always@(posedge clk_i)
-	//	begin
-	//		if(rst_i)
-	//			mode_sel_r <= 2'b00;
-	//		else if(a_bhv_vld)
-	//			mode_sel_r <= mode_sel;
-	//		else
-	//			mode_sel_r <= mode_sel_r;
-	//	end
-	//	
-	//	
-	//	always@(posedge clk_i)
-	//	begin
-	//		if(rst_i || !a_en)
-	//			do_o <= 3'b000;
-	//		else if(curr_state == S_EXE && a_bhv_id_r == 8'd1)
-	//			case(mode_sel_r)
-	//				1:do_o <= 3'b010;	//Single-key mode
-	//				2:do_o <= 3'b011;	//Double-key mode
-	//				default:do_o <= 3'b011;
-	//			endcase
-	//		else if(curr_state == S_EXE && a_bhv_id_r == 8'd2)
-	//			do_o <= 3'b001;
-	//		else if(curr_state == S_EXE && a_bhv_id_r == 8'd3)
-	//			case(mode_sel_r)
-	//				1:do_o <= 3'b100;	//Single-key mode
-	//				2:do_o <= 3'b110;	//Double-key mode
-	//				default:do_o <= 3'b110;
-	//			endcase
-	//		else
-	//			do_o <= 3'b000;
-	//	end
-	
-	//------------------------------------------- Single-Key and double-Key end -------------------------------------------
 
 	//===============================================================================================================
 	//------------------------------------------------ user logic start ---------------------------------------------
 	//===============================================================================================================
+	reg      rcv_data_finish_p_dy1;
+
+    assign   user_signal_start = rcv_data_finish_p_dy1;
+
+	always@(posedge clk_i)begin
+		if(rst_i) begin
+        	o_data_send_req  <= 8'd0;
+			rcv_data_finish_p_dy1 <= 0;
+		end
+		else	begin
+			rcv_data_finish_p_dy1 <= i_rcv_data_finish_p;
+			 if(curr_state == S_EXE)begin
+				o_data_send_req <= 1'b1;
+			 end
+			 else
+			 	o_data_send_req <= 1'b0;
+		end
+	end
+
+    //Data Trans Error or Success
+    always@(posedge clk_i)begin
+        if(rst_i)
+            o_exe_suc <= 1'd0;
+        else if(i_rcv_data_finish_p)
+            o_exe_suc <= (i_execu_result==3'b001);//001 = ok
+    end
+
+	always@(posedge clk_i)begin
+		if(rst_i) begin
+            o_mat_err <= 0;
+    	end
+		else	begin
+			if (curr_state==S_IDLE)begin
+				o_mat_err <= 0;
+			end
+			else if(i_rcv_data_finish_p)begin
+				if(a_bhv_id_r==4)begin // MAT exist
+					o_mat_err   <= ((target_value != i_rcv_data ) & (i_execu_result==3'b001))| (i_execu_result!=3'b001);////001 = ok,要在读数据正确时再与参照值做比较,否则算出错。
+				end else begin
+					o_mat_err <= 0;
+				end
+			end
+		end
+	end
+
 
 endmodule

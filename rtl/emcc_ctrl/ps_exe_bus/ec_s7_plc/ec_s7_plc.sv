@@ -427,7 +427,7 @@ always@(posedge clk_i)
 	,.task_time_cnt	            (task_time_cnt		)
 	,.pre_sta_allow		        (c_pre_sta_allow	)
 	,.post_sta_allow	        (c_post_sta_allow	)
-	,.c_en				        (1'b1				)
+	,.c_en				        (1'b0				)
 	,.c_bhv_id                  (c_bhv_id			)
 	,.c_tx_ot          	        (c_tx_ot			)
 	,.c_tx_result_rpt  	        (c_tx_result_rpt	)
@@ -462,7 +462,7 @@ always@(posedge clk_i)
 			.c_bhv_id			(c_bhv_id		),
 			.a_en				(a_en			),
 			.b_en				(1'b0			),
-			.c_en				(1'b1			),
+			.c_en				(1'b0			),
 			.ec_cha_st			(ec_cha_st		),
 			.ec_chb_st       	(ec_chb_st		),
 			.ec_chc_st       	(ec_chc_st		),
