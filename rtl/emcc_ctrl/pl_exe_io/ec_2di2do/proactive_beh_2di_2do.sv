@@ -414,15 +414,15 @@ module proactive_beh_2di_2do#(
 				8'd1	:do_o <= 2'b01;
 				8'd2	:do_o <= 2'b10;
 				8'd3	:do_o <= 2'b00;
-				8'd4	:do_o <= 2'b00;
-				8'd5	:do_o <= 2'b00;
+				8'd4	:do_o <= do_o;
+				8'd5	:do_o <= do_o;
 				8'd6	:do_o <= 2'b01;
 				8'd7	:do_o <= 2'b10;
 				8'd8	:do_o <= 2'b01;
 				8'd9	:do_o <= 2'b10;
 				8'd10	:do_o <= 2'b01;
 				8'd11	:do_o <= 2'b10;
-				default	:do_o <= 2'b00;
+				default	:do_o <= do_o;
 			endcase
 		else
 			do_o <= do_o;
