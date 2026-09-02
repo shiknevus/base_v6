@@ -2591,7 +2591,7 @@
       <File Path="$PSRCDIR/utils_1/imports/mst_impl_1363/emcc_mst_top_routed.dcp">
         <FileInfo>
           <Attr Name="ImportPath" Val="$PRUNDIR/mst_impl_1363/emcc_mst_top_routed.dcp"/>
-          <Attr Name="ImportTime" Val="1788264352"/>
+          <Attr Name="ImportTime" Val="1788314128"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedInSteps" Val="mst_impl_1363"/>
@@ -2687,9 +2687,7 @@
     </Run>
     <Run Id="mststa_mpsoc_v2_synth_1" Type="Ft3:Synth" SrcSet="mststa_mpsoc_v2" Part="xczu5eg-sfvc784-2-i" ConstrsSet="mststa_mpsoc_v2" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" Dir="$PRUNDIR/mststa_mpsoc_v2_synth_1" IncludeInArchive="true">
       <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2018">
-          <Desc>Vivado Synthesis Defaults</Desc>
-        </StratHandle>
+        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2018"/>
         <Step Id="synth_design"/>
       </Strategy>
       <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
@@ -2748,9 +2746,7 @@
     </Run>
     <Run Id="mststa_mpsoc_v2_impl_1" Type="Ft2:EntireDesign" Part="xczu5eg-sfvc784-2-i" ConstrsSet="mststa_mpsoc_v2" Description="Default settings for Implementation." AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" SynthRun="mststa_mpsoc_v2_synth_1" IncludeInArchive="false" GenFullBitstream="true">
       <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2018">
-          <Desc>Default settings for Implementation.</Desc>
-        </StratHandle>
+        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2018"/>
         <Step Id="init_design"/>
         <Step Id="opt_design"/>
         <Step Id="power_opt_design"/>
