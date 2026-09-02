@@ -451,7 +451,7 @@ module ec_slv_pul_axis#(
     ,.irq_o                	(irq_a				)
     ,.irq_ack_i       		(irq_a_grant		)
 //----------------------------------------------------- user logic begin -----------------------------------------------------//
-	,.i_servo_notok			(i_servo_notok      )
+	,.i_servo_notok			(i_servo_ok      )
     ,.i_servo_stop			(i_servo_stop       )
     ,.i_axis_limf			(i_axis_limf        )
     ,.i_axis_zero			(i_axis_zero         )
@@ -541,7 +541,7 @@ module ec_slv_pul_axis#(
 	,.state_monitor_o			(debug_reg3			)
 	,.c_tx_ot          	        (c_tx_ot			)
 	,.c_tx_result_rpt  	        (c_tx_result_rpt	)
-	,.c_tx_result_vld           (c_tx_result_vld	)
+	,.c_tx_result_vld           (sync_c_tx_result_vld	)
 	,.ec_chc_st	                (ec_chc_st			)
 	,.c_tx_id         	        (c_tx_id			)
 	,.c_alm_num                 (c_alm_num			)
