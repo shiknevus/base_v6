@@ -65,7 +65,7 @@ module pre_post_sta_check_can_servo#(
 		,input							i_axis_limf
 		,input							i_axis_limb
 		,input							i_axis_zero
-		,input						rctrl_drive_on
+		,input		[7:0]				rctrl_drive_on  //1.on 2.off
 		,input						rctrl_drive_reset
 		,input						rctrl_resume
 		,input						rctrl_pause
@@ -139,15 +139,15 @@ module pre_post_sta_check_can_servo#(
 	//========================================================================================//
 
 	//pre status
-	//行为100~105前置条件(与ec_slv_pul_axis B通道一致,寄存器PARAM26~30驱动)
+	//beh 100~105 pre-cond (B ch, same as ec_slv_pul_axis, PARAM26~30)
 	wire [B_BHA_NUM-1:0]	b_pre_sta	;
 
-	assign	b_pre_sta[99 ] = rctrl_pause && ~rctrl_resume && ~rctrl_stop && ec_cha_st; // pause 行为100
-	assign	b_pre_sta[100] = rctrl_pause && rctrl_resume && ec_cha_st; // resume 行为101
-	assign	b_pre_sta[101] = rctrl_drive_reset;    // reset 行为102
-	assign	b_pre_sta[102] = rctrl_pause && rctrl_stop && ec_cha_st;  // stop 行为103
-	assign	b_pre_sta[103] = rctrl_drive_on;       // son 行为104
-	assign	b_pre_sta[104] = ~rctrl_drive_on;      // soff 行为105
+	assign	b_pre_sta[99 ] = rctrl_pause && ~rctrl_resume && ~rctrl_stop && ec_cha_st; // beh100 pause
+	assign	b_pre_sta[100] = rctrl_pause && rctrl_resume && ec_cha_st; // beh101 resume
+	assign	b_pre_sta[101] = rctrl_drive_reset;    // beh102 reset
+	assign	b_pre_sta[102] = rctrl_pause && rctrl_stop && ec_cha_st;  // beh103 stop
+	assign	b_pre_sta[103] = rctrl_drive_on==8'd1;       // beh104 son
+	assign	b_pre_sta[104] = rctrl_drive_on==8'd2;      // beh105 soff
 
 	reg ec_chb_st_d1;
 	always@(posedge clk_i) begin

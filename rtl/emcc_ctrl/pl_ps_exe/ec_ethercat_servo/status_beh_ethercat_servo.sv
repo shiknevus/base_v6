@@ -41,6 +41,10 @@ module status_beh_ethercat_servo#(
 	,output	reg [7:0]			b_tx_id     
 	,output	reg [7:0]			b_alm_num   
 //----------------------------------------------------- user logic begin -----------------------------------------------------//
+	,output wire				o_dv_reset  	//servo reset
+	,output wire				o_dv_son    	//servo enable
+	,output reg					o_pause			//motor pause pulse
+	,output wire				o_stop			//motor stop pulse (beh 103)
 //----------------------------------------------------- user logic end -------------------------------------------------------//
 	
 	,output	reg					irq_o			
@@ -282,7 +286,7 @@ module status_beh_ethercat_servo#(
 	
 
 	always@(posedge clk_i)begin
-        if(rst_i||!b_en)
+        if(rst_i || !b_en)
             b_alm_num <= 8'd0;
 		else if(curr_state == S_IDLE)
 			b_alm_num <= 8'd0;
@@ -339,6 +343,73 @@ module status_beh_ethercat_servo#(
 	//===============================================================================================================
 	//------------------------------------------------ user logic start ---------------------------------------------
 	//===============================================================================================================
+	always @(posedge clk_i) begin
+		if(rst_i || !b_en)
+			b_bhv_id <= 8'd0;
+		else if(curr_state == S_IDLE)
+			begin
+				if(pre_sta_allow[8'd100-1])       b_bhv_id <= 8'd100;//pause
+				else if(pre_sta_allow[8'd101-1])  b_bhv_id <= 8'd101;//resume
+				else if(pre_sta_allow[8'd102-1])  b_bhv_id <= 8'd102;//reset
+				else if(pre_sta_allow[8'd103-1])  b_bhv_id <= 8'd103;//stop
+				else if(pre_sta_allow[8'd104-1])  b_bhv_id <= 8'd104;//son
+				else if(pre_sta_allow[8'd105-1])  b_bhv_id <= 8'd105;//soff
+				else                              b_bhv_id <= 8'd0;
+			end
+	end
+
+	localparam P_EN_EFF  = 1'b0;
+	localparam P_RST_EFF = 1'b0;
+
+	reg bh_disable;
+	always@(posedge clk_i) begin
+		if(rst_i || !b_en)
+			bh_disable <= 1'b0;
+		else if(curr_state == S_EXE) begin
+			case(b_bhv_id)
+				8'd104: bh_disable <= 1'b0;   // son
+				8'd105: bh_disable <= 1'b1;   // soff
+				default: ;
+			endcase
+		end
+	end
+
+	assign o_dv_son   = bh_disable ? ~P_EN_EFF : P_EN_EFF;
+
+	// reset pulse 5ms
+	reg [2:0] rst_cnt;
+	reg o_dv_reset_r;
+	always@(posedge clk_i) begin
+		if(rst_i || !b_en) begin
+			o_dv_reset_r <= 1'b0;
+			rst_cnt      <= 3'd0;
+		end else if(curr_state == S_EXE && b_bhv_id == 8'd102) begin
+			o_dv_reset_r <= 1'b1;
+			rst_cnt      <= 3'd5;
+		end else if(o_dv_reset_r && i_time_1ms_vld) begin
+			if(rst_cnt <= 3'd1) begin
+				o_dv_reset_r <= 1'b0;
+				rst_cnt      <= 3'd0;
+			end else
+				rst_cnt <= rst_cnt - 1'b1;
+		end
+	end
+	assign o_dv_reset = o_dv_reset_r ? P_RST_EFF : ~P_RST_EFF;
+
+	always@(posedge clk_i) begin
+		if(rst_i || !b_en)
+			o_pause <= 1'b0;
+		else if(curr_state == S_EXE) begin
+			if(b_bhv_id == 8'd100)
+				o_pause <= 1'b1;
+			else if(b_bhv_id == 8'd101)
+				o_pause <= 1'b0;
+			else if(b_bhv_id == 8'd103)
+				o_pause <= 1'b0;   // stop: release pause too
+		end
+	end
+
+	assign o_stop = (curr_state == S_EXE && b_bhv_id == 8'd103);
 	//===============================================================================================================
 	//------------------------------------------------ user logic start ---------------------------------------------
 	//===============================================================================================================

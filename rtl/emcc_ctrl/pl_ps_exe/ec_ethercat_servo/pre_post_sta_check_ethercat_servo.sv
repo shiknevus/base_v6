@@ -65,6 +65,14 @@ module pre_post_sta_check_ethercat_servo#(
 		,input							i_axis_limf
 		,input							i_axis_limb
 		,input							i_axis_zero
+		,input		[7:0]				rctrl_drive_on  //1.on 2.off
+		,input						rctrl_drive_reset
+		,input						rctrl_resume
+		,input						rctrl_pause
+		,input						rctrl_stop
+		,output	reg					b_clr_pause
+		,output	reg					b_clr_resume
+		,output	reg					b_clr_stop
 //----------------------------------------------------- user logic end -------------------------------------------------------//
     );
 
@@ -130,25 +138,98 @@ module pre_post_sta_check_ethercat_servo#(
 	//---------------------------------  Channel B check -------------------------------------//
 	//========================================================================================//
 
-	always@(posedge clk_i)
-	begin
-		if(rst_i) begin
-			b_pre_sta_allow <= {B_BHA_NUM{1'b0}};
-		end else if(b_en) begin
-			b_pre_sta_allow <= {B_BHA_NUM{1'b1}};
+	//pre status
+	//beh 100~105 pre-cond (B ch, same as ec_slv_pul_axis, PARAM26~30)
+	wire [B_BHA_NUM-1:0]	b_pre_sta	;
+
+	assign	b_pre_sta[99 ] = rctrl_pause && ~rctrl_resume && ~rctrl_stop && ec_cha_st; // beh100 pause
+	assign	b_pre_sta[100] = rctrl_pause && rctrl_resume && ec_cha_st; // beh101 resume
+	assign	b_pre_sta[101] = rctrl_drive_reset;    // beh102 reset
+	assign	b_pre_sta[102] = rctrl_pause && rctrl_stop && ec_cha_st;  // beh103 stop
+	assign	b_pre_sta[103] = rctrl_drive_on==8'd1;       // beh104 son
+	assign	b_pre_sta[104] = rctrl_drive_on==8'd2;      // beh105 soff
+
+	reg ec_chb_st_d1;
+	always@(posedge clk_i) begin
+		if(rst_i || !b_en) begin
+			ec_chb_st_d1 <= 1'b0;
+			b_clr_pause  <= 1'b0;
+			b_clr_resume <= 1'b0;
+			b_clr_stop   <= 1'b0;
 		end else begin
-			b_pre_sta_allow <= {B_BHA_NUM{1'b0}};
+			ec_chb_st_d1 <= ec_chb_st;
+			if(!rctrl_pause)  b_clr_pause  <= 1'b0;
+			if(!rctrl_resume) b_clr_resume <= 1'b0;
+			if(!rctrl_stop)   b_clr_stop   <= 1'b0;
+			if(ec_chb_st_d1 && ~ec_chb_st) begin
+				if(b_bhv_id == 8'd100)
+					b_clr_pause  <= 1'b1;
+				else if(b_bhv_id == 8'd103) begin
+					b_clr_pause  <= 1'b1;
+					b_clr_stop   <= 1'b1;
+				end
+				else if(b_bhv_id == 8'd101) begin
+					b_clr_pause  <= 1'b1;
+					b_clr_resume <= 1'b1;
+				end
+			end
+		end
+	end
+
+	reg [B_BHA_NUM-1:0]	b_executed;
+	always@(posedge clk_i) begin
+		if(rst_i || !b_en) begin
+			b_executed <= {B_BHA_NUM{1'b0}};
+		end else begin
+			if(ec_chb_st && ~ec_chb_st_d1) begin
+				if(b_bhv_id >= 8'd100 && b_bhv_id <= 8'd105)
+					b_executed[b_bhv_id - 8'd1] <= 1'b1;
+			end
+			for(integer i = 0; i < B_BHA_NUM; i = i + 1) begin
+				if(!b_pre_sta[i])
+					b_executed[i] <= 1'b0;
+			end
 		end
 	end
 
 	always@(posedge clk_i)
 	begin
-		if(rst_i) begin
+		integer i;
+		if(rst_i)
+			b_pre_sta_allow <= {B_BHA_NUM{1'b0}};
+		else if(!b_en)
+			b_pre_sta_allow <= {B_BHA_NUM{1'b0}};
+		else begin
+			b_pre_sta_allow <= {B_BHA_NUM{1'b0}};
+			for(i = 0; i < B_BHA_NUM; i = i + 1) begin
+				if(b_pre_sta[i] && ~b_executed[i])
+					b_pre_sta_allow[i] <= 1'b1;
+			end
+		end
+	end
+
+	//post status
+	wire [B_BHA_NUM-1:0]	b_post_sta	;
+	assign	b_post_sta[99 ] = (b_bhv_id == 100);
+	assign	b_post_sta[100] = (b_bhv_id == 101);
+	assign	b_post_sta[101] = (b_bhv_id == 102);
+	assign	b_post_sta[102] = (b_bhv_id == 103);
+	assign	b_post_sta[103] = (b_bhv_id == 104);
+	assign	b_post_sta[104] = (b_bhv_id == 105);
+
+	always@(posedge clk_i)
+	begin
+		integer i;
+		if(rst_i)
 			b_post_sta_allow <= {B_BHA_NUM{1'b0}};
-		end else if(b_en) begin
-			b_post_sta_allow <= {B_BHA_NUM{1'b1}};
-		end else begin
+		else if(!b_en)
 			b_post_sta_allow <= {B_BHA_NUM{1'b0}};
+		else begin
+			b_post_sta_allow <= {B_BHA_NUM{1'b0}};
+			for(i = 0; i < B_BHA_NUM; i = i + 1) begin
+				if(b_post_sta[i])
+					b_post_sta_allow[i] <= 1'b1;
+			end
 		end
 	end
 
