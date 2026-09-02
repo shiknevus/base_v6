@@ -381,7 +381,7 @@ module ec_sf_door#(
 	,.param69               (o_lock_open		)
 	//,.param70               (param70		)
 	,.debug_reg1			(debug_reg1		)
-	,.debug_reg2			({16'd0,irq_posedge_cnt,irq_negedge_cnt}		)
+	,.debug_reg2			(debug_reg2		)
 	//,.debug_reg3			(debug_reg3		)
 	//,.debug_reg4			(debug_reg4		)
 	//,.debug_reg5			(debug_reg5		)
@@ -440,6 +440,7 @@ module ec_sf_door#(
 	,.state_monitor_o		(debug_reg1			)
 	,.irq_o			        (irq_b				)
 	,.irq_ack_i	            (irq_b_grant		)	
+	,.debug_r				(debug_reg2)
     );
 	 
 	tim_beh_safety_door tim_beh_safety_door_u0(

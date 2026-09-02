@@ -51,6 +51,9 @@ module status_beh_safety_door#(
 	,output	reg	[31:0]			state_monitor_o
 	,output	reg					irq_o			
 	,input						irq_ack_i	
+	
+	//debug reg
+	,output reg					debug_r
     );
 	
 	wire	i_clk = clk_i;
@@ -78,23 +81,60 @@ module status_beh_safety_door#(
 	
 	
 	//State machine state
-	localparam  S_IDLE          = 8'd0; 	//idle
-    localparam  S_BHA_PRE_DET	= 8'd1; 	//Pre-condition check
-	localparam	S_READY_10		= 8'd2;		//ready
-    localparam  S_READY_10_ACK  = 8'd3; 	//ready ok/no ok
-    localparam  S_EXE_20     	= 8'd4; 	//Action begin
-	localparam	S_EXE			= 8'd5;		//Action execute
-    localparam  S_EXE_20_ACK	= 8'd6;		//Action end
-    localparam  S_BHA_POST_DET  = 8'd7; 	//Post-condition check
-    localparam  S_SUCC_30       = 8'd8; 	//success
-    localparam  S_SUCC_30_ACK	= 8'd9; 	//success ack
-	localparam 	S_ALERT_40		= 8'd10;	//Alert
-	localparam 	S_ALERT_40_ACK	= 8'd11;	//Alert ack
+	localparam  S_IDLE          = 8'd0; 
+    localparam  S_BHA_PRE_DET	= 8'd1; 
+	localparam	S_READY_10		= 8'd2;	
+    localparam  S_READY_10_ACK  = 8'd3; 
+    localparam  S_EXE_20     	= 8'd4; 
+	localparam	S_EXE			= 8'd5;	
+    localparam  S_EXE_20_ACK	= 8'd6;	
+    localparam  S_BHA_POST_DET  = 8'd7; 
+    localparam  S_SUCC_30       = 8'd8; 
+    localparam  S_SUCC_30_ACK	= 8'd9; 
+	localparam 	S_ALERT_40		= 8'd10;
+	localparam 	S_ALERT_40_ACK	= 8'd11;
 	localparam 	S_ACT_END_1		= 8'd12;
 	localparam 	S_ACT_END_2		= 8'd13;
 	
     localparam  IRQ_OK          = 8'h51;	//ps ack:OK
     localparam  IRQ_NO_OK       = 8'h52;	//ps ack:NO OK
+	
+	
+	reg [15:0]	open_io_edge_cnt	;
+	reg [15:0]	close_io_edge_cnt	;	
+	reg			open_io_sta			;
+	reg			close_io_sta		;
+	
+	always@(posedge clk_i)
+	begin
+		if(rst_i)begin
+			open_io_edge_cnt  	<= 16'd0;
+			open_io_sta			<= 1'b0;
+		end else if(open_io_sta != i_open_req_key)begin
+			open_io_edge_cnt  	<= open_io_edge_cnt+1;
+			open_io_sta			<= i_open_req_key;
+		end else begin
+			open_io_edge_cnt  	<= open_io_edge_cnt;
+			open_io_sta			<= open_io_sta;
+		end	
+	end
+	
+	always@(posedge clk_i)
+	begin
+		if(rst_i)begin
+			close_io_edge_cnt  	<= 16'd0;
+			close_io_sta		<= 1'b0;
+		end else if(open_io_sta != i_close_confirm_key)begin
+			close_io_edge_cnt  	<= close_io_edge_cnt+1;
+			close_io_sta		<= i_close_confirm_key;
+		end else begin
+			close_io_edge_cnt  	<= close_io_edge_cnt ; 	
+			close_io_sta		<= close_io_sta		 ;
+		end	
+	end
+
+	assign debug_r  = {open_io_edge_cnt,close_io_edge_cnt};
+	
 	
 	//state monitor
 	reg [7:0]	curr_state_m1;
@@ -440,7 +480,6 @@ module status_beh_safety_door#(
 		else
 			open_req_key_posedge <= 0;
 	end
-	
 	
 	always@(posedge i_clk)
 	begin
