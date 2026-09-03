@@ -19,7 +19,7 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 `include"reg_addr_pl.vh"
-module ps_rw_pl_reg_16di#(
+module ps_rw_pl_reg_stacker_cage_check#(
     parameter  						REG_SPACE_BIAS 	= 	200	,
     parameter  						REG_SPACE_SIZE 	= 	512	
 )(
@@ -126,25 +126,25 @@ module ps_rw_pl_reg_16di#(
 	,input 				[7:0]		c_tsc_id   
 	,input 				[7:0]		c_bhv_id    
 
-	,input 				[31:0]		param51 
+	//,input 				[31:0]		param51 
 	//,input 				[31:0]		param52 
 	//,input 				[31:0]		param53   
-	,input 				[31:0]		param54   
-	,input 				[31:0]		param55   
-	,input 				[19:0]		param56   
-	,input 				[19:0]		param57   
-	,input 				[19:0]		param58   
-	,input 				[19:0]		param59   
-	,input 				[19:0]		param60   
-	,input 				[7:0]		param61   
-	,input 				[7:0]		param62   
-	,input 				[7:0]		param63   
-	,input 				[7:0]		param64   
-	,input 				[7:0]		param65   
+	//,input 				[31:0]		param54   
+	//,input 				[31:0]		param55   
+	//,input 				[19:0]		param56   
+	//,input 				[19:0]		param57   
+	//,input 				[19:0]		param58   
+	//,input 				[19:0]		param59   
+	//,input 				[19:0]		param60   
+	//,input 				[7:0]		param61   
+	//,input 				[7:0]		param62   
+	//,input 				[7:0]		param63   
+	//,input 				[7:0]		param64   
+	//,input 				[7:0]		param65   
 	,input 							param66   
-	,input 							param67   
-	,input 							param68   
-	,input 							param69   
+	//,input 							param67   
+	//,input 							param68   
+	//,input 							param69   
 	//,input 							param70   
 	,input 				[31:0]		debug_reg1
 	,input 				[31:0]		debug_reg2
@@ -158,10 +158,10 @@ module ps_rw_pl_reg_16di#(
 	wire 		rd_space_select;
 	wire 		wr_space_select;
 	wire 		wr_task_vld;
-	reg  [8:0]  rd_addr_d1;
-	reg  [8:0]  rd_addr_d2;
-	wire [8:0]  rd_task_addr;
-	wire [8:0]  wr_task_addr;
+	reg  [19:0] rd_addr_d1;
+	reg  [19:0] rd_addr_d2;
+	wire [19:0] rd_task_addr;
+	wire [19:0] wr_task_addr;
 	
 	//================================================================================================//
 	//---------------------------------Component address is selected --------------------------------//
@@ -236,7 +236,7 @@ module ps_rw_pl_reg_16di#(
 			c_tsc_result_vld	<= 	1'b0			;	
 			c_bhv_gap_crl      	<=	20'd0		   	;
 
-			param1				<=	32'd0	  	;
+			//param1				<=	32'd0	  	;
 			//param2				<=	32'd0	  	;
 			//param3				<=	32'd0	  	;
 			//param4				<=	32'd0	  	;
@@ -312,7 +312,7 @@ module ps_rw_pl_reg_16di#(
 			c_tsc_result_vld<=	(wr_task_vld && wr_task_addr == `C_TX_RSULT_RPT	) ? 1'b1: 1'b0							 ;
 			c_bhv_gap_crl   <=	(wr_task_vld && wr_task_addr == `C_GAP_CRL     	) ? i_st_wr_data[19:0] 	: c_bhv_gap_crl	;
 			
-			param1			<=	(wr_task_vld && wr_task_addr == `PARAM1			) ? i_st_wr_data 		: param1	;
+			//param1			<=	(wr_task_vld && wr_task_addr == `PARAM1			) ? i_st_wr_data 		: param1	;
 			//param2			<=	(wr_task_vld && wr_task_addr == `PARAM2			) ? i_st_wr_data 		: param2	;
 			//param3			<=	(wr_task_vld && wr_task_addr == `PARAM3			) ? i_st_wr_data 		: param3	;
 			//param4			<=	(wr_task_vld && wr_task_addr == `PARAM4			) ? i_st_wr_data 		: param4	;
@@ -383,22 +383,22 @@ module ps_rw_pl_reg_16di#(
 		//`PARAM51		:	o_st_rd_data <= param51     		;
 		//`PARAM52		:	o_st_rd_data <= param52     		;
 		//`PARAM53		:	o_st_rd_data <= param53     		;
-		`PARAM54		:	o_st_rd_data <= param54     		;
-		`PARAM55		:	o_st_rd_data <= param55     		;
-		`PARAM56		:	o_st_rd_data <= {12'd0,param56		};
-		`PARAM57		:	o_st_rd_data <= {12'd0,param57		};
-		`PARAM58		:	o_st_rd_data <= {12'd0,param58		};
-		`PARAM59		:	o_st_rd_data <= {12'd0,param59		};
-		`PARAM60		:	o_st_rd_data <= {12'd0,param60		};
-		`PARAM61		:	o_st_rd_data <= {24'd0,param61  	};
-		`PARAM62		:	o_st_rd_data <= {24'd0,param62  	};
-		`PARAM63		:	o_st_rd_data <= {24'd0,param63  	};
-		`PARAM64		:	o_st_rd_data <= {24'd0,param64  	};
-		`PARAM65		:	o_st_rd_data <= {24'd0,param65  	};
+		//`PARAM54		:	o_st_rd_data <= param54     		;
+		//`PARAM55		:	o_st_rd_data <= param55     		;
+		//`PARAM56		:	o_st_rd_data <= {12'd0,param56		};
+		//`PARAM57		:	o_st_rd_data <= {12'd0,param57		};
+		//`PARAM58		:	o_st_rd_data <= {12'd0,param58		};
+		//`PARAM59		:	o_st_rd_data <= {12'd0,param59		};
+		//`PARAM60		:	o_st_rd_data <= {12'd0,param60		};
+		//`PARAM61		:	o_st_rd_data <= {24'd0,param61  	};
+		//`PARAM62		:	o_st_rd_data <= {24'd0,param62  	};
+		//`PARAM63		:	o_st_rd_data <= {24'd0,param63  	};
+		//`PARAM64		:	o_st_rd_data <= {24'd0,param64  	};
+		//`PARAM65		:	o_st_rd_data <= {24'd0,param65  	};
 		`PARAM66		:	o_st_rd_data <= {31'd0,param66  	};
-		`PARAM67		:	o_st_rd_data <= {31'd0,param67  	};
-		`PARAM68		:	o_st_rd_data <= {31'd0,param68  	};
-		`PARAM69		:	o_st_rd_data <= {31'd0,param69  	};
+		//`PARAM67		:	o_st_rd_data <= {31'd0,param67  	};
+		//`PARAM68		:	o_st_rd_data <= {31'd0,param68  	};
+		//`PARAM69		:	o_st_rd_data <= {31'd0,param69  	};
 		//`PARAM70		:	o_st_rd_data <= {31'd0,param70  	};
 		
 		`DEBUG_REG1		:	o_st_rd_data <= debug_reg1			;
@@ -434,7 +434,7 @@ module ps_rw_pl_reg_16di#(
 		`C_TX_OT		:	o_st_rd_data <= {12'd0,c_bhv_ot		};
 		`C_TX_RSULT_RPT	:	o_st_rd_data <= c_tsc_result_rpt	;
 		`C_GAP_CRL     	:	o_st_rd_data <= {12'd0,c_bhv_gap_crl};
-		`PARAM1			:	o_st_rd_data <= param1				;
+		//`PARAM1			:	o_st_rd_data <= param1				;
 		//`PARAM2			:	o_st_rd_data <= param2				;
 		//`PARAM3			:	o_st_rd_data <= param3				;
 		//`PARAM4			:	o_st_rd_data <= param4				;

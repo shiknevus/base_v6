@@ -137,13 +137,13 @@ module ps_rw_pl_reg_8do#(
 	//,input 				[19:0]		param59   
 	//,input 				[19:0]		param60   
 	,input 				[7:0]		param61   
-	//,input 				[7:0]		param62   
-	//,input 				[7:0]		param63   
-	//,input 				[7:0]		param64   
-	//,input 				[7:0]		param65   
-	//,input 							param66   
-	//,input 							param67   
-	//,input 							param68   
+	,input 				[7:0]		param62   
+	,input 				[7:0]		param63   
+	,input 				[7:0]		param64   
+	,input 				[7:0]		param65   
+	,input 							param66   
+	,input 							param67   
+	,input 							param68   
 	//,input 							param69   
 	//,input 							param70   
 	,input 				[31:0]		debug_reg1
@@ -391,13 +391,13 @@ module ps_rw_pl_reg_8do#(
 		//`PARAM59		:	o_st_rd_data <= {12'd0,param59		};
 		//`PARAM60		:	o_st_rd_data <= {12'd0,param60		};
 		`PARAM61		:	o_st_rd_data <= {24'd0,param61  	};
-		//`PARAM62		:	o_st_rd_data <= {24'd0,param62  	};
-		//`PARAM63		:	o_st_rd_data <= {24'd0,param63  	};
-		//`PARAM64		:	o_st_rd_data <= {24'd0,param64  	};
-		//`PARAM65		:	o_st_rd_data <= {24'd0,param65  	};
-		//`PARAM66		:	o_st_rd_data <= {31'd0,param66  	};
-		//`PARAM67		:	o_st_rd_data <= {31'd0,param67  	};
-		//`PARAM68		:	o_st_rd_data <= {31'd0,param68  	};
+		`PARAM62		:	o_st_rd_data <= {24'd0,param62  	};
+		`PARAM63		:	o_st_rd_data <= {24'd0,param63  	};
+		`PARAM64		:	o_st_rd_data <= {24'd0,param64  	};
+		`PARAM65		:	o_st_rd_data <= {24'd0,param65  	};
+		`PARAM66		:	o_st_rd_data <= {31'd0,param66  	};
+		`PARAM67		:	o_st_rd_data <= {31'd0,param67  	};
+		`PARAM68		:	o_st_rd_data <= {31'd0,param68  	};
 		//`PARAM69		:	o_st_rd_data <= {31'd0,param69  	};
 		//`PARAM70		:	o_st_rd_data <= {31'd0,param70  	};
 		

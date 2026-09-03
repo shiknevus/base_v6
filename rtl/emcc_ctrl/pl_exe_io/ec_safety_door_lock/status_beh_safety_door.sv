@@ -147,52 +147,28 @@ module status_beh_safety_door#(
 		curr_state_1d <= curr_state;
 	end
 	
-	always@(posedge clk_i)
-	begin
-		if(rst_i)
-			ec_chb_st_r <= 1'b0;
-		else
-			ec_chb_st_r <= ec_chb_st;
-	end
-
-	always@(posedge clk_i)
-	begin
-		if(rst_i)
-			ec_chb_st_negedge <= 0;
-		else if({ec_chb_st_r,ec_chb_st} == 2'b10)
-			ec_chb_st_negedge <= 1;
-		else
-			ec_chb_st_negedge <= 0;
-	end
-	
-	
 	//Current behavior number
 	reg		b_bhv_id_vld;
 	
 	always @(posedge clk_i) begin
-		if(rst_i)
+		if(rst_i || !b_en)begin
 			b_bhv_id <= 8'd0;
-		else if(ec_chb_st_negedge)
+			b_bhv_id_vld <= 1'b0;
+		end else if(curr_state == S_ACT_END_1)begin
 			b_bhv_id <= 8'd0;
-		else if(open_req_key_posedge)	//open door press
+			b_bhv_id_vld <= 1'b0;
+		end else if(open_req_key_posedge)begin	//open door press
 			b_bhv_id <= 8'd100;
-		else if(close_confirm_key_posedge)	//close door press
-			b_bhv_id <= 8'd101;
-		else
-			b_bhv_id <= b_bhv_id;
-	end
-	
-	
-	always@(posedge clk_i)
-	begin
-		if(rst_i)
-			b_bhv_id_vld <= 1'b0;
-		else if(open_req_key_posedge || close_confirm_key_posedge)
 			b_bhv_id_vld <= 1'b1;
-		else
+		end else if(close_confirm_key_posedge)begin	//close door press
+			b_bhv_id <= 8'd101;
+			b_bhv_id_vld <= 1'b1;
+		end else begin
+			b_bhv_id <= b_bhv_id;
 			b_bhv_id_vld <= 1'b0;
+		end
 	end
-
+	
 	reg match_10;
 	//reg match_20;
 	reg match_30;
@@ -267,15 +243,6 @@ module status_beh_safety_door#(
 			S_EXE:begin
 				next_state = S_BHA_POST_DET;
 			end
-			
-			//S_EXE_20_ACK: begin
-			//	if(match_20) 	//Transaction 20 Acknowledged OK
-            //        next_state = S_EXE;
-            //    else if(ack_tx_result == IRQ_NO_OK || timout)
-            //        next_state = S_ALERT_40;
-            //    else
-            //        next_state = S_EXE_20_ACK;
-			//end
 			
 			S_BHA_POST_DET: begin	//curr_state = 6
 				if(post_sta_allow[b_bhv_id - 100]) begin
@@ -387,10 +354,8 @@ module status_beh_safety_door#(
             b_alm_num <= 8'd103;
 		else if(curr_state == S_ACT_END_1)
 			b_alm_num <= 8'd0;
-		else if(curr_state == S_IDLE)
-			b_alm_num <= 8'd0;
         else
-               b_alm_num <= b_alm_num;
+            b_alm_num <= b_alm_num;
     end
 	
 
@@ -457,7 +422,6 @@ module status_beh_safety_door#(
 		else
 			close_confirm_key_posedge <= 0;
 	end
-
 	
 	always @(posedge clk_i) begin
 		if (rst_i) 
@@ -466,7 +430,7 @@ module status_beh_safety_door#(
 			case(b_bhv_id)
 				8'd100: o_lock_open <= 1'b1;
 				8'd101: o_lock_open <= 1'b0;
-				default: o_lock_open <= 1'b0;
+				default: o_lock_open <= o_lock_open;
 			endcase
 		else
 			o_lock_open <= o_lock_open;

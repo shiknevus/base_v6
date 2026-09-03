@@ -413,7 +413,6 @@ module proactive_beh_8do#(
 		if(rst_i)
 			do_o <= 8'd0;
 		else if(curr_state == S_EXE)begin
-			do_o <= do_o;
 			case(a_bhv_id_r)
 				1 		:	do_o[0] <= 1'b1;
 				2 		:	do_o[1] <= 1'b1;
@@ -431,7 +430,7 @@ module proactive_beh_8do#(
 				14		:	do_o[5] <= 1'b0;
 				15		:	do_o[6] <= 1'b0;
 				16		:	do_o[7] <= 1'b0;
-				default	:	do_o <= 1'b0;
+				default	:	do_o <= do_o;
 			endcase
 		end else
 			do_o <= do_o;

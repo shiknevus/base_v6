@@ -36,9 +36,7 @@ module pre_post_sta_check_8do#(
 		,input 		[3:0]				m_st            
 		,input 		[3:0]				m_wk_mod        
 		,input 							m_saf_st        
-		,input 							link_m_saf_st           
-		
-		,input							di		
+		,input 							link_m_saf_st           	
 		
 		,input 		[7:0]				a_bhv_id
 		,input 		[7:0]				b_bhv_id

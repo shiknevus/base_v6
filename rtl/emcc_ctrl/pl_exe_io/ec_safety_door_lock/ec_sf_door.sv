@@ -41,9 +41,9 @@ module ec_sf_door#(
 
 		input					i_open_req_key		,
 		input 					i_close_confirm_key ,
-		//input 					i_door_monitor  	,
+		input 					i_door_monitor  	,
 		input 					i_lock_monitor  	,
-		//output 					o_key_light     	,
+		output 					o_key_light     	,
 		output 					o_lock_open    		,
 		
 		output 	            	o_intr_irq	
@@ -200,6 +200,8 @@ module ec_sf_door#(
 	wire	i_rst = rst_i;
 	
 	assign o_lock_open = o_lock_open_a || o_lock_open_b;
+	
+	assign o_key_light = 0;
 	
 	`ifdef DEBUG
 		reg			ro_intr_irq;
@@ -374,12 +376,12 @@ module ec_sf_door#(
 	//,.param62               (param62		)
 	//,.param63               (param63		)
 	//,.param64               (param64		)
-	//,.param65               (param65		)
-	,.param66               (i_open_req_key		)
-	,.param67               (i_close_confirm_key)
-	,.param68               (i_lock_monitor		)
-	,.param69               (o_lock_open		)
-	//,.param70               (param70		)
+	,.param65               ({7'd0,i_open_req_key}		)
+	,.param66               (i_close_confirm_key		)
+	,.param67               (o_key_light	)
+	,.param68               (o_lock_open		)
+	,.param69               (i_door_monitor		)
+	,.param70               (i_lock_monitor		)
 	,.debug_reg1			(debug_reg1		)
 	,.debug_reg2			(debug_reg2		)
 	//,.debug_reg3			(debug_reg3		)

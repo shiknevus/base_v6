@@ -395,7 +395,7 @@ module ec_sys_sf#(
     ,.a_tx_id              	(a_tx_id        	)
     ,.a_alm_num            	(a_alm_num      	)
 	,.a_bhv_id_r			(a_bhv_id_r			)
-	,.state_monitor_o		(debug_reg1			)
+	,.state_monitor_o		(			)
     ,.irq_o                	(irq_a				)
     ,.irq_ack_i       		(irq_a_grant		)
     );
@@ -425,7 +425,7 @@ module ec_sys_sf#(
 	,.i_estop               (i_estop   			)
 	,.i_manul	            (i_manul			)
 	,.i_auto	            (i_auto				)
-	,.state_monitor_o		(			)
+	,.state_monitor_o		(debug_reg1			)
 	,.irq_o			        (irq_o				)
 	,.irq_ack_i	            (irq_ack_i			)	
     );

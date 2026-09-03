@@ -212,8 +212,6 @@ module ec_8do#(
 	assign 	o_dri6 = do_o[5];
 	assign 	o_dri7 = do_o[6];
 	assign 	o_dri8 = do_o[7];
-
-	assign param61 = {o_dri8,o_dri7,o_dri6,o_dri5,o_dri4,o_dri3,o_dri2,o_dri1};
 	
 	`ifdef DEBUG
 		reg			ro_intr_irq;
@@ -394,14 +392,14 @@ module ec_8do#(
 	// ,.param58               (param58		)
 	// ,.param59               (param59		)
 	// ,.param60               (param60		)
-	,.param61               (param61		)	//do
-	// ,.param62               (param62		)
-	// ,.param63               (param63		)
-	// ,.param64               (param64		)
-	// ,.param65               (param65		)
-	// ,.param66               (param66		)
-	// ,.param67               (param67		)
-	// ,.param68               (param68		)
+	,.param61               ({7'd0,o_dri1}		)
+	,.param62               ({7'd0,o_dri2}		)
+	,.param63               ({7'd0,o_dri3}		)
+	,.param64               ({7'd0,o_dri4}		)
+	,.param65               ({7'd0,o_dri5}		)
+	,.param66               (o_dri6		)
+	,.param67               (o_dri7		)
+	,.param68               (o_dri8		)
 	// ,.param69               (param69		)
 	// ,.param70               (param70		)
 	,.debug_reg1			(debug_reg1		)
@@ -494,7 +492,6 @@ module ec_8do#(
 		.m_wk_mod        	(m_wk_mod       ),
 		.m_saf_st        	(m_saf_st       ),
 		.link_m_saf_st   	(link_m_saf_st  ),
-		.di					(1'b0			),
 		.a_bhv_id			(a_bhv_id_r		),
 		.b_bhv_id			(b_bhv_id		),
 		.c_bhv_id			(c_bhv_id		),

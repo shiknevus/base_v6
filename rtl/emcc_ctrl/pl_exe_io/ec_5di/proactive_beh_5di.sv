@@ -31,7 +31,6 @@ module proactive_beh_5di#(
     ,input      [BHA_NUM-1:0]   pre_sta_allow   //Pre - sufficient condition satisfied signal. 0: Not satisfied. 1: Satisfied.
     ,input      [BHA_NUM-1:0]   post_sta_allow  //Post - sufficient condition satisfied signal
 
-
 	,input      [7:0]           ec_id
 	,input						a_en			//A enable
     ,input      [7:0]           a_bhv_id
