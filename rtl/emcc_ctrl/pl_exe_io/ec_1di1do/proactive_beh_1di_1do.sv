@@ -417,11 +417,11 @@ module proactive_beh_1di_1do#(
 			case(a_bhv_id_r)
 				8'd1    :	do_o <= 1'b1; 
 				8'd2    :	do_o <= 1'b0; 
-				8'd4    :	do_o <= 1'b0; 
-				8'd5    :	do_o <= 1'b0; 
+				8'd4    :	do_o <= do_o; 
+				8'd5    :	do_o <= do_o; 
 				8'd6    :	do_o <= 1'b1; 
 				8'd7    :	do_o <= 1'b0; 
-				default :	do_o <= 1'b0; 
+				default :	do_o <= do_o; 
 			endcase
 		else
 			do_o <= do_o;

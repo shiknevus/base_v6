@@ -195,7 +195,7 @@ module ec_hw_sdcx#(
 	wire 	[2:0]	do_o;	
 	
 	assign {o_demag,o_lock,o_mag} = do_o;
-	assign di_i = {i_mgs,i_dmgs};
+	assign di_i = {i_dmgs,i_mgs};
 	
 	`ifdef DEBUG
 		reg			ro_intr_irq;
@@ -370,11 +370,11 @@ module ec_hw_sdcx#(
 	//,.param63               (param63		)
 	//,.param64               (param64		)
 	//,.param65               (param65		)
-	,.param66               (o_mag			)
-	,.param67               (o_lock			)
-	,.param68               (o_demag		)
-	,.param69               (i_mgs			)
-	,.param70               (i_dmgs			)
+	,.param66               (i_mgs		)	
+	,.param67               (i_dmgs		)	
+	,.param68               (o_mag		)
+	,.param69               (o_demag	)	
+	,.param70               (o_lock		)	
 	,.debug_reg1			(debug_reg1		)
 	,.debug_reg2			({16'd0,irq_posedge_cnt,irq_negedge_cnt}		)
 	//,.debug_reg3			(debug_reg3		)

@@ -364,18 +364,14 @@ module proactive_beh_2di_3do#(
         else if(curr_state == S_READY_10_ACK && ack_tx_result == IRQ_NO_OK)	
             a_alm_num <= ack_ps_alart_num;    
         else if(curr_state == S_READY_10_ACK && timout)						
-            a_alm_num <= 8'd101;    
-		//else if(curr_state == S_EXE_20_ACK && ack_tx_result == IRQ_NO_OK)	
-        //    a_alm_num <= ack_ps_alart_num;    
-        //else if(curr_state == S_EXE_20_ACK && timout)						
-        //    a_alm_num <= 8'd103;    
+            a_alm_num <= 8'd101;      
 		else if(curr_state_1d == S_BHA_POST_DET && curr_state == S_ALERT_40)
 			a_alm_num <= 8'd102;  
 		else if(curr_state == S_SUCC_30_ACK && ack_tx_result == IRQ_NO_OK)	
 			a_alm_num <= ack_ps_alart_num;
 		else if(curr_state == S_SUCC_30_ACK && timout)						
             a_alm_num <= 8'd103;
-		else if(match_40)
+		else if(curr_state == S_IDLE)
 			a_alm_num <= 8'd0;
         else
             a_alm_num <= a_alm_num;

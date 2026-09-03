@@ -19,10 +19,8 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
-//No need to send an interrupt to the PS
 
-
-module status_beh_3led_buzzer#(
+module status_beh_stacker_cage_check#(
 	parameter	BHA_NUM	=	1
 )(
 	input						clk_i			
@@ -42,18 +40,12 @@ module status_beh_3led_buzzer#(
 	,output	reg [7:0]			b_tx_id     
 	,output	reg [7:0]			b_alm_num   
 	
-	,output reg					o_led_r
-	,output reg					o_led_y
-	,output reg					o_led_g
-	,output reg					o_bz
+	//,input						di				
 	
-	,input		[7:0]			ctrl_signal	//ps Control the LED
-
-	,output	reg	[31:0]			state_monitor_o
 	,output	reg					irq_o			
 	,input						irq_ack_i	
     );
-
+	
 	reg			[7:0]			curr_state		;
 	reg			[7:0]			curr_state_1d	;
 	reg			[7:0]			next_state		;
@@ -66,49 +58,9 @@ module status_beh_3led_buzzer#(
 	reg [7:0]		ack_tx_result;
 	reg	[7:0]		ack_ps_alart_num;
 	
-	reg		[7:0]	ctrl_signal_r;
-	reg				sta_vld;
 	
-	wire	i_clk = clk_i;
-	wire	i_rst = rst_i;
-	
-	//State machine state
-	localparam  S_IDLE          = 8'd0; 	//idle
-    localparam  S_BHA_PRE_DET	= 8'd1; 	//Pre-condition check
-	localparam	S_READY_10		= 8'd2;		//ready
-    localparam  S_READY_10_ACK  = 8'd3; 	//ready ok/no ok
-    localparam  S_EXE_20     	= 8'd4; 	//Action begin
-	localparam	S_EXE			= 8'd5;		//Action execute
-    localparam  S_EXE_20_ACK	= 8'd6;		//Action end
-    localparam  S_BHA_POST_DET  = 8'd7; 	//Post-condition check
-    localparam  S_SUCC_30       = 8'd8; 	//success
-    localparam  S_SUCC_30_ACK	= 8'd9; 	//success ack
-	localparam 	S_ALERT_40		= 8'd10;	//Alert
-	localparam 	S_ALERT_40_ACK	= 8'd11;	//Alert ack
-	
-    localparam  IRQ_OK          = 8'h51;	//ps ack:OK
-    localparam  IRQ_NO_OK       = 8'h52;	//ps ack:NO OK
-	
-	//state monitor
-	reg [7:0]	curr_state_m1;
-	reg [7:0]	curr_state_m2;
-	reg [7:0]	curr_state_m3;
-	
-    always @(posedge clk_i) 
-	begin
-        if (rst_i)begin
-			curr_state_m1 <= 8'b0;
-			curr_state_m2 <= 8'b0;
-			curr_state_m3 <= 8'b0;
-			state_monitor_o <= 32'b0;
-			end
-        else if (curr_state != curr_state_m1) begin
-            curr_state_m1 <= curr_state;
-            curr_state_m2 <= curr_state_m1;
-            curr_state_m3 <= curr_state_m2;
-			state_monitor_o <= {curr_state_m3,curr_state_m2,curr_state_m1, curr_state};
-		end
-    end
+	localparam  IRQ_OK          = 8'h51;
+    localparam  IRQ_NO_OK       = 8'h52;
 	
 	always@(posedge clk_i)begin
 	if(rst_i)begin
@@ -121,11 +73,6 @@ module status_beh_3led_buzzer#(
 		ack_tx_id		<= 	b_tx_result_rpt[23:16];
 		ack_tx_result	<= 	b_tx_result_rpt[15:8];
 		ack_ps_alart_num<=	b_tx_result_rpt[7:0];
-	end else if(curr_state == S_IDLE)begin
-		ack_beh_id 		<= 	8'd0;
-		ack_tx_id		<= 	8'd0;
-		ack_tx_result	<= 	8'd0;
-		ack_ps_alart_num<=	8'd0;
 	end else begin
 		ack_beh_id 		<= 	ack_beh_id 	  ;
 		ack_tx_id		<= 	ack_tx_id	  ;
@@ -141,43 +88,47 @@ module status_beh_3led_buzzer#(
 		curr_state_1d <= curr_state;
 	end
 	
-	always@(posedge i_clk)
-	begin
-		if(i_rst)
+	//Current behavior number
+	always @(posedge clk_i) begin
+		if(rst_i)
 			b_bhv_id <= 8'd0;
 		else
-			b_bhv_id <= 8'd100;
+			b_bhv_id <= 8'd101;
 	end
 	
 	reg match_10;
-	//reg match_20;
+	reg match_20;
 	reg match_30;
 	reg match_40;
 	
 	always @(posedge clk_i) begin
-    if(rst_i) 
-		begin
-        	match_10 <= 1'b0;
-			//match_20 <= 1'b0;
-			match_30 <= 1'b0;
-			match_40 <= 1'b0;
-    	end 
-	else if(curr_state == S_READY_10_ACK)
+    if(rst_i) begin
+        match_10 <= 1'b0;
+		match_20 <= 1'b0;
+		match_30 <= 1'b0;
+		match_40 <= 1'b0;
+    end else begin
         match_10 <= (ack_tx_result == IRQ_OK && ack_tx_id == 8'd10 && ack_beh_id == b_bhv_id);
-		//match_20 <= (ack_tx_result == IRQ_OK && ack_tx_id == 8'd20 && ack_beh_id == a_bhv_id_r);
-	else if(curr_state == S_SUCC_30_ACK)
+		match_20 <= (ack_tx_result == IRQ_OK && ack_tx_id == 8'd20 && ack_beh_id == b_bhv_id);
 		match_30 <= (ack_tx_result == IRQ_OK && ack_tx_id == 8'd30 && ack_beh_id == b_bhv_id);
-	else if(curr_state == S_ALERT_40_ACK)
-		match_40 <= (ack_tx_id == 8'd40 && ack_beh_id == b_bhv_id);
-	else 
-		begin
-			match_10 <= 1'b0;
-			//match_20 <= 1'b0;
-			match_30 <= 1'b0;
-			match_40 <= 1'b0;
-		end
+		match_40 <= (ack_tx_result == IRQ_OK && ack_tx_id == 8'd40 && ack_beh_id == b_bhv_id);
+    end
 	end
+	
+	localparam  S_IDLE          = 8'd0; 
+    localparam  S_BHA_PRE_DET	= 8'd1; 
+	localparam	S_READY_10		= 8'd2;
+    localparam  S_READY_10_ACK  = 8'd3; 
+    localparam  S_EXE_20     	= 8'd4; 
+    localparam  S_EXE_20_ACK	= 8'd5; 
+    localparam  S_BHA_POST_DET  = 8'd6; 
+    localparam  S_SUCC_30       = 8'd7; 
+    localparam  S_SUCC_30_ACK	= 8'd8; 
+	localparam 	S_ALERT_40		= 8'd9;
+	localparam 	S_ALERT_40_ACK	= 8'd10;
+	localparam	S_EXE			= 8'd11;
 
+	
 	always @(posedge clk_i) begin
         if (rst_i)
             curr_state <= S_IDLE;
@@ -186,19 +137,20 @@ module status_beh_3led_buzzer#(
     end
 	
 	always @(*) begin
+        next_state = curr_state;
         case (curr_state)
-            S_IDLE: begin	//0
-               if (b_en && sta_vld)
-                   next_state = S_READY_10;
-               else
-                   next_state = S_IDLE;
+            S_IDLE: begin
+                if (b_en && pre_sta_allow != 0)
+                    next_state = S_READY_10;
+                else
+                    next_state = S_IDLE;
             end
 			
-			S_READY_10: begin        //2
+			S_READY_10: begin        //Send 10 interrupt
 				next_state = S_READY_10_ACK;
             end
 			
-			S_READY_10_ACK: begin//3
+			S_READY_10_ACK: begin
 				if(match_10)  //Transaction 10 Acknowledged OK
                     next_state = S_EXE_20;
                 else if(ack_tx_result == IRQ_NO_OK || timout)
@@ -207,25 +159,25 @@ module status_beh_3led_buzzer#(
                     next_state = S_READY_10_ACK;
 			end
 			
-			S_EXE_20: begin	//4
-				next_state = S_EXE;
+			S_EXE_20: begin	//Send 20 interrupt
+				next_state = S_EXE_20_ACK;
             end
 			
-			S_EXE:begin	//5
+			S_EXE_20_ACK: begin
+				if(match_20) 	//Transaction 20 Acknowledged OK
+                    next_state = S_EXE;
+                else if(ack_tx_result == IRQ_NO_OK || timout)
+                    next_state = S_ALERT_40;
+                else
+                    next_state = S_EXE_20_ACK;
+			end
+			
+			S_EXE:begin
 				next_state = S_BHA_POST_DET;	//Behavior 1/Behavior 2 failed
 			end
 			
-			//S_EXE_20_ACK: begin
-			//	if(match_20) 	//Transaction 20 Acknowledged OK
-            //        next_state = S_EXE;
-            //    else if(ack_tx_result == IRQ_NO_OK || timout)
-            //        next_state = S_ALERT_40;
-            //    else
-            //        next_state = S_EXE_20_ACK;
-			//end
-			
-			S_BHA_POST_DET: begin		//7
-				if(post_sta_allow[0] && b_bhv_id == 8'd100) 
+			S_BHA_POST_DET: begin
+				if(post_sta_allow[0] && b_bhv_id == 8'd101)    //Behavior 1 + Post - sufficient condition satisfied
                     next_state = S_SUCC_30;
                 else if(timout)
                     next_state = S_ALERT_40;
@@ -275,8 +227,8 @@ module status_beh_3led_buzzer#(
 			b_tx_id <= 8'd0;
         else if(curr_state == S_READY_10)
             b_tx_id <= 8'd10;
-       //else if(curr_state == S_EXE_20)
-       //    b_tx_id <= 8'd20;
+        // else if(curr_state == S_EXE_20)
+            //     b_tx_id <= 8'd20;
         else if(curr_state == S_SUCC_30)
             b_tx_id <= 8'd30;
         else if(curr_state == S_ALERT_40)
@@ -296,8 +248,8 @@ module status_beh_3led_buzzer#(
             irq_o <= 1'b0;
         else if(curr_state == S_READY_10)
             irq_o <= 1'b1;
-		//else if(curr_state == S_EXE_20)
-		//	irq_o <= 1'b1;
+		// else if(curr_state == S_EXE_20)
+			// 	irq_o <= 1'b1;
 		else if(curr_state == S_SUCC_30)
 			irq_o <= 1'b1;
 		else if(curr_state == S_ALERT_40)
@@ -308,22 +260,28 @@ module status_beh_3led_buzzer#(
 	
 
 	always@(posedge clk_i)begin
-        if(rst_i || !b_en)
+        if(rst_i)
             b_alm_num <= 8'd0;
-		else if(curr_state == S_IDLE)
+		else if(!b_en)
 			b_alm_num <= 8'd0;
         else if(curr_state == S_BHA_PRE_DET && timout)						//The pre - full inspection is not met.
-            b_alm_num <= 8'd100;    
+            b_alm_num <= 8'd1;    
         else if(curr_state == S_READY_10_ACK && ack_tx_result == IRQ_NO_OK)	//Transaction 10 ps response error
             b_alm_num <= ack_ps_alart_num;    
         else if(curr_state == S_READY_10_ACK && timout)						//For Transaction 10, waiting for the ps response timed out.
-            b_alm_num <= 8'd101;    
-		else if(curr_state == S_BHA_POST_DET && timout)//The post - full inspection is not met.
-			b_alm_num <= 8'd102;   
+            b_alm_num <= 8'd2;    
+		// else if(curr_state == S_EXE_20_ACK && ack_tx_result == IRQ_NO_OK)	//Transaction 20 has a ps response error.
+            //     b_alm_num <= ack_ps_alart_num;
+        else if(curr_state == S_EXE_20_ACK && timout)						//For Transaction 20, waiting for the ps response timed out.
+            b_alm_num <= 8'd3;    
+		else if(curr_state_1d == S_EXE && curr_state == S_ALERT_40 && b_bhv_id == 8'd1)//The execution of Behavior 1 failed.
+			b_alm_num <= 8'd4; 
+		else if(curr_state_1d == S_EXE && curr_state == S_ALERT_40 && b_bhv_id == 8'd2)//The execution of Behavior 2 failed.
+			b_alm_num <= 8'd5;
 		else if(curr_state == S_SUCC_30_ACK && ack_tx_result == IRQ_NO_OK)	//Transaction 30 has a ps response error.
 			b_alm_num <= ack_ps_alart_num;
 		else if(curr_state == S_SUCC_30_ACK && timout)						//For Transaction 30, waiting for the ps response timed out.
-            b_alm_num <= 8'd103;
+            b_alm_num <= 8'd6;
 		else if(curr_state == S_IDLE)
 			b_alm_num <= 8'd0;
         else
@@ -339,7 +297,7 @@ module status_beh_3led_buzzer#(
 			timout_cnt <= 20'd0;
 		else if(curr_state != curr_state_1d)
 			timout_cnt <= 20'd0;
-        else if(timout_cnt > b_tx_ot)
+        else if(timout_cnt >= b_tx_ot-1)
             timout_cnt <= 20'd0;
         else if(i_time_1s_vld)
             timout_cnt <= timout_cnt+1;
@@ -349,109 +307,11 @@ module status_beh_3led_buzzer#(
     always@(posedge clk_i)begin
         if(rst_i)
             timout <= 1'b0;
-        else if(timout_cnt > b_tx_ot)
+        else if(timout_cnt >= b_tx_ot-1)
             timout <= 1'b1;
         else
             timout <= 1'b0;
     end
-
-	
-	//===============================================================================================================
-	//------------------------------------------------ user logic start ---------------------------------------------
-	//===============================================================================================================
-	
-	always@(posedge i_clk)
-	begin
-		if(i_rst)
-			ctrl_signal_r <= 8'd0;
-		else
-			ctrl_signal_r <= ctrl_signal;
-	end
-	
-	always@(posedge i_clk)
-	begin
-		if(i_rst)
-			sta_vld <= 1'b0;
-		else if(ctrl_signal_r != ctrl_signal)
-			sta_vld <= 1'b1;
-		else
-			sta_vld <= 1'b0;
-	end
-	
-	
-	//-------------------------------------------------------------------
-	
-	reg		[9:0]	cnt_tim;
-	
-	always@(posedge i_clk)
-	begin
-		if(i_rst)
-			cnt_tim <= 'd0;
-		else if(i_time_1ms_vld)
-			if(cnt_tim >= 499)	//0.5s
-				cnt_tim <= 'd0;
-			else	
-				cnt_tim <= cnt_tim + 1;
-		else
-			cnt_tim <= cnt_tim;
-	end
-	
-	always@(posedge i_clk)
-	begin
-		if(i_rst)
-			o_led_r <= 1'b0;
-		else 
-			case(ctrl_signal[7:6])
-				2'd0:o_led_r <= 1'b0;
-				2'd1:o_led_r <= 1'b1;
-				2'd2:o_led_r <= (i_time_1ms_vld && cnt_tim >= 499)?(!o_led_r):o_led_r;
-				default:o_led_r <= o_led_r;
-			endcase
-	end
-	
-	always@(posedge i_clk)
-	begin
-		if(i_rst)
-			o_led_g <= 1'b0;
-		else
-			case(ctrl_signal[5:4])
-				2'd0:o_led_g <= 1'b0;
-				2'd1:o_led_g <= 1'b1;
-				2'd2:o_led_g <= (i_time_1ms_vld && cnt_tim >= 499)?(!o_led_g):o_led_g;
-				default:o_led_g <= o_led_g;
-			endcase
-	end
-	
-	always@(posedge i_clk)
-	begin
-		if(i_rst)
-			o_led_y <= 1'b0;
-		else
-			case(ctrl_signal[3:2])
-				2'd0:o_led_y <= 1'b0;
-				2'd1:o_led_y <= 1'b1;
-				2'd2:o_led_y <= (i_time_1ms_vld && cnt_tim >= 499)?(!o_led_y):o_led_y;
-				default:o_led_y <= o_led_y;
-			endcase
-	end
-	
-	always@(posedge i_clk)
-	begin
-		if(i_rst)
-			o_bz <= 1'b0;
-		else
-			case(ctrl_signal[1:0])	//01
-				2'd0:o_bz <= 1'b0;
-				2'd1:o_bz <= 1'b1;
-				2'd2:o_bz <= (i_time_1ms_vld && cnt_tim >= 499)?(!o_bz):o_bz;
-				default:o_bz <= o_bz;
-			endcase
-	end
-
-	
-	//===============================================================================================================
-	//------------------------------------------------ user logic end -----------------------------------------------
-	//===============================================================================================================
 	
 	
 endmodule

@@ -1,7 +1,7 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
 // Company: 
-// Engineer: 
+// Engineer: cgliu
 // 
 // Create Date: 2026/06/30 10:25:54
 // Design Name: 
@@ -20,9 +20,9 @@
 //////////////////////////////////////////////////////////////////////////////////
 `define DEBUG
 
-module ec_trayclaw#(
-		parameter  				REG_SPACE_BIAS 		= 	2000	,
-		parameter  				REG_SPACE_SIZE 		= 	512	
+module ec_wxjc#(
+		parameter  				REG_SPACE_BIAS 		= 	2000	,	//Component offset address
+		parameter  				REG_SPACE_SIZE 		= 	512			//Component register size
 )(
 		input					clk_i			,
 		input					rst				,
@@ -39,20 +39,13 @@ module ec_trayclaw#(
 		output 		 [31:0]     o_st_rd_data    ,
 		output 		            o_st_rd_vld     ,
 
-		input 					i_close_arr	    ,
-		input 					i_open_arr    	,
-		input 					i_material_arr	,
-		input 					i_airtight_arr  ,
-		output 					o_claw_unlock   ,
-		output 					o_claw_press  	,
-		output 					o_claw_blow     ,
-
+		output					o_sig_dri		,
+		
 		output 	            	o_intr_irq	
     );
 	
-	
-	localparam		A_BHA_NUM		=	6;	
-	localparam		B_BHA_NUM		=	1;	
+	localparam		A_BHA_NUM	=	2;	
+	localparam		B_BHA_NUM	=	1;	
 	
 	//PS-PL    
 	wire 	[7:0]	unit_id         ;     	
@@ -189,10 +182,14 @@ module ec_trayclaw#(
 	wire			a_en;
 	wire 	[31:0]	bhv_en;
 	
-	wire		[7:0]	a_bhv_id_r;
+	wire	[7:0]	a_bhv_id_r;
+	
+	wire	do_o;
 	
 	wire	i_clk = clk_i;
 	wire	i_rst = rst_i;
+	
+	assign o_sig_dri = do_o;
 	
 	`ifdef DEBUG
 		reg			ro_intr_irq;
@@ -264,13 +261,11 @@ module ec_trayclaw#(
 			sync_a_bhv_vld       	<= r_a_bhv_vld      ;
 		end
 	end
-
 	
-	
-	ps_rw_pl_reg_trayclaw#(
+	ps_rw_pl_reg_wxjc#(
 		.REG_SPACE_BIAS 	(REG_SPACE_BIAS		),
 		.REG_SPACE_SIZE 	(REG_SPACE_SIZE		)
-)ps_rw_pl_reg_trayclaw_u0(
+)ps_rw_pl_reg_wxjc_u0(
 	.clk_i			        (ps_reg_clk		)
 	,.rst_i			        (ps_reg_reset	)
 	,.i_st_wr_en		    (i_st_wr_en		)
@@ -280,7 +275,7 @@ module ec_trayclaw#(
     ,.i_st_rd_addr	        (i_st_rd_addr 	)
     ,.o_st_rd_data	        (o_st_rd_data 	)
 	,.o_st_rd_vld 	        (o_st_rd_vld  	)
-	,.rst_en_n              (rst_en_n		)	//board error
+	,.rst_en_n              (rst_en_n		)
 	,.ec_id                 (ec_id			)
 	,.sc_id			        (sc_id			)
 	,.chl_priority	        (chl_priority	)
@@ -293,7 +288,7 @@ module ec_trayclaw#(
 	,.m_wk_mod              (m_wk_mod		)
 	,.m_saf_st              (m_saf_st		)
 	,.link_m_saf_st         (link_m_saf_st	)
-	//,.bhv_en                (bhv_en			)
+	// ,.bhv_en                (bhv_en			)
 	,.a_task_id      	    (a_task_id		)
 	,.a_task_bhv_id	        (a_task_bhv_id	)
 	,.a_en				    (a_en			)
@@ -311,36 +306,36 @@ module ec_trayclaw#(
 	,.c_tsc_result_rpt	    (c_tx_result_rpt)
 	,.c_tsc_result_vld	    (c_tx_result_vld)
 	,.c_bhv_gap_crl         (c_gap_crl		)
-	//,.param1			    (param1			)
-	//,.param2			    (param2			)
-	//,.param3			    (param3			)
-	//,.param4			    (param4			)
-	//,.param5			    (param5			)
-	//,.param6			    (param6			)
-	//,.param7			    (param7			)
-	//,.param8			    (param8			)
-	//,.param9			    (param9			)
-	//,.param10			    (param10		)
-	//,.param11			    (param11		)
-	//,.param12			    (param12		)
-	//,.param13			    (param13		)
-	//,.param14			    (param14		)
-	//,.param15			    (param15		)
-	//,.param16			    (param16		)
-	//,.param17			    (param17		)
-	//,.param18			    (param18		)
-	//,.param19			    (param19		)
-	//,.param20			    (param20		)
-	//,.param21			    (param21		)
-	//,.param22			    (param22		)
-	//,.param23			    (param23		)
-	//,.param24			    (param24		)
-	//,.param25			    (param25		)
-	//,.param26			    (param26		)
-	//,.param27			    (param27		)
-	//,.param28			    (param28		)
-	//,.param29			    (param29		)
-	//,.param30				(param30		)
+	// ,.param1			    (param1			)
+	// ,.param2			    (param2			)
+	// ,.param3			    (param3			)
+	// ,.param4			    (param4			)
+	// ,.param5			    (param5			)
+	// ,.param6			    (param6			)
+	// ,.param7			    (param7			)
+	// ,.param8			    (param8			)
+	// ,.param9			    (param9			)
+	// ,.param10			    (param10		)
+	// ,.param11			    (param11		)
+	// ,.param12			    (param12		)
+	// ,.param13			    (param13		)
+	// ,.param14			    (param14		)
+	// ,.param15			    (param15		)
+	// ,.param16			    (param16		)
+	// ,.param17			    (param17		)
+	// ,.param18			    (param18		)
+	// ,.param19			    (param19		)
+	// ,.param20			    (param20		)
+	// ,.param21			    (param21		)
+	// ,.param22			    (param22		)
+	// ,.param23			    (param23		)
+	// ,.param24			    (param24		)
+	// ,.param25			    (param25		)
+	// ,.param26			    (param26		)
+	// ,.param27			    (param27		)
+	// ,.param28			    (param28		)
+	// ,.param29			    (param29		)
+	// ,.param30				(param30		)
 	,.irq_reg1	            (irq_reg1		)
 	,.irq_reg2	            (irq_reg2		)
 	,.a_st                  (ec_cha_st		)
@@ -354,36 +349,39 @@ module ec_trayclaw#(
 	,.c_alm_num             (c_alm_num 		)
 	,.c_tsc_id              (c_tx_id  		)
 	,.c_bhv_id              (c_bhv_id 		)
-	//,.param51               (param51		)
-	//,.param52               (param52		)
-	//,.param53               (param53		)
-	//,.param54               (param54		)
-	//,.param55               (param55		)
-	//,.param56               (param56		)
-	//,.param57               (param57		)
-	//,.param58               (param58		)
-	//,.param59               (param59		)
-	//,.param60               (param60		)
-	//,.param61               (param61		)
-	//,.param62               (param62		)
-	//,.param63               (param63		)  
-	,.param64               ({7'd0,i_close_arr}	)
-	,.param65               ({7'd0,i_open_arr}  )
-	,.param66               (o_claw_unlock		)
-	,.param67               (o_claw_press		)
-	,.param68               (i_material_arr 		)
-	,.param69               (i_airtight_arr  		)
-	,.param70               (o_claw_blow   		)
+	// ,.param51               (param51		)
+	// ,.param52               (param52		)
+	// ,.param53               (param53		)
+	// ,.param54               (param54		)
+	// ,.param55               (param55		)
+	// ,.param56               (param56		)
+	// ,.param57               (param57		)
+	// ,.param58               (param58		)
+	// ,.param59               (param59		)
+	// ,.param60               (param60		)
+	// ,.param61               (param61		)
+	// ,.param62               (param62		)
+	// ,.param63               (param63		)
+	// ,.param64               (param64		)
+	// ,.param65               (param65		)
+	,.param66               (do_o			)
+	// ,.param67               (param67		)
+	// ,.param68               (param68		)
+	// ,.param69               (param69		)
+	// ,.param70               (param70		)
 	,.debug_reg1			(debug_reg1		)
-	,.debug_reg2			({16'd0,irq_posedge_cnt,irq_negedge_cnt}	)
-	//,.debug_reg3			(debug_reg3		)
-	//,.debug_reg4			(debug_reg4		)
-	//,.debug_reg5			(debug_reg5		)
+	,.debug_reg2			({16'd0,irq_posedge_cnt,irq_negedge_cnt})
+	// ,.debug_reg3			(debug_reg3		)
+	// ,.debug_reg4			(debug_reg4		)
+	// ,.debug_reg5			(debug_reg5		)
 	);
 
-	proactive_beh_trayclaw#(	
-	.BHA_NUM 				(A_BHA_NUM  	 	)	//Number of active behaviors
-)proactive_beh_trayclaw_u0(
+	wire	[7:0]	curr_state;
+	wire			a_bhv_vld_r;
+	
+	proactive_beh_wxjc#(	
+	.BHA_NUM 				(A_BHA_NUM  	 )	//Number of active behaviors
+)proactive_beh_wxjc_u0(
     .clk_i                 	(clk_i				)
     ,.rst_i                	(rst_i				)
     ,.i_time_1ms_vld       	(i_time_1ms_vld 	)
@@ -399,19 +397,18 @@ module ec_trayclaw#(
     ,.ec_cha_st            	(ec_cha_st			)
     ,.a_tx_id              	(a_tx_id        	)
     ,.a_alm_num            	(a_alm_num      	)
-    ,.o_claw_unlock			(o_claw_unlock		)
-	,.o_claw_press 			(o_claw_press 		)
-	,.o_claw_blow  			(o_claw_blow  		)
+    ,.do_o                  (do_o				)
 	,.a_bhv_id_r			(a_bhv_id_r			)
 	,.state_monitor_o		(debug_reg1			)
     ,.irq_o                	(irq_a				)
     ,.irq_ack_i       		(irq_a_grant		)
+	//,.curr_state			(curr_state)
+	//,.a_bhv_vld_r			(a_bhv_vld_r)
     );
-
 	 
-	status_beh_trayclaw#(
+	status_beh_wxjc#(
 		.BHA_NUM(B_BHA_NUM	)
-)status_beh_trayclaw_u0(
+)status_beh_wxjc_u0(
 	.clk_i			        (clk_i				)
 	,.rst_i			        (rst_i				)
 	,.i_time_1ms_vld		(i_time_1ms_vld 	)
@@ -426,13 +423,13 @@ module ec_trayclaw#(
 	,.ec_chb_st             (ec_chb_st			)
 	,.b_tx_id               (b_tx_id			)
 	,.b_alm_num             (b_alm_num			)
-	,.di				    (di_i				)
+	//,.do_o				    (do_o				)
 	,.irq_o			        (irq_o				)
 	,.irq_ack_i	            (irq_ack_i			)	
     );
 	 
-	tim_beh_trayclaw tim_beh_trayclaw_u0(
-    .clk_i                      (clk_i          	)
+	tim_beh_wxjc tim_beh_wxjc_u0(
+	.clk_i                      (clk_i          	)
 	,.rst_i              	    (rst_i         		)
 	,.i_time_1ms_vld   	        (i_time_1ms_vld 	)
 	,.i_time_1s_vld    	        (i_time_1s_vld  	)
@@ -450,48 +447,43 @@ module ec_trayclaw#(
 	,.c_gap_crl                 (c_gap_crl			)
 	,.irq_o 					(irq_o				)
 	,.irq_ack_i                 (irq_ack_i			)
-   );
+	);
 	
-		pre_post_sta_check_trayclaw#(
-			.A_BHA_NUM			(A_BHA_NUM	 		)   ,	
-			.B_BHA_NUM			(B_BHA_NUM	 		)  
-	)pre_post_sta_check_trayclaw_u0(
-			.clk_i				(clk_i			),
-			.rst_i				(rst_i			),
-			.i_time_1ms_vld		(i_time_1ms_vld	),
-			.i_time_1s_vld 		(i_time_1s_vld 	),
-			.unit_id         	(unit_id        ),
-			.unit_ectrl      	(unit_ectrl     ),
-			.unit_st         	(unit_st        ),
-			.m_id            	(m_id           ),
-			.m_ectrl         	(m_ectrl        ),
-			.m_st            	(m_st           ),
-			.m_wk_mod        	(m_wk_mod       ),
-			.m_saf_st        	(m_saf_st       ),
-			.link_m_saf_st   	(link_m_saf_st  ),
-			.i_close_arr		(i_close_arr	),
-			.i_open_arr         (i_open_arr    	),
-			.i_material_arr     (i_material_arr	),
-			.i_airtight_arr     (i_airtight_arr	),
-			.a_en				(1'b1			),
-			.b_en				(1'b0			),	
-			.c_en				(1'b0			),	
-			.a_bhv_id			(a_bhv_id_r		),
-			.b_bhv_id			(b_bhv_id		),
-			.c_bhv_id			(c_bhv_id		),
-			.ec_cha_st			(ec_cha_st		),
-			.ec_chb_st       	(ec_chb_st		),
-			.ec_chc_st       	(ec_chc_st		),
-			.c_circle_time		(c_gap_crl		),	
-			.task_time_cnt		(task_time_cnt	),	
-			.a_pre_sta_allow	(a_pre_sta_allow),	
-			.a_post_sta_allow	(a_post_sta_allow),	
-			.b_pre_sta_allow	(b_pre_sta_allow),	
-			.b_post_sta_allow	(b_post_sta_allow),	
-			.c_pre_sta_allow	(c_pre_sta_allow),	
-			.c_post_sta_allow	(c_post_sta_allow)	
-		);
-		
+	pre_post_sta_check_wxjc#(
+		.A_BHA_NUM			(A_BHA_NUM	 )    ,	
+		.B_BHA_NUM			(B_BHA_NUM	 )    
+)pre_post_sta_check_wxjc_u0(
+		.clk_i				(clk_i			),
+		.rst_i				(rst_i			),
+		.unit_id         	(unit_id        ),
+		.unit_ectrl      	(unit_ectrl     ),
+		.unit_st         	(unit_st        ),
+		.m_id            	(m_id           ),
+		.m_ectrl         	(m_ectrl        ),
+		.m_st            	(m_st           ),
+		.m_wk_mod        	(m_wk_mod       ),
+		.m_saf_st        	(m_saf_st       ),
+		.link_m_saf_st   	(link_m_saf_st  ),
+		.di					(di				),
+		.a_bhv_id			(a_bhv_id_r		),
+		.b_bhv_id			(b_bhv_id		),
+		.c_bhv_id			(c_bhv_id		),
+		.a_en				(1'b1			),
+		.b_en				(1'b0			),	
+		.c_en				(1'b0			),	
+		.ec_cha_st			(ec_cha_st		),
+		.ec_chb_st       	(ec_chb_st		),
+		.ec_chc_st       	(ec_chc_st		),
+		.c_circle_time		(c_gap_crl		),	
+		.task_time_cnt		(task_time_cnt	),	
+		.a_pre_sta_allow	(a_pre_sta_allow),	
+		.a_post_sta_allow	(a_post_sta_allow),	
+		.b_pre_sta_allow	(b_pre_sta_allow),	
+		.b_post_sta_allow	(b_post_sta_allow),	
+		.c_pre_sta_allow	(c_pre_sta_allow),	
+		.c_post_sta_allow	(c_post_sta_allow)	
+    );
+	
 	irq_3i1o_arbitrator irq_3i1o_arbitrator_u0(
 		.clk_i              (clk_i            	)
 		,.rst_i             (rst_i           	)
@@ -519,6 +511,7 @@ module ec_trayclaw#(
 		,.irq_busy_o		(irq_busy_o			)
 		,.irq_receive_ack_i (sync_a_tx_result_vld || sync_b_tx_result_vld || sync_c_tx_result_vld)	
     );
-
+	
+	
 	
 endmodule

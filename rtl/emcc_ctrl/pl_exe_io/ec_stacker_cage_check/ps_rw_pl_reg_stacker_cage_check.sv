@@ -19,7 +19,7 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 `include"reg_addr_pl.vh"
-module ps_rw_pl_reg_2di_1do#(
+module ps_rw_pl_reg_stacker_cage_check#(
     parameter  						REG_SPACE_BIAS 	= 	200	,
     parameter  						REG_SPACE_SIZE 	= 	512	
 )(
@@ -142,8 +142,8 @@ module ps_rw_pl_reg_2di_1do#(
 	//,input 				[7:0]		param64   
 	//,input 				[7:0]		param65   
 	,input 							param66   
-	,input 							param67   
-	,input 							param68   
+	//,input 							param67   
+	//,input 							param68   
 	//,input 							param69   
 	//,input 							param70   
 	,input 				[31:0]		debug_reg1
@@ -158,10 +158,10 @@ module ps_rw_pl_reg_2di_1do#(
 	wire 		rd_space_select;
 	wire 		wr_space_select;
 	wire 		wr_task_vld;
-	reg  [8:0]  rd_addr_d1;
-	reg  [8:0]  rd_addr_d2;
-	wire [8:0]  rd_task_addr;
-	wire [8:0]  wr_task_addr;
+	reg  [19:0] rd_addr_d1;
+	reg  [19:0] rd_addr_d2;
+	wire [19:0] rd_task_addr;
+	wire [19:0] wr_task_addr;
 	
 	//================================================================================================//
 	//---------------------------------Component address is selected --------------------------------//
@@ -396,8 +396,8 @@ module ps_rw_pl_reg_2di_1do#(
 		//`PARAM64		:	o_st_rd_data <= {24'd0,param64  	};
 		//`PARAM65		:	o_st_rd_data <= {24'd0,param65  	};
 		`PARAM66		:	o_st_rd_data <= {31'd0,param66  	};
-		`PARAM67		:	o_st_rd_data <= {31'd0,param67  	};
-		`PARAM68		:	o_st_rd_data <= {31'd0,param68  	};
+		//`PARAM67		:	o_st_rd_data <= {31'd0,param67  	};
+		//`PARAM68		:	o_st_rd_data <= {31'd0,param68  	};
 		//`PARAM69		:	o_st_rd_data <= {31'd0,param69  	};
 		//`PARAM70		:	o_st_rd_data <= {31'd0,param70  	};
 		

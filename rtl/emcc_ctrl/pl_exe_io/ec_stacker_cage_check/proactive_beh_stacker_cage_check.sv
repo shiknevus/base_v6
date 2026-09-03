@@ -3,9 +3,9 @@
 // Company: 
 // Engineer: cgliu
 // 
-// Create Date: 2026/06/29 22:38:46
+// Create Date: 2026/07/14 22:38:46
 // Design Name: 
-// Module Name: proactive_beh
+// Module Name: 
 // Project Name: 
 // Target Devices: 
 // Tool Versions: 
@@ -20,8 +20,8 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module proactive_beh_1avo#(
-    parameter                 	BHA_NUM = 1   //Number of active behaviors
+module proactive_beh_stacker_cage_check#(
+    parameter                 	BHA_NUM = 2   //Number of active behaviors
 )(
     input                       clk_i
     ,input                      rst_i
@@ -41,20 +41,21 @@ module proactive_beh_1avo#(
     ,output reg [7:0]           a_tx_id
     ,output reg	[7:0]           a_alm_num
 
-	,output 					o_dac_syn  
-	,output 					o_dac_sclk 
-	,output 					o_dac_din  
-	,input 						i_dac_dout 
-	,output 					o_dac_load 
-	,output 					o_dac_clr  
-	
-	,input		[11:0]			i_v_value
+    ,output reg                 do_o
 
 	,output reg	[7:0]           a_bhv_id_r
 	,output	reg	[31:0]			state_monitor_o
     ,output reg                 irq_o
     ,input                      irq_ack_i       //Interrupt response
+	
+	//debug io
+	//,output	reg [7:0]    		curr_state
+	//,output	reg					a_bhv_vld_r
+	
     );
+	
+	wire	i_clk = clk_i;
+	wire	i_rst = rst_i;
 
     reg [7:0]    	curr_state;
 	reg [7:0]    	curr_state_1d;
@@ -68,28 +69,25 @@ module proactive_beh_1avo#(
 	reg [7:0]		ack_tx_result;
 	reg	[7:0]		ack_ps_alart_num;
 	
-	wire 			adc_ch0_data_vld  ;
-	wire [31:0]		adc_ch0_data	  ;
-	
 	//State machine state
-	localparam  S_IDLE          = 8'd0; 	
-    localparam  S_BHA_PRE_DET	= 8'd1; 	
-	localparam	S_READY_10		= 8'd2;		
-    localparam  S_READY_10_ACK  = 8'd3; 	
-    localparam  S_EXE_20     	= 8'd4; 	
-	localparam	S_EXE			= 8'd5;		
-    localparam  S_EXE_20_ACK	= 8'd6;		
-    localparam  S_BHA_POST_DET  = 8'd7; 	
-    localparam  S_SUCC_30       = 8'd8; 	
-    localparam  S_SUCC_30_ACK	= 8'd9; 	
-	localparam 	S_ALERT_40		= 8'd10;	
-	localparam 	S_ALERT_40_ACK	= 8'd11;	
+	localparam  S_IDLE          = 8'd0; 
+    localparam  S_BHA_PRE_DET	= 8'd1; 
+	localparam	S_READY_10		= 8'd2;	
+    localparam  S_READY_10_ACK  = 8'd3; 
+    localparam  S_EXE_20     	= 8'd4; 
+	localparam	S_EXE			= 8'd5;	
+    localparam  S_EXE_20_ACK	= 8'd6;	
+    localparam  S_BHA_POST_DET  = 8'd7; 
+    localparam  S_SUCC_30       = 8'd8; 
+    localparam  S_SUCC_30_ACK	= 8'd9; 
+	localparam 	S_ALERT_40		= 8'd10;
+	localparam 	S_ALERT_40_ACK	= 8'd11;
 	localparam 	S_ACT_END_1		= 8'd12;
 	localparam 	S_ACT_END_2		= 8'd13;
 	
+	
     localparam  IRQ_OK          = 8'h51;	//ps ack:OK
     localparam  IRQ_NO_OK       = 8'h52;	//ps ack:NO OK
-	
 	
 	//state monitor
 	reg [7:0]	curr_state_m1;
@@ -144,8 +142,9 @@ module proactive_beh_1avo#(
 	end
 	
     reg			a_bhv_vld_r;
-	reg		[7:0]	sta1;
-     //Current behavior number
+	
+	reg	[7:0]	sta1;
+	 //Current behavior number
     always@(posedge clk_i)begin
         if(rst_i)begin
             a_bhv_id_r <= 8'd0;
@@ -221,9 +220,9 @@ module proactive_beh_1avo#(
         else
             curr_state <= next_state;
     end
-	
-    always @(*) begin			
-        case (curr_state)	
+
+    always @(*) begin
+        case (curr_state)
             S_IDLE: begin	//0
                 if (a_en && ((a_bhv_id_r >= 8'd1) && (a_bhv_id_r <= BHA_NUM)) && a_bhv_vld_r)	//behavior start
                     next_state = S_BHA_PRE_DET;
@@ -258,11 +257,11 @@ module proactive_beh_1avo#(
 				next_state = S_EXE;
             end
 			
-			S_EXE:begin		//5								//active Execution
+			S_EXE:begin		//11								//active Execution
 				next_state = S_BHA_POST_DET;
 			end
 			
-			//S_EXE_20_ACK: begin	//6
+			//S_EXE_20_ACK: begin
 			//	if(match_20) 								//Transaction 20 Acknowledged OK
             //        next_state = S_EXE;
             //    else if(ack_tx_result == IRQ_NO_OK || timout)
@@ -270,8 +269,8 @@ module proactive_beh_1avo#(
             //    else
             //        next_state = S_EXE_20_ACK;
 			//end
-			
-            S_BHA_POST_DET: begin	//curr_state = 7
+
+            S_BHA_POST_DET: begin	//curr_state = 6
 				if(post_sta_allow[a_bhv_id_r - 1'b1]) begin
 					next_state = S_SUCC_30;
 				end else if(timout) begin
@@ -281,11 +280,11 @@ module proactive_beh_1avo#(
 				end
             end
 
-            S_SUCC_30: begin		//8						//Send Interrupt 30
+            S_SUCC_30: begin		//7						//Send Interrupt 30
 				next_state = S_SUCC_30_ACK;
             end
 			
-			S_SUCC_30_ACK:begin	//9
+			S_SUCC_30_ACK:begin	//8
 				if(match_30)    							//30 response success
                     next_state = S_ACT_END_1;
                 else if(ack_tx_result == IRQ_NO_OK || timout)
@@ -294,11 +293,11 @@ module proactive_beh_1avo#(
                     next_state = S_SUCC_30_ACK;
 			end
 
-            S_ALERT_40: begin		//10						//Send Interrupt 40
+            S_ALERT_40: begin		//9						//Send Interrupt 40
 				next_state = S_ALERT_40_ACK;
             end
 			
-			S_ALERT_40_ACK:begin	//11
+			S_ALERT_40_ACK:begin	//10
 				if(match_40 || timout) 						//40 response
                     next_state = S_ACT_END_1;
                 else
@@ -312,7 +311,7 @@ module proactive_beh_1avo#(
 			S_ACT_END_2:begin
 				next_state = S_IDLE;
 			end
-
+			
             default: begin
                 next_state = S_IDLE;
             end
@@ -325,8 +324,10 @@ module proactive_beh_1avo#(
 
     //Channel A transaction ID: 10 20 30 40
     always@(posedge clk_i)begin
-        if(rst_i || !a_en)
+        if(rst_i)
             a_tx_id <= 8'd0;
+		else if(!a_en)
+			a_tx_id <= 8'd0;
         else if(curr_state == S_READY_10)
             a_tx_id <= 8'd10;
         //else if(curr_state == S_EXE_20)
@@ -361,19 +362,27 @@ module proactive_beh_1avo#(
     always@(posedge clk_i)begin
         if(rst_i || !a_en)
             a_alm_num <= 8'd0;
-        else if(curr_state == S_BHA_PRE_DET && timout)						
-			a_alm_num <= 8'd100;
+        else if(curr_state == S_BHA_PRE_DET && timout)
+            a_alm_num <= 8'd100;    
         else if(curr_state == S_READY_10_ACK && ack_tx_result == IRQ_NO_OK)	
             a_alm_num <= ack_ps_alart_num;    
         else if(curr_state == S_READY_10_ACK && timout)						
-            a_alm_num <= 8'd101;      
-		else if(curr_state_1d == S_BHA_POST_DET && curr_state == S_ALERT_40)
-			a_alm_num <= 8'd102;  
+            a_alm_num <= 8'd101;    
+		//else if(curr_state == S_EXE_20_ACK && ack_tx_result == IRQ_NO_OK)	
+        //    a_alm_num <= ack_ps_alart_num;    
+        //else if(curr_state == S_EXE_20_ACK && timout)						
+        //    a_alm_num <= 8'd103;    
+		//else if(curr_state_1d == S_EXE && curr_state == S_ALERT_40 && a_bhv_id_r == 8'd1)
+		//	a_alm_num <= 8'd104; 
+		//else if(curr_state_1d == S_EXE && curr_state == S_ALERT_40 && a_bhv_id_r == 8'd2)
+		//	a_alm_num <= 8'd105;
+		else if(curr_state == S_BHA_POST_DET && timout)
+            a_alm_num <= 8'd102;    
 		else if(curr_state == S_SUCC_30_ACK && ack_tx_result == IRQ_NO_OK)	
 			a_alm_num <= ack_ps_alart_num;
 		else if(curr_state == S_SUCC_30_ACK && timout)						
             a_alm_num <= 8'd103;
-		else if(curr_state == S_IDLE)
+		else if(curr_state == S_ACT_END_1)
 			a_alm_num <= 8'd0;
         else
             a_alm_num <= a_alm_num;
@@ -402,24 +411,29 @@ module proactive_beh_1avo#(
             timout <= 1'b0;
     end
 	
-	//============================================ user logic begin ===================================================//
-
 	
-	dac_top dac_top_u0(
-		.i_sys_clk        (clk_i			)
-		,.i_rst_n         (~rst_i			)
-		,.i_time_1ms_vld  (i_time_1ms_vld	)
-		,.i_time_1s_vld   (i_time_1s_vld 	)
-		,.v_value		  (i_v_value		)
-		,.o_dac_syn       (o_dac_syn 		)
-		,.o_dac_sclk      (o_dac_sclk		)
-		,.o_dac_din       (o_dac_din 		)
-		,.i_dac_dout      (i_dac_dout		)
-		,.o_dac_load      (o_dac_load		)
-		,.o_dac_clr       (o_dac_clr 		)
-	);
 	
-	//============================================ user logic end ===================================================//
-
-
+	//===============================================================================================================
+	//------------------------------------------------ user logic start ---------------------------------------------
+	//===============================================================================================================
+	
+	always@(posedge i_clk)
+	begin
+		if(i_rst)
+			do_o <= 1'b0;
+		else if(curr_state == S_EXE)
+			case(a_bhv_id_r)
+				8'd1:do_o <= 1;
+				8'd2:do_o <= 0;
+				default:do_o <= 0;
+			endcase
+		else
+			do_o <= do_o;
+	end
+	
+	//===============================================================================================================
+	//------------------------------------------------ user logic start ---------------------------------------------
+	//===============================================================================================================
+	
+	
 endmodule
