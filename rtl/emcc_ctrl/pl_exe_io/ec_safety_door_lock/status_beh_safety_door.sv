@@ -24,7 +24,7 @@ module status_beh_safety_door#(
 	parameter	BHA_NUM	=	1
 )(
 	input						clk_i			
-	,input						rst_i			
+	,input						rst_i		
 	,input						i_time_1ms_vld		
 	,input						i_time_1s_vld 		
 	
@@ -51,13 +51,7 @@ module status_beh_safety_door#(
 	,output	reg	[31:0]			state_monitor_o
 	,output	reg					irq_o			
 	,input						irq_ack_i	
-	
-	//debug reg
-	,output [31:0]					debug_r
     );
-	
-	wire	i_clk = clk_i;
-	wire	i_rst = rst_i;
 	
 	reg			[7:0]			curr_state		;
 	reg			[7:0]			curr_state_1d	;
@@ -79,6 +73,8 @@ module status_beh_safety_door#(
 	reg		ri_close_confirm_key;
 	reg		close_confirm_key_posedge;
 	
+	reg		[31:0]	delay_cnt;
+	
 	
 	//State machine state
 	localparam  S_IDLE          = 8'd0; 
@@ -98,43 +94,6 @@ module status_beh_safety_door#(
 	
     localparam  IRQ_OK          = 8'h51;	//ps ack:OK
     localparam  IRQ_NO_OK       = 8'h52;	//ps ack:NO OK
-	
-	
-	reg [15:0]	open_io_edge_cnt	;
-	reg [15:0]	close_io_edge_cnt	;	
-	reg			open_io_sta			;
-	reg			close_io_sta		;
-	
-	always@(posedge clk_i)
-	begin
-		if(rst_i)begin
-			open_io_edge_cnt  	<= 16'd0;
-			open_io_sta			<= 1'b0;
-		end else if(open_io_sta != i_open_req_key)begin
-			open_io_edge_cnt  	<= open_io_edge_cnt+1;
-			open_io_sta			<= i_open_req_key;
-		end else begin
-			open_io_edge_cnt  	<= open_io_edge_cnt;
-			open_io_sta			<= open_io_sta;
-		end	
-	end
-	
-	always@(posedge clk_i)
-	begin
-		if(rst_i)begin
-			close_io_edge_cnt  	<= 16'd0;
-			close_io_sta		<= 1'b0;
-		end else if(open_io_sta != i_close_confirm_key)begin
-			close_io_edge_cnt  	<= close_io_edge_cnt+1;
-			close_io_sta		<= i_close_confirm_key;
-		end else begin
-			close_io_edge_cnt  	<= close_io_edge_cnt ; 	
-			close_io_sta		<= close_io_sta		 ;
-		end	
-	end
-
-	assign debug_r  = {open_io_edge_cnt,close_io_edge_cnt};
-	
 	
 	//state monitor
 	reg [7:0]	curr_state_m1;
@@ -188,17 +147,17 @@ module status_beh_safety_door#(
 		curr_state_1d <= curr_state;
 	end
 	
-	always@(posedge i_clk)
+	always@(posedge clk_i)
 	begin
-		if(i_rst)
+		if(rst_i)
 			ec_chb_st_r <= 1'b0;
 		else
 			ec_chb_st_r <= ec_chb_st;
 	end
 
-	always@(posedge i_clk)
+	always@(posedge clk_i)
 	begin
-		if(i_rst)
+		if(rst_i)
 			ec_chb_st_negedge <= 0;
 		else if({ec_chb_st_r,ec_chb_st} == 2'b10)
 			ec_chb_st_negedge <= 1;
@@ -224,9 +183,9 @@ module status_beh_safety_door#(
 	end
 	
 	
-	always@(posedge i_clk)
+	always@(posedge clk_i)
 	begin
-		if(i_rst)
+		if(rst_i)
 			b_bhv_id_vld <= 1'b0;
 		else if(open_req_key_posedge || close_confirm_key_posedge)
 			b_bhv_id_vld <= 1'b1;
@@ -463,37 +422,37 @@ module status_beh_safety_door#(
 	//------------------------------------------------ user logic start ---------------------------------------------
 	//===============================================================================================================
 
-	always@(posedge i_clk)
+	always@(posedge clk_i)
 	begin
-		if(i_rst)
+		if(rst_i)
 			ri_open_req_key <= 0;
 		else
 			ri_open_req_key <= i_open_req_key;
 	end
 	
-	always@(posedge i_clk)
+	always@(posedge clk_i)
 	begin
-		if(i_rst)
+		if(rst_i)
 			open_req_key_posedge <= 0;
-		else if({ri_open_req_key,i_open_req_key} == 2'b01)
+		else if({ri_open_req_key,i_open_req_key} == 2'b10)
 			open_req_key_posedge <= 1;
 		else
 			open_req_key_posedge <= 0;
 	end
 	
-	always@(posedge i_clk)
+	always@(posedge clk_i)
 	begin
-		if(i_rst)
+		if(rst_i)
 			ri_close_confirm_key <= 0;
 		else
 			ri_close_confirm_key <= i_close_confirm_key;
 	end
 	
-	always@(posedge i_clk)
+	always@(posedge clk_i)
 	begin
-		if(i_rst)
+		if(rst_i)
 			close_confirm_key_posedge <= 0;
-		else if({ri_close_confirm_key,i_close_confirm_key} == 2'b01)
+		else if({ri_close_confirm_key,i_close_confirm_key} == 2'b10)
 			close_confirm_key_posedge <= 1;
 		else
 			close_confirm_key_posedge <= 0;

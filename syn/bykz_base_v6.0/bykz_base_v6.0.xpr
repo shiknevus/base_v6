@@ -2671,7 +2671,7 @@
       <File Path="$PSRCDIR/utils_1/imports/mst_impl_1363/emcc_mst_top_routed.dcp">
         <FileInfo>
           <Attr Name="ImportPath" Val="$PRUNDIR/mst_impl_1363/emcc_mst_top_routed.dcp"/>
-          <Attr Name="ImportTime" Val="1788338194"/>
+          <Attr Name="ImportTime" Val="1788351253"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedInSteps" Val="mst_impl_1363"/>
@@ -2808,9 +2808,7 @@
   <Runs Version="1" Minor="10">
     <Run Id="mst_synth_1363" Type="Ft3:Synth" SrcSet="sources_1" Part="xczu5eg-sfvc784-2-i" ConstrsSet="mst_constrs" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" State="current" Dir="$PRUNDIR/mst_synth_1363" IncludeInArchive="true">
       <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2018">
-          <Desc>Vivado Synthesis Defaults</Desc>
-        </StratHandle>
+        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2018"/>
         <Step Id="synth_design"/>
       </Strategy>
       <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
@@ -2845,9 +2843,7 @@
     </Run>
     <Run Id="aurora_8b10b_0_synth_1" Type="Ft3:Synth" SrcSet="aurora_8b10b_0" Part="xczu5eg-sfvc784-2-i" ConstrsSet="aurora_8b10b_0" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" Dir="$PRUNDIR/aurora_8b10b_0_synth_1" IncludeInArchive="true">
       <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2018">
-          <Desc>Vivado Synthesis Defaults</Desc>
-        </StratHandle>
+        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2018"/>
         <Step Id="synth_design"/>
       </Strategy>
       <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
@@ -2856,9 +2852,7 @@
     </Run>
     <Run Id="BFIFO_1024x36b_synth_1" Type="Ft3:Synth" SrcSet="BFIFO_1024x36b" Part="xczu5eg-sfvc784-2-i" ConstrsSet="BFIFO_1024x36b" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" Dir="$PRUNDIR/BFIFO_1024x36b_synth_1" IncludeInArchive="true">
       <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2018">
-          <Desc>Vivado Synthesis Defaults</Desc>
-        </StratHandle>
+        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2018"/>
         <Step Id="synth_design"/>
       </Strategy>
       <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
@@ -2867,9 +2861,7 @@
     </Run>
     <Run Id="TDPBRAM_16384x32b_synth_1" Type="Ft3:Synth" SrcSet="TDPBRAM_16384x32b" Part="xczu5eg-sfvc784-2-i" ConstrsSet="TDPBRAM_16384x32b" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" Dir="$PRUNDIR/TDPBRAM_16384x32b_synth_1" IncludeInArchive="true">
       <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2018">
-          <Desc>Vivado Synthesis Defaults</Desc>
-        </StratHandle>
+        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2018"/>
         <Step Id="synth_design"/>
       </Strategy>
       <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
@@ -2878,9 +2870,7 @@
     </Run>
     <Run Id="aurora_8b10b_1_synth_1" Type="Ft3:Synth" SrcSet="aurora_8b10b_1" Part="xczu5eg-sfvc784-2-i" ConstrsSet="aurora_8b10b_1" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" Dir="$PRUNDIR/aurora_8b10b_1_synth_1" IncludeInArchive="true">
       <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2018">
-          <Desc>Vivado Synthesis Defaults</Desc>
-        </StratHandle>
+        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2018"/>
         <Step Id="synth_design"/>
       </Strategy>
       <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
@@ -2889,9 +2879,7 @@
     </Run>
     <Run Id="aurora_mmcm_synth_1" Type="Ft3:Synth" SrcSet="aurora_mmcm" Part="xczu5eg-sfvc784-2-i" ConstrsSet="aurora_mmcm" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" Dir="$PRUNDIR/aurora_mmcm_synth_1" IncludeInArchive="true">
       <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2018">
-          <Desc>Vivado Synthesis Defaults</Desc>
-        </StratHandle>
+        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2018"/>
         <Step Id="synth_design"/>
       </Strategy>
       <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
@@ -2900,9 +2888,7 @@
     </Run>
     <Run Id="TDPBRAM_512x32b_synth_1" Type="Ft3:Synth" SrcSet="TDPBRAM_512x32b" Part="xczu5eg-sfvc784-2-i" ConstrsSet="TDPBRAM_512x32b" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" Dir="$PRUNDIR/TDPBRAM_512x32b_synth_1" IncludeInArchive="true">
       <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2018">
-          <Desc>Vivado Synthesis Defaults</Desc>
-        </StratHandle>
+        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2018"/>
         <Step Id="synth_design"/>
       </Strategy>
       <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
@@ -2911,9 +2897,7 @@
     </Run>
     <Run Id="mst_impl_1363" Type="Ft2:EntireDesign" Part="xczu5eg-sfvc784-2-i" ConstrsSet="mst_constrs" Description="Default settings for Implementation." AutoIncrementalCheckpoint="true" IncrementalCheckpoint="$PSRCDIR/utils_1/imports/mst_impl_1363/emcc_mst_top_routed.dcp" WriteIncrSynthDcp="false" State="current" Dir="$PRUNDIR/mst_impl_1363" SynthRun="mst_synth_1363" IncludeInArchive="true" GenFullBitstream="true">
       <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2018">
-          <Desc>Default settings for Implementation.</Desc>
-        </StratHandle>
+        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2018"/>
         <Step Id="init_design"/>
         <Step Id="opt_design"/>
         <Step Id="power_opt_design"/>
@@ -2978,9 +2962,7 @@
     </Run>
     <Run Id="aurora_8b10b_0_impl_1" Type="Ft2:EntireDesign" Part="xczu5eg-sfvc784-2-i" ConstrsSet="aurora_8b10b_0" Description="Default settings for Implementation." AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" SynthRun="aurora_8b10b_0_synth_1" IncludeInArchive="false" GenFullBitstream="true">
       <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2018">
-          <Desc>Default settings for Implementation.</Desc>
-        </StratHandle>
+        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2018"/>
         <Step Id="init_design"/>
         <Step Id="opt_design"/>
         <Step Id="power_opt_design"/>
@@ -2996,9 +2978,7 @@
     </Run>
     <Run Id="BFIFO_1024x36b_impl_1" Type="Ft2:EntireDesign" Part="xczu5eg-sfvc784-2-i" ConstrsSet="BFIFO_1024x36b" Description="Default settings for Implementation." AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" SynthRun="BFIFO_1024x36b_synth_1" IncludeInArchive="false" GenFullBitstream="true">
       <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2018">
-          <Desc>Default settings for Implementation.</Desc>
-        </StratHandle>
+        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2018"/>
         <Step Id="init_design"/>
         <Step Id="opt_design"/>
         <Step Id="power_opt_design"/>
@@ -3014,9 +2994,7 @@
     </Run>
     <Run Id="TDPBRAM_16384x32b_impl_1" Type="Ft2:EntireDesign" Part="xczu5eg-sfvc784-2-i" ConstrsSet="TDPBRAM_16384x32b" Description="Default settings for Implementation." AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" SynthRun="TDPBRAM_16384x32b_synth_1" IncludeInArchive="false" GenFullBitstream="true">
       <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2018">
-          <Desc>Default settings for Implementation.</Desc>
-        </StratHandle>
+        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2018"/>
         <Step Id="init_design"/>
         <Step Id="opt_design"/>
         <Step Id="power_opt_design"/>
@@ -3032,9 +3010,7 @@
     </Run>
     <Run Id="aurora_8b10b_1_impl_1" Type="Ft2:EntireDesign" Part="xczu5eg-sfvc784-2-i" ConstrsSet="aurora_8b10b_1" Description="Default settings for Implementation." AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" SynthRun="aurora_8b10b_1_synth_1" IncludeInArchive="false" GenFullBitstream="true">
       <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2018">
-          <Desc>Default settings for Implementation.</Desc>
-        </StratHandle>
+        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2018"/>
         <Step Id="init_design"/>
         <Step Id="opt_design"/>
         <Step Id="power_opt_design"/>
@@ -3050,9 +3026,7 @@
     </Run>
     <Run Id="aurora_mmcm_impl_1" Type="Ft2:EntireDesign" Part="xczu5eg-sfvc784-2-i" ConstrsSet="aurora_mmcm" Description="Default settings for Implementation." AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" SynthRun="aurora_mmcm_synth_1" IncludeInArchive="false" GenFullBitstream="true">
       <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2018">
-          <Desc>Default settings for Implementation.</Desc>
-        </StratHandle>
+        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2018"/>
         <Step Id="init_design"/>
         <Step Id="opt_design"/>
         <Step Id="power_opt_design"/>
@@ -3068,9 +3042,7 @@
     </Run>
     <Run Id="TDPBRAM_512x32b_impl_1" Type="Ft2:EntireDesign" Part="xczu5eg-sfvc784-2-i" ConstrsSet="TDPBRAM_512x32b" Description="Default settings for Implementation." AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" SynthRun="TDPBRAM_512x32b_synth_1" IncludeInArchive="false" GenFullBitstream="true">
       <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2018">
-          <Desc>Default settings for Implementation.</Desc>
-        </StratHandle>
+        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2018"/>
         <Step Id="init_design"/>
         <Step Id="opt_design"/>
         <Step Id="power_opt_design"/>

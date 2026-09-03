@@ -69,7 +69,7 @@ module ps_rw_pl_reg_16di#(
 	,output		reg 	 			c_tsc_result_vld	
 	,output		reg 	[19:0]	 	c_bhv_gap_crl     
  	
-	//,output		reg 	[31:0]	 	param1			
+	,output		reg 	[31:0]	 	param1			
 	//,output		reg 	[31:0]	 	param2			
 	//,output		reg 	[31:0]		param3			
 	//,output		reg 	[31:0]		param4			
@@ -236,7 +236,7 @@ module ps_rw_pl_reg_16di#(
 			c_tsc_result_vld	<= 	1'b0			;	
 			c_bhv_gap_crl      	<=	20'd0		   	;
 
-			//param1				<=	32'd0	  	;
+			param1				<=	32'd0	  	;
 			//param2				<=	32'd0	  	;
 			//param3				<=	32'd0	  	;
 			//param4				<=	32'd0	  	;
@@ -312,7 +312,7 @@ module ps_rw_pl_reg_16di#(
 			c_tsc_result_vld<=	(wr_task_vld && wr_task_addr == `C_TX_RSULT_RPT	) ? 1'b1: 1'b0							 ;
 			c_bhv_gap_crl   <=	(wr_task_vld && wr_task_addr == `C_GAP_CRL     	) ? i_st_wr_data[19:0] 	: c_bhv_gap_crl	;
 			
-			//param1			<=	(wr_task_vld && wr_task_addr == `PARAM1			) ? i_st_wr_data 		: param1	;
+			param1			<=	(wr_task_vld && wr_task_addr == `PARAM1			) ? i_st_wr_data 		: param1	;
 			//param2			<=	(wr_task_vld && wr_task_addr == `PARAM2			) ? i_st_wr_data 		: param2	;
 			//param3			<=	(wr_task_vld && wr_task_addr == `PARAM3			) ? i_st_wr_data 		: param3	;
 			//param4			<=	(wr_task_vld && wr_task_addr == `PARAM4			) ? i_st_wr_data 		: param4	;
@@ -434,7 +434,7 @@ module ps_rw_pl_reg_16di#(
 		`C_TX_OT		:	o_st_rd_data <= {12'd0,c_bhv_ot		};
 		`C_TX_RSULT_RPT	:	o_st_rd_data <= c_tsc_result_rpt	;
 		`C_GAP_CRL     	:	o_st_rd_data <= {12'd0,c_bhv_gap_crl};
-		//`PARAM1			:	o_st_rd_data <= param1				;
+		`PARAM1			:	o_st_rd_data <= param1				;
 		//`PARAM2			:	o_st_rd_data <= param2				;
 		//`PARAM3			:	o_st_rd_data <= param3				;
 		//`PARAM4			:	o_st_rd_data <= param4				;
