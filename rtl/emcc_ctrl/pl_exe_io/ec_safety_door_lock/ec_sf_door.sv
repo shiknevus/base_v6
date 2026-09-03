@@ -442,7 +442,6 @@ module ec_sf_door#(
 	,.state_monitor_o		(debug_reg1			)
 	,.irq_o			        (irq_b				)
 	,.irq_ack_i	            (irq_b_grant		)	
-	,.debug_r				(debug_reg2)
     );
 	 
 	tim_beh_safety_door tim_beh_safety_door_u0(

@@ -69,7 +69,7 @@ module ps_rw_pl_reg_16di#(
 	,output		reg 	 			c_tsc_result_vld	
 	,output		reg 	[19:0]	 	c_bhv_gap_crl     
  	
-	//,output		reg 	[31:0]	 	param1			
+	,output		reg 	[31:0]	 	param1			
 	//,output		reg 	[31:0]	 	param2			
 	//,output		reg 	[31:0]		param3			
 	//,output		reg 	[31:0]		param4			

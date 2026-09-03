@@ -145,7 +145,7 @@ module ps_rw_pl_reg_sf_doo#(
 	,input 							param67   
 	,input 							param68   
 	,input 							param69   
-	//,input 							param70   
+	,input 							param70   
 	,input 				[31:0]		debug_reg1
 	,input 				[31:0]		debug_reg2
 	//,input 				[31:0]		debug_reg3
@@ -399,7 +399,7 @@ module ps_rw_pl_reg_sf_doo#(
 		`PARAM67		:	o_st_rd_data <= {31'd0,param67  	};
 		`PARAM68		:	o_st_rd_data <= {31'd0,param68  	};
 		`PARAM69		:	o_st_rd_data <= {31'd0,param69  	};
-		//`PARAM70		:	o_st_rd_data <= {31'd0,param70  	};
+		`PARAM70		:	o_st_rd_data <= {31'd0,param70  	};
 		
 		`DEBUG_REG1		:	o_st_rd_data <= debug_reg1			;
 		`DEBUG_REG2		:	o_st_rd_data <= debug_reg2			;
