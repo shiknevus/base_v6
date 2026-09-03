@@ -119,7 +119,7 @@ module pre_post_sta_check_pul_axis#(
 	always@(posedge clk_i)
 	begin
 		integer i;
-		if(rst_i && !a_en)
+		if(rst_i || !a_en)
 			a_pre_sta_allow <= {A_BHA_NUM{1'b0}};
 		else begin
 			a_pre_sta_allow <= {A_BHA_NUM{1'b0}};
