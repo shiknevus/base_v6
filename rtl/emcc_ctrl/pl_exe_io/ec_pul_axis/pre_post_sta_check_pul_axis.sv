@@ -62,19 +62,28 @@ module pre_post_sta_check_pul_axis#(
 		,output	reg	[C_BHA_NUM-1:0]		c_post_sta_allow
 
 //----------------------------------------------------- user logic begin -----------------------------------------------------//
+//proactive input
 		,input							action_busy
 		,input							action_done
 		,input							action_error
-
+//proactive input end
+//ps config
 		,input		[7:0]				rctrl_drive_on //1.on 2.off
 		,input							rctrl_drive_reset
 		,input							rctrl_resume
 		,input							rctrl_pause
 		,input							rctrl_stop
 		,input							rserv_dir
-		,output	reg					b_clr_pause  	//clear PS pause request after beh 100 done
-		,output	reg					b_clr_resume 	//clear PS resume request after beh 101 done
-		,output	reg					b_clr_stop   	//clear PS stop request after beh 103 done
+//ps config end
+//reg clear
+		,output	reg						b_clr_pause  	//clear PS pause request after beh 100 done
+		,output	reg						b_clr_resume 	//clear PS resume request after beh 101 done
+		,output	reg						b_clr_stop   	//clear PS stop request after beh 103 done
+//reg clear end
+//servo status
+		,input							i_servo_ready       //servo ready
+		,input							i_servo_done        //servo move done
+//servo status end
 //----------------------------------------------------- user logic end -------------------------------------------------------//
     );
 
@@ -93,15 +102,18 @@ module pre_post_sta_check_pul_axis#(
 			home_completed <= 1'b1;
 		else if(b_bhv_id == 8'd105 && action_error)
 			home_completed <= 1'b0;
+		else begin
+			home_completed <= home_completed;
+		end
 	end
 
 	wire [A_BHA_NUM-1:0]	a_pre_sta	;
 
-	assign	a_pre_sta[0 ] = (a_bhv_id == 1 );    // HOME: always allowed
-	assign	a_pre_sta[1 ] = (a_bhv_id == 2 );
-	assign	a_pre_sta[2 ] = (a_bhv_id == 3 ) && home_completed;
-	assign	a_pre_sta[19] = (a_bhv_id == 20) && device_safe;//[safe]
-	assign	a_pre_sta[20] = (a_bhv_id == 21) && home_completed && device_safe;//[safe]
+	assign	a_pre_sta[0 ] = (a_bhv_id == 1 ) && i_servo_ready;    // HOME: always allowed
+	assign	a_pre_sta[1 ] = (a_bhv_id == 2 ) && i_servo_ready;
+	assign	a_pre_sta[2 ] = (a_bhv_id == 3 ) && home_completed && i_servo_ready;
+	assign	a_pre_sta[19] = (a_bhv_id == 20) && device_safe && i_servo_ready;//[safe]
+	assign	a_pre_sta[20] = (a_bhv_id == 21) && home_completed && device_safe && i_servo_ready;//[safe]
 	assign	a_pre_sta[29] = (a_bhv_id == 30);   // GETPOS: always allowed
 
 	always@(posedge clk_i)
@@ -121,11 +133,11 @@ module pre_post_sta_check_pul_axis#(
 	//post status
 	wire [A_BHA_NUM-1:0]	a_post_sta	;
 
-	assign	a_post_sta[0 ] = (a_bhv_id == 1 )&&action_done&&(~action_error);
-	assign	a_post_sta[1 ] = (a_bhv_id == 2 )&&action_done&&(~action_error);
-	assign	a_post_sta[2 ] = (a_bhv_id == 3 )&&action_done&&(~action_error);
-	assign	a_post_sta[19] = (a_bhv_id == 20)&&action_done&&(~action_error);
-	assign	a_post_sta[20] = (a_bhv_id == 21)&&action_done&&(~action_error);
+	assign	a_post_sta[0 ] = (a_bhv_id == 1 )&&action_done&&(~action_error) && i_servo_done;
+	assign	a_post_sta[1 ] = (a_bhv_id == 2 )&&action_done&&(~action_error) && i_servo_done;
+	assign	a_post_sta[2 ] = (a_bhv_id == 3 )&&action_done&&(~action_error) && i_servo_done;
+	assign	a_post_sta[19] = (a_bhv_id == 20)&&action_done&&(~action_error) && i_servo_done;
+	assign	a_post_sta[20] = (a_bhv_id == 21)&&action_done&&(~action_error) && i_servo_done;
 	assign	a_post_sta[29] = (a_bhv_id == 30);
 
 	reg [7:0] a_bhv_id_d;

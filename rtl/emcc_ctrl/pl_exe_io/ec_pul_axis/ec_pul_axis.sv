@@ -39,16 +39,15 @@ module ec_pul_axis#(
 		output 		 [31:0]     o_st_rd_data    ,
 		output 		            o_st_rd_vld     ,
 //----------------------------------------------------- user logic begin -----------------------------------------------------//
-    	input					i_servo_ok       //servo not ok
-    	,input					i_servo_stop        //servo stop
+    	input					i_servo_ready       //servo ready
+    	,input					i_servo_done        //servo move done
     	,input					i_axis_limf         //axis limit forward
     	,input					i_axis_zero          //axis origin
     	,input					i_axis_limb         //axis limit backward
     	,input					i_emerge_stop_signal//emergency stop signal
 
-   		,input  	            i_safe_status 		//safe status
-   		,input  	            i_axis_point		//axis point
-   		,input  	            i_axis_reset		//axis reset
+   		,input  	            i_safe_status 		//safe status unused
+
    		,input  	            i_dv_alarm			//drive alarm
    		,output 	            o_dv_pulse			//axi pulse
    		,output 	            o_dv_dir			//axis dir
@@ -446,15 +445,13 @@ module ec_pul_axis#(
     ,.irq_o                	(irq_a				)
     ,.irq_ack_i       		(irq_a_grant		)
 //----------------------------------------------------- user logic begin -----------------------------------------------------//
-	,.i_servo_notok			(i_servo_ok      )
-    ,.i_servo_stop			(i_servo_stop       )
+	,.i_servo_ready			(i_servo_ready      )
+    ,.i_servo_done			(i_servo_done       )
     ,.i_axis_limf			(i_axis_limf        )
     ,.i_axis_zero			(i_axis_zero         )
     ,.i_axis_limb			(i_axis_limb        )
     ,.i_emerge_stop_signal	(i_emerge_stop_signal)
     ,.i_safe_status			(i_safe_status 		)
-    ,.i_axis_point			(i_axis_point		)
-    ,.i_axis_reset			(i_axis_reset		)
     ,.i_dv_alarm			(i_dv_alarm			)
     ,.o_dv_pulse			(o_dv_pulse			)
     ,.o_dv_dir				(o_dv_dir			)
@@ -587,6 +584,9 @@ module ec_pul_axis#(
 		,.b_clr_pause			(b_clr_pause		)
 		,.b_clr_resume			(b_clr_resume		)
 		,.b_clr_stop			(b_clr_stop			)
+
+		,.i_servo_ready			(i_servo_ready      )
+    	,.i_servo_done			(i_servo_done       )
 //----------------------------------------------------- user logic end -------------------------------------------------------//
     );
 

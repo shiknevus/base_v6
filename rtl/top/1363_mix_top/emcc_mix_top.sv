@@ -474,8 +474,8 @@ module emcc_mix_top
        ,.i_axis_limf        ( ~di_regoin_msg[0][20]           )   // 正限位到位开关
        ,.i_axis_limb        ( ~di_regoin_msg[0][22]           )   // 负限位到位开关
        ,.i_axis_zero        ( ~di_regoin_msg[0][21]           )   // 零位到位开关
-       ,.i_servo_stop        ( ~di_regoin_msg[0][19]           )   // 伺服定位完成
-       ,.i_servo_ok        ( ~di_regoin_msg[0][23]           )   // 伺服就绪
+       ,.i_servo_done        ( ~di_regoin_msg[0][19]           )   // 伺服定位完成
+       ,.i_servo_ready        ( ~di_regoin_msg[0][23]           )   // 伺服就绪
 				,.cur_slv_board_id		(1'b0                   )
 				,.slv_board_id			(slv_board_id           )
 				,.pul_motor_r_flag		(pul_motor0_r_flag      )
@@ -1647,8 +1647,8 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[32]    ),
 	  .o_intr_irq            ( map_irq[32]       )
 
-       ,.i_servo_stop        ( ~di_mst_msg[28]           )   // 伺服定位完成
-       ,.i_servo_ok        ( ~di_mst_msg[32]           )   // 伺服就绪
+       ,.i_servo_done        ( ~di_mst_msg[28]           )   // 伺服定位完成
+       ,.i_servo_ready        ( ~di_mst_msg[32]           )   // 伺服就绪
        ,.i_axis_limf        ( ~di_mst_msg[29]           )   // 正限位到位开关
        ,.i_axis_limb        ( ~di_mst_msg[31]           )   // 负限位到位开关
        ,.i_axis_zero        ( ~di_mst_msg[30]           )   // 零位到位开关

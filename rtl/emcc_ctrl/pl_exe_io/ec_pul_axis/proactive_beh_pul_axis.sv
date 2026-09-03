@@ -47,16 +47,14 @@ module proactive_beh_pul_axis#(
 
 
 //----------------------------------------------------- user logic begin -----------------------------------------------------//
-    ,input					    i_servo_notok       //servo not ok
-    ,input					    i_servo_stop        //servo stop
+    ,input					    i_servo_ready       //servo ready
+    ,input					    i_servo_done        //servo move done
     ,input					    i_axis_limf         //axis limit forward
     ,input					    i_axis_zero          //axis origin
     ,input					    i_axis_limb         //axis limit backward
     ,input					    i_emerge_stop_signal//emergency stop signal
 
    	,input  	                i_safe_status 		//safe status
-   	,input  	                i_axis_point		//axis point
-   	,input  	                i_axis_reset		//axis reset
    	,input  	                i_dv_alarm			//drive alarm
    	,input  	                i_pause			    //motor pause (B channel beh 100)
    	,input  	                i_stop			    //motor stop (B channel beh 103)
