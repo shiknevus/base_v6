@@ -191,7 +191,7 @@ module irq_3i1o_arbitrator_pul_axis(
 	
 	//The channel currently being handled by the state machine
 	reg	[3:0]	cur_chan;
-	
+	reg [3:0] 	end_cnt;
 
 always @(posedge clk_i) begin
 	if(rst_i) begin
@@ -503,7 +503,6 @@ end
 	end
 
 
-	reg [3:0] end_cnt;
 	always@(posedge clk_i)begin
 	if(rst_i)
 		end_cnt <= 4'd0;
