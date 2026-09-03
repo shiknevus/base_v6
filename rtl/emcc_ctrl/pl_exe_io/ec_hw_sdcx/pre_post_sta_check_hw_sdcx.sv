@@ -76,7 +76,7 @@ module pre_post_sta_check_hw_sdcx#(
 		if(rst_i || !a_en) begin
 			a_pre_sta_allow <= {A_BHA_NUM{1'b0}};
 		end else begin
-			a_pre_sta_allow <= {A_BHA_NUM{1'b0}};
+			a_pre_sta_allow <= {A_BHA_NUM{1'b1}};
 		end
 	end
 	

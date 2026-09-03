@@ -326,7 +326,7 @@ module ec_16di#(
 	,.c_tsc_result_rpt	    (c_tx_result_rpt)
 	,.c_tsc_result_vld	    (c_tx_result_vld)
 	,.c_bhv_gap_crl         (c_gap_crl		)
-	//,.param1			    (param1			)
+	,.param1			    (param1			)
 	//,.param2			    (param2			)
 	//,.param3			    (param3			)
 	//,.param4			    (param4			)
