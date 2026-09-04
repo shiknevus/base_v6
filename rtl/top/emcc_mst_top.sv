@@ -431,6 +431,12 @@ module emcc_mst_top #
 	
     // -------------------------------------------------------------------------------------------------------------------------------------
     
+	 wire  [RAM_DWIDTH*3-1:0] dbg_iv_di_slv_msg[RAM_DWIDTH-1:0];
+    wire  [RAM_DWIDTH*3-1:0] dbg_iv_do_slv_msg[RAM_DWIDTH-1:0];
+    wire  [RAM_DWIDTH*3-1:0] dbg_ov_di_slv_msg[RAM_DWIDTH-1:0];
+    wire  [RAM_DWIDTH*3-1:0] dbg_ov_do_slv_msg[RAM_DWIDTH-1:0];
+    wire  [RAM_DWIDTH-1:0]   dbg_ov_di_debug                  ; 
+    wire  [RAM_DWIDTH-1:0]   dbg_ov_do_debug                  ; 
         
 localparam DI_BIT_WIDTH = 64;
 localparam DO_BIT_WIDTH = 32;
@@ -539,8 +545,8 @@ localparam DO_BIT_WIDTH = 32;
     assign emcc_main_inio = di_debug ? dbg_main_board_in_io : emcc_main_inio_debounce; 
 `else
 
-    assign main_board_outio  =  emcc_main_outio; 
-    assign emcc_main_inio    =  ~emcc_main_inio_debounce; 
+    assign main_board_outio  =  ~emcc_main_outio; 
+    assign emcc_main_inio    =  emcc_main_inio_debounce; 
 
 `endif
     

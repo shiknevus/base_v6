@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module proactive_beh_sygole_485#(
+module proactive_beh_superisys_485#(
     parameter                 	BHA_NUM = 4   //Number of active behaviors
 )(
     input                       clk_i
@@ -41,10 +41,10 @@ module proactive_beh_sygole_485#(
     ,output reg [7:0]           a_tx_id
     ,output reg	[7:0]           a_alm_num
     // user logic
-	,input      [31:0]          target_value//目标值
+	,input      [15:0]          target_value//目标值
     ,output reg                 o_data_send_req
 	,input      [2:0]           i_execu_result
-    ,input wire [31:0]          i_rcv_data
+    ,input wire [15:0]          i_rcv_data
 	,input                      i_rcv_data_finish_p//接收数据完成
 	,output	reg					o_exe_suc
 	,output	reg					o_mat_err

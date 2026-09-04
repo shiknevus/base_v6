@@ -70,8 +70,10 @@ module status_beh_safety_door#(
 	
 	reg		ri_open_req_key;
 	reg		open_req_key_posedge;
+	reg		open_req_key_negedge;
 	reg		ri_close_confirm_key;
 	reg		close_confirm_key_posedge;
+	reg		close_confirm_key_negedge;
 	
 	reg		[31:0]	delay_cnt;
 	
@@ -153,19 +155,19 @@ module status_beh_safety_door#(
 	always @(posedge clk_i) begin
 		if(rst_i || !b_en)begin
 			b_bhv_id <= 8'd0;
-			b_bhv_id_vld <= 1'b0;
+			//b_bhv_id_vld <= 1'b0;
 		end else if(curr_state == S_ACT_END_1)begin
 			b_bhv_id <= 8'd0;
-			b_bhv_id_vld <= 1'b0;
+			//b_bhv_id_vld <= 1'b0;
 		end else if(open_req_key_posedge)begin	//open door press
 			b_bhv_id <= 8'd100;
-			b_bhv_id_vld <= 1'b1;
+			//b_bhv_id_vld <= 1'b1;
 		end else if(close_confirm_key_posedge)begin	//close door press
 			b_bhv_id <= 8'd101;
-			b_bhv_id_vld <= 1'b1;
+			//b_bhv_id_vld <= 1'b1;
 		end else begin
 			b_bhv_id <= b_bhv_id;
-			b_bhv_id_vld <= 1'b0;
+			//b_bhv_id_vld <= 1'b0;
 		end
 	end
 	
@@ -387,6 +389,56 @@ module status_beh_safety_door#(
 	//------------------------------------------------ user logic start ---------------------------------------------
 	//===============================================================================================================
 
+	reg	[19:0]	cnt;
+	reg	[7:0]	sta;
+	
+	always@(posedge clk_i)
+	begin
+		if(rst_i)begin
+			cnt <= 0;
+			sta <= 0;
+			b_bhv_id_vld <= 0;
+		end else
+			case(sta)
+				0:begin
+					b_bhv_id_vld <= 0;
+					if(open_req_key_posedge || close_confirm_key_posedge)
+						sta <= 1;
+					else
+						sta <= 0;
+				end
+				1:begin
+					b_bhv_id_vld <= 0;
+					if(open_req_key_negedge || close_confirm_key_negedge)begin
+						sta <= 0;
+						cnt <= 0;
+					end else if(cnt >= 999)begin
+						sta <= 2;
+						cnt <= 0;
+					end else if(i_time_1ms_vld)begin
+						sta <= sta;
+						cnt <= cnt+1;
+					end else begin
+						sta <= sta;
+						cnt <= cnt;
+					end
+				end
+				2:begin
+					b_bhv_id_vld <= 1;
+					sta <= 3;
+				end
+				3:begin
+					b_bhv_id_vld <= 0;
+					sta <= 0;
+				end
+				default:begin
+					cnt 			<= cnt 		;
+				    sta 			<= sta 		;
+				    b_bhv_id_vld 	<= b_bhv_id_vld;
+				end
+			endcase
+	end
+
 	always@(posedge clk_i)
 	begin
 		if(rst_i)
@@ -399,7 +451,7 @@ module status_beh_safety_door#(
 	begin
 		if(rst_i)
 			open_req_key_posedge <= 0;
-		else if({ri_open_req_key,i_open_req_key} == 2'b10)
+		else if({ri_open_req_key,i_open_req_key} == 2'b01)
 			open_req_key_posedge <= 1;
 		else
 			open_req_key_posedge <= 0;
@@ -417,7 +469,7 @@ module status_beh_safety_door#(
 	begin
 		if(rst_i)
 			close_confirm_key_posedge <= 0;
-		else if({ri_close_confirm_key,i_close_confirm_key} == 2'b10)
+		else if({ri_close_confirm_key,i_close_confirm_key} == 2'b01)
 			close_confirm_key_posedge <= 1;
 		else
 			close_confirm_key_posedge <= 0;

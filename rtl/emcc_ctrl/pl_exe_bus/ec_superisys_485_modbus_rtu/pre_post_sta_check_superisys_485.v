@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module pre_post_sta_check_sygole_485#(
+module pre_post_sta_check_superisys_485#(
 		parameter		A_BHA_NUM	=	4      	
 		,parameter		B_BHA_NUM	=	1   
 		,parameter		C_BHA_NUM	=	1      		

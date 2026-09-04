@@ -45,7 +45,7 @@ module emcc_mix_top
     ,output wire    [511:0]             flow_irq  // flow irp,One control flow corresponds to one interrupt number,
                                                    // ensuring that component interrupts and flow interrupts are not repeated
 	
-    ,output wire [RS485_1_USER_NUMBER-1:0] s485_1_userr_req
+    ,output wire [RS485_1_USER_NUMBER-1:0] rs485_1_user_req
     ,input  wire [RS485_1_USER_NUMBER-1:0] rs485_1_user_grant
     ,input  wire [RS485_1_USER_NUMBER-1:0] rs485_1_user_rx
     ,output wire [RS485_1_USER_NUMBER-1:0] rs485_1_user_tx
@@ -180,6 +180,8 @@ module emcc_mix_top
     wire                                pul_motor1_r_flag;
     wire                                pul_motor2_r_flag;
     wire                                pul_motor3_r_flag;
+	
+	reg    [RAM_DWIDTH*2-1:0]          do_regoin_r_msg_n_r[RAM_DWIDTH-1:0];
     
 
     wire    [31:0]              do_mst_msg      ;
@@ -237,7 +239,7 @@ module emcc_mix_top
 
         //master to slave
         ,.pre_r_uuid            (pre_r_uuid            )
-        ,.do_regoin_r_msg       (do_regoin_r_msg_n     )
+        ,.do_regoin_r_msg       (do_regoin_r_msg_n_r     )
         ,.di_regoin_r_msg       (di_regoin_r_msg       )
         ,.ai_regoin_r_msg       (ai_regoin_r_msg       )
         ,.rs232_1st_r_msg       (rs232_00_send_msg       )
@@ -339,6 +341,12 @@ module emcc_mix_top
 	
 	wire ext_emerg_stop;
 	wire ext_pause_sig ;
+	
+	always @(*) begin
+  for(int i=0;i<RAM_DWIDTH;i++) begin
+    do_regoin_r_msg_n_r[i] = ~ do_regoin_r_msg_n[i];
+  end
+end
 	
 	
 	`ifdef RLL_ENB
@@ -1301,13 +1309,13 @@ module emcc_mix_top
 
     // );
 
-ec_sygole_485_modbus_rtu
+ec_superisys_485_modbus_rtu
 #(
         .REG_SPACE_BIAS         (20'd56320                ), //组件基地址
         .REG_SPACE_SIZE         (`REG_SPACE_SIZE          ), //组件偏移地址
         .CLK_FREQ               (156250000                )  //100MHz = 100000000
 )
-ec_sp_485_modbus_rtu_26
+ec_superisys_485_modbus_rtu_26
 (
         .clk_i                  ( clk                     ),
         .rst                    ( reset                   ),
@@ -1328,7 +1336,7 @@ ec_sp_485_modbus_rtu_26
         .i_uart_rx              ( rs485_1_user_rx[0]      ),
         .o_uart_tx              ( rs485_1_user_tx[0]      ),
         .o_uart_de              ( rs485_1_user_de[0]      ),
-        .o_user_req             ( rs485_1_userr_req[0]    ),
+        .o_user_req             ( rs485_1_user_req[0]     ),
         .i_user_grant           ( rs485_1_user_grant[0]   ),
 
          //--- 从板接口 use clk domain 156.25MHz --
@@ -1369,13 +1377,13 @@ ec_sp_485_modbus_rtu_26
 
     // );
 
-	ec_sygole_485_modbus_rtu
+ec_superisys_485_modbus_rtu
 #(
         .REG_SPACE_BIAS         (20'd54272                ), //组件基地址
         .REG_SPACE_SIZE         (`REG_SPACE_SIZE          ), //组件偏移地址
         .CLK_FREQ               (156250000                )  //100MHz = 100000000
 )
-ec_sp_485_modbus_rtu_27
+ec_superisys_485_modbus_rtu_27
 (
         .clk_i                  ( clk                     ),
         .rst                    ( reset                   ),
@@ -1396,7 +1404,7 @@ ec_sp_485_modbus_rtu_27
         .i_uart_rx              ( rs485_1_user_rx[1]      ),
         .o_uart_tx              ( rs485_1_user_tx[1]      ),
         .o_uart_de              ( rs485_1_user_de[1]      ),
-        .o_user_req             ( rs485_1_userr_req[1]    ),
+        .o_user_req             ( rs485_1_user_req[1]     ),
         .i_user_grant           ( rs485_1_user_grant[1]   ),
 
          //--- 从板接口 use clk domain 156.25MHz --
@@ -1437,13 +1445,13 @@ ec_sp_485_modbus_rtu_27
 
     // );
 	
-ec_sygole_485_modbus_rtu
+ec_superisys_485_modbus_rtu
 #(
         .REG_SPACE_BIAS         (20'd52224                ), //组件基地址
         .REG_SPACE_SIZE         (`REG_SPACE_SIZE          ), //组件偏移地址
         .CLK_FREQ               (156250000                )  //100MHz = 100000000
 )
-ec_sp_485_modbus_rtu_28
+ec_superisys_485_modbus_rtu_28
 (
         .clk_i                  ( clk                     ),
         .rst                    ( reset                   ),
@@ -1464,7 +1472,7 @@ ec_sp_485_modbus_rtu_28
         .i_uart_rx              ( rs485_1_user_rx[2]      ),
         .o_uart_tx              ( rs485_1_user_tx[2]      ),
         .o_uart_de              ( rs485_1_user_de[2]      ),
-        .o_user_req             ( rs485_1_userr_req[2]    ),
+        .o_user_req             ( rs485_1_user_req[2]     ),
         .i_user_grant           ( rs485_1_user_grant[2]   ),
 
          //--- 从板接口 use clk domain 156.25MHz --
@@ -1591,8 +1599,8 @@ ec_sp_485_modbus_rtu_28
        ,.i_axis_limf         ( ~di_regoin_msg[0][30]    )
        ,.i_axis_limb         ( ~di_regoin_msg[0][32]    )
     //    ,.i_quickstop         ( motor_quickstop          )   
-       ,.i_servo_ok       ( di_regoin_msg[0][17]     )
-       ,.i_servo_stop        ( ~di_regoin_msg[0][16]    )
+       ,.i_servo_ready       ( di_regoin_msg[0][17]     )
+       ,.i_servo_done        ( ~di_regoin_msg[0][16]    )
 	   
        //,.set_wheel_gear      ( 8'b0000_0001             )
        //,.i_wheel_prog        ( man_wheel_prog           )
@@ -1642,8 +1650,8 @@ ec_sp_485_modbus_rtu_28
        ,.i_axis_limf         ( ~di_regoin_msg[0][33]    )
        ,.i_axis_limb         ( ~di_regoin_msg[0][35]    )
     //    ,.i_quickstop         ( motor_quickstop          )
-       ,.i_servo_ok       ( di_regoin_msg[0][15]     )
-       ,.i_servo_stop        ( ~di_regoin_msg[0][14]    )
+       ,.i_servo_ready       ( di_regoin_msg[0][15]     )
+       ,.i_servo_done        ( ~di_regoin_msg[0][14]    )
 	   
        //,.set_wheel_gear      ( 8'b0000_0010             )
        //,.i_wheel_prog        ( man_wheel_prog           )
@@ -1693,8 +1701,8 @@ ec_sp_485_modbus_rtu_28
        ,.i_axis_limf         ( ~di_regoin_msg[0][36]    )
        ,.i_axis_limb         ( ~di_regoin_msg[0][38]    )
     //    ,.i_quickstop         ( motor_quickstop          )
-       ,.i_servo_ok       ( di_regoin_msg[0][19]     )
-       ,.i_servo_stop        ( ~di_regoin_msg[0][18]    )
+       ,.i_servo_ready       ( di_regoin_msg[0][19]     )
+       ,.i_servo_done        ( ~di_regoin_msg[0][18]    )
 	   
        //,.set_wheel_gear      ( 8'b0000_0100             )
        //,.i_wheel_prog        ( man_wheel_prog           )
@@ -1744,8 +1752,8 @@ ec_sp_485_modbus_rtu_28
        ,.i_axis_limf         ( ~di_regoin_msg[0][39]    )
        ,.i_axis_limb         ( ~di_regoin_msg[0][41]    )
     //    ,.i_quickstop         ( motor_quickstop          )
-       ,.i_servo_ok       ( di_regoin_msg[0][21]     )
-       ,.i_servo_stop        ( ~di_regoin_msg[0][20]    )
+       ,.i_servo_ready       ( di_regoin_msg[0][21]     )
+       ,.i_servo_done        ( ~di_regoin_msg[0][20]    )
 	   
        //,.set_wheel_gear      ( 8'b0000_1000             )
        //,.i_wheel_prog        ( man_wheel_prog           )
@@ -2188,8 +2196,8 @@ ec_sp_485_modbus_rtu_28
        ,.i_axis_limf         ( ~di_regoin_msg[0][53]    )
        ,.i_axis_limb         ( ~di_regoin_msg[0][55]    )
     //    ,.i_quickstop         ( motor_quickstop          )
-       ,.i_servo_ok       ( di_regoin_msg[0][29]     )
-       ,.i_servo_stop        ( ~di_regoin_msg[0][28]    )
+       ,.i_servo_ready       ( di_regoin_msg[0][29]     )
+       ,.i_servo_done        ( ~di_regoin_msg[0][28]    )
 	   
        //,.set_wheel_gear      ( 8'b0001_0000             )
        //,.i_wheel_prog        ( man_wheel_prog           )
@@ -2239,8 +2247,8 @@ ec_sp_485_modbus_rtu_28
        ,.i_axis_limf         ( ~di_regoin_msg[0][44]    )
        ,.i_axis_limb         ( ~di_regoin_msg[0][46]    )
        //,.i_quickstop         ( motor_quickstop          )
-       ,.i_servo_ok       ( di_regoin_msg[0][23]     )
-       ,.i_servo_stop        ( ~di_regoin_msg[0][22]    )
+       ,.i_servo_ready       ( di_regoin_msg[0][23]     )
+       ,.i_servo_done        ( ~di_regoin_msg[0][22]    )
 	   
        //,.set_wheel_gear      ( 8'b0010_0000             )
        //,.i_wheel_prog        ( man_wheel_prog           )
@@ -2290,8 +2298,8 @@ ec_sp_485_modbus_rtu_28
        ,.i_axis_limf         ( ~di_regoin_msg[0][47]    )
        ,.i_axis_limb         ( ~di_regoin_msg[0][49]    )
        //,.i_quickstop         ( motor_quickstop          )
-       ,.i_servo_ok       ( di_regoin_msg[0][25]     )
-       ,.i_servo_stop        ( ~di_regoin_msg[0][24]    )
+       ,.i_servo_ready       ( di_regoin_msg[0][25]     )
+       ,.i_servo_done        ( ~di_regoin_msg[0][24]    )
 	   
        //,.set_wheel_gear      ( 8'b1000_0000             )
        //,.i_wheel_prog        ( man_wheel_prog           )
@@ -2341,8 +2349,8 @@ ec_sp_485_modbus_rtu_28
        ,.i_axis_limf         ( ~di_regoin_msg[0][50]    )
        ,.i_axis_limb         ( ~di_regoin_msg[0][52]    )
     //    ,.i_quickstop         ( motor_quickstop          )
-       ,.i_servo_ok       ( di_regoin_msg[0][27]     )
-       ,.i_servo_stop        ( ~di_regoin_msg[0][26]    )
+       ,.i_servo_ready       ( di_regoin_msg[0][27]     )
+       ,.i_servo_done        ( ~di_regoin_msg[0][26]    )
 	   
        //,.set_wheel_gear      ( 8'b0100_0000             )
        //,.i_wheel_prog        ( man_wheel_prog           )
@@ -3131,8 +3139,8 @@ ec_sp_485_modbus_rtu_28
        ,.i_axis_limf         ( 1'b0                     )
        ,.i_axis_limb         ( 1'b0                     )
     //    ,.i_quickstop         ( 1'b0                     )
-       ,.i_servo_ok       ( di_regoin_msg[2][43]     )
-       ,.i_servo_stop        ( ~di_regoin_msg[2][44]    )
+       ,.i_servo_ready       ( di_regoin_msg[2][43]     )
+       ,.i_servo_done        ( ~di_regoin_msg[2][44]    )
 
     );
 
@@ -3266,7 +3274,7 @@ ec_dv300_485_modbus_rtu_75
         .i_uart_rx              ( rs485_1_user_rx[6]      ),
         .o_uart_tx              ( rs485_1_user_tx[6]      ),
         .o_uart_de              ( rs485_1_user_de[6]      ),
-        .o_user_req             ( rs485_1_userr_req[6]    ),
+        .o_user_req             ( rs485_1_user_req[6]     ),
         .i_user_grant           ( rs485_1_user_grant[6]   )
     );
   
@@ -3498,13 +3506,13 @@ ec_dv300_485_modbus_rtu_75
 
     // );
 
-ec_sygole_485_modbus_rtu
+ec_superisys_485_modbus_rtu
 #(
         .REG_SPACE_BIAS         (20'd63488                ), //组件基地址
         .REG_SPACE_SIZE         (`REG_SPACE_SIZE          ), //组件偏移地址
         .CLK_FREQ               (156250000                )  //100MHz = 100000000
 )
-ec_sp_485_modbus_rtu_83
+ec_superisys_485_modbus_rtu_83
 (
         .clk_i                  ( clk                     ),
         .rst                    ( reset                   ),
@@ -3525,7 +3533,7 @@ ec_sp_485_modbus_rtu_83
         .i_uart_rx              ( rs485_1_user_rx[3]      ),
         .o_uart_tx              ( rs485_1_user_tx[3]      ),
         .o_uart_de              ( rs485_1_user_de[3]      ),
-        .o_user_req             ( rs485_1_userr_req[3]    ),
+        .o_user_req             ( rs485_1_user_req[3]     ),
         .i_user_grant           ( rs485_1_user_grant[3]   ),
 
          //--- 从板接口 use clk domain 156.25MHz --
@@ -3566,13 +3574,13 @@ ec_sp_485_modbus_rtu_83
 
     // );
 
-ec_sygole_485_modbus_rtu
+ec_superisys_485_modbus_rtu
 #(
         .REG_SPACE_BIAS         (20'd64000                ), //组件基地址
         .REG_SPACE_SIZE         (`REG_SPACE_SIZE          ), //组件偏移地址
         .CLK_FREQ               (156250000                )  //100MHz = 100000000
 )
-ec_sp_485_modbus_rtu_84
+ec_superisys_485_modbus_rtu_84
 (
         .clk_i                  ( clk                     ),
         .rst                    ( reset                   ),
@@ -3593,7 +3601,7 @@ ec_sp_485_modbus_rtu_84
         .i_uart_rx              ( rs485_1_user_rx[4]      ),
         .o_uart_tx              ( rs485_1_user_tx[4]      ),
         .o_uart_de              ( rs485_1_user_de[4]      ),
-        .o_user_req             ( rs485_1_userr_req[4]    ),
+        .o_user_req             ( rs485_1_user_req[4]     ),
         .i_user_grant           ( rs485_1_user_grant[4]   ),
 
          //--- 从板接口 use clk domain 156.25MHz --
@@ -4368,13 +4376,13 @@ ec_sp_485_modbus_rtu_84
 
     // );
 
-ec_sygole_485_modbus_rtu
+ec_superisys_485_modbus_rtu
 #(
         .REG_SPACE_BIAS         (20'd57344                ), //组件基地址
         .REG_SPACE_SIZE         (`REG_SPACE_SIZE          ), //组件偏移地址
         .CLK_FREQ               (156250000                )  //100MHz = 100000000
 )
-ec_sygole_485_modbus_rtu_104
+ec_superisys_485_modbus_rtu_104
 (
         .clk_i                  ( clk                     ),
         .rst                    ( reset                   ),
@@ -4395,7 +4403,7 @@ ec_sygole_485_modbus_rtu_104
         .i_uart_rx              ( rs485_1_user_rx[5]      ),
         .o_uart_tx              ( rs485_1_user_tx[5]      ),
         .o_uart_de              ( rs485_1_user_de[5]      ),
-        .o_user_req             ( rs485_1_userr_req[5]    ),
+        .o_user_req             ( rs485_1_user_req[5]     ),
         .i_user_grant           ( rs485_1_user_grant[5]   ),
 
          //--- 从板接口 use clk domain 156.25MHz --
