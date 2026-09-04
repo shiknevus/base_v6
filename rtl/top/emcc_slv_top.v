@@ -182,7 +182,74 @@ module emcc_slv_top #
         ,.aurora_init_clk       (aurora_init_clk    )
     );
 `endif
-    assign  GT_RESET_IN = rst_aurora_init_clk;
+
+    (* ASYNC_REG = "TRUE" *) reg [1:0] ch_up_0_sync;
+    (* ASYNC_REG = "TRUE" *) reg [1:0] ch_up_1_sync;
+    reg         ch_up_0_d, ch_up_1_d;
+    reg [19:0]  gt_rst_cnt;
+    reg         gt_rst_pulse = 1'b0;
+    reg [27:0]  link_wdog    = 28'd0;
+
+    // aurora_init_clk = 50 MHz (50 MHz INIT_CLK input).
+    localparam [19:0] GT_RST_CYCLES  = 20'd32_000;
+    localparam [27:0] LINK_WDOG_CYCLES = 28'd50_000_000;
+
+    wire        channel_up_0_sync = ch_up_0_sync[1];
+    wire        channel_up_1_sync = ch_up_1_sync[1];
+
+    // GT reset pulse width:  ~640 us
+    // Watchdog retry interval: ~1 s
+    // This controller runs from aurora_init_clk, which is independent of
+    // the Aurora user clock being recovered by the GT.
+    always @(posedge aurora_init_clk) begin
+        if (rst_aurora_init_clk) begin
+            ch_up_0_sync <= 2'b00;
+            ch_up_1_sync <= 2'b00;
+            ch_up_0_d    <= 1'b0;
+            ch_up_1_d    <= 1'b0;
+            gt_rst_cnt   <= 20'd0;
+            gt_rst_pulse <= 1'b0;
+            link_wdog    <= 28'd0;
+        end else begin
+            ch_up_0_sync <= {ch_up_0_sync[0], CHANNEL_UP_0};
+            ch_up_1_sync <= {ch_up_1_sync[0], CHANNEL_UP_1};
+            ch_up_0_d    <= channel_up_0_sync;
+            ch_up_1_d    <= channel_up_1_sync;
+
+            if (gt_rst_pulse) begin
+                // Pulse in progress: count to pulse width then release
+                if (gt_rst_cnt == GT_RST_CYCLES) begin
+                    gt_rst_pulse <= 1'b0;
+                    gt_rst_cnt   <= 20'd0;
+                end else begin
+                    gt_rst_cnt <= gt_rst_cnt + 1'b1;
+                end
+                link_wdog <= 28'd0;
+            end
+            else if ((ch_up_0_d & ~channel_up_0_sync) ||
+                     (ch_up_1_d & ~channel_up_1_sync)) begin
+                // Link-down detected (1->0 edge): fire GT reset immediately
+                gt_rst_pulse <= 1'b1;
+                gt_rst_cnt   <= 20'd0;
+                link_wdog    <= 28'd0;
+            end
+            else if (~channel_up_0_sync && ~channel_up_1_sync) begin
+                // Watchdog: no link at all, retry every ~1 s
+                if (link_wdog == LINK_WDOG_CYCLES) begin
+                    gt_rst_pulse <= 1'b1;
+                    gt_rst_cnt   <= 20'd0;
+                    link_wdog    <= 28'd0;
+                end else begin
+                    link_wdog <= link_wdog + 1'b1;
+                end
+            end
+            else begin
+                // At least one link is up: keep watchdog reset
+                link_wdog <= 28'd0;
+            end
+        end
+    end
+    assign  GT_RESET_IN = rst_aurora_init_clk | gt_rst_pulse;
     assign  ll_clk = aurora_ref_clk;
     assign  ll_clk_rst = aurora_ref_clk_rst;
     assign  clk10m = clk_10m;
@@ -708,19 +775,46 @@ module emcc_slv_top #
     assign  ai_regoin_msg   =   {1'b0,1'b0,1'b0,ch_1,1'b0,1'b0,1'b0,ch_2};
 `endif
 
-	//status LED: solid=link idle, fast blink=data flowing, dark=link down
-	wire            slv_link_up  = LANE_UP_0 & CHANNEL_UP_0;
-	wire            slv_data_act = m_app_tx_tvalid | s_app_rx_tvalid
-	                             | s_axi_tx_tvalid_0 | m_axi_rx_tvalid_0
-	                             | s_axi_tx_tvalid_1 | m_axi_rx_tvalid_1;
-	reg [26:0]      led_act_hold;
-	reg [26:0]      led_free_cnt;
+
+	//link LED(active-low): off=break,1Hz=swapped,solid=link-no-data,10Hz=active
+	wire            p0_up = LANE_UP_0 & CHANNEL_UP_0;    //master side
+	wire            p1_up = LANE_UP_1 & CHANNEL_UP_1;    //downstream side
+	wire            p0_data_act = s_axi_tx_tvalid_0 | m_axi_rx_tvalid_0;
+	wire            p1_data_act = s_axi_tx_tvalid_1 | m_axi_rx_tvalid_1;
+	reg             p0act_s, p1act_s;    //sample per-port activity
+	reg [26:0]      p0_act, p1_act;    //activity hold: ~0.5s @156.25MHz
+	reg             swap_lat;         //fiber swapped / one-sided traffic
+	reg [26:0]      blink_cnt;        //free-run
 	always @(posedge axi_clk_0) begin
-	    led_free_cnt    <= led_free_cnt + 1'b1;
-	    if (slv_data_act)
-	        led_act_hold <= 27'd78_125_000;         //0.5s hold @156.25MHz
-	    else if (led_act_hold != 0)
-	        led_act_hold <= led_act_hold - 1'b1;
+	    if (axi_clk_rst_0) begin
+	        p0act_s    <= 1'b0;
+	        p1act_s    <= 1'b0;
+	        p0_act    <= 27'd0;
+	        p1_act    <= 27'd0;
+	        swap_lat  <= 1'b0;
+	        blink_cnt <= 27'd0;
+	    end else begin
+	        p0act_s <= p0_data_act;
+	        p1act_s <= p1_data_act;
+	        if (p0act_s)
+	            p0_act <= 27'd78_125_000;
+	        else if (|p0_act)
+	            p0_act <= p0_act - 1'b1;
+	        if (p1act_s)
+	            p1_act <= 27'd78_125_000;
+	        else if (|p1_act)
+	            p1_act <= p1_act - 1'b1;
+	        blink_cnt <= blink_cnt + 1'b1;
+	        if (~p0_up | (|p0_act))
+	            swap_lat <= 1'b0;
+	        else if (p1_up & (|p1_act) & ~(|p0_act))
+	            swap_lat <= 1'b1;
+	    end
 	end
-	assign  led = ~(slv_link_up & ((led_act_hold != 0) ? led_free_cnt[24] : 1'b1)); //~5Hz blink on activity, keep active-low drive
+	wire blink_10hz = blink_cnt[23];
+	wire blink_1hz  = blink_cnt[26];
+	assign  led = ~p0_up      ? 1'b1
+	            : (|p0_act)    ? blink_10hz
+	            : swap_lat     ? blink_1hz
+	            :               1'b0;
 endmodule

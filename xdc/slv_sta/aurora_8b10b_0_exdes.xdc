@@ -92,6 +92,14 @@ set_property LOC GTPE2_CHANNEL_X0Y5 [get_cells aurora_8b10b_top_u/aurora_8b10b_1
 set_false_path -to [get_clocks -of_objects [get_pins sys_signal_gen_u/SLAVE.aurora_mmcm_u/inst/mmcm_adv_inst/CLKOUT0]]
 set_false_path -from [get_clocks -of_objects [get_pins sys_signal_gen_u/SLAVE.aurora_mmcm_u/inst/mmcm_adv_inst/CLKOUT0]]
 
+# CDC: Aurora CHANNEL_UP (user_clk) -> GT reset ctrl sync (aurora_init_clk)
+set_max_delay -datapath_only 20.0 \
+    -from [get_pins -hierarchical -filter {NAME =~ *aurora_8b10b_0_exdes_u/CHANNEL_UP_reg/C}] \
+    -to   [get_pins -hierarchical -filter {NAME =~ *ch_up_0_sync_reg[0]/D}]
+set_max_delay -datapath_only 20.0 \
+    -from [get_pins -hierarchical -filter {NAME =~ *aurora_8b10b_1_exdes_u/CHANNEL_UP_reg/C}] \
+    -to   [get_pins -hierarchical -filter {NAME =~ *ch_up_1_sync_reg[0]/D}]
+
 #set_property MARK_DEBUG true [get_nets {app_protocal_top_u/app_ctrl_top_u/SLAVE.app_slv_rx_ctrl_u/ethcat_type[*]}]
 #set_property MARK_DEBUG true [get_nets {app_protocal_top_u/app_ctrl_top_u/SLAVE.app_slv_rx_ctrl_u/ethcat_len[*]}]
 #set_property MARK_DEBUG true [get_nets {app_protocal_top_u/app_ctrl_top_u/SLAVE.app_slv_rx_ctrl_u/wk_state[*]}]
