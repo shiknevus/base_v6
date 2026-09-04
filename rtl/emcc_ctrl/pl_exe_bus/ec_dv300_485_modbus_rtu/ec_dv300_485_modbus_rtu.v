@@ -277,7 +277,7 @@ module ec_dv300_485_modbus_rtu#(
 		assign	flow_ctrl      = param25[7:0];//收发控制模式
 
 
-	ps_rw_pl_reg#(
+ps_rw_pl_reg_dv300_485#(
 		.REG_SPACE_BIAS 	(REG_SPACE_BIAS		),//组件基地址
 		.REG_SPACE_SIZE 	(REG_SPACE_SIZE		) //组件偏移地址
 )ps_rw_pl_reg_u0(

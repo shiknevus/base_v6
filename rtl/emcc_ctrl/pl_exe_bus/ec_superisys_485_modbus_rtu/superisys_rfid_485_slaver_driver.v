@@ -18,15 +18,15 @@
 // Additional Comments:
 // 
 /////////////////////////////////////////////////////////////////////////////////
-module sygole_rfid_485_slaver_driver
+module superisys_rfid_485_slaver_driver
 (
-    input                   i_clk             ,//  user clk £¨100MHz or 156.25MHz£©
+    input                   i_clk             ,//  user clk ï¿½ï¿½100MHz or 156.25MHzï¿½ï¿½
     input                   i_rst             ,
     input                   i_prot_clk        ,// 156.25MHz
     input                   i_prot_rst        ,
-    input   wire [31:0]     i_baud_rate       ,//´®¿Ú²¨ÌØÂÊ
+    input   wire [31:0]     i_baud_rate       ,//ï¿½ï¿½ï¿½Ú²ï¿½ï¿½ï¿½ï¿½ï¿½
 
-	//--- ´Ó°å½Ó¿Ú use clk domain 156.25MHz --
+	//--- ï¿½Ó°ï¿½Ó¿ï¿½ use clk domain 156.25MHz --
 	input  wire [4:0]       i_cur_slv_board_id, //
 	input  wire [4:0]       i_slv_board_id    , 
 	input  wire             i_rs485_ch_r_flag , //send en
@@ -34,14 +34,14 @@ module sygole_rfid_485_slaver_driver
 	input  wire             i_rs485_ch_flag   , //recv en
 	input  wire [31:0]      i_s2m_rs485_msg   , //recv data
 
-	//--- ¶Ô½ÓÒµÎñÄ£¿é clk domain 100MHz or 156.25MHz--
+	//--- ï¿½Ô½ï¿½Òµï¿½ï¿½Ä£ï¿½ï¿½ clk domain 100MHz or 156.25MHz--
     input  wire             i_send_req        ,
     input  wire             i_send_req_p      ,
     output reg              o_send_finish_p   ,
     input  wire [8*21-1:0]  i_send_data       ,// little-end
     input  wire [8* 4-1:0]  i_send_data_head  ,
     output reg  [8*24-1:0]  o_recv_data       , //
-    output reg              o_recv_finish_p   , // o_recv_dataÎÈ¶¨×ã¹»³¤Ê±¼äºó£¬ÔÙÀ­¸ß
+    output reg              o_recv_finish_p   , // o_recv_dataï¿½È¶ï¿½ï¿½ã¹»ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
     input  wire             i_uart_inspect    ,
     output reg  [7:0]       o_modbus_err_code  // 5 = SG_CRC_ERR ; 6 = SG_TIME_OUT
@@ -60,7 +60,7 @@ module sygole_rfid_485_slaver_driver
     reg [7:0]    cur_state      ;
     reg [31:0]   time_cnt       ;
     reg [31:0]   uart_id_buf    ;
-    reg         start_send_req;         //¿ªÊ¼·¢ËÍ
+    reg         start_send_req;         //ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½
    
     reg          i_send_req_dy1;
     reg [3:0]    uart_delay_cnt;
@@ -83,17 +83,17 @@ module sygole_rfid_485_slaver_driver
 // --------------- 156.25MHZ clock domain ---------------
     reg [7:0]    m2s_state;
     reg [7:0]    s2m_state;
- //   reg [3:0]    m2s_start_send;         //¿ªÊ¼·¢ËÍ
- //   reg [7:0]    m2s_send_num;           //·¢ËÍµÄ×Ö½ÚÊý
- //   reg [7:0]    m2s_recv_num;           //½ÓÊÕµÄ×Ö½ÚÊý
+ //   reg [3:0]    m2s_start_send;         //ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½
+ //   reg [7:0]    m2s_send_num;           //ï¿½ï¿½ï¿½Íµï¿½ï¿½Ö½ï¿½ï¿½ï¿½
+ //   reg [7:0]    m2s_recv_num;           //ï¿½ï¿½ï¿½Õµï¿½ï¿½Ö½ï¿½ï¿½ï¿½
     reg           rs485_ch_flag_d1;
     reg           rs485_ch_flag_d2;
-    reg  [31:0]   m2s_send_char1;         //·¢ËÍ×Ö·û1*4
-    reg  [31:0]   m2s_send_char2;         //·¢ËÍ×Ö·û2*4
-    reg  [31:0]   m2s_send_char3;         //·¢ËÍ×Ö·û3*4
-    reg  [31:0]   m2s_send_char4;         //·¢ËÍ×Ö·û4*4
-    reg  [31:0]   m2s_send_char5;         //·¢ËÍ×Ö·û5*4
-    reg  [31:0]   m2s_send_char6;         //·¢ËÍ×Ö·û6*4
+    reg  [31:0]   m2s_send_char1;         //ï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½1*4
+    reg  [31:0]   m2s_send_char2;         //ï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½2*4
+    reg  [31:0]   m2s_send_char3;         //ï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½3*4
+    reg  [31:0]   m2s_send_char4;         //ï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½4*4
+    reg  [31:0]   m2s_send_char5;         //ï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½5*4
+    reg  [31:0]   m2s_send_char6;         //ï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½6*4
     reg           m2s_send_finish     ;
     reg [31:0]    s2m_uart_id         ;
     reg [7:0]     s2m_recv_byte[23:0] ;
@@ -174,7 +174,7 @@ module sygole_rfid_485_slaver_driver
         if(i_rst) begin
             uart_id_buf <= 0;
             uart_delay_cnt <= 12;
-        end else if(uart_id_buf != s2m_uart_id) begin // it could stay mismatched for 2-3 clock cycles ;¶àbit¿çÊ±ÖÓÓòÐÅºÅ£¬±È½Ï½á¹û²»Ò»ÖÂ¿ÉÄÜ»á³ÖÐøÁ½Èý¸öÊ±ÖÓ
+        end else if(uart_id_buf != s2m_uart_id) begin // it could stay mismatched for 2-3 clock cycles ;ï¿½ï¿½bitï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ÅºÅ£ï¿½ï¿½È½Ï½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½Â¿ï¿½ï¿½Ü»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½
             uart_id_buf <= s2m_uart_id;
             uart_delay_cnt <= 0;
         end else if(uart_delay_cnt < 12) begin
@@ -447,7 +447,7 @@ module sygole_rfid_485_slaver_driver
             m2s_send_finish <= 0;
             s2m_recv_finish <= 0;
        end else begin
-            m2s_send_finish <= (m2s_state==10)|(m2s_state==11)|(m2s_state==12);//Íê³É±êÖ¾³ÖÐøÈý¸öÊ±ÖÓ£¨Òª³¬¹ýÂýÊ±ÖÓÓòÒ»¸öÊ±ÖÓÖÜÆÚ£©
+            m2s_send_finish <= (m2s_state==10)|(m2s_state==11)|(m2s_state==12);//ï¿½ï¿½É±ï¿½Ö¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½Ó£ï¿½Òªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½Ú£ï¿½
             s2m_recv_finish <= (s2m_state==10)|(s2m_state==11)|(s2m_state==12);
        end
     end

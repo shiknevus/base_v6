@@ -426,10 +426,6 @@ always @(posedge clk_i)begin
         rcv_data_len <= 0;
         rcv_data_check_result <= 0;
         rcv_data_check_finish_p <= 0;
-        rcv_data_field_1 <= 0;
-        rcv_data_field_2 <= 0;
-        rcv_data_field_3 <= 0;
-        rcv_data_field_4 <= 0;
     end else begin
         case(rcv_data_check_state)
             RCV_CHK_STA_IDLE:begin
