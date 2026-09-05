@@ -1,81 +1,67 @@
-///////////////////////////////////////////////////////////////////////////////
-//
-//
-///////////////////////////////////////////////////////////////////////////////
-//
-//  AURORA_EXAMPLE
-//
-//  Aurora Generator
-//
-//
-//  Description: Sample Instantiation of a 1 4-byte lane module.
-//               Only tests initialization in hardware.
-//
-//        
 `timescale 1 ns / 1 ps
+
 (* core_generation_info = "aurora_8b10b_0,aurora_8b10b_v11_1_6,{user_interface=AXI_4_Streaming,backchannel_mode=Sidebands,c_aurora_lanes=1,c_column_used=left,c_gt_clock_1=GTHQ0,c_gt_clock_2=None,c_gt_loc_1=1,c_gt_loc_10=X,c_gt_loc_11=X,c_gt_loc_12=X,c_gt_loc_13=X,c_gt_loc_14=X,c_gt_loc_15=X,c_gt_loc_16=X,c_gt_loc_17=X,c_gt_loc_18=X,c_gt_loc_19=X,c_gt_loc_2=X,c_gt_loc_20=X,c_gt_loc_21=X,c_gt_loc_22=X,c_gt_loc_23=X,c_gt_loc_24=X,c_gt_loc_25=X,c_gt_loc_26=X,c_gt_loc_27=X,c_gt_loc_28=X,c_gt_loc_29=X,c_gt_loc_3=X,c_gt_loc_30=X,c_gt_loc_31=X,c_gt_loc_32=X,c_gt_loc_33=X,c_gt_loc_34=X,c_gt_loc_35=X,c_gt_loc_36=X,c_gt_loc_37=X,c_gt_loc_38=X,c_gt_loc_39=X,c_gt_loc_4=X,c_gt_loc_40=X,c_gt_loc_41=X,c_gt_loc_42=X,c_gt_loc_43=X,c_gt_loc_44=X,c_gt_loc_45=X,c_gt_loc_46=X,c_gt_loc_47=X,c_gt_loc_48=X,c_gt_loc_5=X,c_gt_loc_6=X,c_gt_loc_7=X,c_gt_loc_8=X,c_gt_loc_9=X,c_lane_width=4,c_line_rate=31250,c_nfc=false,c_nfc_mode=IMM,c_refclk_frequency=125000,c_simplex=false,c_simplex_mode=TX,c_stream=false,c_ufc=false,flow_mode=None,interface_mode=Framing,dataflow_config=Duplex}" *)
 (* DowngradeIPIdentifiedWarnings="yes" *)
+
 `include  "base_addr.vh"
 `include  "globe_includes.vh"
-module emcc_mst_top #
-(
+
+module emcc_mst_top #(
     parameter   STATION_ID = 0
-)
-(
-    // User IO
-     input          INIT_CLK_P
-    ,input          INIT_CLK_N
-    // Clocks
-    ,input          GT_REFCLK_P
-    ,input          GT_REFCLK_N
-    // GT I/O
-    ,input          RXP_0
-    ,input          RXN_0
-    ,output         TXP_0
-    ,output         TXN_0
+)( 
+     input          				INIT_CLK_P		// User clk
+    ,input          				INIT_CLK_N
     
-    // 2nd
-    ,input          RXP_1
-    ,input          RXN_1
-    ,output         TXP_1
-    ,output         TXN_1
+    ,input          				GT_REFCLK_P		// GT bank diff clk	
+    ,input          				GT_REFCLK_N
     
-    ,output         led     //systerm status
-    ,output         sfp0_disable
-    ,output         sfp1_disable
-    
-    ,inout         MAX31820_DQ    
-    
-    ,input  wire    rs485_1_rx 
-    ,output wire    rs485_1_tx 
-    ,output wire    rs485_1_de 
-    
-    ,input  wire    rs485_2_rx 
-    ,output wire    rs485_2_tx 
-    ,output wire    rs485_2_de 
-    
-    ,input  wire [63:0]     main_board_inio
-    ,output wire [31:0]     main_board_outio
-    ,input  wire [7:0]      i_dv_alarm      //MOTOR
-    ,output wire [7:0]      o_dv_pulse
-    ,output wire [7:0]      o_dv_dir
-    ,output wire [7:0]      o_dv_reset
-    ,output wire [7:0]      o_dv_son
+    ,input          				RXP_0			// GT I/O	
+    ,input          				RXN_0
+    ,output         				TXP_0
+    ,output         				TXN_0
 	
-    ,output wire            adc_cs          //ADC
-    ,input  wire            adc_dout
-    ,output wire            adc_sclk
-    ,output wire            adc_sdin
-	
-	,output 				o_dac_syn 		//DAC
-	,output 				o_dac_sclk	
-	,output 				o_dac_din 	
-	,output 				o_dac_load	
-	,output 				o_dac_clr	
-	,input					i_dac_dout	
-	
-    ,input  wire            main_232_rxd
-    ,output wire            main_232_txd
+    ,input          				RXP_1
+    ,input          				RXN_1
+    ,output         				TXP_1
+    ,output         				TXN_1
+    
+    ,output         				led     		//systerm status
+    ,output         				sfp0_disable
+    ,output         				sfp1_disable
+    
+    ,inout         					MAX31820_DQ    	//Temperature
+    
+    ,input  	    				rs485_1_rx 
+    ,output 	    				rs485_1_tx 
+    ,output 	    				rs485_1_de 
+		
+    ,input  	    				rs485_2_rx 
+    ,output 	    				rs485_2_tx 
+    ,output 	    				rs485_2_de 
+    
+    ,input  	 [63:0]     		main_board_inio
+    ,output 	 [31:0]     		main_board_outio
+		
+    ,input  	 [7:0]      		i_dv_alarm      //MOTOR
+    ,output 	 [7:0]      		o_dv_pulse
+    ,output 	 [7:0]      		o_dv_dir
+    ,output 	 [7:0]      		o_dv_reset
+    ,output 	 [7:0]      		o_dv_son
+		
+    ,output 	            		o_spi_cs_n      //ADC	
+    ,input  	            		i_spi_miso                
+    ,output 	            		o_spi_clk               
+    ,output 	            		o_spi_mosi               
+		
+	,output 						o_dac_syn 		//DAC
+	,output 						o_dac_sclk	
+	,output 						o_dac_din 	
+	,output 						o_dac_load	
+	,output 						o_dac_clr	
+	,input							i_dac_dout	
+		
+    ,input  	            		main_232_rxd
+    ,output 	            		main_232_txd
 );
     wire            HARD_ERR_0;
     wire            SOFT_ERR_0;
@@ -214,8 +200,15 @@ module emcc_mst_top #
     reg                         aurora_ip_rst_release;
     wire    [2:0]               stu;
     wire                        clk_10m;
+	
+	wire 	[7:0]         		i_servo_alarm;
+	wire    [7:0]   			slv_sta_num;
+	
+	assign  sfp0_disable = 1;
+    assign  sfp1_disable = 1;
 
-     ///////////////////////////////////////////////////////////////////////
+	
+   //--------------- gen clk and sync_rst ---------------
     sys_signal_gen
         sys_signal_gen_u
         (
@@ -223,13 +216,30 @@ module emcc_mst_top #
             ,.sys_clk_in_n          (INIT_CLK_N         )
             ,.rst_fpga_n            (1                  )
             ,.clk_10m               (clk_10m            )
-            ,.aurora_ref_clk        (aurora_ref_clk     )
-            ,.aurora_ref_clk_rst    (aurora_ref_clk_rst )
-            ,.rst_aurora_init_clk   (rst_aurora_init_clk)
-            ,.aurora_init_clk       (aurora_init_clk    )
+            ,.aurora_ref_clk        (aurora_ref_clk     )	//125M
+            ,.aurora_ref_clk_rst    (aurora_ref_clk_rst )	//~MMCM locked
+            ,.rst_aurora_init_clk   (rst_aurora_init_clk)	//156.25M
+            ,.aurora_init_clk       (aurora_init_clk    )	//~MMCM locked
         );
-    assign  GT_RESET_IN = rst_aurora_init_clk;
+    
+	assign  GT_RESET_IN = rst_aurora_init_clk;
     assign  prot_clk = axi_clk_0;
+	
+	always @(posedge axi_clk_0)begin
+        axi_clk_rst_0_d1    <=  axi_clk_rst_0;
+    end
+	
+	always @(posedge axi_clk_0)begin
+        if((~axi_clk_rst_0) & axi_clk_rst_0_d1)begin
+            prot_clk_rst    <=  0;
+        end else begin
+            prot_clk_rst    <=  prot_clk_rst;
+        end
+    end
+	
+	
+	//------------- status LED logic -----------------
+	
     //status LED: solid=link idle, fast blink=data flowing, dark=link down
     wire            mst_link_up  = LANE_UP_1 & CHANNEL_UP_1;
     wire            mst_data_act = m_app_tx_tvalid | s_app_rx_tvalid
@@ -245,92 +255,11 @@ module emcc_mst_top #
             led_act_hold <= led_act_hold - 1'b1;
     end
     assign led = mst_link_up & ((led_act_hold != 0) ? led_free_cnt[24] : 1'b1); //~5Hz blink on activity
-
-    always @(posedge axi_clk_0)begin
-        axi_clk_rst_0_d1    <=  axi_clk_rst_0;
-    end
-
-    always @(posedge axi_clk_0)begin
-        if((~axi_clk_rst_0) & axi_clk_rst_0_d1)begin
-            prot_clk_rst    <=  0;
-        end else begin
-            prot_clk_rst    <=  prot_clk_rst;
-        end
-    end
-    
-    wire [31:0] debug_data;
-    wire [31:0] uart_debug;
-    assign uart_debug = debug_data;
-
-    wire [3:0] dbg_enable;
-//    wire main_232_user_rxd;
-//    wire main_232_user_txd;
-    
-//    wire main_232_rxd_n;
-//    wire main_232_txd_n;
-//    wire main_232_txd_p;
-//    assign main_232_user_rxd = dbg_enable ? main_232_rxd :1'b1 ;
-//    assign main_232_rxd_n    = dbg_enable ? 1'b1 :main_232_rxd ;
-//    assign main_232_txd      = dbg_enable ? main_232_user_txd : main_232_txd_n;
-    
-//    assign main_232_txd_n = (uart_debug == 1) ? rs485_1_rx : (uart_debug == 2) ? rs485_2_rx : main_232_txd_p;
-
-    reg                mst_io_flag;
-    wire [31:0]        mst_io;
-    wire [7:0]         i_servo_alarm;
-//    wire [63:0]        emcc_main_inio;  
-//    wire [31:0]        emcc_main_outio;
-    wire [31:0]        emcc_main_inai;
-    wire [15:0]        main_board_inai[1:0];
-    wire [31:0]      	test_outio_data;
-    wire 				test_mode;
-    
-    wire [15:0] board_temp_82130;
-    
-    assign  emcc_main_inai = {main_board_inai[1],main_board_inai[0]};
-//    assign  main_board_outio = test_mode ? test_outio_data : emcc_main_outio;  //main_board_outio = mst_io_flag ? mst_io : (test_mode ? test_outio_data : emcc_main_outio);
-    `ifdef ENB_SIM_MODULE
-    
-    `else
-//    uart_interface uart_interface_u
-//    (
-//	   .i_clk				(ps_reg_clk          ),
-//	   .i_rstn				(~ps_reg_reset       ),
-	   
-//	   .i_uart_rx           (main_232_rxd_n        ),
-//	   .o_uart_tx			(main_232_txd_p        ),
-//	   .test_mode_d1		(test_mode           ),
-//	   .i_odd_even_check	(2'b00               ),//2'b0x:no check;2'b11:odd check;2'b10:even check;
-//	   .i_bps_sel			(2'b00               ),//2'b00:115200bps;
-//	   .ai_1                (main_board_inai[0]  ),
-//       .ai_2                (main_board_inai[1]  ),
-//       .i_data				(main_board_inio     ),
-//	   .o_data				(test_outio_data     ),
-//	   .io_code_dout		(emcc_main_outio     )
-//    );
-
-//    adc_dac adc_dac_u                       
-//    (                          
-//        .clk10m             (clk_10m            )
-//        ,.locked            (1'b1               )
-                                  
-//        ,.sclk              (adc_sclk           )    
-//        ,.sdin1             (adc_sdin           )   
-//        ,.sdout1            (adc_dout           )  
-//        ,.cs1               (adc_cs             )
-//        ,.ch_1              (main_board_inai[0] )         
-//        ,.ch_2              (main_board_inai[1] )
-//    );
-    wire   o_spi_cs_n;
-    wire   o_spi_clk ;
-    wire   o_spi_mosi;
-    wire   i_spi_miso;
-    assign adc_cs     = o_spi_cs_n ;
-    assign adc_sclk   = o_spi_clk  ;
-    assign adc_sdin   = o_spi_mosi ;
-    assign i_spi_miso = adc_dout   ;
     
     
+	//-------------- Temperature sensor --------------
+	
+	wire [15:0] board_temp_82130;
 //    max31820_driver #(
 //    .CLK_FREQUENCE(100)
 //    )
@@ -342,13 +271,13 @@ module emcc_mst_top #
 //    .ov_t_data          (board_temp_82130         )
 //    );
     
-    `endif
-    wire    [7:0]   slv_sta_num;
-    // -------------------------------------------------------------------------------------------------------------------------------------
+	
+    // --------------------- Global time pulse -------------------
     wire time_1ms_vld;
     wire time_10ms_vld;
     wire time_100ms_vld;
     wire time_1s_vld;
+	
     counter_xms #(
          .TIME_1MS_TIMER ('d100000)
     )U_counter_xms(
@@ -366,6 +295,7 @@ module emcc_mst_top #
 	reg 	[1:0]	r_time_100ms_vld ;
 	reg 	[1:0]	r_time_1s_vld    ;
 	
+	//Synchronized to the 156.25 MHz clock domain
 	reg 	sync_time_1ms_vld   ;
 	reg 	sync_time_10ms_vld  ;
 	reg 	sync_time_100ms_vld ;
@@ -429,20 +359,22 @@ module emcc_mst_top #
 	
 	
 	
-    // -------------------------------------------------------------------------------------------------------------------------------------
+    // ----------------------- debug logic -------------------
     
-	 wire  [RAM_DWIDTH*3-1:0] dbg_iv_di_slv_msg[RAM_DWIDTH-1:0];
+	wire  [RAM_DWIDTH*3-1:0] dbg_iv_di_slv_msg[RAM_DWIDTH-1:0];
     wire  [RAM_DWIDTH*3-1:0] dbg_iv_do_slv_msg[RAM_DWIDTH-1:0];
     wire  [RAM_DWIDTH*3-1:0] dbg_ov_di_slv_msg[RAM_DWIDTH-1:0];
     wire  [RAM_DWIDTH*3-1:0] dbg_ov_do_slv_msg[RAM_DWIDTH-1:0];
     wire  [RAM_DWIDTH-1:0]   dbg_ov_di_debug                  ; 
     wire  [RAM_DWIDTH-1:0]   dbg_ov_do_debug                  ; 
         
-localparam DI_BIT_WIDTH = 64;
-localparam DO_BIT_WIDTH = 32;
+	localparam DI_BIT_WIDTH = 64;
+	localparam DO_BIT_WIDTH = 32;
+	
     wire [DI_BIT_WIDTH-1:0]     emcc_main_inio;  
     wire [DO_BIT_WIDTH-1:0]     emcc_main_outio;
     wire [DI_BIT_WIDTH-1:0]     emcc_main_inio_debounce;
+	
     `ifdef IO_DEBUG
     wire DEBUG_UART_RX ;
     wire DEBUG_UART_TX ;
@@ -502,8 +434,6 @@ localparam DO_BIT_WIDTH = 32;
     wire [DI_BIT_WIDTH-1:0] dbg_main_board_in_io;
     wire [DO_BIT_WIDTH-1:0] dbg_main_board_out_io;
     
-    
-    
     wire  [RAM_DWIDTH*3-1:0] dbg_iv_di_slv_msg[RAM_DWIDTH-1:0];
     wire  [RAM_DWIDTH*3-1:0] dbg_iv_do_slv_msg[RAM_DWIDTH-1:0];
     wire  [RAM_DWIDTH*3-1:0] dbg_ov_di_slv_msg[RAM_DWIDTH-1:0];
@@ -545,26 +475,25 @@ localparam DO_BIT_WIDTH = 32;
     assign emcc_main_inio = di_debug ? dbg_main_board_in_io : emcc_main_inio_debounce; 
 `else
 
-    assign main_board_outio  =  ~emcc_main_outio; 
-    assign emcc_main_inio    =  emcc_main_inio_debounce; 
+    assign main_board_outio  =  ~emcc_main_outio; 				//main_board output
+    assign emcc_main_inio    =  emcc_main_inio_debounce; 		//main_board input
 
 `endif
-    
-    
-    
-    all_inio_debounce 
-    #(
+
+
+	//------------ main_board input debounce ---------------------
+    all_inio_debounce #(
 		.IO_NUM                 (8'd72              )
-	)
-    all_inio_debounce_u1
-    (
+	)all_inio_debounce_u1(
          .clk                   (prot_clk           )
         ,.reset                 (prot_clk_rst       )
-    
         ,.IO_in                 ({i_dv_alarm,main_board_inio}   )
         ,.IO_in_handle          ({i_servo_alarm,emcc_main_inio_debounce} )
     );
 
+	
+	//----------- aurora_8b10b ip core --------------------------
+	
     aurora_8b10b_top
         aurora_8b10b_top_u
         (
@@ -623,9 +552,9 @@ localparam DO_BIT_WIDTH = 32;
             ,.m_axi_rx_tvalid_1 (m_axi_rx_tvalid_1)
             ,.m_axi_rx_tlast_1  (m_axi_rx_tlast_1 )
         );
-    assign  sfp0_disable = 1;
-    assign  sfp1_disable = 1;
-		
+	
+	//----------------- Aurora Data Route select ---------------------
+	
 	ethcat_axi_rout_mststa ethcat_axi_rout_u
     (
          .clk                   (prot_clk       )
@@ -667,6 +596,8 @@ localparam DO_BIT_WIDTH = 32;
         ,.s_axi_rx_tlast_1      (m_axi_rx_tlast_1   )
     );	
 
+	//-------------- sim logic ------------------------------
+	
     `ifdef SIM_PLATFORM_MST
         always @(posedge prot_clk)begin
             if(prot_clk_rst)begin
@@ -690,7 +621,6 @@ localparam DO_BIT_WIDTH = 32;
         reg     [31:0]  vio_ram_rd_data;
         reg     [31:0]  vio_ram_rd_data_d1;
         
-//        wire [31:0] uart_debug;
         wire    [31:0]  vio_ram_wr_addr;
         wire    [31:0]  vio_ram_wr_data;
         reg     [31:0]  vio_ram_wr_addr_d1;
@@ -729,6 +659,10 @@ localparam DO_BIT_WIDTH = 32;
         end
     `endif
 
+	
+	
+	//-------------- rs485 Arbiter module -------------------
+
     localparam RS485_1_USER_NUMBER = 32;
     wire [RS485_1_USER_NUMBER-1:0] rs485_1_user_req;
     wire [RS485_1_USER_NUMBER-1:0] rs485_1_user_grant;
@@ -752,7 +686,7 @@ localparam DO_BIT_WIDTH = 32;
           .i_user_de             (rs485_1_user_de        )
     );
 
-
+	//-------------- rs485 Arbiter module -------------------
 
     localparam RS485_2_USER_NUMBER = 8;
     wire [RS485_2_USER_NUMBER-1:0] rs485_2_user_req;
@@ -790,6 +724,9 @@ localparam DO_BIT_WIDTH = 32;
     wire                        flow_reg_rd_vld;
     wire    [PS_REG_DWIDTH-1:0] flow_reg_rd_dat;
     
+	
+	//------------------- emcc_mix_top ---------------------------
+	
     `ifdef SIM_PLATFORM_MST
     emcc_comp_top_sim
     #(
@@ -846,7 +783,7 @@ localparam DO_BIT_WIDTH = 32;
             //main_IO interface
             ,.di_mst_msg            (emcc_main_inio     )
             ,.do_relay_mst_msg      (emcc_main_outio    )
-            ,.ai_mst_msg            (emcc_main_inai     )
+            ,.ai_mst_msg            (0     )
 //            ,.di_board_io           (main_board_inio     )
 
             //component interface
@@ -877,7 +814,7 @@ localparam DO_BIT_WIDTH = 32;
             ,.flow_irq         (flow_irq      )
 //            ,.emcc_comp_irq         (emcc_comp_irq      )
             
-            ,.ov_dbg_enable     (dbg_enable      )
+            ,.ov_dbg_enable     (	      )
             ,.i_do_dbg_data_vld     (do_dbg_data_vld      )
             ,.iv_io_mode_cfg        (io_mode_cfg          )
             ,.ov_rd_io_data         (inout_io_data        )
@@ -925,21 +862,14 @@ localparam DO_BIT_WIDTH = 32;
        
         );
     `endif
-
-    /*always @(posedge prot_clk)begin
-        if(jtag_irq_select)begin
-            comp_irq    <=  jtag_irq_d1;
-        end else begin
-            comp_irq[255:0]   <=  emcc_flow_irq;
-            comp_irq[511:256] <=  emcc_comp_irq;
-        end
-    end*/
     
     always @(posedge ps_reg_clk)begin
         comp_irq[511:0] <= {flow_irq[511],emcc_irq[510:0]};
-//        comp_irq[511:256] <= emcc_comp_irq;
     end
 
+	
+	//---------------------------- ethcat logic ------------------------
+	
     wire                        app_reg_rd_vld;
     wire    [PS_REG_DWIDTH-1:0] app_reg_rd_dat;
     emcc_mst_app
@@ -979,7 +909,7 @@ localparam DO_BIT_WIDTH = 32;
             //ps tx depot
             ,.ps_tx_depot_addr  (ps_tx_depot_addr   )
             ,.ps_tx_depot_dout  (ps_tx_depot_dout   )
-			,.debug_data (debug_data   )
+			,.debug_data (	   )
         //  ps  config  port    //
             ,.ps_reg_clk                (ps_reg_clk     )
             ,.ps_reg_reset              (ps_reg_reset   )
@@ -1019,6 +949,9 @@ localparam DO_BIT_WIDTH = 32;
             ,.slv_sta_num  (slv_sta_num   )
         );
 
+		
+	//--------------------- ps read data route --------------------------
+	
     ps_rd_dat_route
     #(
          .CHANNEL_NUM       (CHANNEL_NUM    )
@@ -1041,6 +974,8 @@ localparam DO_BIT_WIDTH = 32;
     assign  ds_rd_vld[2] = flow_reg_rd_vld;
     assign  ds_rd_dat[2] = flow_reg_rd_dat;
 
+	
+	//------------------------ axi full to read-write pl reg ------------------------
     ps_cfg_top
     #(
          .OPT_MEM_ADDR_BITS     (PS_REG_AWIDTH      )
@@ -1084,7 +1019,10 @@ localparam DO_BIT_WIDTH = 32;
             ,.s_axi_rvalid  (s_axi_rvalid   )
             ,.s_axi_rready  (s_axi_rready   )
         );
-////////////////////////////////////////PS  MODULE//////////////////////////////
+	
+	
+	//-------------------------- PS  MODULE ------------------------------
+	
   wire [7:0]GPIO_tri_i;
   wire [7:0]GPIO_tri_o;
   wire [7:0]GPIO_tri_t;
@@ -1128,9 +1066,6 @@ localparam DO_BIT_WIDTH = 32;
   wire TX_BRAM_PORTB_en;
   wire TX_BRAM_PORTB_rst;
   wire [3:0]TX_BRAM_PORTB_we;
-  wire [0:0]AXI_GPIO_tri_i_0;
-  wire [0:0]AXI_GPIO_tri_o_0;
-  wire [0:0]AXI_GPIO_tri_t_0;
 
   mststa_mpsoc_v2 mststa_mpsoc_u
        (
@@ -1224,11 +1159,6 @@ localparam DO_BIT_WIDTH = 32;
     
     assign  s_axi_aclk          =   PLCLK;
     assign  s_axi_aresetn       =   PLRESETN;
-/*       */
-  IOBUF AXI_GPIO_tri_iobuf_0
-       (.I(AXI_GPIO_tri_o_0),
-        .IO(),
-        .O(AXI_GPIO_tri_i_0),
-        .T(AXI_GPIO_tri_t_0));
+
 
 endmodule
