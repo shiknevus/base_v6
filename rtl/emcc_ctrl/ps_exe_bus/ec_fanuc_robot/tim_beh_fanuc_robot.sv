@@ -312,7 +312,7 @@ module tim_beh_fanuc_robot(
 			c_alm_num <= ack_ps_alart_num;
 		else if(curr_state == S_SUCC_30_ACK && timout)						//For Transaction 30, waiting for the ps response timed out.
             c_alm_num <= 8'd103;
-		else if(curr_state == S_ACT_END_1)
+		else if(curr_state == S_IDLE)
 			c_alm_num <= 8'd0;
         else
             c_alm_num <= c_alm_num;

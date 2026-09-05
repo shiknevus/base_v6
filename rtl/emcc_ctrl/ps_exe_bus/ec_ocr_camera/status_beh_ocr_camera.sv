@@ -293,7 +293,7 @@ module status_beh_ocr_camera#(
 			b_alm_num <= ack_ps_alart_num;
 		else if(curr_state == S_SUCC_30_ACK && timout)							
             b_alm_num <= 8'd103;
-		else if(curr_state == S_ACT_END_1)
+		else if(curr_state == S_IDLE)
 			b_alm_num <= 8'd0;
         else
             b_alm_num <= b_alm_num;
