@@ -252,14 +252,14 @@ set_property IOSTANDARD LVCMOS18 [get_ports o_dv_reset[7]]
 set_property IOSTANDARD LVCMOS18 [get_ports o_dv_son[7]]
 
 #########################################################################
-set_property PACKAGE_PIN A14 [get_ports adc_cs]
-set_property PACKAGE_PIN B13 [get_ports adc_dout]
-set_property PACKAGE_PIN B14 [get_ports adc_sclk]
-set_property PACKAGE_PIN A13 [get_ports adc_sdin]
-set_property IOSTANDARD LVCMOS33 [get_ports adc_cs]
-set_property IOSTANDARD LVCMOS33 [get_ports adc_dout]
-set_property IOSTANDARD LVCMOS33 [get_ports adc_sclk]
-set_property IOSTANDARD LVCMOS33 [get_ports adc_sdin]
+set_property PACKAGE_PIN A14 [get_ports o_spi_cs_n]
+set_property PACKAGE_PIN B13 [get_ports i_spi_miso]
+set_property PACKAGE_PIN B14 [get_ports o_spi_clk]
+set_property PACKAGE_PIN A13 [get_ports o_spi_mosi]
+set_property IOSTANDARD LVCMOS33 [get_ports o_spi_cs_n]
+set_property IOSTANDARD LVCMOS33 [get_ports i_spi_miso]
+set_property IOSTANDARD LVCMOS33 [get_ports o_spi_clk]
+set_property IOSTANDARD LVCMOS33 [get_ports o_spi_mosi]
 
 ##########################################################################
 
