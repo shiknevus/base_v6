@@ -288,30 +288,22 @@ module status_beh_can_servo#(
 	always@(posedge clk_i)begin
         if(rst_i || !b_en)
             b_alm_num <= 8'd0;
-		else if(curr_state == S_IDLE)
-			b_alm_num <= 8'd0;
-        else if(curr_state == S_BHA_PRE_DET && timout)						//The pre - full inspection is not met.
-            b_alm_num <= 8'd1;    
-        else if(curr_state == S_READY_10_ACK && ack_tx_result == IRQ_NO_OK)	//Transaction 10 ps response error
+        else if(curr_state == S_BHA_PRE_DET && timout)						
+            b_alm_num <= 8'd100;    
+        else if(curr_state == S_READY_10_ACK && ack_tx_result == IRQ_NO_OK)	
             b_alm_num <= ack_ps_alart_num;    
-        else if(curr_state == S_READY_10_ACK && timout)						//For Transaction 10, waiting for the ps response timed out.
-            b_alm_num <= 8'd2;    
-		// else if(curr_state == S_EXE_20_ACK && ack_tx_result == IRQ_NO_OK)	//Transaction 20 has a ps response error.
-            //     b_alm_num <= ack_ps_alart_num;
-        else if(curr_state == S_EXE_20_ACK && timout)						//For Transaction 20, waiting for the ps response timed out.
-            b_alm_num <= 8'd3;    
-		else if(curr_state_1d == S_EXE && curr_state == S_ALERT_40 && b_bhv_id == 8'd100)//The execution of Behavior 100 failed.
-			b_alm_num <= 8'd4;
-		else if(curr_state_1d == S_EXE && curr_state == S_ALERT_40 && b_bhv_id == 8'd101)//The execution of Behavior 101 failed.
-			b_alm_num <= 8'd5;
-		else if(curr_state == S_SUCC_30_ACK && ack_tx_result == IRQ_NO_OK)	//Transaction 30 has a ps response error.
+        else if(curr_state == S_READY_10_ACK && timout)						
+            b_alm_num <= 8'd101;    
+		else if(curr_state == S_BHA_POST_DET && timout)						
+			b_alm_num <= 8'd102;
+		else if(curr_state == S_SUCC_30_ACK && ack_tx_result == IRQ_NO_OK)	
 			b_alm_num <= ack_ps_alart_num;
-		else if(curr_state == S_SUCC_30_ACK && timout)						//For Transaction 30, waiting for the ps response timed out.
-            b_alm_num <= 8'd6;
-		else if(curr_state == S_IDLE)
+		else if(curr_state == S_SUCC_30_ACK && timout)						
+            b_alm_num <= 8'd103;
+		else if(curr_state == S_ACT_END_1)
 			b_alm_num <= 8'd0;
         else
-               b_alm_num <= b_alm_num;
+            b_alm_num <= b_alm_num;
     end
 	
 

@@ -342,17 +342,17 @@ module status_beh_safety_door#(
 	always@(posedge clk_i)begin
         if(rst_i || !b_en)
             b_alm_num <= 8'd0;
-        else if(curr_state == S_BHA_PRE_DET && timout)						//The pre - full inspection is not met.
+        else if(curr_state == S_BHA_PRE_DET && timout)						
             b_alm_num <= 8'd100;    
-        else if(curr_state == S_READY_10_ACK && ack_tx_result == IRQ_NO_OK)	//Transaction 10 ps response error
+        else if(curr_state == S_READY_10_ACK && ack_tx_result == IRQ_NO_OK)	
             b_alm_num <= ack_ps_alart_num;    
-        else if(curr_state == S_READY_10_ACK && timout)						//For Transaction 10, waiting for the ps response timed out.
+        else if(curr_state == S_READY_10_ACK && timout)						
             b_alm_num <= 8'd101;    
-		else if(curr_state == S_BHA_POST_DET && timout)//The execution of Behavior 2 failed.
+		else if(curr_state == S_BHA_POST_DET && timout)						
 			b_alm_num <= 8'd102;
-		else if(curr_state == S_SUCC_30_ACK && ack_tx_result == IRQ_NO_OK)	//Transaction 30 has a ps response error.
+		else if(curr_state == S_SUCC_30_ACK && ack_tx_result == IRQ_NO_OK)	
 			b_alm_num <= ack_ps_alart_num;
-		else if(curr_state == S_SUCC_30_ACK && timout)						//For Transaction 30, waiting for the ps response timed out.
+		else if(curr_state == S_SUCC_30_ACK && timout)						
             b_alm_num <= 8'd103;
 		else if(curr_state == S_ACT_END_1)
 			b_alm_num <= 8'd0;

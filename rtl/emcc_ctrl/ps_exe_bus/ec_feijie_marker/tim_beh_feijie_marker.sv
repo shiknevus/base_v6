@@ -298,25 +298,21 @@ module tim_beh_feijie_marker(
     end
 
 	always@(posedge clk_i)begin
-        if(rst_i||!c_en)
+        if(rst_i || !c_en)
             c_alm_num <= 8'd0;
         else if(curr_state == S_BHA_PRE_DET && timout)						//The pre - full inspection is not met.
-            c_alm_num <= 8'd1;
+            c_alm_num <= 8'd100;    
         else if(curr_state == S_READY_10_ACK && ack_tx_result == IRQ_NO_OK)	//Transaction 10 ps response error
-            c_alm_num <= ack_ps_alart_num;
+            c_alm_num <= ack_ps_alart_num;    
         else if(curr_state == S_READY_10_ACK && timout)						//For Transaction 10, waiting for the ps response timed out.
-            c_alm_num <= 8'd2;
-		else if(curr_state == S_EXE_20_ACK && ack_tx_result == IRQ_NO_OK)	//Transaction 20 has a ps response error.
-            c_alm_num <= ack_ps_alart_num;
-        else if(curr_state == S_EXE_20_ACK && timout)						//For Transaction 20, waiting for the ps response timed out.
-            c_alm_num <= 8'd3;
-		else if(curr_state_1d == S_EXE && curr_state == S_ALERT_40 && c_bhv_id == 8'd150)//The execution failed.
-			c_alm_num <= 8'd4;
+            c_alm_num <= 8'd101;     
+		else if(curr_state == S_BHA_POST_DET && timout)//The execution of Behavior 1 failed.
+			c_alm_num <= 8'd102; 
 		else if(curr_state == S_SUCC_30_ACK && ack_tx_result == IRQ_NO_OK)	//Transaction 30 has a ps response error.
 			c_alm_num <= ack_ps_alart_num;
 		else if(curr_state == S_SUCC_30_ACK && timout)						//For Transaction 30, waiting for the ps response timed out.
-            c_alm_num <= 8'd6;
-		else if(curr_state == S_IDLE)
+            c_alm_num <= 8'd103;
+		else if(curr_state == S_ACT_END_1)
 			c_alm_num <= 8'd0;
         else
             c_alm_num <= c_alm_num;
