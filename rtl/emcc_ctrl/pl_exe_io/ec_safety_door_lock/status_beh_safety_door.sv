@@ -449,12 +449,19 @@ module status_beh_safety_door#(
 	
 	always@(posedge clk_i)
 	begin
-		if(rst_i)
+		if(rst_i)begin
 			open_req_key_posedge <= 0;
-		else if({ri_open_req_key,i_open_req_key} == 2'b01)
+			open_req_key_negedge <= 0;
+		end else if({ri_open_req_key,i_open_req_key} == 2'b01)begin
 			open_req_key_posedge <= 1;
-		else
+			open_req_key_negedge <= 0;
+		end else if({ri_open_req_key,i_open_req_key} == 2'b10)begin
 			open_req_key_posedge <= 0;
+			open_req_key_negedge <= 1;
+		end else begin
+			open_req_key_posedge <= 0;
+			open_req_key_negedge <= 0;
+		end
 	end
 	
 	always@(posedge clk_i)
@@ -467,12 +474,19 @@ module status_beh_safety_door#(
 	
 	always@(posedge clk_i)
 	begin
-		if(rst_i)
+		if(rst_i)begin
 			close_confirm_key_posedge <= 0;
-		else if({ri_close_confirm_key,i_close_confirm_key} == 2'b01)
+			close_confirm_key_negedge <= 0;
+		end else if({ri_close_confirm_key,i_close_confirm_key} == 2'b01)begin
 			close_confirm_key_posedge <= 1;
-		else
+			close_confirm_key_negedge <= 0;
+		end else if({ri_close_confirm_key,i_close_confirm_key} == 2'b10)begin
 			close_confirm_key_posedge <= 0;
+			close_confirm_key_negedge <= 1;
+		end else begin
+			close_confirm_key_posedge <= 0;
+			close_confirm_key_negedge <= 0;
+		end
 	end
 	
 	always @(posedge clk_i) begin
