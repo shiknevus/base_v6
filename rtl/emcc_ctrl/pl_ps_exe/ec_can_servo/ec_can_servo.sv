@@ -190,41 +190,39 @@ module ec_can_servo#(
 	
 	wire	[7:0]	a_bhv_id_r;
 	
-	wire	i_clk = clk_i;
-	wire	i_rst = rst_i;
 	
-		reg			ro_intr_irq;
-		reg	[7:0]	irq_posedge_cnt;
-		reg	[7:0]	irq_negedge_cnt;
-		
-		always@(posedge i_clk)
-		begin
-			ro_intr_irq <= o_intr_irq;
-		end
-		
-		
-		always@(posedge i_clk)
-		begin
-			if(i_rst)begin
-				irq_posedge_cnt <= 8'd0;
-				irq_negedge_cnt <= 8'd0;
-			end else if(a_bhv_vld)begin
-				irq_posedge_cnt <= 8'd0;
-				irq_negedge_cnt <= 8'd0;
+	reg			ro_intr_irq;
+	reg	[7:0]	irq_posedge_cnt;
+	reg	[7:0]	irq_negedge_cnt;
+	
+	always@(posedge clk_i)
+	begin
+		ro_intr_irq <= o_intr_irq;
+	end
+	
+	
+	always@(posedge clk_i)
+	begin
+		if(rst_i)begin
+			irq_posedge_cnt <= 8'd0;
+			irq_negedge_cnt <= 8'd0;
+		end else if(a_bhv_vld)begin
+			irq_posedge_cnt <= 8'd0;
+			irq_negedge_cnt <= 8'd0;
+		end else begin
+			if({ro_intr_irq,o_intr_irq} == 2'b01)begin	//rising
+				irq_posedge_cnt <= irq_posedge_cnt+1;
 			end else begin
-				if({ro_intr_irq,o_intr_irq} == 2'b01)begin	//rising
-					irq_posedge_cnt <= irq_posedge_cnt+1;
-				end else begin
-					irq_posedge_cnt <= irq_posedge_cnt;
-				end
-				
-				if({ro_intr_irq,o_intr_irq} == 2'b10)begin	//falling
-					irq_negedge_cnt <= irq_negedge_cnt+1;
-				end else begin
-					irq_negedge_cnt <= irq_negedge_cnt;
-				end
+				irq_posedge_cnt <= irq_posedge_cnt;
+			end
+			
+			if({ro_intr_irq,o_intr_irq} == 2'b10)begin	//falling
+				irq_negedge_cnt <= irq_negedge_cnt+1;
+			end else begin
+				irq_negedge_cnt <= irq_negedge_cnt;
 			end
 		end
+	end
 	
 	//valid signal sync
 	reg 		r_a_tx_result_vld ;
