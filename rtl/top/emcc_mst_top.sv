@@ -555,7 +555,7 @@ localparam DO_BIT_WIDTH = 32;
     assign emcc_main_inio = di_debug ? dbg_main_board_in_io : emcc_main_inio_debounce; 
 `else
 
-    assign main_board_outio  =  emcc_main_outio; 
+    assign main_board_outio  =  ~emcc_main_outio; 
     assign emcc_main_inio    =  emcc_main_inio_debounce; 
 
 `endif
