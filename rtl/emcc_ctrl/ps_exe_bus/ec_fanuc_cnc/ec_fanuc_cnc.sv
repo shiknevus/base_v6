@@ -221,22 +221,20 @@ always@(posedge clk_i)
 
 	wire	[7:0]	a_bhv_id_r;
 
-	wire	i_clk = clk_i;
-	wire	i_rst = rst_i;
 
 		reg			ro_intr_irq;
 		reg	[7:0]	irq_posedge_cnt;
 		reg	[7:0]	irq_negedge_cnt;
 
-		always@(posedge i_clk)
+		always@(posedge clk_i)
 		begin
 			ro_intr_irq <= o_intr_irq;
 		end
 
 
-		always@(posedge i_clk)
+		always@(posedge clk_i)
 		begin
-			if(i_rst)begin
+			if(rst_i)begin
 				irq_posedge_cnt <= 8'd0;
 				irq_negedge_cnt <= 8'd0;
 			end else if(a_bhv_vld)begin

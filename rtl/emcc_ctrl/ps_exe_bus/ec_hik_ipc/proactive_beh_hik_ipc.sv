@@ -81,10 +81,6 @@ module proactive_beh_hik_ipc#(
     localparam  IRQ_OK          = 8'h51;	//ps ack:OK
     localparam  IRQ_NO_OK       = 8'h52;	//ps ack:NO OK
 
-    localparam  ALARM_BEHATMOUT = 8'd120;	//behavior timeout (same as old framework)
-    localparam  ALARM_MANUAL    = 8'd204;	//manual mode (same as old framework)
-    localparam  ALARM_LOCK      = 8'd203;	//link lock (same as old framework)
-
     wire auto_manual = (i_m_wk_mod == 4'd3);	//set_work_mode == 3: manual
 
 
@@ -366,26 +362,20 @@ module proactive_beh_hik_ipc#(
     always@(posedge clk_i)begin
         if(rst_i || !a_en)
             a_alm_num <= 8'd0;
-        else if(curr_state == S_BHA_PRE_DET && auto_manual && !pre_sta_allow[a_bhv_id_r - 1'b1])
-            a_alm_num <= ALARM_MANUAL;	//hard alarm: manual mode
-        else if(curr_state == S_BHA_PRE_DET && i_link_lock && !pre_sta_allow[a_bhv_id_r - 1'b1])
-            a_alm_num <= ALARM_LOCK;	//hard alarm: link lock
+        else if(curr_state == S_BHA_PRE_DET && auto_manual)
+            a_alm_num <= 8'd110;	//hard alarm: manual mode
         else if(curr_state == S_BHA_PRE_DET && timout)
-            a_alm_num <= ALARM_BEHATMOUT;
+            a_alm_num <= 8'd100;
         else if(curr_state == S_READY_10_ACK && ack_tx_result == IRQ_NO_OK)
             a_alm_num <= ack_ps_alart_num;
         else if(curr_state == S_READY_10_ACK && timout)
-            a_alm_num <= ALARM_BEHATMOUT;
-		//else if(curr_state == S_EXE_20_ACK && ack_tx_result == IRQ_NO_OK)
-        //    a_alm_num <= ack_ps_alart_num;
-        //else if(curr_state == S_EXE_20_ACK && timout)
-        //    a_alm_num <= 8'd103;
+            a_alm_num <= 8'd101;
 		else if(curr_state == S_BHA_POST_DET && timout)
-            a_alm_num <= ALARM_BEHATMOUT;
+            a_alm_num <= 8'd102;
 		else if(curr_state == S_SUCC_30_ACK && ack_tx_result == IRQ_NO_OK)
 			a_alm_num <= ack_ps_alart_num;
 		else if(curr_state == S_SUCC_30_ACK && timout)
-            a_alm_num <= ALARM_BEHATMOUT;
+            a_alm_num <= 8'd103;
 		else if(curr_state == S_IDLE)
 			a_alm_num <= 8'd0;
         else

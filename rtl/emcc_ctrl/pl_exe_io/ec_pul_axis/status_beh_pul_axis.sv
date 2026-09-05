@@ -34,7 +34,7 @@ module status_beh_pul_axis#(
 	,input						b_en	
 	,output	reg [7:0]			b_bhv_id    
 	,output	reg	[31:0]			state_monitor_o
-	,input 		[31:0]			b_tx_ot         
+	,input 		[19:0]			b_tx_ot         
 	,input 		[31:0]			b_tx_result_rpt 
 	,input						b_tx_result_vld
 	,output		 				ec_chb_st   
