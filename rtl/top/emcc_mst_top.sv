@@ -240,13 +240,9 @@ module emcc_mst_top #(
 	
 	//------------- status LED logic -----------------
 	
-    //status LED: solid=link idle, fast blink=data flowing, dark=link down
-    wire            mst_link_up  = LANE_UP_1 & CHANNEL_UP_1;
-    wire            mst_data_act = m_app_tx_tvalid | s_app_rx_tvalid
-                                 | s_axi_tx_tvalid_0 | m_axi_rx_tvalid_0
-                                 | s_axi_tx_tvalid_1 | m_axi_rx_tvalid_1;
-    reg [26:0]      led_act_hold;
-    reg [26:0]      led_free_cnt;
+    //status LED: off=link down, solid=idle, slow=abnormal, fast=normal
+    localparam [26:0] LED_ACT_HOLD = 27'd78_125_000;  //0.5s @156.25MHz
+    reg  [26:0] blink_cnt, hold_dn, hold_up;
     always @(posedge axi_clk_0) begin
         if (axi_clk_rst_0) begin
             blink_cnt <= 27'd0;
@@ -260,8 +256,13 @@ module emcc_mst_top #(
             else if (|hold_up)                         hold_up <= hold_up - 1'b1;
         end
     end
-    assign led = mst_link_up & ((led_act_hold != 0) ? led_free_cnt[24] : 1'b1); //~5Hz blink on activity
-    
+    wire led_link = LANE_UP_0 & CHANNEL_UP_0 & LANE_UP_1 & CHANNEL_UP_1;
+    wire led_idle = ~(|hold_dn) & ~(|hold_up);
+    wire led_act  = (|hold_dn) & (|hold_up);
+    assign led = ~( ~led_link ? 1'b1
+                   : led_idle  ? 1'b0           //idle: solid on
+                   : ~led_act  ? blink_cnt[26]  //abnormal(single-side): slow ~1Hz
+                   :             blink_cnt[23]); //    
     
 	//-------------- Temperature sensor --------------
 	
