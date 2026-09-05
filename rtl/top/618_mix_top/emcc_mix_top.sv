@@ -2464,20 +2464,20 @@ ec_superisys_485_modbus_rtu_28
 	  
 	  ,.i_sign1_check          ( ~di_mst_msg[36] )
 	  ,.i_sign2_check          ( ~di_mst_msg[35] )
-	  ,.i_sign3_check          ( di_mst_msg[61] )
-	  ,.i_sign4_check          ( di_mst_msg[60] )
-	  ,.i_sign5_check          ( di_mst_msg[59] )
-	  ,.i_sign6_check          ( di_mst_msg[58] )
-	  ,.i_sign7_check          ( di_mst_msg[57] )
-	  ,.i_sign8_check          ( di_mst_msg[56] )
-	  ,.i_sign9_check          ( di_mst_msg[10] )
-	  ,.i_sign10_check         ( di_mst_msg[9] )
-	  ,.i_sign11_check         ( di_mst_msg[8] )
-	  ,.i_sign12_check         ( di_mst_msg[7] )
-	  ,.i_sign13_check         ( di_mst_msg[6] )
-	  ,.i_sign14_check         ( di_mst_msg[5] )
-	  ,.i_sign15_check         ( di_mst_msg[4] )
-	  ,.i_sign16_check         ( di_mst_msg[3] )  
+	  ,.i_sign3_check          ( ~di_mst_msg[61] )
+	  ,.i_sign4_check          ( ~di_mst_msg[60] )
+	  ,.i_sign5_check          ( ~di_mst_msg[59] )
+	  ,.i_sign6_check          ( ~di_mst_msg[58] )
+	  ,.i_sign7_check          ( ~di_mst_msg[57] )
+	  ,.i_sign8_check          ( ~di_mst_msg[56] )
+	  ,.i_sign9_check          ( ~di_mst_msg[10] )
+	  ,.i_sign10_check         ( ~di_mst_msg[9] )
+	  ,.i_sign11_check         ( ~di_mst_msg[8] )
+	  ,.i_sign12_check         ( ~di_mst_msg[7] )
+	  ,.i_sign13_check         ( ~di_mst_msg[6] )
+	  ,.i_sign14_check         ( ~di_mst_msg[5] )
+	  ,.i_sign15_check         ( ~di_mst_msg[4] )
+	  ,.i_sign16_check         ( ~di_mst_msg[3] )  
 
     );
 
@@ -3406,14 +3406,21 @@ ec_dv300_485_modbus_rtu_75
 	
 	
 	// --- flow_comp_79 -----固定机器人夹爪物料检测信号
-    ec_5di
+	
+	ec_1di
     #(
          .REG_SPACE_BIAS     (20'd59904)
         ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
+        //,.P_MODULE_ID        (8'd32                      )
+        //,.P_SEAT_NUM         (4'd0                      )
     )
-    ec_5di_79
+    ec_1di_79
     (
-      .clk_i                 ( clk               ),
+      //.clk                   ( ps_reg_clk               ),
+      //.reset                 ( ps_reg_reset             ),
+	  //.aurora_clk            ( clk               ),
+      //.aurora_reset          ( reset             ),
+	  .clk_i                 ( clk               ),
       .rst                   ( reset             ),
 	  .ps_reg_clk            ( ps_reg_clk               ),
       .ps_reg_reset          ( ps_reg_reset             ),
@@ -3429,11 +3436,9 @@ ec_dv300_485_modbus_rtu_75
 	  .o_st_rd_vld           ( sub_comp_rd_vld[113]    ),
       .o_st_rd_data          ( sub_comp_rd_dat[113]    ),
 	  .o_intr_irq            ( map_irq[113]       )
-	  
-	  //,.i_sign_check        (           )
 
+       ,.i_sign1_check        ( di_mst_msg[30]           )
     );
-
 	
 	
 	wire   o_dri1_80;
@@ -3676,11 +3681,11 @@ ec_superisys_485_modbus_rtu_84
       .o_st_rd_data          ( sub_comp_rd_dat[157]    ),
 	  .o_intr_irq            ( map_irq[157]       )
 	  
-	  ,.i_sign1_check        ( di_regoin_msg[2][47] )
-	  ,.i_sign2_check        ( di_regoin_msg[2][48] )
-	  ,.i_sign3_check        ( di_regoin_msg[1][20] )
-	  ,.i_sign4_check        ( di_regoin_msg[1][19] )
-	  ,.i_sign5_check        ( di_regoin_msg[1][21] )
+	  ,.i_sign1_check        ( ~di_regoin_msg[2][47] )
+	  ,.i_sign2_check        ( ~di_regoin_msg[2][48] )
+	  ,.i_sign3_check        ( ~di_regoin_msg[1][20] )
+	  ,.i_sign4_check        ( ~di_regoin_msg[1][19] )
+	  ,.i_sign5_check        ( ~di_regoin_msg[1][21] )
 	  
 	  
 
@@ -3786,11 +3791,11 @@ ec_superisys_485_modbus_rtu_84
       .o_st_rd_data          ( sub_comp_rd_dat[163]    ),
 	  .o_intr_irq            ( map_irq[163]       )
 	  
-	  ,.i_sign1_check        ( di_regoin_msg[3][25] )
-	  ,.i_sign2_check        ( di_regoin_msg[3][26] )
-	  ,.i_sign3_check        ( di_regoin_msg[4][31] )
-	  ,.i_sign4_check        ( di_regoin_msg[4][32] )
-	  ,.i_sign5_check        ( di_regoin_msg[4][33] )
+	  ,.i_sign1_check        ( ~di_regoin_msg[3][25] )
+	  ,.i_sign2_check        ( ~di_regoin_msg[3][26] )
+	  ,.i_sign3_check        ( ~di_regoin_msg[4][31] )
+	  ,.i_sign4_check        ( ~di_regoin_msg[4][32] )
+	  ,.i_sign5_check        ( ~di_regoin_msg[4][33] )
 
     );
 
@@ -3822,11 +3827,11 @@ ec_superisys_485_modbus_rtu_84
       .o_st_rd_data          ( sub_comp_rd_dat[160]    ),
 	  .o_intr_irq            ( map_irq[160]       )
 	  
-	  ,.i_sign1_check        ( di_regoin_msg[3][27] )
-	  ,.i_sign2_check        ( di_regoin_msg[3][28] )
-	  ,.i_sign3_check        ( di_regoin_msg[4][43] )
-	  ,.i_sign4_check        ( di_regoin_msg[4][45] )
-	  ,.i_sign5_check        ( di_regoin_msg[4][44] )
+	  ,.i_sign1_check        ( ~di_regoin_msg[3][27] )
+	  ,.i_sign2_check        ( ~di_regoin_msg[3][28] )
+	  ,.i_sign3_check        ( ~di_regoin_msg[4][43] )
+	  ,.i_sign4_check        ( ~di_regoin_msg[4][45] )
+	  ,.i_sign5_check        ( ~di_regoin_msg[4][44] )
 
     );
 
@@ -3858,11 +3863,11 @@ ec_superisys_485_modbus_rtu_84
       .o_st_rd_data          ( sub_comp_rd_dat[164]    ),
 	  .o_intr_irq            ( map_irq[164]       )
 	  
-	  ,.i_sign1_check        ( di_regoin_msg[3][29] )
-	  ,.i_sign2_check        ( di_regoin_msg[3][30] )
-	  ,.i_sign3_check        ( di_regoin_msg[4][34] )
-	  ,.i_sign4_check        ( di_regoin_msg[4][35] )
-	  ,.i_sign5_check        ( di_regoin_msg[4][36] )
+	  ,.i_sign1_check        ( ~di_regoin_msg[3][29] )
+	  ,.i_sign2_check        ( ~di_regoin_msg[3][30] )
+	  ,.i_sign3_check        ( ~di_regoin_msg[4][34] )
+	  ,.i_sign4_check        ( ~di_regoin_msg[4][35] )
+	  ,.i_sign5_check        ( ~di_regoin_msg[4][36] )
 
     );
 
@@ -3894,11 +3899,11 @@ ec_superisys_485_modbus_rtu_84
       .o_st_rd_data          ( sub_comp_rd_dat[165]    ),
 	  .o_intr_irq            ( map_irq[165]       )
 	  
-	  ,.i_sign1_check        ( di_regoin_msg[3][31] )
-	  ,.i_sign2_check        ( di_regoin_msg[3][44] )
-	  ,.i_sign3_check        ( di_regoin_msg[4][37] )
-	  ,.i_sign4_check        ( di_regoin_msg[4][38] )
-	  ,.i_sign5_check        ( di_regoin_msg[4][39] )
+	  ,.i_sign1_check        ( ~di_regoin_msg[3][31] )
+	  ,.i_sign2_check        ( ~di_regoin_msg[3][44] )
+	  ,.i_sign3_check        ( ~di_regoin_msg[4][37] )
+	  ,.i_sign4_check        ( ~di_regoin_msg[4][38] )
+	  ,.i_sign5_check        ( ~di_regoin_msg[4][39] )
 
     );
 
@@ -3930,11 +3935,11 @@ ec_superisys_485_modbus_rtu_84
       .o_st_rd_data          ( sub_comp_rd_dat[166]    ),
 	  .o_intr_irq            ( map_irq[166]       )
 	  
-	  ,.i_sign1_check        ( di_regoin_msg[3][46] )
-	  ,.i_sign2_check        ( di_regoin_msg[3][45] )
-	  ,.i_sign3_check        ( di_regoin_msg[4][40] )
-	  ,.i_sign4_check        ( di_regoin_msg[4][41] )
-	  ,.i_sign5_check        ( di_regoin_msg[4][42] )
+	  ,.i_sign1_check        ( ~di_regoin_msg[3][46] )
+	  ,.i_sign2_check        ( ~di_regoin_msg[3][45] )
+	  ,.i_sign3_check        ( ~di_regoin_msg[4][40] )
+	  ,.i_sign4_check        ( ~di_regoin_msg[4][41] )
+	  ,.i_sign5_check        ( ~di_regoin_msg[4][42] )
 
     );
 
@@ -4342,7 +4347,7 @@ ec_superisys_485_modbus_rtu_84
       .o_st_rd_data          ( sub_comp_rd_dat[155]    ),
 	  .o_intr_irq            ( map_irq[155]       )
 	  
-	  ,.i_sign1_check        ( di_mst_msg[49]          )
+	  ,.i_sign1_check        ( ~di_mst_msg[49]          )
 
     );
 
