@@ -182,6 +182,7 @@ module emcc_slv_top #
         ,.aurora_init_clk       (aurora_init_clk    )
     );
 `endif
+
     assign  GT_RESET_IN = rst_aurora_init_clk;
     assign  ll_clk = aurora_ref_clk;
     assign  ll_clk_rst = aurora_ref_clk_rst;
@@ -708,19 +709,28 @@ module emcc_slv_top #
     assign  ai_regoin_msg   =   {1'b0,1'b0,1'b0,ch_1,1'b0,1'b0,1'b0,ch_2};
 `endif
 
-	//status LED: solid=link idle, fast blink=data flowing, dark=link down
-	wire            slv_link_up  = LANE_UP_0 & CHANNEL_UP_0;
-	wire            slv_data_act = m_app_tx_tvalid | s_app_rx_tvalid
-	                             | s_axi_tx_tvalid_0 | m_axi_rx_tvalid_0
-	                             | s_axi_tx_tvalid_1 | m_axi_rx_tvalid_1;
-	reg [26:0]      led_act_hold;
-	reg [26:0]      led_free_cnt;
+
+	//LED(active-low): off=link down, solid=idle, slow=abnormal, fast=normal  by szzhang 20260904
+	localparam [26:0] LED_ACT_HOLD = 27'd78_125_000;  //0.5s @156.25MHz
+	reg  [26:0] blink_cnt, hold_dn, hold_up;
 	always @(posedge axi_clk_0) begin
-	    led_free_cnt    <= led_free_cnt + 1'b1;
-	    if (slv_data_act)
-	        led_act_hold <= 27'd78_125_000;         //0.5s hold @156.25MHz
-	    else if (led_act_hold != 0)
-	        led_act_hold <= led_act_hold - 1'b1;
+	    if (axi_clk_rst_0) begin
+	        blink_cnt <= 27'd0;
+	        hold_dn   <= 27'd0;
+	        hold_up   <= 27'd0;
+	    end else begin
+	        blink_cnt <= blink_cnt + 1'b1;
+	        if (s_axi_tx_tvalid_0 | m_axi_rx_tvalid_0) hold_dn <= LED_ACT_HOLD;
+	        else if (|hold_dn)                         hold_dn <= hold_dn - 1'b1;
+	        if (s_axi_tx_tvalid_1 | m_axi_rx_tvalid_1) hold_up <= LED_ACT_HOLD;
+	        else if (|hold_up)                         hold_up <= hold_up - 1'b1;
+	    end
 	end
-	assign  led = ~(slv_link_up & ((led_act_hold != 0) ? led_free_cnt[24] : 1'b1)); //~5Hz blink on activity, keep active-low drive
+	wire led_link = LANE_UP_0 & CHANNEL_UP_0 & LANE_UP_1 & CHANNEL_UP_1;
+	wire led_idle = ~(|hold_dn) & ~(|hold_up);
+	wire led_act  = (|hold_dn) & (|hold_up);
+	assign led = ~led_link ? 1'b1
+	           : led_idle  ? 1'b0            //idle: solid on
+	           : ~led_act  ? blink_cnt[26]   //abnormal(single-side): slow ~1Hz
+	           :             blink_cnt[23];  //normal: fast ~9Hz
 endmodule

@@ -248,11 +248,17 @@ module emcc_mst_top #(
     reg [26:0]      led_act_hold;
     reg [26:0]      led_free_cnt;
     always @(posedge axi_clk_0) begin
-        led_free_cnt    <= led_free_cnt + 1'b1;
-        if (mst_data_act)
-            led_act_hold <= 27'd78_125_000;             //0.5s hold @156.25MHz
-        else if (led_act_hold != 0)
-            led_act_hold <= led_act_hold - 1'b1;
+        if (axi_clk_rst_0) begin
+            blink_cnt <= 27'd0;
+            hold_dn   <= 27'd0;
+            hold_up   <= 27'd0;
+        end else begin
+            blink_cnt <= blink_cnt + 1'b1;
+            if (s_axi_tx_tvalid_0 | m_axi_rx_tvalid_0) hold_dn <= LED_ACT_HOLD;
+            else if (|hold_dn)                         hold_dn <= hold_dn - 1'b1;
+            if (s_axi_tx_tvalid_1 | m_axi_rx_tvalid_1) hold_up <= LED_ACT_HOLD;
+            else if (|hold_up)                         hold_up <= hold_up - 1'b1;
+        end
     end
     assign led = mst_link_up & ((led_act_hold != 0) ? led_free_cnt[24] : 1'b1); //~5Hz blink on activity
     

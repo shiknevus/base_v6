@@ -152,6 +152,10 @@ module hardware_interface_top
 
 	reg              axi_flag;
 	reg	 [23:0]		  wk_cnt;
+	reg              cfg_ok;        //valid config received  by szzhang 20260904
+	reg [23:0]       cfg_wdog;      //config watchdog  by szzhang 20260904
+	reg              cfg_wea_d;     //edge detect  by szzhang 20260904
+	reg [3:0]        cfg_frm_cnt;   //consecutive frame counter  by szzhang 20260904
 	reg [15:0]       rd_msg_addr_d;
 	reg [31:0]       slvbd_outio_low;
 	reg [15:0]       slvbd_outio_high;
@@ -408,6 +412,34 @@ assign rs232_uart_id[0] = rs232_ch0_buf[0];
             axi_flag <= axi_flag;
         end
     end
+
+    //fail-safe: release dataout after 2 consecutive config frames  by szzhang 20260904
+    localparam [3:0] CFG_FRM_REQ = 4'd2;
+    wire cfg_wea_rise = driver_cfg_wea & ~cfg_wea_d;
+    always @(posedge clk)begin
+        if(reset)begin
+            cfg_wdog    <= 24'd0;
+            cfg_ok      <= 1'b0;
+            cfg_wea_d   <= 1'b0;
+            cfg_frm_cnt <= 4'd0;
+        end else begin
+            cfg_wea_d <= driver_cfg_wea;
+            if (cfg_wea_rise) begin
+                cfg_wdog    <= 24'd0;
+                if (cfg_frm_cnt == CFG_FRM_REQ - 1) begin
+                    cfg_ok      <= 1'b1;
+                    cfg_frm_cnt <= cfg_frm_cnt;
+                end else begin
+                    cfg_frm_cnt <= cfg_frm_cnt + 1'b1;
+                end
+            end else if (cfg_wdog == 24'hffffff) begin
+                cfg_ok      <= 1'b0;
+                cfg_frm_cnt <= 4'd0;
+            end else begin
+                cfg_wdog <= cfg_wdog + 1'b1;
+            end
+        end
+    end
     
     always @(posedge clk)begin
         rd_msg_addr_d <= rd_msg_addr;
@@ -540,7 +572,7 @@ assign rs232_uart_id[0] = rs232_ch0_buf[0];
     end
 
     always @(posedge clk)begin
-        if(reset | axi_flag)begin
+        if(reset | axi_flag | ~cfg_ok)begin  //force all-1 on fault  by szzhang 20260904
             slvbd_outio_low <= 32'hffff_ffff;
             slvbd_outio_high <= 16'hffff;
         end else if(driver_cfg_wea & (driver_cfg_addra < bias_rs232_ch0)) begin 
