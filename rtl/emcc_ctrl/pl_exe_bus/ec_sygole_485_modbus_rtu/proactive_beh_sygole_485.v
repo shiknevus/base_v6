@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module proactive_beh_superisys_485#(
+module proactive_beh_sygole_485#(
     parameter                 	BHA_NUM = 4   //Number of active behaviors
 )(
     input                       clk_i

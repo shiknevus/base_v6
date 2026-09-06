@@ -129,7 +129,7 @@ always @(posedge i_clk)begin
     end
     else begin
         case(bhv_id)
-            READ_UID     :crc_check_data_send <= {24'h00,i_slave_addr,8'h03,    16'hE000,16'h4};//读UID时是定长消息，{设备地址，命令码0x03,固定地址起点0x800E,data_len固定为4}
+            READ_UID     :crc_check_data_send <= {24'h00,i_slave_addr,8'h03,    16'h800E,16'h4};//读UID时是定长消息，{设备地址，命令码0x03,固定地址起点0x800E,data_len固定为4}
             READ_TAG,
             READ_AND_COMP:crc_check_data_send <= {24'h00,i_slave_addr,8'h03,i_start_addr,16'h1};//目前支持读1个寄存器组 （2字节）
             WRITE_TAG    :crc_check_data_send <= {i_slave_addr,8'h10,i_start_addr,16'h1,8'h2,i_send_data_field_1[15:0]};//i_ctl_data_field 高16bit是数据1，低16bit是数据2

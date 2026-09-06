@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module ec_superisys_485_modbus_rtu#(
+module ec_sygole_485_modbus_rtu#(
 		parameter  				REG_SPACE_BIAS 	= 	2000	,	//组件基地址
 		parameter  				REG_SPACE_SIZE 	= 	1024	,	//组件偏移地址
 		parameter 				A_BHA_NUM		=	4    ,
@@ -305,7 +305,7 @@ module ec_superisys_485_modbus_rtu#(
 		assign  slaver_en      = param26;//0=主板模式，1=从板模式
 
 
-ps_rw_pl_reg_superisys_485#(
+ps_rw_pl_reg_sygole_485#(
 		.REG_SPACE_BIAS 	(REG_SPACE_BIAS		),//组件基地址
 		.REG_SPACE_SIZE 	(REG_SPACE_SIZE		) //组件偏移地址
 )ps_rw_pl_reg_u0(
@@ -448,7 +448,7 @@ ps_rw_pl_reg_superisys_485#(
 //	assign 	param70   =	32'd0;
 
 
-proactive_beh_superisys_485#(	
+proactive_beh_sygole_485#(	
 	.BHA_NUM 				(A_BHA_NUM  	 	)	//Number of active behaviors
 //	.ARV_SIG_DET_TIM		(ARV_SIG_DET_TIM	)		//In - place signal detection time
 )proactive_beh_u0(
@@ -480,7 +480,7 @@ proactive_beh_superisys_485#(
     ,.irq_ack_i             (irq_a_grant        )
     );
 
-pre_post_sta_check_superisys_485#(
+pre_post_sta_check_sygole_485#(
 		.A_BHA_NUM			(A_BHA_NUM	 )    ,	
 		.B_BHA_NUM			(B_BHA_NUM	 )    ,
 		.C_BHA_NUM			(1)
@@ -550,7 +550,7 @@ pre_post_sta_check_superisys_485#(
 	
 
 // --------- uart ----------
-frame_ctrl_superisys_485 frame_ctrl_i(
+frame_ctrl_sygole_485 frame_ctrl_i(
     .i_clk                 ( clk_i               ),
     .i_rst                 ( rst_i               ),
     .i_time_1s_vld         ( i_time_1s_vld       ),
@@ -613,7 +613,7 @@ frame_ctrl_superisys_485 frame_ctrl_i(
 );
 
 // ----------- slaver 从板接口  ---------------
-  superisys_rfid_485_slaver_driver  superisys_rfid_485_slaver_driver_i(
+  sygole_rfid_485_slaver_driver  sygole_rfid_485_slaver_driver_i(
     .i_clk               ( clk_i                ),// user clk （100MHz or 156.25MHz）
     .i_rst               ( rst_i                ),
     .i_prot_clk          ( clk_i                ),// 156.25MHz
