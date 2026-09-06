@@ -180,8 +180,6 @@ module emcc_mix_top
     wire                                pul_motor1_r_flag;
     wire                                pul_motor2_r_flag;
     wire                                pul_motor3_r_flag;
-	
-	reg    [RAM_DWIDTH*2-1:0]          do_regoin_r_msg_n_r[RAM_DWIDTH-1:0];
     
 
     wire    [31:0]              do_mst_msg      ;
@@ -239,7 +237,7 @@ module emcc_mix_top
 
         //master to slave
         ,.pre_r_uuid            (pre_r_uuid            )
-        ,.do_regoin_r_msg       (do_regoin_r_msg_n_r     )
+        ,.do_regoin_r_msg       (do_regoin_r_msg_n     )
         ,.di_regoin_r_msg       (di_regoin_r_msg       )
         ,.ai_regoin_r_msg       (ai_regoin_r_msg       )
         ,.rs232_1st_r_msg       (rs232_00_send_msg       )
@@ -342,12 +340,6 @@ module emcc_mix_top
 	wire ext_emerg_stop;
 	wire ext_pause_sig ;
 	
-	always @(*) begin
-  for(int i=0;i<RAM_DWIDTH;i++) begin
-    do_regoin_r_msg_n_r[i] = ~ do_regoin_r_msg_n[i];
-  end
-end
-	
 	
 	`ifdef RLL_ENB
 	// --------------------------------------------------------------------------------------------------------------------------------------
@@ -365,7 +357,7 @@ end
     // ------------------------------------------------------------------------------------------------------------------------------------
     // -------------------------------- The following is the flow components --------------------------------------------------------------
     // ------------------------------------------------------------------------------------------------------------------------------------
-    assign  emcc_irq[46]   = map_irq[46];
+   assign  emcc_irq[46]   = map_irq[46];
     assign  emcc_irq[168]   = map_irq[168];
     assign  emcc_irq[169]   = map_irq[169];
     assign  emcc_irq[167]   = map_irq[167];
@@ -488,7 +480,7 @@ end
     
 	
 	
-	// --- flow_comp_1 -----Ä¥´²1
+	// --- flow_comp_1 -----ç£¨åºŠ1
     ec_siemens_cnc
     #(
          .REG_SPACE_BIAS     (20'd25600)
@@ -518,7 +510,7 @@ end
 	
 	
 	
-	// --- flow_comp_2 -----Ä¥´²2
+	// --- flow_comp_2 -----ç£¨åºŠ2
     ec_siemens_cnc
     #(
          .REG_SPACE_BIAS     (20'd34816)
@@ -548,7 +540,7 @@ end
 	
 	
 	
-	// --- flow_comp_3 -----Ä¥´²3
+	// --- flow_comp_3 -----ç£¨åºŠ3
     ec_siemens_cnc
     #(
          .REG_SPACE_BIAS     (20'd44032)
@@ -579,7 +571,7 @@ end
 	
 	
 	
-	// --- flow_comp_4 -----Ä¥´²4
+	// --- flow_comp_4 -----ç£¨åºŠ4
     ec_siemens_cnc
     #(
          .REG_SPACE_BIAS     (20'd45056)
@@ -609,7 +601,7 @@ end
 	
 	
 	
-	// --- flow_comp_5 -----Ä¥´²5
+	// --- flow_comp_5 -----ç£¨åºŠ5
     ec_siemens_cnc
     #(
          .REG_SPACE_BIAS     (20'd45568)
@@ -638,7 +630,7 @@ end
 	
 	
 	
-	// --- flow_comp_6 -----Ä¥´²6
+	// --- flow_comp_6 -----ç£¨åºŠ6
     ec_siemens_cnc
     #(
          .REG_SPACE_BIAS     (20'd44544)
@@ -668,7 +660,7 @@ end
 	
 	
 	
-	// --- flow_comp_7 -----Ä¥´²7
+	// --- flow_comp_7 -----ç£¨åºŠ7
     ec_siemens_cnc
     #(
          .REG_SPACE_BIAS     (20'd46080)
@@ -698,7 +690,7 @@ end
 	
 	
 	
-	// --- flow_comp_8 -----Ä¥´²8
+	// --- flow_comp_8 -----ç£¨åºŠ8
     ec_siemens_cnc
     #(
          .REG_SPACE_BIAS     (20'd46592)
@@ -728,7 +720,7 @@ end
 	
 	
 	
-	// --- flow_comp_9 -----Ä¥´²9
+	// --- flow_comp_9 -----ç£¨åºŠ9
     ec_siemens_cnc
     #(
          .REG_SPACE_BIAS     (20'd47104)
@@ -758,7 +750,7 @@ end
 	
 	
 	
-	// --- flow_comp_11 -----º£¿ËË¹¿µÈý×ø±ê1
+	// --- flow_comp_11 -----æµ·å…‹æ–¯åº·ä¸‰åæ ‡1
     ec_hex_coordinate
     #(
          .REG_SPACE_BIAS     (20'd48128)
@@ -788,7 +780,7 @@ end
 	
 	
 	
-	// --- flow_comp_12 -----º£¿ËË¹¿µÈý×ø±ê2
+	// --- flow_comp_12 -----æµ·å…‹æ–¯åº·ä¸‰åæ ‡2
     ec_hex_coordinate
     #(
          .REG_SPACE_BIAS     (20'd48640)
@@ -818,7 +810,7 @@ end
 	
 	
 	
-	// --- flow_comp_13 -----º£¿ËË¹¿µÓ°Ïñ²âÁ¿ÒÇ
+	// --- flow_comp_13 -----æµ·å…‹æ–¯åº·å½±åƒæµ‹é‡ä»ª
     ec_hex_coordinate
     #(
          .REG_SPACE_BIAS     (20'd49152)
@@ -849,7 +841,7 @@ end
 	
 	wire o_dri1_14;
 	wire o_dri2_14;
-	// --- flow_comp_14 -----1#Èý×ø±ê¿¨ÅÌ
+	// --- flow_comp_14 -----1#ä¸‰åæ ‡å¡ç›˜
     ec_2di_3do
     #(
          .REG_SPACE_BIAS     (20'd50688)
@@ -874,25 +866,25 @@ end
       .o_st_rd_data          ( sub_comp_rd_dat[95]    ),
 	  .o_intr_irq            ( map_irq[95]       )
 	  
-	  //Î»ÖÃµ½Î»¿ª¹Ø
+	  //ä½ç½®åˆ°ä½å¼€å…³
 	  ,.i_pos			( ~di_mst_msg[50] )
-	  //ÓÐÎÞ¸Ð²â¿ª¹Ø
+	  //æœ‰æ— æ„Ÿæµ‹å¼€å…³
 	  ,.i_poa			( 1'b0 )
-	  //µ¥Çý¶¯ÐÅºÅ
+	  //å•é©±åŠ¨ä¿¡å·
 	  ,.o_dri			( 1'b0 )
-	  //Ë«ÇýÇý¶¯ÐÅºÅ1
+	  //åŒé©±é©±åŠ¨ä¿¡å·1
 	  ,.o_dri1			( o_dri1_14 )
-	  //Ë«ÇýÇý¶¯ÐÅºÅ2
+	  //åŒé©±é©±åŠ¨ä¿¡å·2
 	  ,.o_dri2			( o_dri2_14 )
 
     );
-	assign do_regoin_r_msg[2][17] = o_dri1_14;
-    assign do_regoin_r_msg[2][16] = o_dri2_14;
+	assign do_regoin_r_msg[2][17] = ~o_dri1_14;
+    assign do_regoin_r_msg[2][16] = ~o_dri2_14;
 	
 	
 	wire o_dri1_15;
 	wire o_dri2_15;
-	// --- flow_comp_15 -----2#Èý×ø±ê¿¨ÅÌ
+	// --- flow_comp_15 -----2#ä¸‰åæ ‡å¡ç›˜
     ec_2di_3do
     #(
          .REG_SPACE_BIAS     (20'd51200)
@@ -917,25 +909,25 @@ end
       .o_st_rd_data          ( sub_comp_rd_dat[96]    ),
 	  .o_intr_irq            ( map_irq[96]       )
 	  
-	  //Î»ÖÃµ½Î»¿ª¹Ø
+	  //ä½ç½®åˆ°ä½å¼€å…³
 	  ,.i_pos			( ~di_mst_msg[51] )
-	  //ÓÐÎÞ¸Ð²â¿ª¹Ø
+	  //æœ‰æ— æ„Ÿæµ‹å¼€å…³
 	  ,.i_poa			( 1'b0 )
-	  //µ¥Çý¶¯ÐÅºÅ
+	  //å•é©±åŠ¨ä¿¡å·
 	  ,.o_dri			( 1'b0 )
-	  //Ë«ÇýÇý¶¯ÐÅºÅ1
+	  //åŒé©±é©±åŠ¨ä¿¡å·1
 	  ,.o_dri1			( o_dri1_15 )
-	  //Ë«ÇýÇý¶¯ÐÅºÅ2
+	  //åŒé©±é©±åŠ¨ä¿¡å·2
 	  ,.o_dri2			( o_dri2_15 )
 
     );
-	assign do_regoin_r_msg[2][19] = o_dri1_15;
-    assign do_regoin_r_msg[2][18] = o_dri2_15;
+	assign do_regoin_r_msg[2][19] = ~o_dri1_15;
+    assign do_regoin_r_msg[2][18] = ~o_dri2_15;
 	
 	
 	wire o_dri1_16;
 	wire o_dri2_16;
-	// --- flow_comp_16 -----Ó°Ïñ²âÁ¿ÒÇ¿¨ÅÌ
+	// --- flow_comp_16 -----å½±åƒæµ‹é‡ä»ªå¡ç›˜
     ec_2di_3do
     #(
          .REG_SPACE_BIAS     (20'd51712)
@@ -960,24 +952,24 @@ end
       .o_st_rd_data          ( sub_comp_rd_dat[97]    ),
 	  .o_intr_irq            ( map_irq[97]       )
 	  
-	  //Î»ÖÃµ½Î»¿ª¹Ø
+	  //ä½ç½®åˆ°ä½å¼€å…³
 	  ,.i_pos			( ~di_mst_msg[54] )
-	  //ÓÐÎÞ¸Ð²â¿ª¹Ø
+	  //æœ‰æ— æ„Ÿæµ‹å¼€å…³
 	  ,.i_poa			( 1'b0 )
-	  //µ¥Çý¶¯ÐÅºÅ
+	  //å•é©±åŠ¨ä¿¡å·
 	  ,.o_dri			( 1'b0 )
-	  //Ë«ÇýÇý¶¯ÐÅºÅ1
+	  //åŒé©±é©±åŠ¨ä¿¡å·1
 	  ,.o_dri1			( o_dri1_16 )
-	  //Ë«ÇýÇý¶¯ÐÅºÅ2
+	  //åŒé©±é©±åŠ¨ä¿¡å·2
 	  ,.o_dri2			( o_dri2_16 )
 
     );
-	assign do_regoin_r_msg[2][21] = o_dri1_16;
-    assign do_regoin_r_msg[2][20] = o_dri2_16;
+	assign do_regoin_r_msg[2][21] = ~o_dri1_16;
+    assign do_regoin_r_msg[2][20] = ~o_dri2_16;
 	
 	
 	
-	// --- flow_comp_17 -----À¶¾¨ÇåÏ´»ú
+	// --- flow_comp_17 -----è“é²¸æ¸…æ´—æœº
     ec_lanj_washer
     #(
          .REG_SPACE_BIAS     (20'd47616)
@@ -1007,7 +999,7 @@ end
 	
 	
 	
-	// --- flow_comp_18 -----Ö÷µØ¹ì°áÔË»úÆ÷ÈË
+	// --- flow_comp_18 -----ä¸»åœ°è½¨æ¬è¿æœºå™¨äºº
     ec_fanuc_robot
     #(
          .REG_SPACE_BIAS     (20'd55296)
@@ -1037,7 +1029,7 @@ end
 	
 	
 	
-	// --- flow_comp_19 -----¶Ìèì¼Ü1#»úÆ÷ÈË
+	// --- flow_comp_19 -----çŸ­æ¡æž¶1#æœºå™¨äºº
     ec_fanuc_robot
     #(
          .REG_SPACE_BIAS     (20'd52736)
@@ -1067,7 +1059,7 @@ end
 	
 	
 	
-	// --- flow_comp_20 -----³¤èì¼Ü2#»úÆ÷ÈË
+	// --- flow_comp_20 -----é•¿æ¡æž¶2#æœºå™¨äºº
     ec_fanuc_robot
     #(
          .REG_SPACE_BIAS     (20'd53248)
@@ -1097,7 +1089,7 @@ end
 	
 	
 	
-	// --- flow_comp_21 -----³¤èì¼Ü3#»úÆ÷ÈË
+	// --- flow_comp_21 -----é•¿æ¡æž¶3#æœºå™¨äºº
     ec_fanuc_robot
     #(
          .REG_SPACE_BIAS     (20'd53760)
@@ -1127,7 +1119,7 @@ end
 	
 	
 	
-	// --- flow_comp_22 -----°áÔË»úÆ÷ÈË
+	// --- flow_comp_22 -----æ¬è¿æœºå™¨äºº
     ec_fanuc_robot
     #(
          .REG_SPACE_BIAS     (20'd49664)
@@ -1158,7 +1150,7 @@ end
 	
 	wire   o_claw_press_23;
 	wire   o_claw_unlock_23;
-	// --- flow_comp_23 -----µØ¹ì»úÆ÷ÈËÍÐÅÌ°áÔË¼Ð×¦
+	// --- flow_comp_23 -----åœ°è½¨æœºå™¨äººæ‰˜ç›˜æ¬è¿å¤¹çˆª
     ec_trayclaw
     #(
          .REG_SPACE_BIAS     (20'd54784)
@@ -1192,14 +1184,14 @@ end
       ,.o_claw_blow         (             )
 
     );
-	assign do_mst_msg[1] = o_claw_press_23;
-    assign do_mst_msg[12] = o_claw_unlock_23;
+	assign do_mst_msg[1] = ~o_claw_press_23;
+    assign do_mst_msg[12] = ~o_claw_unlock_23;
 
 	
 	
 	wire   o_dri1_24;
 	wire   o_dri2_24;
-	// --- flow_comp_24 -----µØ¹ì»úÆ÷ÈËÉ°ÂÖ°áÔË¼Ð×¦
+	// --- flow_comp_24 -----åœ°è½¨æœºå™¨äººç ‚è½®æ¬è¿å¤¹çˆª
     ec_2di_2do
     #(
          .REG_SPACE_BIAS     (20'd55808)
@@ -1224,24 +1216,24 @@ end
       .o_st_rd_data          ( sub_comp_rd_dat[105]    ),
 	  .o_intr_irq            ( map_irq[105]       )
 	  
-	  //Î»ÖÃ1µ½Î»¶Ë¿Ú
+	  //ä½ç½®1åˆ°ä½ç«¯å£
 	  ,.i_pos1				( ~di_mst_msg[19]          )
-	  //Î»ÖÃ2µ½Î»¶Ë¿Ú
+	  //ä½ç½®2åˆ°ä½ç«¯å£
 	  ,.i_pos2				( ~di_mst_msg[20]          )
-	  //Çý¶¯¶Ë¿Ú1
+	  //é©±åŠ¨ç«¯å£1
 	  ,.o_dri1				( o_dri1_24           )
-	  //Çý¶¯¶Ë¿Ú2
+	  //é©±åŠ¨ç«¯å£2
 	  ,.o_dri2				( o_dri2_24           )
 
     );
-	assign do_mst_msg[13]=o_dri1_24;
-    assign do_mst_msg[14]=o_dri2_24;
+	assign do_mst_msg[13]=~o_dri1_24;
+    assign do_mst_msg[14]=~o_dri2_24;
 
 	
 	
 	wire   o_dri1_25;
 	wire   o_dri2_25;
-	// --- flow_comp_25 -----°áÔË»úÆ÷ÈË¼Ð×¦
+	// --- flow_comp_25 -----æ¬è¿æœºå™¨äººå¤¹çˆª
     ec_2di_2do
     #(
          .REG_SPACE_BIAS     (20'd50176)
@@ -1266,23 +1258,23 @@ end
       .o_st_rd_data          ( sub_comp_rd_dat[94]    ),
 	  .o_intr_irq            ( map_irq[94]       )
 	  
-	  //Î»ÖÃ1µ½Î»¶Ë¿Ú
+	  //ä½ç½®1åˆ°ä½ç«¯å£
 	  ,.i_pos1				( ~di_regoin_msg[2][16] )
-	  //Î»ÖÃ2µ½Î»¶Ë¿Ú
-	  ,.i_pos2				( ~di_regoin_msg[2][15] )
-	  //Çý¶¯¶Ë¿Ú1
+	  //ä½ç½®2åˆ°ä½ç«¯å£
+	  ,.i_pos2				( ~di_regoin_msg[2][14] )
+	  //é©±åŠ¨ç«¯å£1
 	  ,.o_dri1				( o_dri1_25 )
-	  //Çý¶¯¶Ë¿Ú2
+	  //é©±åŠ¨ç«¯å£2
 	  ,.o_dri2				( o_dri2_25 )
 
     );
-	assign do_regoin_r_msg[2][22] = o_dri1_25;
-    assign do_regoin_r_msg[2][23] = o_dri2_25;
+	assign do_regoin_r_msg[2][22] = ~o_dri1_25;
+    assign do_regoin_r_msg[2][23] = ~o_dri2_25;
 
 	
 	
 	
-	// // --- flow_comp_26 -----µØ¹ì»úÆ÷ÈË_RFID¶ÁÐ´Æ÷
+	// // --- flow_comp_26 -----åœ°è½¨æœºå™¨äºº_RFIDè¯»å†™å™¨
     // ec_sp_rfid
     // #(
     //      .REG_SPACE_BIAS     (20'd56320)
@@ -1306,13 +1298,19 @@ end
 	//   .o_st_rd_vld           ( sub_comp_rd_vld[106]    ),
     //   .o_st_rd_data          ( sub_comp_rd_dat[106]    ),
 	//   .o_intr_irq            ( map_irq[106]       )
+	
+	//   ,.o_user_req        ( rs485_1_user_req[0]           )   // RS485ç«¯å£
+    //   ,.i_user_grant        ( rs485_1_user_grant[0]           )   // 
+    //   ,.o_uart_tx        ( rs485_1_user_tx[0]           )   // 
+    //   ,.i_uart_rx        ( rs485_1_user_rx[0]           )   // 
+    //   ,.o_uart_de        ( rs485_1_user_de[0]           )   // 
 
     // );
 
 ec_superisys_485_modbus_rtu
 #(
-        .REG_SPACE_BIAS         (20'd56320                ), //×é¼þ»ùµØÖ·
-        .REG_SPACE_SIZE         (`REG_SPACE_SIZE          ), //×é¼þÆ«ÒÆµØÖ·
+        .REG_SPACE_BIAS         (20'd56320                ), //ç»„ä»¶åŸºåœ°å€
+        .REG_SPACE_SIZE         (`REG_SPACE_SIZE          ), //ç»„ä»¶åç§»åœ°å€
         .CLK_FREQ               (156250000                )  //100MHz = 100000000
 )
 ec_superisys_485_modbus_rtu_26
@@ -1323,23 +1321,23 @@ ec_superisys_485_modbus_rtu_26
         .i_time_1s_vld          ( time_1s_vld             ),
         .ps_reg_clk             ( ps_reg_clk              ),
         .ps_reg_reset           ( ps_reg_reset            ),
-        .i_st_wr_en             ( ps_reg_we               ),//bram×ÜÏß
+        .i_st_wr_en             ( ps_reg_we               ),//bramæ€»çº¿
         .i_st_wr_addr           ( ps_reg_addr             ),
         .i_st_wr_data           ( ps_reg_wr_dat           ),
         .i_st_rd_en             ( ps_reg_re               ),
         .i_st_rd_addr           ( ps_reg_rd_addr          ),
         .o_st_rd_data           ( sub_comp_rd_dat[106]    ),
         .o_st_rd_vld            ( sub_comp_rd_vld[106]    ),
-        .o_intr_irq             ( map_irq[106]            ),//×é¼þÖÐ¶ÏÇëÇó
+        .o_intr_irq             ( map_irq[106]            ),//ç»„ä»¶ä¸­æ–­è¯·æ±‚
         
-        //--- Ö÷°åUart½Ó¿Ú
+        //--- ä¸»æ¿UartæŽ¥å£
         .i_uart_rx              ( rs485_1_user_rx[0]      ),
         .o_uart_tx              ( rs485_1_user_tx[0]      ),
         .o_uart_de              ( rs485_1_user_de[0]      ),
         .o_user_req             ( rs485_1_user_req[0]     ),
         .i_user_grant           ( rs485_1_user_grant[0]   ),
 
-         //--- ´Ó°å½Ó¿Ú use clk domain 156.25MHz --
+         //--- ä»Žæ¿æŽ¥å£ use clk domain 156.25MHz --
         .cur_slv_board_id       ( 0                       ), //
         .slv_board_id           ( slv_board_id            ), 
         .rs485_ch_r_flag        ( rs485_00_r_flag         ), //send en
@@ -1350,7 +1348,7 @@ ec_superisys_485_modbus_rtu_26
 
 	
 	
-	// // --- flow_comp_27 -----¶Ìèì¼Ü1#¼Ð×¦RFID¶ÁÐ´Æ÷
+	// // --- flow_comp_27 -----çŸ­æ¡æž¶1#å¤¹çˆªRFIDè¯»å†™å™¨
     // ec_sp_rfid
     // #(
     //      .REG_SPACE_BIAS     (20'd54272)
@@ -1379,8 +1377,8 @@ ec_superisys_485_modbus_rtu_26
 
 ec_superisys_485_modbus_rtu
 #(
-        .REG_SPACE_BIAS         (20'd54272                ), //×é¼þ»ùµØÖ·
-        .REG_SPACE_SIZE         (`REG_SPACE_SIZE          ), //×é¼þÆ«ÒÆµØÖ·
+        .REG_SPACE_BIAS         (20'd54272                ), //ç»„ä»¶åŸºåœ°å€
+        .REG_SPACE_SIZE         (`REG_SPACE_SIZE          ), //ç»„ä»¶åç§»åœ°å€
         .CLK_FREQ               (156250000                )  //100MHz = 100000000
 )
 ec_superisys_485_modbus_rtu_27
@@ -1391,23 +1389,23 @@ ec_superisys_485_modbus_rtu_27
         .i_time_1s_vld          ( time_1s_vld             ),
         .ps_reg_clk             ( ps_reg_clk              ),
         .ps_reg_reset           ( ps_reg_reset            ),
-        .i_st_wr_en             ( ps_reg_we               ),//bram×ÜÏß
+        .i_st_wr_en             ( ps_reg_we               ),//bramæ€»çº¿
         .i_st_wr_addr           ( ps_reg_addr             ),
         .i_st_wr_data           ( ps_reg_wr_dat           ),
         .i_st_rd_en             ( ps_reg_re               ),
         .i_st_rd_addr           ( ps_reg_rd_addr          ),
         .o_st_rd_data           ( sub_comp_rd_dat[102]    ),
         .o_st_rd_vld            ( sub_comp_rd_vld[102]    ),
-        .o_intr_irq             ( map_irq[102]            ),//×é¼þÖÐ¶ÏÇëÇó
+        .o_intr_irq             ( map_irq[102]            ),//ç»„ä»¶ä¸­æ–­è¯·æ±‚
         
-        //--- Ö÷°åUart½Ó¿Ú
+        //--- ä¸»æ¿UartæŽ¥å£
         .i_uart_rx              ( rs485_1_user_rx[1]      ),
         .o_uart_tx              ( rs485_1_user_tx[1]      ),
         .o_uart_de              ( rs485_1_user_de[1]      ),
         .o_user_req             ( rs485_1_user_req[1]     ),
         .i_user_grant           ( rs485_1_user_grant[1]   ),
 
-         //--- ´Ó°å½Ó¿Ú use clk domain 156.25MHz --
+         //--- ä»Žæ¿æŽ¥å£ use clk domain 156.25MHz --
         .cur_slv_board_id      (                          ), //
         .slv_board_id          (                          ), 
         .rs485_ch_r_flag       ( 0                        ), //send en
@@ -1418,7 +1416,7 @@ ec_superisys_485_modbus_rtu_27
   
 	
 	
-	// // --- flow_comp_28 -----¹Ì¶¨»úÆ÷ÈË_RFID¶ÁÐ´Æ÷
+	// // --- flow_comp_28 -----å›ºå®šæœºå™¨äºº_RFIDè¯»å†™å™¨
     // ec_sp_rfid
     // #(
     //      .REG_SPACE_BIAS     (20'd52224)
@@ -1447,8 +1445,8 @@ ec_superisys_485_modbus_rtu_27
 	
 ec_superisys_485_modbus_rtu
 #(
-        .REG_SPACE_BIAS         (20'd52224                ), //×é¼þ»ùµØÖ·
-        .REG_SPACE_SIZE         (`REG_SPACE_SIZE          ), //×é¼þÆ«ÒÆµØÖ·
+        .REG_SPACE_BIAS         (20'd52224                ), //ç»„ä»¶åŸºåœ°å€
+        .REG_SPACE_SIZE         (`REG_SPACE_SIZE          ), //ç»„ä»¶åç§»åœ°å€
         .CLK_FREQ               (156250000                )  //100MHz = 100000000
 )
 ec_superisys_485_modbus_rtu_28
@@ -1459,23 +1457,23 @@ ec_superisys_485_modbus_rtu_28
         .i_time_1s_vld          ( time_1s_vld             ),
         .ps_reg_clk             ( ps_reg_clk              ),
         .ps_reg_reset           ( ps_reg_reset            ),
-        .i_st_wr_en             ( ps_reg_we               ),//bram×ÜÏß
+        .i_st_wr_en             ( ps_reg_we               ),//bramæ€»çº¿
         .i_st_wr_addr           ( ps_reg_addr             ),
         .i_st_wr_data           ( ps_reg_wr_dat           ),
         .i_st_rd_en             ( ps_reg_re               ),
         .i_st_rd_addr           ( ps_reg_rd_addr          ),
         .o_st_rd_data           ( sub_comp_rd_dat[98]     ),
         .o_st_rd_vld            ( sub_comp_rd_vld[98]     ),
-        .o_intr_irq             ( map_irq[98]             ),//×é¼þÖÐ¶ÏÇëÇó
+        .o_intr_irq             ( map_irq[98]             ),//ç»„ä»¶ä¸­æ–­è¯·æ±‚
         
-        //--- Ö÷°åUart½Ó¿Ú
+        //--- ä¸»æ¿UartæŽ¥å£
         .i_uart_rx              ( rs485_1_user_rx[2]      ),
         .o_uart_tx              ( rs485_1_user_tx[2]      ),
         .o_uart_de              ( rs485_1_user_de[2]      ),
         .o_user_req             ( rs485_1_user_req[2]     ),
         .i_user_grant           ( rs485_1_user_grant[2]   ),
 
-         //--- ´Ó°å½Ó¿Ú use clk domain 156.25MHz --
+         //--- ä»Žæ¿æŽ¥å£ use clk domain 156.25MHz --
         .cur_slv_board_id       ( 0                       ), //
         .slv_board_id           ( 0                       ), 
         .rs485_ch_r_flag        ( 0                       ), //send en
@@ -1517,7 +1515,7 @@ ec_superisys_485_modbus_rtu_28
       .o_st_rd_data          ( sub_comp_rd_dat[195]    ),
 	  .o_intr_irq            ( map_irq[195]       )
 
-       ,.i_sign1_check        ( di_mst_msg[27]           )
+       ,.i_sign1_check        ( ~di_mst_msg[27]           )
     );
 
 	
@@ -1554,15 +1552,15 @@ ec_superisys_485_modbus_rtu_28
       .o_st_rd_data          ( sub_comp_rd_dat[196]    ),
 	  .o_intr_irq            ( map_irq[196]       )
 
-       ,.i_sign2_check        ( di_mst_msg[29]           )
-       ,.i_sign1_check        ( di_mst_msg[28]           )
+       ,.i_sign2_check        ( ~di_mst_msg[29]           )
+       ,.i_sign1_check        ( ~di_mst_msg[28]           )
     );
 
 
 	
 	
 	
-	// --- flow_comp_35 -----·Ö¼ð¿â_XÖá
+	// --- flow_comp_35 -----åˆ†æ‹£åº“_Xè½´
     ec_slv_pul_axis
     #(
          .REG_SPACE_BIAS     (20'd65024)
@@ -1613,7 +1611,7 @@ ec_superisys_485_modbus_rtu_28
 	
 	
 	
-	// --- flow_comp_36 -----·Ö¼ð¿â_YÖá
+	// --- flow_comp_36 -----åˆ†æ‹£åº“_Yè½´
     ec_slv_pul_axis
     #(
          .REG_SPACE_BIAS     (20'd65536)
@@ -1664,7 +1662,7 @@ ec_superisys_485_modbus_rtu_28
 	
 	
 	
-	// --- flow_comp_37 -----·Ö¼ð¿â_ZÖá
+	// --- flow_comp_37 -----åˆ†æ‹£åº“_Zè½´
     ec_slv_pul_axis
     #(
          .REG_SPACE_BIAS     (20'd66048)
@@ -1715,7 +1713,7 @@ ec_superisys_485_modbus_rtu_28
 	
 	
 	
-	// --- flow_comp_38 -----·Ö¼ð¿â_RÖá
+	// --- flow_comp_38 -----åˆ†æ‹£åº“_Rè½´
     ec_slv_pul_axis
     #(
          .REG_SPACE_BIAS     (20'd66560)
@@ -1767,7 +1765,7 @@ ec_superisys_485_modbus_rtu_28
 	
 	wire   o_dri2_39;
 	wire   o_dri1_39;
-	// --- flow_comp_39 -----·Ö¼ð¿â_èì¼Ü¼Ð×¦
+	// --- flow_comp_39 -----åˆ†æ‹£åº“_æ¡æž¶å¤¹çˆª
     ec_2di_2do
     #(
          .REG_SPACE_BIAS     (20'd67072)
@@ -1792,24 +1790,24 @@ ec_superisys_485_modbus_rtu_28
       .o_st_rd_data          ( sub_comp_rd_dat[127]    ),
 	  .o_intr_irq            ( map_irq[127]       )
 	  
-	  //Î»ÖÃ1µ½Î»¶Ë¿Ú
+	  //ä½ç½®1åˆ°ä½ç«¯å£
 	  ,.i_pos1				( ~di_regoin_msg[0][43]          )
-	  //Î»ÖÃ2µ½Î»¶Ë¿Ú
+	  //ä½ç½®2åˆ°ä½ç«¯å£
 	  ,.i_pos2				( ~di_regoin_msg[0][42]          )
-	  //Çý¶¯¶Ë¿Ú1
+	  //é©±åŠ¨ç«¯å£1
 	  ,.o_dri1				( o_dri1_39          )
-	  //Çý¶¯¶Ë¿Ú2
+	  //é©±åŠ¨ç«¯å£2
 	  ,.o_dri2				( o_dri2_39           )
 
     );
-	assign do_regoin_r_msg[ 0][27] = o_dri2_39;
-    assign do_regoin_r_msg[ 0][26] = o_dri1_39;
+	assign do_regoin_r_msg[0][27] = ~o_dri2_39;
+    assign do_regoin_r_msg[0][26] = ~o_dri1_39;
 
 	
 	
 	wire   o_dri2_40;
 	wire   o_dri1_40;
-	// --- flow_comp_40 -----»úÆ÷ÈËÍÐÅÌÈë¿Ú»¬Ì¨
+	// --- flow_comp_40 -----æœºå™¨äººæ‰˜ç›˜å…¥å£æ»‘å°
     ec_3di_2do
     #(
          .REG_SPACE_BIAS     (20'd69120)
@@ -1834,26 +1832,26 @@ ec_superisys_485_modbus_rtu_28
       .o_st_rd_data          ( sub_comp_rd_dat[131]    ),
 	  .o_intr_irq            ( map_irq[131]       )
 	  
-	  //Î»ÖÃ1µ½Î»¶Ë¿Ú
+	  //ä½ç½®1åˆ°ä½ç«¯å£
 	  ,.i_pos1				( ~di_regoin_msg[1][12]          )
-	  //Î»ÖÃ2µ½Î»¶Ë¿Ú
+	  //ä½ç½®2åˆ°ä½ç«¯å£
 	  ,.i_pos2				( ~di_regoin_msg[1][13]          )
-	  //Çý¶¯¶Ë¿Ú1
+	  //é©±åŠ¨ç«¯å£1
 	  ,.o_dri1				( o_dri1_40           )
-	  //Çý¶¯¶Ë¿Ú2
+	  //é©±åŠ¨ç«¯å£2
 	  ,.o_dri2				( o_dri2_40           )
-	  //ÓÐÎÞ¸Ð²â¶Ë¿Ú
+	  //æœ‰æ— æ„Ÿæµ‹ç«¯å£
 	  ,.i_poa               ( ~di_regoin_msg[1][7]  )
 
     );
-	assign do_regoin_r_msg[ 0][21] = o_dri2_40;
-    assign do_regoin_r_msg[ 0][20] = o_dri1_40;
+	assign do_regoin_r_msg[0][21] = ~o_dri2_40;
+    assign do_regoin_r_msg[0][20] = ~o_dri1_40;
 
 	
 	
 	wire   o_dri2_41;
 	wire   o_dri1_41;
-	// --- flow_comp_41 -----»úÆ÷ÈËÍÐÅÌ³ö¿Ú»¬Ì¨
+	// --- flow_comp_41 -----æœºå™¨äººæ‰˜ç›˜å‡ºå£æ»‘å°
     ec_3di_2do
     #(
          .REG_SPACE_BIAS     (20'd69632)
@@ -1878,26 +1876,26 @@ ec_superisys_485_modbus_rtu_28
       .o_st_rd_data          ( sub_comp_rd_dat[132]    ),
 	  .o_intr_irq            ( map_irq[132]       )
 	  
-	  //Î»ÖÃ1µ½Î»¶Ë¿Ú
+	  //ä½ç½®1åˆ°ä½ç«¯å£
 	  ,.i_pos1				( ~di_regoin_msg[1][14]          )
-	  //Î»ÖÃ2µ½Î»¶Ë¿Ú
+	  //ä½ç½®2åˆ°ä½ç«¯å£
 	  ,.i_pos2				( ~di_regoin_msg[1][15]          )
-	  //Çý¶¯¶Ë¿Ú1
+	  //é©±åŠ¨ç«¯å£1
 	  ,.o_dri1				( o_dri1_41           )
-	  //Çý¶¯¶Ë¿Ú2
+	  //é©±åŠ¨ç«¯å£2
 	  ,.o_dri2				( o_dri2_41           )
-	  //ÓÐÎÞ¸Ð²â¶Ë¿Ú
+	  //æœ‰æ— æ„Ÿæµ‹ç«¯å£
 	  ,.i_poa               ( ~di_regoin_msg[1][8]  )
 
     );
-	assign do_regoin_r_msg[ 0][23] = o_dri2_41;
-    assign do_regoin_r_msg[ 0][22] = o_dri1_41;
+	assign do_regoin_r_msg[0][23] = ~o_dri2_41;
+    assign do_regoin_r_msg[0][22] = ~o_dri1_41;
  
 	
 	
 	wire   o_dri1_42;
 	wire   o_dri2_42;
-	// --- flow_comp_42 -----[1ºÅ-A]Õý³£ÉÏÁÏ»¬Ì¨
+	// --- flow_comp_42 -----[1å·-A]æ­£å¸¸ä¸Šæ–™æ»‘å°
     ec_3di_2do
     #(
          .REG_SPACE_BIAS     (20'd70144)
@@ -1922,25 +1920,25 @@ ec_superisys_485_modbus_rtu_28
       .o_st_rd_data          ( sub_comp_rd_dat[133]    ),
 	  .o_intr_irq            ( map_irq[133]       )
 	  
-	  //Î»ÖÃ1µ½Î»¶Ë¿Ú
+	  //ä½ç½®1åˆ°ä½ç«¯å£
 	  ,.i_pos1				( ~di_regoin_msg[1][0]          )
-	  //Î»ÖÃ2µ½Î»¶Ë¿Ú
+	  //ä½ç½®2åˆ°ä½ç«¯å£
 	  ,.i_pos2				( ~di_regoin_msg[1][1]          )
-	  //Çý¶¯¶Ë¿Ú1
+	  //é©±åŠ¨ç«¯å£1
 	  ,.o_dri1				( o_dri1_42           )
-	  //Çý¶¯¶Ë¿Ú2
+	  //é©±åŠ¨ç«¯å£2
 	  ,.o_dri2				( o_dri2_42           )
-	  //ÓÐÎÞ¸Ð²â¶Ë¿Ú
+	  //æœ‰æ— æ„Ÿæµ‹ç«¯å£
 	  ,.i_poa               ( ~di_regoin_msg[1][1]  )
 
     );
-	assign do_regoin_r_msg[0][8] = o_dri1_42;
-    assign do_regoin_r_msg[0][9] = o_dri2_42;
+	assign do_regoin_r_msg[0][8] = ~o_dri1_42;
+    assign do_regoin_r_msg[0][9] = ~o_dri2_42;
 	
 	
 	wire   o_dri1_43;
 	wire   o_dri2_43;
-	// --- flow_comp_43 -----[1ºÅ-B]Õý³£ÉÏÁÏ»¬Ì¨
+	// --- flow_comp_43 -----[1å·-B]æ­£å¸¸ä¸Šæ–™æ»‘å°
     ec_3di_2do
     #(
          .REG_SPACE_BIAS     (20'd67584)
@@ -1965,26 +1963,26 @@ ec_superisys_485_modbus_rtu_28
       .o_st_rd_data          ( sub_comp_rd_dat[128]    ),
 	  .o_intr_irq            ( map_irq[128]       )
 	  
-	  //Î»ÖÃ1µ½Î»¶Ë¿Ú
+	  //ä½ç½®1åˆ°ä½ç«¯å£
 	  ,.i_pos1				( ~di_regoin_msg[1][2]          )
-	  //Î»ÖÃ2µ½Î»¶Ë¿Ú
+	  //ä½ç½®2åˆ°ä½ç«¯å£
 	  ,.i_pos2				( ~di_regoin_msg[1][3]          )
-	  //Çý¶¯¶Ë¿Ú1
+	  //é©±åŠ¨ç«¯å£1
 	  ,.o_dri1				( o_dri1_43           )
-	  //Çý¶¯¶Ë¿Ú2
+	  //é©±åŠ¨ç«¯å£2
 	  ,.o_dri2				( o_dri2_43           )
-	  //ÓÐÎÞ¸Ð²â¶Ë¿Ú
+	  //æœ‰æ— æ„Ÿæµ‹ç«¯å£
 	  ,.i_poa               ( ~di_regoin_msg[1][2]  )
 
     );
-	assign do_regoin_r_msg[0][10] = o_dri1_43;
-    assign do_regoin_r_msg[0][11] = o_dri2_43;
+	assign do_regoin_r_msg[0][10] = ~o_dri1_43;
+    assign do_regoin_r_msg[0][11] = ~o_dri2_43;
 
 	
 	
 	wire   o_dri1_44;
 	wire   o_dri2_44;
-	// --- flow_comp_44 -----[2ºÅ-A]Õý³£ÉÏÁÏ»¬Ì¨
+	// --- flow_comp_44 -----[2å·-A]æ­£å¸¸ä¸Šæ–™æ»‘å°
     ec_3di_2do
     #(
          .REG_SPACE_BIAS     (20'd70656)
@@ -2009,26 +2007,26 @@ ec_superisys_485_modbus_rtu_28
       .o_st_rd_data          ( sub_comp_rd_dat[134]    ),
 	  .o_intr_irq            ( map_irq[134]       )
 	  
-	  //Î»ÖÃ1µ½Î»¶Ë¿Ú
+	  //ä½ç½®1åˆ°ä½ç«¯å£
 	  ,.i_pos1				( ~di_regoin_msg[1][4]          )
-	  //Î»ÖÃ2µ½Î»¶Ë¿Ú
+	  //ä½ç½®2åˆ°ä½ç«¯å£
 	  ,.i_pos2				( ~di_regoin_msg[1][5]          )
-	  //Çý¶¯¶Ë¿Ú1
+	  //é©±åŠ¨ç«¯å£1
 	  ,.o_dri1				( o_dri1_44           )
-	  //Çý¶¯¶Ë¿Ú2
+	  //é©±åŠ¨ç«¯å£2
 	  ,.o_dri2				( o_dri2_44           )
-	  //ÓÐÎÞ¸Ð²â¶Ë¿Ú
+	  //æœ‰æ— æ„Ÿæµ‹ç«¯å£
 	  ,.i_poa               ( ~di_regoin_msg[1][3]  )
 
     );
-	assign do_regoin_r_msg[ 0][12] = o_dri1_44;
-    assign do_regoin_r_msg[ 0][13] = o_dri2_44;
+	assign do_regoin_r_msg[ 0][12] = ~o_dri1_44;
+    assign do_regoin_r_msg[ 0][13] = ~o_dri2_44;
 
 	
 	
 	wire   o_dri1_45;
 	wire   o_dri2_45;
-	// --- flow_comp_45 -----[2ºÅ-B]Õý³£ÉÏÁÏ»¬Ì¨
+	// --- flow_comp_45 -----[2å·-B]æ­£å¸¸ä¸Šæ–™æ»‘å°
     ec_3di_2do
     #(
          .REG_SPACE_BIAS     (20'd68096)
@@ -2053,26 +2051,26 @@ ec_superisys_485_modbus_rtu_28
       .o_st_rd_data          ( sub_comp_rd_dat[129]    ),
 	  .o_intr_irq            ( map_irq[129]       )
 	  
-	  //Î»ÖÃ1µ½Î»¶Ë¿Ú
+	  //ä½ç½®1åˆ°ä½ç«¯å£
 	  ,.i_pos1				( ~di_regoin_msg[1][6]          )
-	  //Î»ÖÃ2µ½Î»¶Ë¿Ú
+	  //ä½ç½®2åˆ°ä½ç«¯å£
 	  ,.i_pos2				( ~di_regoin_msg[1][7]          )
-	  //Çý¶¯¶Ë¿Ú1
+	  //é©±åŠ¨ç«¯å£1
 	  ,.o_dri1				( o_dri1_45           )
-	  //Çý¶¯¶Ë¿Ú2
+	  //é©±åŠ¨ç«¯å£2
 	  ,.o_dri2				( o_dri2_45           )
-	  //ÓÐÎÞ¸Ð²â¶Ë¿Ú
+	  //æœ‰æ— æ„Ÿæµ‹ç«¯å£
 	  ,.i_poa               ( ~di_regoin_msg[1][4]  )
 
     );
-	assign do_regoin_r_msg[0][14] = o_dri1_45;
-    assign do_regoin_r_msg[0][15] = o_dri2_45;
+	assign do_regoin_r_msg[0][14] = ~o_dri1_45;
+    assign do_regoin_r_msg[0][15] = ~o_dri2_45;
 
 	
 	
 	wire   o_dri2_46;
 	wire   o_dri1_46;
-	// --- flow_comp_46 -----[3ºÅ-A]Òì³£ÏÂÁÏ»¬Ì¨
+	// --- flow_comp_46 -----[3å·-A]å¼‚å¸¸ä¸‹æ–™æ»‘å°
     ec_3di_2do
     #(
          .REG_SPACE_BIAS     (20'd71168)
@@ -2097,26 +2095,26 @@ ec_superisys_485_modbus_rtu_28
       .o_st_rd_data          ( sub_comp_rd_dat[135]    ),
 	  .o_intr_irq            ( map_irq[135]       )
 	  
-	  //Î»ÖÃ1µ½Î»¶Ë¿Ú
+	  //ä½ç½®1åˆ°ä½ç«¯å£
 	  ,.i_pos1				( ~di_regoin_msg[1][8]          )
-	  //Î»ÖÃ2µ½Î»¶Ë¿Ú
+	  //ä½ç½®2åˆ°ä½ç«¯å£
 	  ,.i_pos2				( ~di_regoin_msg[1][9]          )
-	  //Çý¶¯¶Ë¿Ú1
+	  //é©±åŠ¨ç«¯å£1
 	  ,.o_dri1				( o_dri1_46           )
-	  //Çý¶¯¶Ë¿Ú2
+	  //é©±åŠ¨ç«¯å£2
 	  ,.o_dri2				( o_dri2_46           )
-	  //ÓÐÎÞ¸Ð²â¶Ë¿Ú
+	  //æœ‰æ— æ„Ÿæµ‹ç«¯å£
 	  ,.i_poa               ( ~di_regoin_msg[1][5]  )
 
     );
-	assign do_regoin_r_msg[0][17] = o_dri2_46;
-    assign do_regoin_r_msg[0][16] = o_dri1_46;
+	assign do_regoin_r_msg[0][17] = ~o_dri2_46;
+    assign do_regoin_r_msg[0][16] = ~o_dri1_46;
 
 	
 	
 	wire   o_dri2_47;
 	wire   o_dri1_47;
-	// --- flow_comp_47 -----[3ºÅ-B]Òì³£ÏÂÁÏ»¬Ì¨
+	// --- flow_comp_47 -----[3å·-B]å¼‚å¸¸ä¸‹æ–™æ»‘å°
     ec_3di_2do
     #(
          .REG_SPACE_BIAS     (20'd68608)
@@ -2141,25 +2139,25 @@ ec_superisys_485_modbus_rtu_28
       .o_st_rd_data          ( sub_comp_rd_dat[130]    ),
 	  .o_intr_irq            ( map_irq[130]       )
 	  
-	  //Î»ÖÃ1µ½Î»¶Ë¿Ú
+	  //ä½ç½®1åˆ°ä½ç«¯å£
 	  ,.i_pos1				( ~di_regoin_msg[1][10]          )
-	  //Î»ÖÃ2µ½Î»¶Ë¿Ú
+	  //ä½ç½®2åˆ°ä½ç«¯å£
 	  ,.i_pos2				( ~di_regoin_msg[1][11]          )
-	  //Çý¶¯¶Ë¿Ú1
+	  //é©±åŠ¨ç«¯å£1
 	  ,.o_dri1				( o_dri1_47           )
-	  //Çý¶¯¶Ë¿Ú2
+	  //é©±åŠ¨ç«¯å£2
 	  ,.o_dri2				( o_dri2_47           )
-	  //ÓÐÎÞ¸Ð²â¶Ë¿Ú
+	  //æœ‰æ— æ„Ÿæµ‹ç«¯å£
 	  ,.i_poa               ( ~di_regoin_msg[1][6]  )
 
     );
-	assign do_regoin_r_msg[0][19] = o_dri2_47;
-    assign do_regoin_r_msg[0][18] = o_dri1_47;
+	assign do_regoin_r_msg[0][19] = ~o_dri2_47;
+    assign do_regoin_r_msg[0][18] = ~o_dri1_47;
 
 	
 	
 	
-	// --- flow_comp_48 -----·Ö¼ð¿â_´ò±ê»ú¿¨ÅÌRÖá
+	// --- flow_comp_48 -----åˆ†æ‹£åº“_æ‰“æ ‡æœºå¡ç›˜Rè½´
     ec_slv_pul_axis
     #(
          .REG_SPACE_BIAS     (20'd72704)
@@ -2210,7 +2208,7 @@ ec_superisys_485_modbus_rtu_28
 	
 	
 	
-	// --- flow_comp_49 -----·Ö¼ð¿â_´ò±ê»ú¿¨ÅÌYÖá
+	// --- flow_comp_49 -----åˆ†æ‹£åº“_æ‰“æ ‡æœºå¡ç›˜Yè½´
     ec_slv_pul_axis
     #(
          .REG_SPACE_BIAS     (20'd73216)
@@ -2261,7 +2259,7 @@ ec_superisys_485_modbus_rtu_28
 	
 	
 	
-	// --- flow_comp_50 -----·Ö¼ð¿â_´ò±ê»úÇã½ÇÖá
+	// --- flow_comp_50 -----åˆ†æ‹£åº“_æ‰“æ ‡æœºå€¾è§’è½´
     ec_slv_pul_axis
     #(
          .REG_SPACE_BIAS     (20'd73728)
@@ -2312,7 +2310,7 @@ ec_superisys_485_modbus_rtu_28
 	
 	
 	
-	// --- flow_comp_51 -----·Ö¼ð¿â_´ò±ê»úÉý½µZÖá
+	// --- flow_comp_51 -----åˆ†æ‹£åº“_æ‰“æ ‡æœºå‡é™Zè½´
     ec_slv_pul_axis
     #(
          .REG_SPACE_BIAS     (20'd74240)
@@ -2363,10 +2361,10 @@ ec_superisys_485_modbus_rtu_28
 	
 	
 	
-	// --- flow_comp_52 -----´ò±ê»ú
+	// --- flow_comp_52 -----æ‰“æ ‡æœº
     ec_feijie_marker
     #(
-         .REG_SPACE_BIAS     (20'd75264)
+         .REG_SPACE_BIAS     (20'd76288)
         ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
     )
     ec_feijie_marker_52
@@ -2394,7 +2392,7 @@ ec_superisys_485_modbus_rtu_28
 	
 	wire   o_dri2_53;
 	wire   o_dri1_53;
-	// --- flow_comp_53 -----·Ö¼ð¿â_´ò±ê»ú¿¨ÅÌ
+	// --- flow_comp_53 -----åˆ†æ‹£åº“_æ‰“æ ‡æœºå¡ç›˜
     ec_2di_3do
     #(
          .REG_SPACE_BIAS     (20'd72192)
@@ -2419,25 +2417,25 @@ ec_superisys_485_modbus_rtu_28
       .o_st_rd_data          ( sub_comp_rd_dat[137]    ),
 	  .o_intr_irq            ( map_irq[137]       )
 	  
-	  //Î»ÖÃµ½Î»¿ª¹Ø
+	  //ä½ç½®åˆ°ä½å¼€å…³
 	  ,.i_pos			( do_regoin_r_msg[0][25] ? 1'b0 : 1'b1 )
-	  //ÓÐÎÞ¸Ð²â¿ª¹Ø
+	  //æœ‰æ— æ„Ÿæµ‹å¼€å…³
 	  ,.i_poa			( 1'b0 )
-	  //µ¥Çý¶¯ÐÅºÅ
+	  //å•é©±åŠ¨ä¿¡å·
 	  ,.o_dri			( 1'b0 )
-	  //Ë«ÇýÇý¶¯ÐÅºÅ1
+	  //åŒé©±é©±åŠ¨ä¿¡å·1
 	  ,.o_dri1			( o_dri1_53 )
-	  //Ë«ÇýÇý¶¯ÐÅºÅ2
+	  //åŒé©±é©±åŠ¨ä¿¡å·2
 	  ,.o_dri2			( o_dri2_53 )
 
     );
-	assign do_regoin_r_msg[0][24] = o_dri2_53;
-    assign do_regoin_r_msg[0][25] = o_dri1_53;
+	assign do_regoin_r_msg[0][24] = ~o_dri2_53;
+    assign do_regoin_r_msg[0][25] = ~o_dri1_53;
 
 	
 	
 	
-	// --- flow_comp_55 -----É°ÂÖÓÐÎÞ¼ì²â´«¸ÐÆ÷
+	// --- flow_comp_55 -----ç ‚è½®æœ‰æ— æ£€æµ‹ä¼ æ„Ÿå™¨
     ec_16di
     #(
          .REG_SPACE_BIAS     (20'd75776)
@@ -2464,20 +2462,20 @@ ec_superisys_485_modbus_rtu_28
 	  
 	  ,.i_sign1_check          ( ~di_mst_msg[36] )
 	  ,.i_sign2_check          ( ~di_mst_msg[35] )
-	  ,.i_sign3_check          ( ~di_mst_msg[61] )
-	  ,.i_sign4_check          ( ~di_mst_msg[60] )
-	  ,.i_sign5_check          ( ~di_mst_msg[59] )
-	  ,.i_sign6_check          ( ~di_mst_msg[58] )
-	  ,.i_sign7_check          ( ~di_mst_msg[57] )
-	  ,.i_sign8_check          ( ~di_mst_msg[56] )
-	  ,.i_sign9_check          ( ~di_mst_msg[10] )
-	  ,.i_sign10_check         ( ~di_mst_msg[9] )
-	  ,.i_sign11_check         ( ~di_mst_msg[8] )
-	  ,.i_sign12_check         ( ~di_mst_msg[7] )
-	  ,.i_sign13_check         ( ~di_mst_msg[6] )
-	  ,.i_sign14_check         ( ~di_mst_msg[5] )
-	  ,.i_sign15_check         ( ~di_mst_msg[4] )
-	  ,.i_sign16_check         ( ~di_mst_msg[3] )  
+	  ,.i_sign3_check          ( di_mst_msg[61] )
+	  ,.i_sign4_check          ( di_mst_msg[60] )
+	  ,.i_sign5_check          ( di_mst_msg[59] )
+	  ,.i_sign6_check          ( di_mst_msg[58] )
+	  ,.i_sign7_check          ( di_mst_msg[57] )
+	  ,.i_sign8_check          ( di_mst_msg[56] )
+	  ,.i_sign9_check          ( di_mst_msg[10] )
+	  ,.i_sign10_check         ( di_mst_msg[9] )
+	  ,.i_sign11_check         ( di_mst_msg[8] )
+	  ,.i_sign12_check         ( di_mst_msg[7] )
+	  ,.i_sign13_check         ( di_mst_msg[6] )
+	  ,.i_sign14_check         ( di_mst_msg[5] )
+	  ,.i_sign15_check         ( di_mst_msg[4] )
+	  ,.i_sign16_check         ( di_mst_msg[3] )  
 
     );
 
@@ -2487,7 +2485,7 @@ ec_superisys_485_modbus_rtu_28
 	wire   o_led_r_56;
 	wire   o_bz_56;
 	wire   o_led_g_56;
-	// --- flow_comp_56 -----·Ö¼ð¿â_ÈýÉ«µÆ·äÃùÆ÷
+	// --- flow_comp_56 -----åˆ†æ‹£åº“_ä¸‰è‰²ç¯èœ‚é¸£å™¨
     ec_3led_buzzer
     #(
          .REG_SPACE_BIAS     (20'd74752)
@@ -2518,15 +2516,15 @@ ec_superisys_485_modbus_rtu_28
        ,.o_led_g        ( o_led_g_56           )
 
     );
-	assign do_regoin_r_msg[ 0][1]=o_led_y_56;
-    assign do_regoin_r_msg[ 0][0]=o_led_r_56;
-    assign do_regoin_r_msg[ 0][3]=o_bz_56;
-    assign do_regoin_r_msg[ 0][2]=o_led_g_56;
+	assign do_regoin_r_msg[0][1]=o_led_y_56;
+    assign do_regoin_r_msg[0][0]=o_led_r_56;
+    assign do_regoin_r_msg[0][3]=o_bz_56;
+    assign do_regoin_r_msg[0][2]=o_led_g_56;
 
 	
 	
 	
-	// --- flow_comp_57 -----·Ö¼ð¿â_µç×ÓÊÖÂÖ
+	// --- flow_comp_57 -----åˆ†æ‹£åº“_ç”µå­æ‰‹è½®
     ec_pulmotor_handwheel
     #(
          .REG_SPACE_BIAS     (20'd71680)
@@ -2576,7 +2574,7 @@ ec_superisys_485_modbus_rtu_28
 	
 	wire   o_dri2_58;
 	wire   o_dri1_58;
-	// --- flow_comp_58 -----Èý×ø±ê·¿ÇåÏ´»ú²à×Ô¶¯ÃÅ
+	// --- flow_comp_58 -----ä¸‰åæ ‡æˆ¿æ¸…æ´—æœºä¾§è‡ªåŠ¨é—¨
     ec_2di_2do
     #(
          .REG_SPACE_BIAS     (20'd58368)
@@ -2601,23 +2599,23 @@ ec_superisys_485_modbus_rtu_28
       .o_st_rd_data          ( sub_comp_rd_dat[110]    ),
 	  .o_intr_irq            ( map_irq[110]       )
 	  
-	  //Î»ÖÃ1µ½Î»¶Ë¿Ú
+	  //ä½ç½®1åˆ°ä½ç«¯å£
 	  ,.i_pos1				( ~di_mst_msg[1]          )
-	  //Î»ÖÃ2µ½Î»¶Ë¿Ú
+	  //ä½ç½®2åˆ°ä½ç«¯å£
 	  ,.i_pos2				( ~di_mst_msg[2]          )
-	  //Çý¶¯¶Ë¿Ú1
+	  //é©±åŠ¨ç«¯å£1
 	  ,.o_dri1				( o_dri1_58          )
-	  //Çý¶¯¶Ë¿Ú2
+	  //é©±åŠ¨ç«¯å£2
 	  ,.o_dri2				( o_dri2_58          )
 
     );
-	assign do_mst_msg[9] = o_dri2_58;
-    assign do_mst_msg[8] = o_dri1_58;
+	assign do_mst_msg[9] = ~o_dri2_58;
+    assign do_mst_msg[8] = ~o_dri1_58;
 	
 	
 	wire   o_dri1_59;
 	wire   o_dri2_59;
-	// --- flow_comp_59 -----Èý×ø±ê·¿µØ¹ì²à×Ô¶¯ÃÅ
+	// --- flow_comp_59 -----ä¸‰åæ ‡æˆ¿åœ°è½¨ä¾§è‡ªåŠ¨é—¨
     ec_2di_2do
     #(
          .REG_SPACE_BIAS     (20'd58880)
@@ -2642,23 +2640,23 @@ ec_superisys_485_modbus_rtu_28
       .o_st_rd_data          ( sub_comp_rd_dat[111]    ),
 	  .o_intr_irq            ( map_irq[111]       )
 	  
-	  //Î»ÖÃ1µ½Î»¶Ë¿Ú
+	  //ä½ç½®1åˆ°ä½ç«¯å£
 	  ,.i_pos1				( ~di_mst_msg[62]          )
-	  //Î»ÖÃ2µ½Î»¶Ë¿Ú
+	  //ä½ç½®2åˆ°ä½ç«¯å£
 	  ,.i_pos2				( ~di_mst_msg[63]          )
-	  //Çý¶¯¶Ë¿Ú1
+	  //é©±åŠ¨ç«¯å£1
 	  ,.o_dri1				( o_dri1_59           )
-	  //Çý¶¯¶Ë¿Ú2
+	  //é©±åŠ¨ç«¯å£2
 	  ,.o_dri2				( o_dri2_59           )
 
     );
-	assign do_mst_msg[10] = o_dri1_59;
-    assign do_mst_msg[11] = o_dri2_59;
+	assign do_mst_msg[10] = ~o_dri1_59;
+    assign do_mst_msg[11] = ~o_dri2_59;
 	
 	
 	wire   o_dri1_60;
 	wire   o_dri2_60;
-	// --- flow_comp_60 -----Èý×ø±ê·¿È¥Ã«´Ì»ú²à×Ô¶¯ÃÅ
+	// --- flow_comp_60 -----ä¸‰åæ ‡æˆ¿åŽ»æ¯›åˆºæœºä¾§è‡ªåŠ¨é—¨
     ec_2di_2do
     #(
          .REG_SPACE_BIAS     (20'd59392)
@@ -2683,23 +2681,23 @@ ec_superisys_485_modbus_rtu_28
       .o_st_rd_data          ( sub_comp_rd_dat[112]    ),
 	  .o_intr_irq            ( map_irq[112]       )
 	  
-	  //Î»ÖÃ1µ½Î»¶Ë¿Ú
+	  //ä½ç½®1åˆ°ä½ç«¯å£
 	  ,.i_pos1				( ~di_mst_msg[52]          )
-	  //Î»ÖÃ2µ½Î»¶Ë¿Ú
+	  //ä½ç½®2åˆ°ä½ç«¯å£
 	  ,.i_pos2				( ~di_mst_msg[53]          )
-	  //Çý¶¯¶Ë¿Ú1
+	  //é©±åŠ¨ç«¯å£1
 	  ,.o_dri1				( o_dri1_60           )
-	  //Çý¶¯¶Ë¿Ú2
+	  //é©±åŠ¨ç«¯å£2
 	  ,.o_dri2				( o_dri2_60           )
 
     );
-	assign do_mst_msg[3] = o_dri1_60;
-    assign do_mst_msg[4] = o_dri2_60;
+	assign do_mst_msg[3] = ~o_dri1_60;
+    assign do_mst_msg[4] = ~o_dri2_60;
 
 	
 	
 	
-	// --- flow_comp_61 -----Ö÷»úÆ÷ÈËµØ¹ì
+	// --- flow_comp_61 -----ä¸»æœºå™¨äººåœ°è½¨
     ec_can_servo
     #(
          .REG_SPACE_BIAS     (20'd64512)
@@ -2734,7 +2732,7 @@ ec_superisys_485_modbus_rtu_28
 	
 	
 	
-	// --- flow_comp_62 -----¶Ìèì¼Ü1
+	// --- flow_comp_62 -----çŸ­æ¡æž¶1
     ec_can_servo
     #(
          .REG_SPACE_BIAS     (20'd60416)
@@ -2769,7 +2767,7 @@ ec_superisys_485_modbus_rtu_28
 	
 	
 	
-	// --- flow_comp_63 -----³¤èì¼Ü1
+	// --- flow_comp_63 -----é•¿æ¡æž¶1
     ec_can_servo
     #(
          .REG_SPACE_BIAS     (20'd60928)
@@ -2804,7 +2802,7 @@ ec_superisys_485_modbus_rtu_28
 	
 	
 	
-	// --- flow_comp_64 -----³¤èì¼Ü2
+	// --- flow_comp_64 -----é•¿æ¡æž¶2
     ec_can_servo
     #(
          .REG_SPACE_BIAS     (20'd61440)
@@ -2839,10 +2837,10 @@ ec_superisys_485_modbus_rtu_28
 	
 	
 	
-	// --- flow_comp_66 -----´òÄ¥»úÆ÷ÈË
+	// --- flow_comp_66 -----æ‰“ç£¨æœºå™¨äºº
     ec_fanuc_robot
     #(
-         .REG_SPACE_BIAS     (20'd76288)
+         .REG_SPACE_BIAS     (20'd75264)
         ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
     )
     ec_fanuc_robot_66
@@ -2889,7 +2887,7 @@ ec_superisys_485_modbus_rtu_28
 	wire   o_bz_67;
 	wire   o_led_g_67;
 	wire   o_led_r_67;
-	// --- flow_comp_67 -----È¥Ã«´Ì»ú_ÈýÉ«µÆ·äÃùÆ÷
+	// --- flow_comp_67 -----åŽ»æ¯›åˆºæœº_ä¸‰è‰²ç¯èœ‚é¸£å™¨
     ec_3led_buzzer
     #(
          .REG_SPACE_BIAS     (20'd80896)
@@ -2920,16 +2918,16 @@ ec_superisys_485_modbus_rtu_28
        ,.o_led_r        ( o_led_r_67           )
 
     );
-	assign do_regoin_r_msg[ 2][1]=o_led_y_67;
-    assign do_regoin_r_msg[ 2][3]=o_bz_67;
-    assign do_regoin_r_msg[ 2][2]=o_led_g_67;
-    assign do_regoin_r_msg[ 2][0]=o_led_r_67;
+	assign do_regoin_r_msg[2][1] = ~o_led_y_67;
+    assign do_regoin_r_msg[2][3] = ~o_bz_67;
+    assign do_regoin_r_msg[2][2] = ~o_led_g_67;
+    assign do_regoin_r_msg[2][0] = ~o_led_r_67;
 
 	
 	
 	wire   o_dri1_68;
 	wire   o_dri2_68;
-	// --- flow_comp_68 -----È¥Ã«´Ì¿¨ÅÌ
+	// --- flow_comp_68 -----åŽ»æ¯›åˆºå¡ç›˜
     ec_2di_3do
     #(
          .REG_SPACE_BIAS     (20'd77312)
@@ -2954,26 +2952,26 @@ ec_superisys_485_modbus_rtu_28
       .o_st_rd_data          ( sub_comp_rd_dat[147]    ),
 	  .o_intr_irq            ( map_irq[147]       )
 	  
-	  //Î»ÖÃµ½Î»¿ª¹Ø
+	  //ä½ç½®åˆ°ä½å¼€å…³
 	  ,.i_pos			( ~di_regoin_msg[2][51] )
-	  //ÓÐÎÞ¸Ð²â¿ª¹Ø
+	  //æœ‰æ— æ„Ÿæµ‹å¼€å…³
 	  ,.i_poa			( 1'b0 )
-	  //µ¥Çý¶¯ÐÅºÅ
+	  //å•é©±åŠ¨ä¿¡å·
 	  ,.o_dri			( 1'b0 )
-	  //Ë«ÇýÇý¶¯ÐÅºÅ1
+	  //åŒé©±é©±åŠ¨ä¿¡å·1
 	  ,.o_dri1			( o_dri1_68 )
-	  //Ë«ÇýÇý¶¯ÐÅºÅ2
+	  //åŒé©±é©±åŠ¨ä¿¡å·2
 	  ,.o_dri2			( o_dri2_68 )
 
     );
-	assign do_regoin_r_msg[2][9] = o_dri1_68;
-    assign do_regoin_r_msg[2][8] = o_dri2_68;
+	assign do_regoin_r_msg[2][9] = ~o_dri1_68;
+    assign do_regoin_r_msg[2][8] = ~o_dri2_68;
 
 	
 	
 	wire   o_dri1_69;
 	wire   o_dri2_69;
-	// --- flow_comp_69 -----È¥Ã«´Ì»ú_Ä¥Í·¼Ð×¦
+	// --- flow_comp_69 -----åŽ»æ¯›åˆºæœº_ç£¨å¤´å¤¹çˆª
     ec_2di_2do
     #(
          .REG_SPACE_BIAS     (20'd76800)
@@ -2998,24 +2996,24 @@ ec_superisys_485_modbus_rtu_28
       .o_st_rd_data          ( sub_comp_rd_dat[146]    ),
 	  .o_intr_irq            ( map_irq[146]       )
 	  
-	  //Î»ÖÃ1µ½Î»¶Ë¿Ú
+	  //ä½ç½®1åˆ°ä½ç«¯å£
 	  ,.i_pos1				( ~di_regoin_msg[2][22]          )
-	  //Î»ÖÃ2µ½Î»¶Ë¿Ú
+	  //ä½ç½®2åˆ°ä½ç«¯å£
 	  ,.i_pos2				( ~di_regoin_msg[2][21]          )
-	  //Çý¶¯¶Ë¿Ú1
+	  //é©±åŠ¨ç«¯å£1
 	  ,.o_dri1				( o_dri1_69           )
-	  //Çý¶¯¶Ë¿Ú2
+	  //é©±åŠ¨ç«¯å£2
 	  ,.o_dri2				( o_dri2_69           )
 
     );
-	assign do_regoin_r_msg[2][13] = o_dri1_69;
-    assign do_regoin_r_msg[2][12] = o_dri2_69;
+	assign do_regoin_r_msg[2][13] = ~o_dri1_69;
+    assign do_regoin_r_msg[2][12] = ~o_dri2_69;
 
 	
 	
 	wire   o_dri1_70;
 	wire   o_dri2_70;
-	// --- flow_comp_70 -----È¥Ã«´Ì»ú_×Ô¶¯ÃÅ
+	// --- flow_comp_70 -----åŽ»æ¯›åˆºæœº_è‡ªåŠ¨é—¨
     ec_4di_2do
     #(
          .REG_SPACE_BIAS     (20'd78848)
@@ -3048,12 +3046,12 @@ ec_superisys_485_modbus_rtu_28
 	  ,.o_dri2  			     ( o_dri2_70 )
 
     );
-	assign do_regoin_r_msg[2][11] = o_dri1_70;
-    assign do_regoin_r_msg[2][10] = o_dri2_70;
+	assign do_regoin_r_msg[2][11] = ~o_dri1_70;
+    assign do_regoin_r_msg[2][10] = ~o_dri2_70;
 	
 	
 	
-	// --- flow_comp_71 -----Ã«´Ìµ¶¼Ü¿âÐÅºÅ¼ì²â×é
+	// --- flow_comp_71 -----æ¯›åˆºåˆ€æž¶åº“ä¿¡å·æ£€æµ‹ç»„
     ec_16di
     #(
          .REG_SPACE_BIAS     (20'd80384)
@@ -3102,7 +3100,7 @@ ec_superisys_485_modbus_rtu_28
 	
 	
 	
-	// --- flow_comp_72 -----È¥Ã«´Ì»ú_Ðý×ªÌ¨ËÅ·þµç»ú
+	// --- flow_comp_72 -----åŽ»æ¯›åˆºæœº_æ—‹è½¬å°ä¼ºæœç”µæœº
     ec_slv_pul_axis
     #(
          .REG_SPACE_BIAS     (20'd77824)
@@ -3147,7 +3145,7 @@ ec_superisys_485_modbus_rtu_28
 	
 	
 	wire   o_sig_dri_73;
-	// --- flow_comp_73 -----È¥Ã«´Ì»ú_·À±¬³ý³¾Æ÷
+	// --- flow_comp_73 -----åŽ»æ¯›åˆºæœº_é˜²çˆ†é™¤å°˜å™¨
     ec_1do
     #(
          .REG_SPACE_BIAS     (20'd79360)
@@ -3175,11 +3173,11 @@ ec_superisys_485_modbus_rtu_28
 	 ,.o_sig_dri             ( o_sig_dri_73           )			
 
     );
-	assign do_regoin_r_msg[ 2][29]=o_sig_dri_73;
+	assign do_regoin_r_msg[ 2][29] = ~o_sig_dri_73;
 	
 	
 	wire   o_sig_dri_74;
-	// --- flow_comp_74 -----È¥Ã«´Ì»ú_Ë®Àä»ú
+	// --- flow_comp_74 -----åŽ»æ¯›åˆºæœº_æ°´å†·æœº
     ec_1do
     #(
          .REG_SPACE_BIAS     (20'd79872)
@@ -3207,11 +3205,11 @@ ec_superisys_485_modbus_rtu_28
 	  ,.o_sig_dri        ( o_sig_dri_74           )
 
     );
-	assign do_regoin_r_msg[ 2][31]=o_sig_dri_74;
+	assign do_regoin_r_msg[ 2][31] = ~o_sig_dri_74;
 
 
 	
-	// --- flow_comp_75 -----È¥Ã«´Ì»ú_Ä¥Í·Ðý×ªµç»ú
+	// --- flow_comp_75 -----åŽ»æ¯›åˆºæœº_ç£¨å¤´æ—‹è½¬ç”µæœº
     // ec_slv_dv300_485
     // #(
     //      .REG_SPACE_BIAS     (20'd78336)
@@ -3249,8 +3247,8 @@ ec_superisys_485_modbus_rtu_28
 
 ec_dv300_485_modbus_rtu
 #(
-        .REG_SPACE_BIAS         (20'd78336                ), //×é¼þ»ùµØÖ·
-        .REG_SPACE_SIZE         (`REG_SPACE_SIZE          ), //×é¼þÆ«ÒÆµØÖ·
+        .REG_SPACE_BIAS         (20'd78336                ), //ç»„ä»¶åŸºåœ°å€
+        .REG_SPACE_SIZE         (`REG_SPACE_SIZE          ), //ç»„ä»¶åç§»åœ°å€
         .CLK_FREQ               (156250000                )  //100MHz = 100000000
 )
 ec_dv300_485_modbus_rtu_75
@@ -3261,16 +3259,16 @@ ec_dv300_485_modbus_rtu_75
         .i_time_1s_vld          ( time_1s_vld             ),
         .ps_reg_clk             ( ps_reg_clk              ),
         .ps_reg_reset           ( ps_reg_reset            ),
-        .i_st_wr_en             ( ps_reg_we               ),//bram×ÜÏß
+        .i_st_wr_en             ( ps_reg_we               ),//bramæ€»çº¿
         .i_st_wr_addr           ( ps_reg_addr             ),
         .i_st_wr_data           ( ps_reg_wr_dat           ),
         .i_st_rd_en             ( ps_reg_re               ),
         .i_st_rd_addr           ( ps_reg_rd_addr          ),
         .o_st_rd_data           ( sub_comp_rd_dat[149]    ),
         .o_st_rd_vld            ( sub_comp_rd_vld[149]    ),
-        .o_intr_irq             ( map_irq[149]            ),//×é¼þÖÐ¶ÏÇëÇó
+        .o_intr_irq             ( map_irq[149]            ),//ç»„ä»¶ä¸­æ–­è¯·æ±‚
         
-        //--- Ö÷°åUart½Ó¿Ú
+        //--- ä¸»æ¿UartæŽ¥å£
         .i_uart_rx              ( rs485_1_user_rx[6]      ),
         .o_uart_tx              ( rs485_1_user_tx[6]      ),
         .o_uart_de              ( rs485_1_user_de[6]      ),
@@ -3281,7 +3279,7 @@ ec_dv300_485_modbus_rtu_75
 
 	wire   o_dri1_76;
 	wire   o_dri2_76;
-	// --- flow_comp_76 -----¶Ìèì¼Ü1#»úÆ÷ÈË¼Ð×¦
+	// --- flow_comp_76 -----çŸ­æ¡æž¶1#æœºå™¨äººå¤¹çˆª
     ec_2di_2do
     #(
          .REG_SPACE_BIAS     (20'd61952)
@@ -3306,26 +3304,26 @@ ec_dv300_485_modbus_rtu_75
       .o_st_rd_data          ( sub_comp_rd_dat[117]    ),
 	  .o_intr_irq            ( map_irq[117]       )
 	  
-	  //Î»ÖÃ1µ½Î»¶Ë¿Ú
+	  //ä½ç½®1åˆ°ä½ç«¯å£
 	  ,.i_pos1				( ~di_mst_msg[12]          )
-	  //Î»ÖÃ2µ½Î»¶Ë¿Ú
+	  //ä½ç½®2åˆ°ä½ç«¯å£
 	  ,.i_pos2				( ~di_mst_msg[11] | di_mst_msg[13]          )
-	  //Çý¶¯¶Ë¿Ú1
+	  //é©±åŠ¨ç«¯å£1
 	  ,.o_dri1				( o_dri1_76           )
-	  //Çý¶¯¶Ë¿Ú2
+	  //é©±åŠ¨ç«¯å£2
 	  ,.o_dri2				( o_dri2_76           )
 
     );
-	assign do_mst_msg[6] = o_dri1_76;
-    assign do_mst_msg[7] = o_dri2_76;
+	assign do_mst_msg[6] = ~o_dri1_76;
+    assign do_mst_msg[7] = ~o_dri2_76;
 	
 	
 	wire   o_dri2_77;
 	wire   o_dri1_77;
-	// --- flow_comp_77 -----³¤èì¼Ü1#»úÆ÷ÈË¼Ð×¦
+	// --- flow_comp_77 -----é•¿æ¡æž¶1#æœºå™¨äººå¤¹çˆª
     ec_2di_2do
     #(
-         .REG_SPACE_BIAS     (20'd62464)
+         .REG_SPACE_BIAS     (20'd62976)
         ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
     )
     ec_2di_2do_77
@@ -3347,27 +3345,27 @@ ec_dv300_485_modbus_rtu_75
       .o_st_rd_data          ( sub_comp_rd_dat[118]    ),
 	  .o_intr_irq            ( map_irq[118]       )
 	  
-	  //Î»ÖÃ1µ½Î»¶Ë¿Ú
+	  //ä½ç½®1åˆ°ä½ç«¯å£
 	  ,.i_pos1				( ~di_regoin_msg[3][32]          )
-	  //Î»ÖÃ2µ½Î»¶Ë¿Ú
+	  //ä½ç½®2åˆ°ä½ç«¯å£
 	  ,.i_pos2				( ~di_regoin_msg[3][33] | di_regoin_msg[3][56]          )
-	  //Çý¶¯¶Ë¿Ú1
+	  //é©±åŠ¨ç«¯å£1
 	  ,.o_dri1				( o_dri1_77           )
-	  //Çý¶¯¶Ë¿Ú2
+	  //é©±åŠ¨ç«¯å£2
 	  ,.o_dri2				( o_dri2_77           )
 
     );
-	assign do_regoin_r_msg[3][25] = o_dri2_77;
-    assign do_regoin_r_msg[3][24] = o_dri1_77;
+	assign do_regoin_r_msg[3][25] = ~o_dri2_77;
+    assign do_regoin_r_msg[3][24] = ~o_dri1_77;
 
 	
 	
 	wire   o_dri1_78;
 	wire   o_dri2_78;
-	// --- flow_comp_78 -----³¤èì¼Ü2#»úÆ÷ÈË¼Ð×¦
+	// --- flow_comp_78 -----é•¿æ¡æž¶2#æœºå™¨äººå¤¹çˆª
     ec_2di_2do
     #(
-         .REG_SPACE_BIAS     (20'd62976)
+         .REG_SPACE_BIAS     (20'd62464)
         ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
     )
     ec_2di_2do_78
@@ -3389,38 +3387,31 @@ ec_dv300_485_modbus_rtu_75
       .o_st_rd_data          ( sub_comp_rd_dat[119]    ),
 	  .o_intr_irq            ( map_irq[119]       )
 	  
-	  //Î»ÖÃ1µ½Î»¶Ë¿Ú
+	  //ä½ç½®1åˆ°ä½ç«¯å£
 	  ,.i_pos1				( ~di_regoin_msg[3][35]          )
-	  //Î»ÖÃ2µ½Î»¶Ë¿Ú
+	  //ä½ç½®2åˆ°ä½ç«¯å£
 	  ,.i_pos2				( ~di_regoin_msg[3][36] | di_regoin_msg[3][57]       )
-	  //Çý¶¯¶Ë¿Ú1
+	  //é©±åŠ¨ç«¯å£1
 	  ,.o_dri1				( o_dri1_78           )
-	  //Çý¶¯¶Ë¿Ú2
+	  //é©±åŠ¨ç«¯å£2
 	  ,.o_dri2				( o_dri2_78           )
 
     );
-	assign do_regoin_r_msg[3][26] = o_dri1_78;
-    assign do_regoin_r_msg[3][27] = o_dri2_78;
+	assign do_regoin_r_msg[3][26] = ~o_dri1_78;
+    assign do_regoin_r_msg[3][27] = ~o_dri2_78;
 
 	
 	
 	
-	// --- flow_comp_79 -----¹Ì¶¨»úÆ÷ÈË¼Ð×¦ÎïÁÏ¼ì²âÐÅºÅ
-	
-	ec_1di
+	// --- flow_comp_79 -----å›ºå®šæœºå™¨äººå¤¹çˆªç‰©æ–™æ£€æµ‹ä¿¡å·
+    ec_1di
     #(
          .REG_SPACE_BIAS     (20'd59904)
         ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
-        //,.P_MODULE_ID        (8'd32                      )
-        //,.P_SEAT_NUM         (4'd0                      )
     )
     ec_1di_79
     (
-      //.clk                   ( ps_reg_clk               ),
-      //.reset                 ( ps_reg_reset             ),
-	  //.aurora_clk            ( clk               ),
-      //.aurora_reset          ( reset             ),
-	  .clk_i                 ( clk               ),
+      .clk_i                 ( clk               ),
       .rst                   ( reset             ),
 	  .ps_reg_clk            ( ps_reg_clk               ),
       .ps_reg_reset          ( ps_reg_reset             ),
@@ -3436,17 +3427,19 @@ ec_dv300_485_modbus_rtu_75
 	  .o_st_rd_vld           ( sub_comp_rd_vld[113]    ),
       .o_st_rd_data          ( sub_comp_rd_dat[113]    ),
 	  .o_intr_irq            ( map_irq[113]       )
+	  
+	  ,.i_sign1_check        ( ~di_mst_msg[30]           )   // å•ä½æ£€æµ‹ä¿¡å·
 
-       ,.i_sign1_check        ( di_mst_msg[30]           )
     );
+
 	
 	
 	wire   o_dri1_80;
 	wire   o_dri2_80;
-	// --- flow_comp_80 -----6ºÅ»ú´²Ðý×ª»ú¹¹
+	// --- flow_comp_80 -----6å·æœºåºŠæ—‹è½¬æœºæž„
     ec_2di_2do
     #(
-         .REG_SPACE_BIAS     (20'd84480)
+         .REG_SPACE_BIAS     (20'd99840)
         ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
     )
     ec_2di_2do_80
@@ -3468,23 +3461,23 @@ ec_dv300_485_modbus_rtu_75
       .o_st_rd_data          ( sub_comp_rd_dat[161]    ),
 	  .o_intr_irq            ( map_irq[161]       )
 	  
-	  //Î»ÖÃ1µ½Î»¶Ë¿Ú
+	  //ä½ç½®1åˆ°ä½ç«¯å£
 	  ,.i_pos1				( ~di_regoin_msg[4][64]          )
-	  //Î»ÖÃ2µ½Î»¶Ë¿Ú
+	  //ä½ç½®2åˆ°ä½ç«¯å£
 	  ,.i_pos2				( ~di_regoin_msg[4][65]          )
-	  //Çý¶¯¶Ë¿Ú1
+	  //é©±åŠ¨ç«¯å£1
 	  ,.o_dri1				( o_dri1_80           )
-	  //Çý¶¯¶Ë¿Ú2
+	  //é©±åŠ¨ç«¯å£2
 	  ,.o_dri2				( o_dri2_80           )
 
     );
-	assign do_regoin_r_msg[4][32] = o_dri1_80;
-    assign do_regoin_r_msg[4][33] = o_dri2_80;
+	assign do_regoin_r_msg[4][32] = ~o_dri1_80;
+    assign do_regoin_r_msg[4][33] = ~o_dri2_80;
 
 	
 	
 	
-	// // --- flow_comp_83 -----³¤èì¼Ü1#¼Ð×¦RFID¶ÁÐ´Æ÷
+	// // --- flow_comp_83 -----é•¿æ¡æž¶1#å¤¹çˆªRFIDè¯»å†™å™¨
     // ec_sp_rfid
     // #(
     //      .REG_SPACE_BIAS     (20'd63488)
@@ -3513,8 +3506,8 @@ ec_dv300_485_modbus_rtu_75
 
 ec_superisys_485_modbus_rtu
 #(
-        .REG_SPACE_BIAS         (20'd63488                ), //×é¼þ»ùµØÖ·
-        .REG_SPACE_SIZE         (`REG_SPACE_SIZE          ), //×é¼þÆ«ÒÆµØÖ·
+        .REG_SPACE_BIAS         (20'd63488                ), //ç»„ä»¶åŸºåœ°å€
+        .REG_SPACE_SIZE         (`REG_SPACE_SIZE          ), //ç»„ä»¶åç§»åœ°å€
         .CLK_FREQ               (156250000                )  //100MHz = 100000000
 )
 ec_superisys_485_modbus_rtu_83
@@ -3525,23 +3518,23 @@ ec_superisys_485_modbus_rtu_83
         .i_time_1s_vld          ( time_1s_vld             ),
         .ps_reg_clk             ( ps_reg_clk              ),
         .ps_reg_reset           ( ps_reg_reset            ),
-        .i_st_wr_en             ( ps_reg_we               ),//bram×ÜÏß
+        .i_st_wr_en             ( ps_reg_we               ),//bramæ€»çº¿
         .i_st_wr_addr           ( ps_reg_addr             ),
         .i_st_wr_data           ( ps_reg_wr_dat           ),
         .i_st_rd_en             ( ps_reg_re               ),
         .i_st_rd_addr           ( ps_reg_rd_addr          ),
         .o_st_rd_data           ( sub_comp_rd_dat[120]    ),
         .o_st_rd_vld            ( sub_comp_rd_vld[120]    ),
-        .o_intr_irq             ( map_irq[120]            ),//×é¼þÖÐ¶ÏÇëÇó
+        .o_intr_irq             ( map_irq[120]            ),//ç»„ä»¶ä¸­æ–­è¯·æ±‚
         
-        //--- Ö÷°åUart½Ó¿Ú
+        //--- ä¸»æ¿UartæŽ¥å£
         .i_uart_rx              ( rs485_1_user_rx[3]      ),
         .o_uart_tx              ( rs485_1_user_tx[3]      ),
         .o_uart_de              ( rs485_1_user_de[3]      ),
         .o_user_req             ( rs485_1_user_req[3]     ),
         .i_user_grant           ( rs485_1_user_grant[3]   ),
 
-         //--- ´Ó°å½Ó¿Ú use clk domain 156.25MHz --
+         //--- ä»Žæ¿æŽ¥å£ use clk domain 156.25MHz --
         .cur_slv_board_id       ( 0                       ), //
         .slv_board_id           ( 0                       ), 
         .rs485_ch_r_flag        ( 0                       ), //send en
@@ -3552,7 +3545,7 @@ ec_superisys_485_modbus_rtu_83
   
 	
 	
-	// // --- flow_comp_84 -----³¤èì¼Ü2#¼Ð×¦RFID¶ÁÐ´Æ÷
+	// // --- flow_comp_84 -----é•¿æ¡æž¶2#å¤¹çˆªRFIDè¯»å†™å™¨
     // ec_sp_rfid
     // #(
     //      .REG_SPACE_BIAS     (20'd64000)
@@ -3581,8 +3574,8 @@ ec_superisys_485_modbus_rtu_83
 
 ec_superisys_485_modbus_rtu
 #(
-        .REG_SPACE_BIAS         (20'd64000                ), //×é¼þ»ùµØÖ·
-        .REG_SPACE_SIZE         (`REG_SPACE_SIZE          ), //×é¼þÆ«ÒÆµØÖ·
+        .REG_SPACE_BIAS         (20'd64000                ), //ç»„ä»¶åŸºåœ°å€
+        .REG_SPACE_SIZE         (`REG_SPACE_SIZE          ), //ç»„ä»¶åç§»åœ°å€
         .CLK_FREQ               (156250000                )  //100MHz = 100000000
 )
 ec_superisys_485_modbus_rtu_84
@@ -3593,23 +3586,23 @@ ec_superisys_485_modbus_rtu_84
         .i_time_1s_vld          ( time_1s_vld             ),
         .ps_reg_clk             ( ps_reg_clk              ),
         .ps_reg_reset           ( ps_reg_reset            ),
-        .i_st_wr_en             ( ps_reg_we               ),//bram×ÜÏß
+        .i_st_wr_en             ( ps_reg_we               ),//bramæ€»çº¿
         .i_st_wr_addr           ( ps_reg_addr             ),
         .i_st_wr_data           ( ps_reg_wr_dat           ),
         .i_st_rd_en             ( ps_reg_re               ),
         .i_st_rd_addr           ( ps_reg_rd_addr          ),
         .o_st_rd_data           ( sub_comp_rd_dat[121]    ),
         .o_st_rd_vld            ( sub_comp_rd_vld[121]    ),
-        .o_intr_irq             ( map_irq[121]            ),//×é¼þÖÐ¶ÏÇëÇó
+        .o_intr_irq             ( map_irq[121]            ),//ç»„ä»¶ä¸­æ–­è¯·æ±‚
         
-        //--- Ö÷°åUart½Ó¿Ú
+        //--- ä¸»æ¿UartæŽ¥å£
         .i_uart_rx              ( rs485_1_user_rx[4]      ),
         .o_uart_tx              ( rs485_1_user_tx[4]      ),
         .o_uart_de              ( rs485_1_user_de[4]      ),
         .o_user_req             ( rs485_1_user_req[4]     ),
         .i_user_grant           ( rs485_1_user_grant[4]   ),
 
-         //--- ´Ó°å½Ó¿Ú use clk domain 156.25MHz --
+         //--- ä»Žæ¿æŽ¥å£ use clk domain 156.25MHz --
         .cur_slv_board_id       ( 0                       ), //
         .slv_board_id           ( 0                       ), 
         .rs485_ch_r_flag        ( 0                       ), //send en
@@ -3620,7 +3613,7 @@ ec_superisys_485_modbus_rtu_84
   	
 	
 	
-	// --- flow_comp_85 -----1ºÅ»ú´²Ïß±ßÍÐÅÌ¼ì²â×é
+	// --- flow_comp_85 -----1å·æœºåºŠçº¿è¾¹æ‰˜ç›˜æ£€æµ‹ç»„
     ec_5di
     #(
          .REG_SPACE_BIAS     (20'd81920)
@@ -3656,7 +3649,7 @@ ec_superisys_485_modbus_rtu_84
 	
 	
 	
-	// --- flow_comp_86 -----2ºÅ»ú´²Ïß±ßÍÐÅÌ¼ì²â×é
+	// --- flow_comp_86 -----2å·æœºåºŠçº¿è¾¹æ‰˜ç›˜æ£€æµ‹ç»„
     ec_5di
     #(
          .REG_SPACE_BIAS     (20'd82432)
@@ -3681,11 +3674,11 @@ ec_superisys_485_modbus_rtu_84
       .o_st_rd_data          ( sub_comp_rd_dat[157]    ),
 	  .o_intr_irq            ( map_irq[157]       )
 	  
-	  ,.i_sign1_check        ( ~di_regoin_msg[2][47] )
-	  ,.i_sign2_check        ( ~di_regoin_msg[2][48] )
-	  ,.i_sign3_check        ( ~di_regoin_msg[1][20] )
-	  ,.i_sign4_check        ( ~di_regoin_msg[1][19] )
-	  ,.i_sign5_check        ( ~di_regoin_msg[1][21] )
+	  ,.i_sign1_check        ( di_regoin_msg[2][47] )
+	  ,.i_sign2_check        ( di_regoin_msg[2][48] )
+	  ,.i_sign3_check        ( di_regoin_msg[1][20] )
+	  ,.i_sign4_check        ( di_regoin_msg[1][19] )
+	  ,.i_sign5_check        ( di_regoin_msg[1][21] )
 	  
 	  
 
@@ -3694,7 +3687,7 @@ ec_superisys_485_modbus_rtu_84
 	
 	
 	
-	// --- flow_comp_87 -----3ºÅ»ú´²Ïß±ßÍÐÅÌ¼ì²â×é
+	// --- flow_comp_87 -----3å·æœºåºŠçº¿è¾¹æ‰˜ç›˜æ£€æµ‹ç»„
     ec_5di
     #(
          .REG_SPACE_BIAS     (20'd82944)
@@ -3730,10 +3723,10 @@ ec_superisys_485_modbus_rtu_84
 	
 	
 	
-	// --- flow_comp_88 -----4ºÅ»ú´²Ïß±ßÍÐÅÌ¼ì²â×é
+	// --- flow_comp_88 -----4å·æœºåºŠçº¿è¾¹æ‰˜ç›˜æ£€æµ‹ç»„
     ec_5di
     #(
-         .REG_SPACE_BIAS     (20'd84992)
+         .REG_SPACE_BIAS     (20'd86016)
         ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
     )
     ec_5di_88
@@ -3766,10 +3759,10 @@ ec_superisys_485_modbus_rtu_84
 	
 	
 	
-	// --- flow_comp_89 -----5ºÅ»ú´²Ïß±ßÍÐÅÌ¼ì²â×é
+	// --- flow_comp_89 -----5å·æœºåºŠçº¿è¾¹æ‰˜ç›˜æ£€æµ‹ç»„
     ec_5di
     #(
-         .REG_SPACE_BIAS     (20'd85504)
+         .REG_SPACE_BIAS     (20'd87040)
         ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
     )
     ec_5di_89
@@ -3791,21 +3784,21 @@ ec_superisys_485_modbus_rtu_84
       .o_st_rd_data          ( sub_comp_rd_dat[163]    ),
 	  .o_intr_irq            ( map_irq[163]       )
 	  
-	  ,.i_sign1_check        ( ~di_regoin_msg[3][25] )
-	  ,.i_sign2_check        ( ~di_regoin_msg[3][26] )
-	  ,.i_sign3_check        ( ~di_regoin_msg[4][31] )
-	  ,.i_sign4_check        ( ~di_regoin_msg[4][32] )
-	  ,.i_sign5_check        ( ~di_regoin_msg[4][33] )
+	  ,.i_sign1_check        ( di_regoin_msg[3][25] )
+	  ,.i_sign2_check        ( di_regoin_msg[3][26] )
+	  ,.i_sign3_check        ( di_regoin_msg[4][31] )
+	  ,.i_sign4_check        ( di_regoin_msg[4][32] )
+	  ,.i_sign5_check        ( di_regoin_msg[4][33] )
 
     );
 
 	
 	
 	
-	// --- flow_comp_90 -----6ºÅ»ú´²Ïß±ßÍÐÅÌ¼ì²â×é
+	// --- flow_comp_90 -----6å·æœºåºŠçº¿è¾¹æ‰˜ç›˜æ£€æµ‹ç»„
     ec_5di
     #(
-         .REG_SPACE_BIAS     (20'd83968)
+         .REG_SPACE_BIAS     (20'd85504)
         ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
     )
     ec_5di_90
@@ -3827,21 +3820,21 @@ ec_superisys_485_modbus_rtu_84
       .o_st_rd_data          ( sub_comp_rd_dat[160]    ),
 	  .o_intr_irq            ( map_irq[160]       )
 	  
-	  ,.i_sign1_check        ( ~di_regoin_msg[3][27] )
-	  ,.i_sign2_check        ( ~di_regoin_msg[3][28] )
-	  ,.i_sign3_check        ( ~di_regoin_msg[4][43] )
-	  ,.i_sign4_check        ( ~di_regoin_msg[4][45] )
-	  ,.i_sign5_check        ( ~di_regoin_msg[4][44] )
+	  ,.i_sign1_check        ( di_regoin_msg[3][27] )
+	  ,.i_sign2_check        ( di_regoin_msg[3][28] )
+	  ,.i_sign3_check        ( di_regoin_msg[4][43] )
+	  ,.i_sign4_check        ( di_regoin_msg[4][45] )
+	  ,.i_sign5_check        ( di_regoin_msg[4][44] )
 
     );
 
 	
 	
 	
-	// --- flow_comp_91 -----7ºÅ»ú´²Ïß±ßÍÐÅÌ¼ì²â×é
+	// --- flow_comp_91 -----7å·æœºåºŠçº¿è¾¹æ‰˜ç›˜æ£€æµ‹ç»„
     ec_5di
     #(
-         .REG_SPACE_BIAS     (20'd86016)
+         .REG_SPACE_BIAS     (20'd83968)
         ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
     )
     ec_5di_91
@@ -3863,18 +3856,18 @@ ec_superisys_485_modbus_rtu_84
       .o_st_rd_data          ( sub_comp_rd_dat[164]    ),
 	  .o_intr_irq            ( map_irq[164]       )
 	  
-	  ,.i_sign1_check        ( ~di_regoin_msg[3][29] )
-	  ,.i_sign2_check        ( ~di_regoin_msg[3][30] )
-	  ,.i_sign3_check        ( ~di_regoin_msg[4][34] )
-	  ,.i_sign4_check        ( ~di_regoin_msg[4][35] )
-	  ,.i_sign5_check        ( ~di_regoin_msg[4][36] )
+	  ,.i_sign1_check        ( di_regoin_msg[3][29] )
+	  ,.i_sign2_check        ( di_regoin_msg[3][30] )
+	  ,.i_sign3_check        ( di_regoin_msg[4][34] )
+	  ,.i_sign4_check        ( di_regoin_msg[4][35] )
+	  ,.i_sign5_check        ( di_regoin_msg[4][36] )
 
     );
 
 	
 	
 	
-	// --- flow_comp_92 -----8ºÅ»ú´²Ïß±ßÍÐÅÌ¼ì²â×é
+	// --- flow_comp_92 -----8å·æœºåºŠçº¿è¾¹æ‰˜ç›˜æ£€æµ‹ç»„
     ec_5di
     #(
          .REG_SPACE_BIAS     (20'd86528)
@@ -3899,21 +3892,21 @@ ec_superisys_485_modbus_rtu_84
       .o_st_rd_data          ( sub_comp_rd_dat[165]    ),
 	  .o_intr_irq            ( map_irq[165]       )
 	  
-	  ,.i_sign1_check        ( ~di_regoin_msg[3][31] )
-	  ,.i_sign2_check        ( ~di_regoin_msg[3][44] )
-	  ,.i_sign3_check        ( ~di_regoin_msg[4][37] )
-	  ,.i_sign4_check        ( ~di_regoin_msg[4][38] )
-	  ,.i_sign5_check        ( ~di_regoin_msg[4][39] )
+	  ,.i_sign1_check        ( di_regoin_msg[3][31] )
+	  ,.i_sign2_check        ( di_regoin_msg[3][44] )
+	  ,.i_sign3_check        ( di_regoin_msg[4][37] )
+	  ,.i_sign4_check        ( di_regoin_msg[4][38] )
+	  ,.i_sign5_check        ( di_regoin_msg[4][39] )
 
     );
 
 	
 	
 	
-	// --- flow_comp_93 -----9ºÅ»ú´²Ïß±ßÍÐÅÌ¼ì²â×é
+	// --- flow_comp_93 -----9å·æœºåºŠçº¿è¾¹æ‰˜ç›˜æ£€æµ‹ç»„
     ec_5di
     #(
-         .REG_SPACE_BIAS     (20'd87040)
+         .REG_SPACE_BIAS     (20'd84992)
         ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
     )
     ec_5di_93
@@ -3935,11 +3928,11 @@ ec_superisys_485_modbus_rtu_84
       .o_st_rd_data          ( sub_comp_rd_dat[166]    ),
 	  .o_intr_irq            ( map_irq[166]       )
 	  
-	  ,.i_sign1_check        ( ~di_regoin_msg[3][46] )
-	  ,.i_sign2_check        ( ~di_regoin_msg[3][45] )
-	  ,.i_sign3_check        ( ~di_regoin_msg[4][40] )
-	  ,.i_sign4_check        ( ~di_regoin_msg[4][41] )
-	  ,.i_sign5_check        ( ~di_regoin_msg[4][42] )
+	  ,.i_sign1_check        ( di_regoin_msg[3][46] )
+	  ,.i_sign2_check        ( di_regoin_msg[3][45] )
+	  ,.i_sign3_check        ( di_regoin_msg[4][40] )
+	  ,.i_sign4_check        ( di_regoin_msg[4][41] )
+	  ,.i_sign5_check        ( di_regoin_msg[4][42] )
 
     );
 
@@ -3947,10 +3940,10 @@ ec_superisys_485_modbus_rtu_84
 	
 	wire   o_dri2_94;
 	wire   o_dri1_94;
-	// --- flow_comp_94 -----»ú´²1¶¥²¿Î§À¸×Ô¶¯ÃÅ
+	// --- flow_comp_94 -----æœºåºŠ1é¡¶éƒ¨å›´æ è‡ªåŠ¨é—¨
     ec_2di_2do
     #(
-         .REG_SPACE_BIAS     (20'd87552)
+         .REG_SPACE_BIAS     (20'd91648)
         ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
     )
     ec_2di_2do_94
@@ -3972,27 +3965,27 @@ ec_superisys_485_modbus_rtu_84
       .o_st_rd_data          ( sub_comp_rd_dat[167]    ),
 	  .o_intr_irq            ( map_irq[167]       )
 	  
-	  //Î»ÖÃ1µ½Î»¶Ë¿Ú
+	  //ä½ç½®1åˆ°ä½ç«¯å£
 	  ,.i_pos1				( di_regoin_msg[1][56]          )
-	  //Î»ÖÃ2µ½Î»¶Ë¿Ú
+	  //ä½ç½®2åˆ°ä½ç«¯å£
 	  ,.i_pos2				( di_regoin_msg[1][55]          )
-	  //Çý¶¯¶Ë¿Ú1
+	  //é©±åŠ¨ç«¯å£1
 	  ,.o_dri1				( o_dri1_94           )
-	  //Çý¶¯¶Ë¿Ú2
+	  //é©±åŠ¨ç«¯å£2
 	  ,.o_dri2				( o_dri2_94           )
 
     );
-	assign do_regoin_r_msg[1][1] = o_dri2_94;
-    assign do_regoin_r_msg[1][0] = o_dri1_94;
+	assign do_regoin_r_msg[1][1] = ~o_dri2_94;
+    assign do_regoin_r_msg[1][0] = ~o_dri1_94;
 
 	
 	
 	wire   o_dri2_95;
 	wire   o_dri1_95;
-	// --- flow_comp_95 -----»ú´²2¶¥²¿Î§À¸×Ô¶¯ÃÅ
+	// --- flow_comp_95 -----æœºåºŠ2é¡¶éƒ¨å›´æ è‡ªåŠ¨é—¨
     ec_2di_2do
     #(
-         .REG_SPACE_BIAS     (20'd88064)
+         .REG_SPACE_BIAS     (20'd91136)
         ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
     )
     ec_2di_2do_95
@@ -4014,27 +4007,27 @@ ec_superisys_485_modbus_rtu_84
       .o_st_rd_data          ( sub_comp_rd_dat[168]    ),
 	  .o_intr_irq            ( map_irq[168]       )
 	  
-	  //Î»ÖÃ1µ½Î»¶Ë¿Ú
+	  //ä½ç½®1åˆ°ä½ç«¯å£
 	  ,.i_pos1				( di_regoin_msg[1][58]          )
-	  //Î»ÖÃ2µ½Î»¶Ë¿Ú
+	  //ä½ç½®2åˆ°ä½ç«¯å£
 	  ,.i_pos2				( di_regoin_msg[1][57]          )
-	  //Çý¶¯¶Ë¿Ú1
+	  //é©±åŠ¨ç«¯å£1
 	  ,.o_dri1				( o_dri1_95           )
-	  //Çý¶¯¶Ë¿Ú2
+	  //é©±åŠ¨ç«¯å£2
 	  ,.o_dri2				( o_dri2_95           )
 
     );
-	assign do_regoin_r_msg[1][3] = o_dri2_95;
-    assign do_regoin_r_msg[1][2] = o_dri1_95;
+	assign do_regoin_r_msg[1][3] = ~o_dri2_95;
+    assign do_regoin_r_msg[1][2] = ~o_dri1_95;
 
 	
 	
 	wire   o_dri1_96;
 	wire   o_dri2_96;
-	// --- flow_comp_96 -----»ú´²3¶¥²¿Î§À¸×Ô¶¯ÃÅ
+	// --- flow_comp_96 -----æœºåºŠ3é¡¶éƒ¨å›´æ è‡ªåŠ¨é—¨
     ec_2di_2do
     #(
-         .REG_SPACE_BIAS     (20'd88576)
+         .REG_SPACE_BIAS     (20'd90624)
         ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
     )
     ec_2di_2do_96
@@ -4056,24 +4049,24 @@ ec_superisys_485_modbus_rtu_84
       .o_st_rd_data          ( sub_comp_rd_dat[169]    ),
 	  .o_intr_irq            ( map_irq[169]       )
 	  
-	  //Î»ÖÃ1µ½Î»¶Ë¿Ú
+	  //ä½ç½®1åˆ°ä½ç«¯å£
 	  ,.i_pos1				( di_regoin_msg[1][60]          )
-	  //Î»ÖÃ2µ½Î»¶Ë¿Ú
+	  //ä½ç½®2åˆ°ä½ç«¯å£
 	  ,.i_pos2				( di_regoin_msg[1][59]          )
-	  //Çý¶¯¶Ë¿Ú1
+	  //é©±åŠ¨ç«¯å£1
 	  ,.o_dri1				( o_dri1_96           )
-	  //Çý¶¯¶Ë¿Ú2
+	  //é©±åŠ¨ç«¯å£2
 	  ,.o_dri2				( o_dri2_96           )
 
     );
-	assign do_regoin_r_msg[1][4] = o_dri1_96;
-    assign do_regoin_r_msg[1][5] = o_dri2_96;
+	assign do_regoin_r_msg[1][4] = ~o_dri1_96;
+    assign do_regoin_r_msg[1][5] = ~o_dri2_96;
 
 	
 	
 	wire   o_dri1_97;
 	wire   o_dri2_97;
-	// --- flow_comp_97 -----»ú´²4¶¥²¿Î§À¸×Ô¶¯ÃÅ
+	// --- flow_comp_97 -----æœºåºŠ4é¡¶éƒ¨å›´æ è‡ªåŠ¨é—¨
     ec_2di_2do
     #(
          .REG_SPACE_BIAS     (20'd89088)
@@ -4098,23 +4091,23 @@ ec_superisys_485_modbus_rtu_84
       .o_st_rd_data          ( sub_comp_rd_dat[170]    ),
 	  .o_intr_irq            ( map_irq[170]       )
 	  
-	  //Î»ÖÃ1µ½Î»¶Ë¿Ú
+	  //ä½ç½®1åˆ°ä½ç«¯å£
 	  ,.i_pos1				( di_regoin_msg[4][48]          )
-	  //Î»ÖÃ2µ½Î»¶Ë¿Ú
+	  //ä½ç½®2åˆ°ä½ç«¯å£
 	  ,.i_pos2				( di_regoin_msg[4][47]          )
-	  //Çý¶¯¶Ë¿Ú1
+	  //é©±åŠ¨ç«¯å£1
 	  ,.o_dri1				( o_dri1_97          )
-	  //Çý¶¯¶Ë¿Ú2
+	  //é©±åŠ¨ç«¯å£2
 	  ,.o_dri2				( o_dri2_97          )
 
     );
-	assign do_regoin_r_msg[4][7] = o_dri1_97;
-    assign do_regoin_r_msg[4][8] = o_dri2_97;
+	assign do_regoin_r_msg[4][7] = ~o_dri1_97;
+    assign do_regoin_r_msg[4][8] = ~o_dri2_97;
 	
 	
 	wire   o_dri1_98;
 	wire   o_dri2_98;
-	// --- flow_comp_98 -----»ú´²5¶¥²¿Î§À¸×Ô¶¯ÃÅ
+	// --- flow_comp_98 -----æœºåºŠ5é¡¶éƒ¨å›´æ è‡ªåŠ¨é—¨
     ec_2di_2do
     #(
          .REG_SPACE_BIAS     (20'd89600)
@@ -4139,24 +4132,24 @@ ec_superisys_485_modbus_rtu_84
       .o_st_rd_data          ( sub_comp_rd_dat[171]    ),
 	  .o_intr_irq            ( map_irq[171]       )
 	  
-	  //Î»ÖÃ1µ½Î»¶Ë¿Ú
+	  //ä½ç½®1åˆ°ä½ç«¯å£
 	  ,.i_pos1				( di_regoin_msg[4][50]          )
-	  //Î»ÖÃ2µ½Î»¶Ë¿Ú
+	  //ä½ç½®2åˆ°ä½ç«¯å£
 	  ,.i_pos2				( di_regoin_msg[4][49]          )
-	  //Çý¶¯¶Ë¿Ú1
+	  //é©±åŠ¨ç«¯å£1
 	  ,.o_dri1				( o_dri1_98           )
-	  //Çý¶¯¶Ë¿Ú2
+	  //é©±åŠ¨ç«¯å£2
 	  ,.o_dri2				( o_dri2_98           )
 
     );
-	assign do_regoin_r_msg[4][9] = o_dri1_98;
-    assign do_regoin_r_msg[4][10] = o_dri2_98;
+	assign do_regoin_r_msg[4][9] = ~o_dri1_98;
+    assign do_regoin_r_msg[4][10] = ~o_dri2_98;
 
 	
 	
 	wire   o_dri1_99;
 	wire   o_dri2_99;
-	// --- flow_comp_99 -----»ú´²6¶¥²¿Î§À¸×Ô¶¯ÃÅ
+	// --- flow_comp_99 -----æœºåºŠ6é¡¶éƒ¨å›´æ è‡ªåŠ¨é—¨
     ec_2di_2do
     #(
          .REG_SPACE_BIAS     (20'd90112)
@@ -4181,26 +4174,26 @@ ec_superisys_485_modbus_rtu_84
       .o_st_rd_data          ( sub_comp_rd_dat[172]    ),
 	  .o_intr_irq            ( map_irq[172]       )
 	  
-	  //Î»ÖÃ1µ½Î»¶Ë¿Ú
+	  //ä½ç½®1åˆ°ä½ç«¯å£
 	  ,.i_pos1				( di_regoin_msg[4][52]          )
-	  //Î»ÖÃ2µ½Î»¶Ë¿Ú
+	  //ä½ç½®2åˆ°ä½ç«¯å£
 	  ,.i_pos2				( di_regoin_msg[4][51]          )
-	  //Çý¶¯¶Ë¿Ú1
+	  //é©±åŠ¨ç«¯å£1
 	  ,.o_dri1				( o_dri1_99           )
-	  //Çý¶¯¶Ë¿Ú2
+	  //é©±åŠ¨ç«¯å£2
 	  ,.o_dri2				( o_dri2_99           )
 
     );
-	assign do_regoin_r_msg[4][11] = o_dri1_99;
-    assign do_regoin_r_msg[4][12] = o_dri2_99;
+	assign do_regoin_r_msg[4][11] = ~o_dri1_99;
+    assign do_regoin_r_msg[4][12] = ~o_dri2_99;
 
 	
 	wire   o_dri2_100;
 	wire   o_dri1_100;
-	// --- flow_comp_100 -----»ú´²7¶¥²¿Î§À¸×Ô¶¯ÃÅ
+	// --- flow_comp_100 -----æœºåºŠ7é¡¶éƒ¨å›´æ è‡ªåŠ¨é—¨
     ec_2di_2do
     #(
-         .REG_SPACE_BIAS     (20'd90624)
+         .REG_SPACE_BIAS     (20'd88064)
         ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
     )
     ec_2di_2do_100
@@ -4222,27 +4215,27 @@ ec_superisys_485_modbus_rtu_84
       .o_st_rd_data          ( sub_comp_rd_dat[173]    ),
 	  .o_intr_irq            ( map_irq[173]       )
 	  
-	  //Î»ÖÃ1µ½Î»¶Ë¿Ú
+	  //ä½ç½®1åˆ°ä½ç«¯å£
 	  ,.i_pos1				( di_regoin_msg[4][54]          )
-	  //Î»ÖÃ2µ½Î»¶Ë¿Ú
+	  //ä½ç½®2åˆ°ä½ç«¯å£
 	  ,.i_pos2				( di_regoin_msg[4][53]          )
-	  //Çý¶¯¶Ë¿Ú1
+	  //é©±åŠ¨ç«¯å£1
 	  ,.o_dri1				( o_dri1_100           )
-	  //Çý¶¯¶Ë¿Ú2
+	  //é©±åŠ¨ç«¯å£2
 	  ,.o_dri2				( o_dri2_100           )
 
     );
-	assign do_regoin_r_msg[ 4][14]=o_dri2_100;
-    assign do_regoin_r_msg[ 4][13]=o_dri1_100;
+	assign do_regoin_r_msg[4][14] = ~o_dri2_100;
+    assign do_regoin_r_msg[4][13] = ~o_dri1_100;
 
 	
 	
 	wire   o_dri2_101;
 	wire   o_dri1_101;
-	// --- flow_comp_101 -----»ú´²8¶¥²¿Î§À¸×Ô¶¯ÃÅ
+	// --- flow_comp_101 -----æœºåºŠ8é¡¶éƒ¨å›´æ è‡ªåŠ¨é—¨
     ec_2di_2do
     #(
-         .REG_SPACE_BIAS     (20'd91136)
+         .REG_SPACE_BIAS     (20'd88576)
         ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
     )
     ec_2di_2do_101
@@ -4264,27 +4257,27 @@ ec_superisys_485_modbus_rtu_84
       .o_st_rd_data          ( sub_comp_rd_dat[174]    ),
 	  .o_intr_irq            ( map_irq[174]       )
 	  
-	  //Î»ÖÃ1µ½Î»¶Ë¿Ú
+	  //ä½ç½®1åˆ°ä½ç«¯å£
 	  ,.i_pos1				( di_regoin_msg[3][20]          )
-	  //Î»ÖÃ2µ½Î»¶Ë¿Ú
+	  //ä½ç½®2åˆ°ä½ç«¯å£
 	  ,.i_pos2				( di_regoin_msg[4][55]          )
-	  //Çý¶¯¶Ë¿Ú1
+	  //é©±åŠ¨ç«¯å£1
 	  ,.o_dri1				( o_dri1_101           )
-	  //Çý¶¯¶Ë¿Ú2
+	  //é©±åŠ¨ç«¯å£2
 	  ,.o_dri2				( o_dri2_101           )
 
     );
-	assign do_regoin_r_msg[ 4][16] = o_dri2_101;
-    assign do_regoin_r_msg[ 4][15] = o_dri1_101;
+	assign do_regoin_r_msg[4][16] = ~o_dri2_101;
+    assign do_regoin_r_msg[4][15] = ~o_dri1_101;
 
 	
 	
 	wire   o_dri1_102;
 	wire   o_dri2_102;
-	// --- flow_comp_102 -----»ú´²9¶¥²¿Î§À¸×Ô¶¯ÃÅ
+	// --- flow_comp_102 -----æœºåºŠ9é¡¶éƒ¨å›´æ è‡ªåŠ¨é—¨
     ec_2di_2do
     #(
-         .REG_SPACE_BIAS     (20'd91648)
+         .REG_SPACE_BIAS     (20'd87552)
         ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
     )
     ec_2di_2do_102
@@ -4306,23 +4299,23 @@ ec_superisys_485_modbus_rtu_84
       .o_st_rd_data          ( sub_comp_rd_dat[175]    ),
 	  .o_intr_irq            ( map_irq[175]       )
 	  
-	  //Î»ÖÃ1µ½Î»¶Ë¿Ú
+	  //ä½ç½®1åˆ°ä½ç«¯å£
 	  ,.i_pos1				( di_regoin_msg[3][22]          )
-	  //Î»ÖÃ2µ½Î»¶Ë¿Ú
+	  //ä½ç½®2åˆ°ä½ç«¯å£
 	  ,.i_pos2				( di_regoin_msg[3][21]          )
-	  //Çý¶¯¶Ë¿Ú1
+	  //é©±åŠ¨ç«¯å£1
 	  ,.o_dri1				( o_dri1_102           )
-	  //Çý¶¯¶Ë¿Ú2
+	  //é©±åŠ¨ç«¯å£2
 	  ,.o_dri2				( o_dri2_102           )
 
     );
-	assign do_regoin_r_msg[ 4][17] = o_dri1_102;
-    assign do_regoin_r_msg[ 4][18] = o_dri2_102;
+	assign do_regoin_r_msg[4][17] = ~o_dri1_102;
+    assign do_regoin_r_msg[4][18] = ~o_dri2_102;
 
 	
 	
 	
-	// --- flow_comp_103 -----¼ì²âÕ¾»º´æÌ¨ÍÐÅÌ¼ì²âÐÅºÅ
+	// --- flow_comp_103 -----æ£€æµ‹ç«™ç¼“å­˜å°æ‰˜ç›˜æ£€æµ‹ä¿¡å·
     ec_5di
     #(
          .REG_SPACE_BIAS     (20'd81408)
@@ -4347,86 +4340,21 @@ ec_superisys_485_modbus_rtu_84
       .o_st_rd_data          ( sub_comp_rd_dat[155]    ),
 	  .o_intr_irq            ( map_irq[155]       )
 	  
-	  ,.i_sign1_check        ( ~di_mst_msg[49]          )
+	  ,.i_sign1_check        ( di_mst_msg[49]          )
 
     );
 
 	
 	
 	
-	// // --- flow_comp_104 -----·Ö¼ð¿âË¼¹È_RFID¶ÁÐ´Æ÷
-    // ec_sg_rfid
-    // #(
-    //      .REG_SPACE_BIAS     (20'd57344)
-    //     ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
-    // )
-    // ec_sg_rfid_104
-    // (
-    //   .clk_i                 ( clk               ),
-    //   .rst                   ( reset             ),
-	//   .ps_reg_clk            ( ps_reg_clk               ),
-    //   .ps_reg_reset          ( ps_reg_reset             ),
-	  
-	//   .i_time_1ms_vld        (time_1ms_vld         ),
-	//   .i_time_1s_vld         (time_1s_vld          ),
-
-	//   .i_st_wr_en            ( ps_reg_we                ),
-	//   .i_st_wr_addr          ( ps_reg_addr              ),
-    //   .i_st_wr_data          ( ps_reg_wr_dat            ),
-    //   .i_st_rd_en            ( ps_reg_re                ),
-    //   .i_st_rd_addr          ( ps_reg_rd_addr           ),
-	//   .o_st_rd_vld           ( sub_comp_rd_vld[108]    ),
-    //   .o_st_rd_data          ( sub_comp_rd_dat[108]    ),
-	//   .o_intr_irq            ( map_irq[108]       )
-
-    // );
-
-ec_superisys_485_modbus_rtu
-#(
-        .REG_SPACE_BIAS         (20'd57344                ), //×é¼þ»ùµØÖ·
-        .REG_SPACE_SIZE         (`REG_SPACE_SIZE          ), //×é¼þÆ«ÒÆµØÖ·
-        .CLK_FREQ               (156250000                )  //100MHz = 100000000
-)
-ec_superisys_485_modbus_rtu_104
-(
-        .clk_i                  ( clk                     ),
-        .rst                    ( reset                   ),
-        .i_time_1ms_vld         ( time_1ms_vld            ),
-        .i_time_1s_vld          ( time_1s_vld             ),
-        .ps_reg_clk             ( ps_reg_clk              ),
-        .ps_reg_reset           ( ps_reg_reset            ),
-        .i_st_wr_en             ( ps_reg_we               ),//bram×ÜÏß
-        .i_st_wr_addr           ( ps_reg_addr             ),
-        .i_st_wr_data           ( ps_reg_wr_dat           ),
-        .i_st_rd_en             ( ps_reg_re               ),
-        .i_st_rd_addr           ( ps_reg_rd_addr          ),
-        .o_st_rd_data           ( sub_comp_rd_dat[108]    ),
-        .o_st_rd_vld            ( sub_comp_rd_vld[108]    ),
-        .o_intr_irq             ( map_irq[108]            ),//×é¼þÖÐ¶ÏÇëÇó
-        
-        //--- Ö÷°åUart½Ó¿Ú
-        .i_uart_rx              ( rs485_1_user_rx[5]      ),
-        .o_uart_tx              ( rs485_1_user_tx[5]      ),
-        .o_uart_de              ( rs485_1_user_de[5]      ),
-        .o_user_req             ( rs485_1_user_req[5]     ),
-        .i_user_grant           ( rs485_1_user_grant[5]   ),
-
-         //--- ´Ó°å½Ó¿Ú use clk domain 156.25MHz --
-        .cur_slv_board_id       ( 0                       ), //
-        .slv_board_id           ( 0                       ), 
-        .rs485_ch_r_flag        ( 0                       ), //send en
-        .m2s_rs485_msg          (                         ), //send data
-        .rs485_ch_flag          ( 0                       ), //recv en
-        .s2m_rs485_msg          ( 0                       )  //recv data
-    );
-  
+	
 	
 	
 	wire   o_lock_open_105;
-	// --- flow_comp_105 -----AÇø1#°²È«ÃÅËø
+	// --- flow_comp_105 -----AåŒº1#å®‰å…¨é—¨é”
     ec_sf_door
     #(
-         .REG_SPACE_BIAS     (20'd93696)
+         .REG_SPACE_BIAS     (20'd94208)
         ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
     )
     ec_sf_door_105
@@ -4456,15 +4384,15 @@ ec_superisys_485_modbus_rtu_104
 	  //,.o_key_light          (                          )
 
     );
-	assign do_regoin_r_msg[ 1][28] = o_lock_open_105;
+	assign do_regoin_r_msg[1][28] = ~o_lock_open_105;
 
 	
 	
 	wire   o_lock_open_106;
-	// --- flow_comp_106 -----AÇø2#°²È«ÃÅËø
+	// --- flow_comp_106 -----AåŒº2#å®‰å…¨é—¨é”
     ec_sf_door
     #(
-         .REG_SPACE_BIAS     (20'd94208)
+         .REG_SPACE_BIAS     (20'd94720)
         ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
     )
     ec_sf_door_106
@@ -4495,15 +4423,15 @@ ec_superisys_485_modbus_rtu_104
 	//   ,.o_key_light          (                          )
 
     );
-	assign do_regoin_r_msg[ 1][29] = o_lock_open_106;
+	assign do_regoin_r_msg[1][29] = ~o_lock_open_106;
 
 	
 	
 	wire   o_lock_open_107;
-	// --- flow_comp_107 -----AÇø3#°²È«ÃÅËø
+	// --- flow_comp_107 -----AåŒº3#å®‰å…¨é—¨é”
     ec_sf_door
     #(
-         .REG_SPACE_BIAS     (20'd94720)
+         .REG_SPACE_BIAS     (20'd93696)
         ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
     )
     ec_sf_door_107
@@ -4533,15 +4461,15 @@ ec_superisys_485_modbus_rtu_104
 	//   ,.o_key_light          (                          )
 
     );
-	assign do_regoin_r_msg[ 1][30] = o_lock_open_107;
+	assign do_regoin_r_msg[1][30] = ~o_lock_open_107;
 
 	
 	
 	wire   o_lock_open_108;
-	// --- flow_comp_108 -----BÇø1#°²È«ÃÅËø
+	// --- flow_comp_108 -----BåŒº1#å®‰å…¨é—¨é”
     ec_sf_door
     #(
-         .REG_SPACE_BIAS     (20'd95232)
+         .REG_SPACE_BIAS     (20'd98816)
         ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
     )
     ec_sf_door_108
@@ -4571,14 +4499,14 @@ ec_superisys_485_modbus_rtu_104
 	//   ,.o_key_light          (                          )
 
     );
-	assign do_regoin_r_msg[ 4][1] = o_lock_open_108;
+	assign do_regoin_r_msg[4][1] = ~o_lock_open_108;
 	
 	
 	wire   o_lock_open_109;
-	// --- flow_comp_109 -----BÇø2#°²È«ÃÅËø
+	// --- flow_comp_109 -----BåŒº2#å®‰å…¨é—¨é”
     ec_sf_door
     #(
-         .REG_SPACE_BIAS     (20'd95744)
+         .REG_SPACE_BIAS     (20'd97280)
         ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
     )
     ec_sf_door_109
@@ -4608,15 +4536,15 @@ ec_superisys_485_modbus_rtu_104
 	//   ,.o_key_light          (                          )
 
     );
-	assign do_regoin_r_msg[ 4][2] = o_lock_open_109;
+	assign do_regoin_r_msg[4][2] = ~o_lock_open_109;
 
 	
 	
 	wire   o_lock_open_110;
-	// --- flow_comp_110 -----BÇø3#°²È«ÃÅËø
+	// --- flow_comp_110 -----BåŒº3#å®‰å…¨é—¨é”
     ec_sf_door
     #(
-         .REG_SPACE_BIAS     (20'd96256)
+         .REG_SPACE_BIAS     (20'd96768)
         ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
     )
     ec_sf_door_110
@@ -4646,15 +4574,15 @@ ec_superisys_485_modbus_rtu_104
 	//   ,.o_key_light          (                          )
 
     );
-	assign do_regoin_r_msg[ 4][3] = o_lock_open_110;
+	assign do_regoin_r_msg[4][3] = ~o_lock_open_110;
 
 	
 	
 	wire   o_lock_open_111;
-	// --- flow_comp_111 -----CÇø1#°²È«ÃÅËø
+	// --- flow_comp_111 -----CåŒº1#å®‰å…¨é—¨é”
     ec_sf_door
     #(
-         .REG_SPACE_BIAS     (20'd96768)
+         .REG_SPACE_BIAS     (20'd98304)
         ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
     )
     ec_sf_door_111
@@ -4684,14 +4612,14 @@ ec_superisys_485_modbus_rtu_104
 	//   ,.o_key_light          (                          )
 
     );
-	assign do_regoin_r_msg[3][4] = o_lock_open_111;
+	assign do_regoin_r_msg[3][4] = ~o_lock_open_111;
 	
 	
 	wire   o_lock_open_112;
-	// --- flow_comp_112 -----CÇø2#°²È«ÃÅËø
+	// --- flow_comp_112 -----CåŒº2#å®‰å…¨é—¨é”
     ec_sf_door
     #(
-         .REG_SPACE_BIAS     (20'd97280)
+         .REG_SPACE_BIAS     (20'd97792)
         ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
     )
     ec_sf_door_112
@@ -4721,14 +4649,14 @@ ec_superisys_485_modbus_rtu_104
 	//   ,.o_key_light          (                          )
 
     );
-	assign do_regoin_r_msg[ 3][5] = o_lock_open_112;
+	assign do_regoin_r_msg[3][5] = ~o_lock_open_112;
 	
 	
 	wire   o_lock_open_113;
-	// --- flow_comp_113 -----CÇø3#°²È«ÃÅËø
+	// --- flow_comp_113 -----CåŒº3#å®‰å…¨é—¨é”
     ec_sf_door
     #(
-         .REG_SPACE_BIAS     (20'd97792)
+         .REG_SPACE_BIAS      (20'd96256)
         ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
     )
     ec_sf_door_113
@@ -4758,14 +4686,14 @@ ec_superisys_485_modbus_rtu_104
 	//   ,.o_key_light          (                          )
 
     );
-	assign do_regoin_r_msg[3][6] = o_lock_open_113;
+	assign do_regoin_r_msg[3][6] = ~o_lock_open_113;
 	
 	
 	wire   o_lock_open_114;
-	// --- flow_comp_114 -----µØ¹ìÊ×¶Ë°²È«ÃÅËø
+	// --- flow_comp_114 -----åœ°è½¨é¦–ç«¯å®‰å…¨é—¨é”
     ec_sf_door
     #(
-         .REG_SPACE_BIAS     (20'd98304)
+         .REG_SPACE_BIAS     (20'd95232)
         ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
     )
     ec_sf_door_114
@@ -4795,14 +4723,14 @@ ec_superisys_485_modbus_rtu_104
 	//   ,.o_key_light          (                          )
 
     );
-	assign do_regoin_r_msg[1][32] = o_lock_open_114;
+	assign do_regoin_r_msg[1][32] = ~o_lock_open_114;
 	
 	
 	wire   o_lock_open_115;
-	// --- flow_comp_115 -----µØ¹ìÎ²¶Ë°²È«ÃÅËø
+	// --- flow_comp_115 -----åœ°è½¨å°¾ç«¯å®‰å…¨é—¨é”
     ec_sf_door
     #(
-         .REG_SPACE_BIAS     (20'd98816)
+         .REG_SPACE_BIAS     (20'd95744)
         ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
     )
     ec_sf_door_115
@@ -4832,12 +4760,12 @@ ec_superisys_485_modbus_rtu_104
 	//   ,.o_key_light          (                          )
 
     );
-	assign do_regoin_r_msg[1][31] = o_lock_open_115;
+	assign do_regoin_r_msg[1][31] = ~o_lock_open_115;
 
 	
 	
 	wire   o_sig_dri_116;
-	// --- flow_comp_116 -----ÇåÏ´»ú´µÆø
+	// --- flow_comp_116 -----æ¸…æ´—æœºå¹æ°”
     ec_1do
     #(
          .REG_SPACE_BIAS     (20'd57856)
@@ -4865,7 +4793,7 @@ ec_superisys_485_modbus_rtu_104
 	  ,.o_sig_dri            ( o_sig_dri_116 )
 
     );
-	assign do_regoin_r_msg[ 2][7]=o_sig_dri_116;
+	assign do_regoin_r_msg[2][7] = ~o_sig_dri_116;
 
 	
 	
@@ -4873,7 +4801,7 @@ ec_superisys_485_modbus_rtu_104
 	wire   o_led_g_118;
 	wire   o_led_y_118;
 	wire   o_led_r_118;
-	// --- flow_comp_118 -----6ºÅ»ú´²_ÈýÉ«µÆ·äÃùÆ÷
+	// --- flow_comp_118 -----6å·æœºåºŠ_ä¸‰è‰²ç¯èœ‚é¸£å™¨
     ec_3led_buzzer
     #(
          .REG_SPACE_BIAS     (20'd83456)
@@ -4904,136 +4832,22 @@ ec_superisys_485_modbus_rtu_104
        ,.o_led_r        ( o_led_r_118           )
 
     );
-	assign do_regoin_r_msg[ 3][3]=o_bz_118;
-    assign do_regoin_r_msg[ 3][2]=o_led_g_118;
-    assign do_regoin_r_msg[ 3][1]=o_led_y_118;
-    assign do_regoin_r_msg[ 3][0]=o_led_r_118;
-
-	
-	
-	/*
-	// --- flow_comp_119 -----1Ðò1ºÅ»ú´²»¬¿é
-    ec_2di_2do
-    #(
-         .REG_SPACE_BIAS     (20'd92160)
-        ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
-    )
-    ec_2di_2do_119
-    (
-      .clk_i                 ( clk               ),
-      .rst                   ( reset             ),
-	  .ps_reg_clk            ( ps_reg_clk               ),
-      .ps_reg_reset          ( ps_reg_reset             ),
-	  
-	  .i_time_1ms_vld        (time_1ms_vld         ),
-	  .i_time_1s_vld         (time_1s_vld          ),
-
-	  .i_st_wr_en            ( ps_reg_we                ),
-	  .i_st_wr_addr          ( ps_reg_addr              ),
-      .i_st_wr_data          ( ps_reg_wr_dat            ),
-      .i_st_rd_en            ( ps_reg_re                ),
-      .i_st_rd_addr          ( ps_reg_rd_addr           ),
-	  .o_st_rd_vld           ( sub_comp_rd_vld[176]    ),
-      .o_st_rd_data          ( sub_comp_rd_dat[176]    ),
-	  .o_intr_irq            ( map_irq[176]       )
-	  
-	  //Î»ÖÃ1µ½Î»¶Ë¿Ú
-	  ,.i_pos1				( ~di_regoin_msg[4][1]          )
-	  //Î»ÖÃ2µ½Î»¶Ë¿Ú
-	  ,.i_pos2				( ~di_regoin_msg[4][2]          )
-	  //Çý¶¯¶Ë¿Ú1
-	  ,.o_dri1				( do_regoin_r_msg[4][20]           )
-	  //Çý¶¯¶Ë¿Ú2
-	  ,.o_dri2				( do_regoin_r_msg[4][21]           )
-
-    );
+	assign do_regoin_r_msg[3][3] = ~o_bz_118;
+    assign do_regoin_r_msg[3][2] = ~o_led_g_118;
+    assign do_regoin_r_msg[3][1] = ~o_led_y_118;
+    assign do_regoin_r_msg[3][0] = ~o_led_r_118;
 
 	
 	
 	
-	// --- flow_comp_120 -----1Ðò2ºÅ»ú´²»¬¿é
-    ec_2di_2do
-    #(
-         .REG_SPACE_BIAS     (20'd92672)
-        ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
-    )
-    ec_2di_2do_120
-    (
-      .clk_i                 ( clk               ),
-      .rst                   ( reset             ),
-	  .ps_reg_clk            ( ps_reg_clk               ),
-      .ps_reg_reset          ( ps_reg_reset             ),
-	  
-	  .i_time_1ms_vld        (time_1ms_vld         ),
-	  .i_time_1s_vld         (time_1s_vld          ),
-
-	  .i_st_wr_en            ( ps_reg_we                ),
-	  .i_st_wr_addr          ( ps_reg_addr              ),
-      .i_st_wr_data          ( ps_reg_wr_dat            ),
-      .i_st_rd_en            ( ps_reg_re                ),
-      .i_st_rd_addr          ( ps_reg_rd_addr           ),
-	  .o_st_rd_vld           ( sub_comp_rd_vld[177]    ),
-      .o_st_rd_data          ( sub_comp_rd_dat[177]    ),
-	  .o_intr_irq            ( map_irq[177]       )
-	  
-	  //Î»ÖÃ1µ½Î»¶Ë¿Ú
-	  ,.i_pos1				( ~di_regoin_msg[4][3]          )
-	  //Î»ÖÃ2µ½Î»¶Ë¿Ú
-	  ,.i_pos2				( ~di_regoin_msg[4][4]          )
-	  //Çý¶¯¶Ë¿Ú1
-	  ,.o_dri1				( do_regoin_r_msg[4][22]           )
-	  //Çý¶¯¶Ë¿Ú2
-	  ,.o_dri2				( do_regoin_r_msg[4][23]           )
-
-    );
-
-	
-	
-	
-	// --- flow_comp_121 -----1Ðò3ºÅ»ú´²»¬¿é
-    ec_2di_2do
-    #(
-         .REG_SPACE_BIAS     (20'd93184)
-        ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
-    )
-    ec_2di_2do_121
-    (
-      .clk_i                 ( clk               ),
-      .rst                   ( reset             ),
-	  .ps_reg_clk            ( ps_reg_clk               ),
-      .ps_reg_reset          ( ps_reg_reset             ),
-	  
-	  .i_time_1ms_vld        (time_1ms_vld         ),
-	  .i_time_1s_vld         (time_1s_vld          ),
-
-	  .i_st_wr_en            ( ps_reg_we                ),
-	  .i_st_wr_addr          ( ps_reg_addr              ),
-      .i_st_wr_data          ( ps_reg_wr_dat            ),
-      .i_st_rd_en            ( ps_reg_re                ),
-      .i_st_rd_addr          ( ps_reg_rd_addr           ),
-	  .o_st_rd_vld           ( sub_comp_rd_vld[178]    ),
-      .o_st_rd_data          ( sub_comp_rd_dat[178]    ),
-	  .o_intr_irq            ( map_irq[178]       )
-	  
-	  //Î»ÖÃ1µ½Î»¶Ë¿Ú
-	  ,.i_pos1				( ~di_regoin_msg[4][5]          )
-	  //Î»ÖÃ2µ½Î»¶Ë¿Ú
-	  ,.i_pos2				( ~di_regoin_msg[4][6]          )
-	  //Çý¶¯¶Ë¿Ú1
-	  ,.o_dri1				( do_regoin_r_msg[4][24]           )
-	  //Çý¶¯¶Ë¿Ú2
-	  ,.o_dri2				( do_regoin_r_msg[4][25]           )
-
-    );
-*/
 	
 	
 	wire   o_dri1_122;
 	wire   o_dri2_122;
-	// --- flow_comp_122 -----7ºÅ»ú´²Ðý×ª»ú¹¹
+	// --- flow_comp_122 -----7å·æœºåºŠæ—‹è½¬æœºæž„
     ec_2di_2do
     #(
-         .REG_SPACE_BIAS     (20'd99328)
+         .REG_SPACE_BIAS     (20'd84480)
         ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
     )
     ec_2di_2do_122
@@ -5055,27 +4869,27 @@ ec_superisys_485_modbus_rtu_104
       .o_st_rd_data          ( sub_comp_rd_dat[190]    ),
 	  .o_intr_irq            ( map_irq[190]       )
 	  
-	  //Î»ÖÃ1µ½Î»¶Ë¿Ú
+	  //ä½ç½®1åˆ°ä½ç«¯å£
 	  ,.i_pos1				( ~di_regoin_msg[4][66]          )
-	  //Î»ÖÃ2µ½Î»¶Ë¿Ú
+	  //ä½ç½®2åˆ°ä½ç«¯å£
 	  ,.i_pos2				( ~di_regoin_msg[4][67]          )
-	  //Çý¶¯¶Ë¿Ú1
+	  //é©±åŠ¨ç«¯å£1
 	  ,.o_dri1				( o_dri1_122   )
-	  //Çý¶¯¶Ë¿Ú2
+	  //é©±åŠ¨ç«¯å£2
 	  ,.o_dri2				( o_dri2_122   )
 
     );
-	assign do_regoin_r_msg[4][34] = o_dri1_122;
-    assign do_regoin_r_msg[4][35] = o_dri2_122;
+	assign do_regoin_r_msg[4][34] = ~o_dri1_122;
+    assign do_regoin_r_msg[4][35] = ~o_dri2_122;
 
 	
 	
 	wire   o_dri2_123;
 	wire   o_dri1_123;
-	// --- flow_comp_123 -----8ºÅ»ú´²Ðý×ª»ú¹¹
+	// --- flow_comp_123 -----8å·æœºåºŠæ—‹è½¬æœºæž„
     ec_2di_2do
     #(
-         .REG_SPACE_BIAS     (20'd99840)
+         .REG_SPACE_BIAS     (20'd99328)
         ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
     )
     ec_2di_2do_123
@@ -5097,23 +4911,23 @@ ec_superisys_485_modbus_rtu_104
       .o_st_rd_data          ( sub_comp_rd_dat[191]    ),
 	  .o_intr_irq            ( map_irq[191]       )
 	  
-	  //Î»ÖÃ1µ½Î»¶Ë¿Ú
+	  //ä½ç½®1åˆ°ä½ç«¯å£
 	  ,.i_pos1				( ~di_regoin_msg[4][68]          )
-	  //Î»ÖÃ2µ½Î»¶Ë¿Ú
+	  //ä½ç½®2åˆ°ä½ç«¯å£
 	  ,.i_pos2				( ~di_regoin_msg[4][69]          )
-	  //Çý¶¯¶Ë¿Ú1
+	  //é©±åŠ¨ç«¯å£1
 	  ,.o_dri1				( o_dri1_123           )
-	  //Çý¶¯¶Ë¿Ú2
+	  //é©±åŠ¨ç«¯å£2
 	  ,.o_dri2				( o_dri2_123           )
 
     );
-	assign do_regoin_r_msg[ 4][37]=o_dri2_123;
-    assign do_regoin_r_msg[ 4][36]=o_dri1_123;
+	assign do_regoin_r_msg[4][37] = ~o_dri2_123;
+    assign do_regoin_r_msg[4][36] = ~o_dri1_123;
 	
 	
 	wire   o_dri1_124;
 	wire   o_dri2_124;
-	// --- flow_comp_124 -----9ºÅ»ú´²Ðý×ª»ú¹¹
+	// --- flow_comp_124 -----9å·æœºåºŠæ—‹è½¬æœºæž„
     ec_2di_2do
     #(
          .REG_SPACE_BIAS     (20'd100352)
@@ -5138,22 +4952,22 @@ ec_superisys_485_modbus_rtu_104
       .o_st_rd_data          ( sub_comp_rd_dat[192]    ),
 	  .o_intr_irq            ( map_irq[192]       )
 	  
-	  //Î»ÖÃ1µ½Î»¶Ë¿Ú
+	  //ä½ç½®1åˆ°ä½ç«¯å£
 	  ,.i_pos1				( ~di_regoin_msg[4][70]          )
-	  //Î»ÖÃ2µ½Î»¶Ë¿Ú
+	  //ä½ç½®2åˆ°ä½ç«¯å£
 	  ,.i_pos2				( ~di_regoin_msg[4][71]          )
-	  //Çý¶¯¶Ë¿Ú1
+	  //é©±åŠ¨ç«¯å£1
 	  ,.o_dri1				( o_dri1_124           )
-	  //Çý¶¯¶Ë¿Ú2
+	  //é©±åŠ¨ç«¯å£2
 	  ,.o_dri2				( o_dri2_124           )
 
     );
-	assign do_regoin_r_msg[ 4][38] = o_dri1_124;
-    assign do_regoin_r_msg[ 4][39] = o_dri2_124;
+	assign do_regoin_r_msg[4][38] = ~o_dri1_124;
+    assign do_regoin_r_msg[4][39] = ~o_dri2_124;
 	
 	
 	
-	// // --- flow_comp_125 -----EMCC60Ö÷¿Ø°å
+	 // --- flow_comp_125 -----EMCC60ä¸»æŽ§æ¿
     // ec_emcc60_board
     // #(
     //      .REG_SPACE_BIAS     (20'd100864)

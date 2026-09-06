@@ -482,7 +482,7 @@ module emcc_mst_top #(
     assign emcc_main_inio = di_debug ? dbg_main_board_in_io : emcc_main_inio_debounce; 
 `else
 
-    assign main_board_outio  =  ~emcc_main_outio; 				//main_board output
+    assign main_board_outio  =  emcc_main_outio; 				//main_board output
     assign emcc_main_inio    =  emcc_main_inio_debounce; 		//main_board input
 
 `endif
