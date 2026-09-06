@@ -82,78 +82,78 @@ module ec_dv300_485_modbus_rtu#(
 	wire			c_en			;
 	
 	//PL-PS
-	wire 			ec_cha_st     ;		
-	wire 			ec_chb_st     ;     
-	wire 			ec_chc_st     ;     
-	wire	[7:0]	a_bhv_typ     ;       
-	wire	[7:0]	a_tx_id       ;     
-	wire	[7:0]	a_alm_num     ;     
-	wire	[7:0]	b_bhv_id      ;            
-	wire	[7:0]	b_tx_id       ;     
-	wire	[7:0]	b_alm_num     ;     
-	wire	[7:0]	c_bhv_id      ;        
-	wire	[7:0]	c_tx_id       ;     
-	wire	[7:0]	c_alm_num     ;  
+	wire 			ec_cha_st     ;
+	wire 			ec_chb_st     ;
+	wire 			ec_chc_st     ;
+	wire	[7:0]	a_tx_id       ;
+	wire	[7:0]	a_alm_num     ;
+	wire	[7:0]	b_bhv_id      ;
+	wire	[7:0]	b_tx_id       ;
+	wire	[7:0]	b_alm_num     ;
+	wire	[7:0]	c_bhv_id      ;
+	wire	[7:0]	c_tx_id       ;
+	wire	[7:0]	c_alm_num     ;
 	
 	//动态参数PS-PL
 	wire [31:0]	param1			;
 	wire [31:0]	param2			;
-	wire [31:0]	param3			;
-	wire [31:0]	param4			;
-	wire [31:0]	param5			;
-	wire [31:0]	param6			;
-	wire [31:0]	param7			;
-	wire [31:0]	param8			;
-	wire [31:0]	param9			;
-	wire [31:0]	param10			;
-	wire [31:0]	param11			;
-	wire [31:0]	param12			;
-	wire [31:0]	param13			;
-	wire [31:0]	param14			;
-	wire [31:0]	param15			;
-	wire [31:0]	param16			;
-	wire [31:0]	param17			;
-	wire [31:0]	param18			;
-	wire [31:0]	param19			;
-	wire [31:0]	param20			;
-	wire [31:0]	param21			;
-	wire [31:0]	param22			;
-	wire [31:0]	param23			;
-	wire [31:0]	param24			;
-	wire [31:0]	param25			;
-	wire [31:0]	param26			;
-	wire [31:0]	param27			;
-	wire [31:0]	param28			;
-	wire [31:0]	param29			;
-	wire [31:0]	param30			;
+//	wire [31:0]	param3			;
+//	wire [31:0]	param4			;
+//	wire [31:0]	param5			;
+	wire [19:0]	param6			;
+	wire [19:0]	param7			;
+	wire [19:0]	param8			;
+//	wire [19:0]	param9			;
+//	wire [19:0]	param10			;
+//	wire [19:0]	param11			;
+//	wire [19:0]	param12			;
+//	wire [19:0]	param13			;
+//	wire [19:0]	param14			;
+//	wire [19:0]	param15			;
+	wire [ 7:0]	param16			;
+	wire [ 7:0]	param17			;
+	wire [ 7:0]	param18			;
+//	wire [ 7:0]	param19			;
+//	wire [ 7:0]	param20			;
+//	wire [ 7:0]	param21			;
+//	wire [ 7:0]	param22			;
+//	wire [ 7:0]	param23			;
+//	wire [ 7:0]	param24			;
+//	wire [ 7:0]	param25			;
+	wire        param26         ;
+//	wire        param27         ;
+//	wire        param28         ;
+//	wire        param29         ;
+//	wire        param30         ;
 	
 	//动态参数PL-PS
-	wire	[31:0]	param51       ;
-	wire	[31:0]	param52       ;
-	wire	[31:0]	param53       ;
-	wire	[31:0]	param54       ;
-	wire	[31:0]	param55       ;
-	wire	[31:0]	param56       ;
-	wire	[31:0]	param57       ;
-	wire	[31:0]	param58       ;
-	wire	[31:0]	param59       ;
-	wire	[31:0]	param60       ;
-	wire	[31:0]	param61       ;
-	wire	[31:0]	param62       ;
-	wire	[31:0]	param63       ;
-	wire	[31:0]	param64       ;
-	wire	[31:0]	param65       ;
-	wire	[31:0]	param66       ;
-	wire	[31:0]	param67       ;
-	wire	[31:0]	param68       ;
-	wire	[31:0]	param69       ;
-	wire	[31:0]	param70       ;
+    wire    [31:0]  param50       ;
+    wire    [31:0]  param51       ;
+    wire    [31:0]  param52       ;
+//  wire    [31:0]  param53       ;
+//  wire    [31:0]  param54       ;
+//  wire    [31:0]  param55       ;
+//  wire    [19:0]  param56       ;
+//  wire    [19:0]  param57       ;
+//  wire    [19:0]  param58       ;
+//  wire    [19:0]  param59       ;
+//  wire    [19:0]  param60       ;
+//  wire    [7:0]   param61       ;
+//  wire    [7:0]   param62       ;
+//  wire    [7:0]   param63       ;
+//  wire    [7:0]   param64       ;
+//  wire    [7:0]   param65       ;
+//  wire            param66       ;
+//  wire            param67       ;
+//  wire            param68       ;
+//  wire            param69       ;
+//  wire            param70       ;
+    wire   [31:0]   debug_reg1    ;
+//  wire   [31:0]   debug_reg2    ;
+//  wire   [31:0]   debug_reg3    ;
+//  wire   [31:0]   debug_reg4    ;
+//  wire   [31:0]   debug_reg5    ;
 	
-	wire	[31:0]	debug_reg1 ;
-	wire	[31:0]	debug_reg2 ;
-	wire	[31:0]	debug_reg3 ;
-	wire	[31:0]	debug_reg4 ;
-	wire	[31:0]	debug_reg5 ;
 
 	wire	[31:0]	task_time_cnt	;
 	
@@ -189,8 +189,8 @@ module ec_dv300_485_modbus_rtu#(
 	//a_tx_result_rpt:a_bhv_id[7:0]+a_tx_id[7:0]+OK/NO_OK
 
 	//元资源参数
-	wire		[31:0]		baud_rate ;//串口波特率
-	wire		[19:0]		stop_bit  ;//停止位
+	wire		[19:0]		baud_rate ;//串口波特率
+	wire		[7:0]		stop_bit  ;//停止位
 	wire		[7:0]		parity   ; //校验位
 	wire					flow_ctl ;//流控模式
 	wire		[7:0]		com_port ;//串口号
@@ -212,24 +212,20 @@ module ec_dv300_485_modbus_rtu#(
 	wire		[7:0]		end_delim;
 	wire		[15:0]		start_addr;//起始地址
 
-	wire		[63:0]		fb_data_frame;//反馈数据
-
+	wire		[31:0]		fb_data_frame;//反馈数据
+	wire        [15:0]      cfg_data   ;//配置数据（设置转数）
 
 
 	wire            uart_send_start_p;
-	wire            uart_send_finish_p;
 	wire            uart_send_ready;
     wire [7:0]      uart_send_length;
-    wire [127:0]    uart_send_data;
-    wire [127:0]    uart_rcv_data;
-	wire [127:0]    uart_rcv_data_big;
+    wire [63:0]     uart_send_data;
+    wire [63:0]     uart_rcv_data;
     wire            uart_rcv_data_ok;
     wire            chl_a_send_req;
 	wire            chl_a_fb_data_ready_p;
 	wire [2:0]      chl_a_execu_result;
-    wire            chl_c_send_req;
-	wire            chl_c_fb_data_ready_p;
-    wire [2:0]      chl_c_execu_result;
+
 
 	wire [7:0]      chl_a_data_send_func;
 	wire [15:0]     chl_a_data_send_start_addr;
@@ -242,39 +238,43 @@ module ec_dv300_485_modbus_rtu#(
 	assign b_tx_id     =0;
 	assign b_alm_num   =0;
 	assign irq_b       =0;
+	assign b_pre_sta_allow  =0 ;
+	assign b_post_sta_allow =0 ;
 
+	assign task_time_cnt =0;
+	assign c_gap_crl   =0;
 	assign ec_chc_st   =0;
 	assign c_bhv_id    =0;
 	assign c_tx_id     =0;
 	assign c_alm_num   =0;
 	assign irq_c       =0;
-
+	assign c_pre_sta_allow  =0 ;
+	assign c_post_sta_allow =0 ;
 
 // ---- 元资源参数，在配置值为0时，要采用默认值 ------
-		assign	baud_rate      = 9600;// (param1[31:0]==0)?9600:param1[31:0];//串口波特率
-		assign	stop_bit       = param2[7:0];//停止位
-		assign	parity         = 2;//param3[7:0];//校验位
-		assign	flow_ctl       = param4[7:0];//流控模式
-		assign	com_port       = param5[7:0];//串口号
-		assign	slave_addr     = param6[7:0];//(param6[7:0]==0)?8'h01:param6[7:0];//从站地址
-		assign	frame_gap      = param7[15:0];//帧间隔时间
-		assign	resp_tout      = (param8[15:0]==0)?16'd1000:param8[15:0];//响应超时时间
-		assign	retry_cnt      = (param9[15:0]==0)?16'd3:param9[15:0];//重试次数
-		assign	poll_cycle     = (param10[15:0]==0)?16'd100:param10[15:0];//轮询周期
-		assign	max_frame_len  = param11[7:0];//最大帧长度
-		assign	ctl_data_field = param12[19:0];//控制数据帧
-		assign	add_filt_mod   = param13[7:0];//地址过滤模式
+		assign	baud_rate      = (param6==0)?9600:param6;//串口波特率，默认9600
+		assign	stop_bit       = 0;//停止位
+		assign	parity         = (param16==0)? 2 : param16;//奇偶校验位,默认偶校验
+		assign	flow_ctl       = 0;//流控模式
+		assign	com_port       = 0;//串口号
+		assign	slave_addr     = param18[7:0];//从站地址
+		assign	frame_gap      = 0;//帧间隔时间
+		assign	resp_tout      = (param7[15:0]==0)?16'd1000:param7[15:0];//响应超时时间
+		assign	retry_cnt      = (param17==0)?8'd3:param17;//重试次数
+		assign	poll_cycle     = 0;//轮询周期
+		assign	max_frame_len  = 0;//最大帧长度
+		assign	ctl_data_field = 0;//控制数据帧
+		assign	add_filt_mod   = 0;//地址过滤模式
 
-		assign	func_code      = param16[7:0];//功能码
-		assign	data_len       = param17[7:0];//数据长度
-		assign	err_check      = param18[15:0];//校验码
-		assign  end_delim      = (param19[7:0]==0)?8'h16:param19[7:0];//结束符
-		assign	check_method   = param20[7:0];//校验方式
-		assign	byte_order      = param21[7:0];//字节顺序
-		assign	start_addr[15:8]= param22[7:0];//起始地址H
-		assign	start_addr[7:0] = param23[7:0];//起始地址L
-		assign  start_delim    = (param24[7:0])==0?8'h68:param24[7:0];//起始符
-		assign	flow_ctrl      = param25[7:0];//收发控制模式
+		assign	func_code      = 0;//功能码
+		assign	data_len       = 0;//数据长度
+		assign	err_check      = 0;//校验码
+		assign  end_delim      = 0;//结束符
+		assign	check_method   = 0;//校验方式
+		assign	byte_order     = 0;//字节顺序
+		assign	start_addr     = 0;//起始地址
+		assign  start_delim    = 0;//起始符
+		assign	flow_ctrl      = 0;//收发控制模式
 
 
 ps_rw_pl_reg_dv300_485#(
@@ -297,13 +297,13 @@ ps_rw_pl_reg_dv300_485#(
 	,.unit_id      	        (unit_id		)
 	,.unit_ectrl            (unit_ectrl		)
 	,.unit_st               (unit_st		)
-	,.m_id         	        (m_id			)
-	,.m_ectrl               (m_ectrl		)
+//	,.m_id         	        (m_id			)
+//	,.m_ectrl               (m_ectrl		)
 	,.m_st                  (m_st			)
-	,.m_wk_mod              (m_wk_mod		)
+//	,.m_wk_mod              (m_wk_mod		)
 	,.m_saf_st              (m_saf_st		)
 	,.link_m_saf_st         (link_m_saf_st	)
-	,.bhv_en                (bhv_en			)
+//	,.bhv_en                (bhv_en			)
 	,.a_task_id      	    (a_task_id		)
 	,.a_task_bhv_id	        (a_task_bhv_id	)
 	,.a_en				    (a_en			)
@@ -312,107 +312,108 @@ ps_rw_pl_reg_dv300_485#(
 	,.a_tsc_result_vld	    (a_tx_result_vld)
 	,.a_bhv_id       	    (a_bhv_id		)
 	,.a_bhv_vld             (a_bhv_vld		)
-	,.b_en					(b_en			)
-	,.b_bhv_ot 		        (b_tx_ot		)
-	,.b_tsc_result_rpt	    (b_tx_result_rpt)
-	,.b_tsc_result_vld      (b_tx_result_vld)
-	,.c_en				    (c_en			)
-	,.c_bhv_ot			    (c_tx_ot		)
-	,.c_tsc_result_rpt	    (c_tx_result_rpt)
-	,.c_tsc_result_vld	    (c_tx_result_vld)
-	,.c_bhv_gap_crl         (c_gap_crl		)
+//	,.b_en					(b_en			)
+//	,.b_bhv_ot 		        (b_tx_ot		)
+//	,.b_tsc_result_rpt	    (b_tx_result_rpt)
+//	,.b_tsc_result_vld      (b_tx_result_vld)
+//	,.c_en				    (c_en			)
+//	,.c_bhv_ot			    (c_tx_ot		)
+//	,.c_tsc_result_rpt	    (c_tx_result_rpt)
+//	,.c_tsc_result_vld	    (c_tx_result_vld)
+//	,.c_bhv_gap_crl         (c_gap_crl		)
 	,.param1			    (param1			)
 	,.param2			    (param2			)
-	,.param3			    (param3			)
-	,.param4			    (param4			)
-	,.param5			    (param5			)
+//	,.param3			    (param3			)
+//	,.param4			    (param4			)
+//	,.param5			    (param5			)
 	,.param6			    (param6			)
 	,.param7			    (param7			)
 	,.param8			    (param8			)
-	,.param9			    (param9			)
-	,.param10			    (param10		)
-	,.param11			    (param11		)
-	,.param12			    (param12		)
-	,.param13			    (param13		)
-	,.param14			    (param14		)
-	,.param15			    (param15		)
+//	,.param9			    (param9			)
+//	,.param10			    (param10		)
+//	,.param11			    (param11		)
+//	,.param12			    (param12		)
+//	,.param13			    (param13		)
+//	,.param14			    (param14		)
+//	,.param15			    (param15		)
 	,.param16			    (param16		)
 	,.param17			    (param17		)
 	,.param18			    (param18		)
-	,.param19			    (param19		)
-	,.param20			    (param20		)
-	,.param21			    (param21		)
-	,.param22			    (param22		)
-	,.param23			    (param23		)
-	,.param24			    (param24		)
-	,.param25			    (param25		)
+//	,.param19			    (param19		)
+//	,.param20			    (param20		)
+//	,.param21			    (param21		)
+//	,.param22			    (param22		)
+//	,.param23			    (param23		)
+//	,.param24			    (param24		)
+//	,.param25			    (param25		)
 	,.param26			    (param26		)
-	,.param27			    (param27		)
-	,.param28			    (param28		)
-	,.param29			    (param29		)
-	,.param30				(param30		)
+//	,.param27			    (param27		)
+//	,.param28			    (param28		)
+//	,.param29			    (param29		)
+//	,.param30				(param30		)
 	,.irq_reg1	            (irq_reg1		)
 	,.irq_reg2	            (irq_reg2		)
 	,.a_st                  (ec_cha_st		)
 	,.a_alm_num             (a_alm_num		)
 	,.a_tsc_id              (a_tx_id		)
-	,.b_st                  (ec_chb_st		)
-	,.b_alm_num             (b_alm_num		)
-	,.b_tsc_id              (b_tx_id		)
-	,.b_bhv_id              (b_bhv_id		)
-	,.c_st                  (ec_chc_st 		)
-	,.c_alm_num             (c_alm_num 		)
-	,.c_tsc_id              (c_tx_id  		)
-	,.c_bhv_id              (c_bhv_id 		)
-	,.param51               (param51		)
-	,.param52               (param52		)
-	,.param53               (param53		)
-	,.param54               (param54		)
-	,.param55               (param55		)
-	,.param56               (param56		)
-	,.param57               (param57		)
-	,.param58               (param58		)
-	,.param59               (param59		)
-	,.param60               (param60		)
-	,.param61               (param61		)
-	,.param62               (param62		)
-	,.param63               (param63		)
-	,.param64               (param64		)
-	,.param65               (param65		)
-	,.param66               (param66		)
-	,.param67               (param67		)
-	,.param68               (param68		)
-	,.param69               (param69		)
-	,.param70               (param70		)
+//	,.b_st                  (ec_chb_st		)
+//	,.b_alm_num             (b_alm_num		)
+//	,.b_tsc_id              (b_tx_id		)
+//	,.b_bhv_id              (b_bhv_id		)
+//	,.c_st                  (ec_chc_st 		)
+//	,.c_alm_num             (c_alm_num 		)
+//	,.c_tsc_id              (c_tx_id  		)
+//	,.c_bhv_id              (c_bhv_id 		)
+//	,.param51               (param51		)
+//	,.param52               (param52		)
+//	,.param53               (param53		)
+//	,.param54               (param54		)
+//	,.param55               (param55		)
+//	,.param56               (param56		)
+//	,.param57               (param57		)
+//	,.param58               (param58		)
+//	,.param59               (param59		)
+//	,.param60               (param60		)
+//	,.param61               (param61		)
+//	,.param62               (param62		)
+//	,.param63               (param63		)
+//	,.param64               (param64		)
+//	,.param65               (param65		)
+//	,.param66               (param66		)
+//	,.param67               (param67		)
+//	,.param68               (param68		)
+//	,.param69               (param69		)
+//	,.param70               (param70		)
 	,.debug_reg1			(debug_reg1		)
-	,.debug_reg2			(debug_reg2		)
-	,.debug_reg3			(debug_reg3		)
-	,.debug_reg4			(debug_reg4		)
-	,.debug_reg5			(debug_reg5		)
+//	,.debug_reg2			(debug_reg2		)
+//	,.debug_reg3			(debug_reg3		)
+//	,.debug_reg4			(debug_reg4		)
+//	,.debug_reg5			(debug_reg5		)
 	
 	);
 
+	assign cfg_data = param1;
 
-	assign 	param51   =	fb_data_frame[31:0];
-	assign 	param52   =	fb_data_frame[63:32];
-	assign 	param53   =	32'd0;
-	assign 	param54   =	32'd0;
-	assign 	param55   =	32'd0;
-	assign 	param56   =	32'd0;
-	assign 	param57   =	32'd0;
-	assign 	param58   =	32'd0;
-	assign 	param59   =	32'd0;
-	assign 	param60   =	32'd0;
-	assign 	param61   =	32'd0;
-	assign 	param62   =	32'd0;
-	assign 	param63   =	32'd0;
-	assign 	param64   =	32'd0;
-	assign 	param65   =	32'd0;
-	assign 	param66   =	32'd0;
-	assign 	param67   =	32'd0;
-	assign 	param68   =	32'd0;
-	assign 	param69   =	32'd0;
-	assign 	param70   =	32'd0;
+	assign 	param51   =	0;
+	assign 	param52   =	0;
+	assign 	param53   =	0;
+	assign 	param54   =	0;
+	assign 	param55   =	0;
+	assign 	param56   =	0;
+	assign 	param57   =	0;
+	assign 	param58   =	0;
+	assign 	param59   =	0;
+	assign 	param60   =	0;
+	assign 	param61   =	0;
+	assign 	param62   =	0;
+	assign 	param63   =	0;
+	assign 	param64   =	0;
+	assign 	param65   =	0;
+	assign 	param66   =	0;
+	assign 	param67   =	0;
+	assign 	param68   =	0;
+	assign 	param69   =	0;
+	assign 	param70   =	0;
 
 
 proactive_beh_dv300_485_modbus_rtu#(	
@@ -436,7 +437,7 @@ proactive_beh_dv300_485_modbus_rtu#(
     ,.a_alm_num            	(a_alm_num          )
     ,.a_bhv_id_r            (a_bhv_id_r         )
     ,.state_monitor_o       (debug_reg1         )
-	,.i_ctrl_data           (param1[15:0]       )
+	,.i_ctrl_data           (cfg_data           )
 	,.o_data_send_func      (chl_a_data_send_func )
 	,.o_data_send_start_addr(chl_a_data_send_start_addr )
 	,.o_data_send_data      (chl_a_data_send_data)
@@ -448,33 +449,6 @@ proactive_beh_dv300_485_modbus_rtu#(
     ,.irq_ack_i             (irq_a_grant        )
     );
 
-/*
-	tim_beh_osm41_485 tim_beh_osm41_485_u0(
-    .clk_i                      (clk_i          	)
-	,.rst_i              	    (rst_i         		)
-	,.i_time_1ms_vld   	        (i_time_1ms_vld 	)
-	,.i_time_1s_vld    	        (i_time_1s_vld  	)
-	,.task_time_cnt	            (task_time_cnt		)
-	,.pre_sta_allow		        (c_pre_sta_allow	)
-	,.post_sta_allow	        (c_post_sta_allow	)
-	,.c_en				        (c_en				)
-	,.c_bhv_id                  (c_bhv_id			)
-	,.c_tx_ot          	        (c_tx_ot			)
-	,.c_tx_result_rpt  	        (c_tx_result_rpt	)
-	,.c_tx_result_vld           (c_tx_result_vld	)
-	,.ec_chc_st	                (ec_chc_st			)
-	,.c_tx_id         	        (c_tx_id			)
-	,.c_alm_num                 (c_alm_num			)
-	,.c_gap_crl                 (c_gap_crl			)
-    ,.o_data_send_req			(chl_c_send_req		)
-    ,.i_data_send_finish_p		(chl_c_send_finish_p)
-	,.i_execu_result            (chl_c_execu_result )
-	,.i_rcv_data_finish_p		(uart_rcv_data_ok	)//接收数据完成
-	,.irq_o 					(irq_c				)
-	,.irq_ack_i                 (irq_c_grant		)
-   );
-*/
-
 pre_post_sta_check_dv300_485_modbus_rtu#(
         .A_BHA_NUM          (A_BHA_NUM      ),
         .B_BHA_NUM          (B_BHA_NUM      ),
@@ -485,10 +459,10 @@ pre_post_sta_check_dv300_485_modbus_rtu#(
         .unit_id            (unit_id        ),
         .unit_ectrl         (unit_ectrl     ),
         .unit_st            (unit_st        ),
-        .m_id               (m_id           ),
-        .m_ectrl            (m_ectrl        ),
+        .m_id            	(0              ),//m_id           ),
+        .m_ectrl            (0              ),//m_ectrl        ),
         .m_st               (m_st           ),
-        .m_wk_mod           (m_wk_mod       ),
+        .m_wk_mod           (0              ),//m_wk_mod       ),
         .m_saf_st           (m_saf_st       ),
         .link_m_saf_st      (link_m_saf_st  ),
         .a_en               (a_en            ), //通道A使能 ps-pl
@@ -535,7 +509,7 @@ pre_post_sta_check_dv300_485_modbus_rtu#(
         .irq_reg2_o         (irq_reg2          ),
         .irq_o              (o_intr_irq        ),
         .irq_busy_o         (irq_busy_o        ),
-        .irq_receive_ack_i  (a_tx_result_vld || b_tx_result_vld || c_tx_result_vld)	
+        .irq_receive_ack_i  (a_tx_result_vld   ) //|| b_tx_result_vld || c_tx_result_vld)	
     );
 	
 
@@ -551,7 +525,7 @@ frame_ctrl_dv300_485_modbus_rtu
     .i_resp_tout            ( resp_tout                    ),//响应超时时间
     .i_retry_cnt            ( retry_cnt                    ),//重试次数
     .i_func_code            ( chl_a_data_send_func         ),//功能码
-    .i_data                 ( {16'h0,chl_a_data_send_data} ),//数据
+    .i_data                 ( chl_a_data_send_data         ),//数据
     .i_data_len             ( data_len                     ),//数据长度
     .i_start_addr           ( chl_a_data_send_start_addr   ),//起始地址
 //
@@ -561,9 +535,6 @@ frame_ctrl_dv300_485_modbus_rtu
     .i_chl_a_send_req       (chl_a_send_req                ),
     .o_chl_a_fb_data_ready_p(chl_a_fb_data_ready_p         ),
     .o_chl_a_execu_result   (chl_a_execu_result            ),
-    .i_chl_c_send_req       (chl_c_send_req                ),
-    .o_chl_c_fb_data_ready_p(chl_c_fb_data_ready_p         ),
-    .o_chl_c_execu_result   (chl_c_execu_result            ),
     .o_send_start_p         ( uart_send_start_p            ),
     .i_send_ready           ( uart_send_ready              ),
     .o_send_data            ( uart_send_data               ),

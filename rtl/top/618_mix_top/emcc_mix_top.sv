@@ -20,8 +20,8 @@ module emcc_mix_top
      input                               clk
     ,input                               reset
     ,input                               clk_10m
-    ,input  wire    [63:0]              di_mst_msg
-    ,output wire    [31:0]              do_relay_mst_msg
+    ,input  wire    [63:0]              di_mst_msg		//The board's DI status
+    ,output wire    [31:0]              do_relay_mst_msg//The opposite of the board's do state
     ,input  wire    [31:0]              ai_mst_msg
     ,input  wire                        slv_cfg_msg_rden
     ,input  wire    [RAM_AWIDTH-1:0]    slv_cfg_msg_addr
