@@ -84,12 +84,14 @@ module pre_post_sta_check_2di#(
 	//post  status
 	wire [A_BHA_NUM-1:0]	a_post_sta	;
 	
-	wire [1:0] error_bit = signal_vld & (~di_i);
-	wire	err;
-	assign err  = |error_bit;
+	wire	[1:0]	det_signal1;
+	wire	[1:0]	det_signal2;
 	
-	assign	a_post_sta[0 ] = (a_bhv_id == 1 )&& err;	
-	assign	a_post_sta[1 ] = (a_bhv_id == 2 )&& !err;
+	assign det_signal1 = (~di_i) & signal_vld;
+	assign det_signal2 = di_i & signal_vld;
+	
+	assign	a_post_sta[0 ] = (a_bhv_id == 1 )&& (det_signal1 == signal_vld);	//invalid
+	assign	a_post_sta[1 ] = (a_bhv_id == 2 )&& (det_signal2 == signal_vld);	//valid
 
 	
 	always@(posedge clk_i) 
