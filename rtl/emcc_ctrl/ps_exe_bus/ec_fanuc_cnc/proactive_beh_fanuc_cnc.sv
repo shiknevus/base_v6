@@ -400,7 +400,7 @@ module proactive_beh_fanuc_cnc#(
     always@(posedge clk_i)begin
         if(rst_i)
             timout <= 1'b0;
-        else if(timout_cnt >= a_tx_ot-1)
+        else if(timout_cnt > a_tx_ot)
             timout <= 1'b1;
         else
             timout <= 1'b0;
