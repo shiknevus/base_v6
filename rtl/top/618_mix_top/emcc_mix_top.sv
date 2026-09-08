@@ -762,7 +762,7 @@ module emcc_mix_top
 	// --- flow_comp_1 --A0001_磨床1---
     ec_siemens_cnc
     #(
-         .REG_SPACE_BIAS     ( 20'd25600)
+         .REG_SPACE_BIAS     ( 20'h6400)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_siemens_cnc_1
@@ -793,7 +793,7 @@ module emcc_mix_top
 	// --- flow_comp_2 --A0002_磨床2---
     ec_siemens_cnc
     #(
-         .REG_SPACE_BIAS     ( 20'd34816)
+         .REG_SPACE_BIAS     ( 20'h8800)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_siemens_cnc_2
@@ -824,7 +824,7 @@ module emcc_mix_top
 	// --- flow_comp_3 --A0003_磨床3---
     ec_siemens_cnc
     #(
-         .REG_SPACE_BIAS     ( 20'd44032)
+         .REG_SPACE_BIAS     ( 20'hac00)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_siemens_cnc_3
@@ -855,7 +855,7 @@ module emcc_mix_top
 	// --- flow_comp_4 --A0004_磨床4---
     ec_siemens_cnc
     #(
-         .REG_SPACE_BIAS     ( 20'd45056)
+         .REG_SPACE_BIAS     ( 20'hb000)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_siemens_cnc_4
@@ -886,7 +886,7 @@ module emcc_mix_top
 	// --- flow_comp_5 --A0005_磨床5---
     ec_siemens_cnc
     #(
-         .REG_SPACE_BIAS     ( 20'd45568)
+         .REG_SPACE_BIAS     ( 20'hb200)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_siemens_cnc_5
@@ -917,7 +917,7 @@ module emcc_mix_top
 	// --- flow_comp_6 --A0006_磨床6---
     ec_siemens_cnc
     #(
-         .REG_SPACE_BIAS     ( 20'd44544)
+         .REG_SPACE_BIAS     ( 20'hae00)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_siemens_cnc_6
@@ -948,7 +948,7 @@ module emcc_mix_top
 	// --- flow_comp_7 --A0007_磨床7---
     ec_siemens_cnc
     #(
-         .REG_SPACE_BIAS     ( 20'd46080)
+         .REG_SPACE_BIAS     ( 20'hb400)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_siemens_cnc_7
@@ -979,7 +979,7 @@ module emcc_mix_top
 	// --- flow_comp_8 --A0008_磨床8---
     ec_siemens_cnc
     #(
-         .REG_SPACE_BIAS     ( 20'd46592)
+         .REG_SPACE_BIAS     ( 20'hb600)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_siemens_cnc_8
@@ -1010,7 +1010,7 @@ module emcc_mix_top
 	// --- flow_comp_9 --A0009_磨床9---
     ec_siemens_cnc
     #(
-         .REG_SPACE_BIAS     ( 20'd47104)
+         .REG_SPACE_BIAS     ( 20'hb800)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_siemens_cnc_9
@@ -1041,7 +1041,7 @@ module emcc_mix_top
 	// --- flow_comp_11 --A0011_海克斯康三坐标1---
     ec_hex_coordinate
     #(
-         .REG_SPACE_BIAS     ( 20'd48128)
+         .REG_SPACE_BIAS     ( 20'hbc00)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_hex_coordinate_11
@@ -1072,7 +1072,7 @@ module emcc_mix_top
 	// --- flow_comp_12 --A0012_海克斯康三坐标2---
     ec_hex_coordinate
     #(
-         .REG_SPACE_BIAS     ( 20'd48640)
+         .REG_SPACE_BIAS     ( 20'hbe00)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_hex_coordinate_12
@@ -1103,7 +1103,7 @@ module emcc_mix_top
 	// --- flow_comp_13 --A0013_海克斯康影像测量仪---
     ec_hex_coordinate
     #(
-         .REG_SPACE_BIAS     ( 20'd49152)
+         .REG_SPACE_BIAS     ( 20'hc000)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_hex_coordinate_13
@@ -1136,7 +1136,7 @@ module emcc_mix_top
 	// --- flow_comp_14 --A0014_1#三坐标卡盘---
     ec_2di_3do
     #(
-         .REG_SPACE_BIAS     ( 20'd50688)
+         .REG_SPACE_BIAS     ( 20'hc600)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_2di_3do_14
@@ -1174,7 +1174,7 @@ module emcc_mix_top
 	// --- flow_comp_15 --A0015_2#三坐标卡盘---
     ec_2di_3do
     #(
-         .REG_SPACE_BIAS     ( 20'd51200)
+         .REG_SPACE_BIAS     ( 20'hc800)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_2di_3do_15
@@ -1212,7 +1212,7 @@ module emcc_mix_top
 	// --- flow_comp_16 --A0016_影像测量仪卡盘---
     ec_2di_3do
     #(
-         .REG_SPACE_BIAS     ( 20'd51712)
+         .REG_SPACE_BIAS     ( 20'hca00)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_2di_3do_16
@@ -1248,7 +1248,7 @@ module emcc_mix_top
 	// --- flow_comp_17 --A0017_蓝鲸清洗机---
     ec_lanj_washer
     #(
-         .REG_SPACE_BIAS     ( 20'd47616)
+         .REG_SPACE_BIAS     ( 20'hba00)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_lanj_washer_17
@@ -1279,7 +1279,7 @@ module emcc_mix_top
 	// --- flow_comp_18 --A0018_主地轨搬运机器人---
     ec_fanuc_robot
     #(
-         .REG_SPACE_BIAS     ( 20'd55296)
+         .REG_SPACE_BIAS     ( 20'hd800)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_fanuc_robot_18
@@ -1310,7 +1310,7 @@ module emcc_mix_top
 	// --- flow_comp_19 --A0019_短桁架1#机器人---
     ec_fanuc_robot
     #(
-         .REG_SPACE_BIAS     ( 20'd52736)
+         .REG_SPACE_BIAS     ( 20'hce00)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_fanuc_robot_19
@@ -1341,7 +1341,7 @@ module emcc_mix_top
 	// --- flow_comp_20 --A0020_长桁架1#机器人---
     ec_fanuc_robot
     #(
-         .REG_SPACE_BIAS     ( 20'd53248)
+         .REG_SPACE_BIAS     ( 20'hd000)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_fanuc_robot_20
@@ -1372,7 +1372,7 @@ module emcc_mix_top
 	// --- flow_comp_21 --A0021_长桁架2#机器人---
     ec_fanuc_robot
     #(
-         .REG_SPACE_BIAS     ( 20'd53760)
+         .REG_SPACE_BIAS     ( 20'hd200)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_fanuc_robot_21
@@ -1403,7 +1403,7 @@ module emcc_mix_top
 	// --- flow_comp_22 --A0022_搬运机器人---
     ec_fanuc_robot
     #(
-         .REG_SPACE_BIAS     ( 20'd49664)
+         .REG_SPACE_BIAS     ( 20'hc200)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_fanuc_robot_22
@@ -1436,7 +1436,7 @@ module emcc_mix_top
 	// --- flow_comp_23 --A0023_地轨机器人托盘搬运夹爪---
     ec_trayclaw
     #(
-         .REG_SPACE_BIAS     ( 20'd54784)
+         .REG_SPACE_BIAS     ( 20'hd600)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_trayclaw_23
@@ -1476,7 +1476,7 @@ module emcc_mix_top
 	// --- flow_comp_24 --A0024_地轨机器人砂轮搬运夹爪---
     ec_2di_2do
     #(
-         .REG_SPACE_BIAS     ( 20'd55808)
+         .REG_SPACE_BIAS     ( 20'hda00)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_2di_2do_24
@@ -1515,7 +1515,7 @@ module emcc_mix_top
 	// --- flow_comp_25 --A0025_搬运机器人夹爪---
     ec_2di_2do
     #(
-         .REG_SPACE_BIAS     ( 20'd50176)
+         .REG_SPACE_BIAS     ( 20'hc400)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_2di_2do_25
@@ -1552,7 +1552,7 @@ module emcc_mix_top
 	// // --- flow_comp_26 -----地轨机器人_RFID读写器
     // ec_sp_rfid
     // #(
-    //      .REG_SPACE_BIAS     (20'd56320)
+    //      .REG_SPACE_BIAS     (20'hdc00)
     //     ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
     // )
     // ec_sp_rfid_26
@@ -1584,7 +1584,7 @@ module emcc_mix_top
 
 ec_superisys_485_modbus_rtu
 #(
-        .REG_SPACE_BIAS         (20'd56320                ), //组件基地址
+        .REG_SPACE_BIAS         (20'hdc00                ), //组件基地址
         .REG_SPACE_SIZE         (`REG_SPACE_SIZE          ), //组件偏移地址
         .CLK_FREQ               (156250000                )  //100MHz = 100000000
 )
@@ -1626,7 +1626,7 @@ ec_superisys_485_modbus_rtu_26
 	// // --- flow_comp_27 -----短桁架1#夹爪RFID读写器
     // ec_sp_rfid
     // #(
-    //      .REG_SPACE_BIAS     (20'd54272)
+    //      .REG_SPACE_BIAS     (20'hd400)
     //     ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
     // )
     // ec_sp_rfid_27
@@ -1652,7 +1652,7 @@ ec_superisys_485_modbus_rtu_26
 
 ec_superisys_485_modbus_rtu
 #(
-        .REG_SPACE_BIAS         (20'd54272                ), //组件基地址
+        .REG_SPACE_BIAS         (20'hd400                ), //组件基地址
         .REG_SPACE_SIZE         (`REG_SPACE_SIZE          ), //组件偏移地址
         .CLK_FREQ               (156250000                )  //100MHz = 100000000
 )
@@ -1694,7 +1694,7 @@ ec_superisys_485_modbus_rtu_27
 	// // --- flow_comp_28 -----固定机器人_RFID读写器
     // ec_sp_rfid
     // #(
-    //      .REG_SPACE_BIAS     (20'd52224)
+    //      .REG_SPACE_BIAS     (20'hcc00)
     //     ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
     // )
     // ec_sp_rfid_28
@@ -1720,7 +1720,7 @@ ec_superisys_485_modbus_rtu_27
 	
 ec_superisys_485_modbus_rtu
 #(
-        .REG_SPACE_BIAS         (20'd52224                ), //组件基地址
+        .REG_SPACE_BIAS         (20'hcc00                ), //组件基地址
         .REG_SPACE_SIZE         (`REG_SPACE_SIZE          ), //组件偏移地址
         .CLK_FREQ               (156250000                )  //100MHz = 100000000
 )
@@ -1762,7 +1762,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_32 -----
     ec_1di
     #(
-         .REG_SPACE_BIAS     ( 20'd101888)
+         .REG_SPACE_BIAS     ( 20'h18e00)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_1di_32
@@ -1794,7 +1794,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_33 --A0033_双托盘信号组件---
     ec_2di
     #(
-         .REG_SPACE_BIAS     ( 20'd102400)
+         .REG_SPACE_BIAS     ( 20'h19000)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_2di_33
@@ -1827,7 +1827,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_35 --A0036_分拣库_X轴---
     ec_slv_pul_axis
     #(
-         .REG_SPACE_BIAS     ( 20'd65024)
+         .REG_SPACE_BIAS     ( 20'hfe00)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_slv_pul_axis_35
@@ -1850,15 +1850,15 @@ ec_superisys_485_modbus_rtu_28
       .o_st_rd_data          ( sub_comp_rd_dat[123]    ),
 	  .o_intr_irq            ( map_irq[123]       )
 
-       ,.i_axis_limf        ( ~di_regoin_msg[0][33]           )   // 正限位到位开关
+       ,.i_axis_limf        ( ~di_regoin_msg[0][30]           )   // 正限位到位开关
        ,.pul_motor_r_flag        ( pul_motor1_r_flag           )   // 
        ,.cur_slv_board_id        ( 5'd0           )   // 
        ,.slv_board_id        ( slv_board_id           )   // 
        ,.pul_motor_flag        ( pul_motor1_flag           )   // 
        ,.m2s_pulm_msg        ( pul_motor1_r_msg[0]           )   // 
        ,.s2m_pulm_msg        ( pul_motor1_msg[0]           )   // 
-       ,.i_axis_limb        ( ~di_regoin_msg[0][35]           )   // 负限位到位开关
-       ,.i_axis_zero        ( ~di_regoin_msg[0][34]           )   // 零位到位开关
+       ,.i_axis_limb        ( ~di_regoin_msg[0][32]           )   // 负限位到位开关
+       ,.i_axis_zero        ( ~di_regoin_msg[0][31]           )   // 零位到位开关
        ,.i_servo_done        ( ~di_regoin_msg[0][16]           )   // 伺服定位完成
        ,.i_servo_ready        ( ~di_regoin_msg[0][17]           )   // 伺服就绪
     );
@@ -1869,7 +1869,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_36 --A0037_分拣库_Y轴---
     ec_slv_pul_axis
     #(
-         .REG_SPACE_BIAS     ( 20'd65536)
+         .REG_SPACE_BIAS     ( 20'h10000)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_slv_pul_axis_36
@@ -1892,15 +1892,15 @@ ec_superisys_485_modbus_rtu_28
       .o_st_rd_data          ( sub_comp_rd_dat[124]    ),
 	  .o_intr_irq            ( map_irq[124]       )
 
-       ,.i_axis_limf        ( ~di_regoin_msg[0][30]           )   // 正限位到位开关
+       ,.i_axis_limf        ( ~di_regoin_msg[0][33]           )   // 正限位到位开关
        ,.pul_motor_r_flag        ( pul_motor1_r_flag           )   // 
        ,.cur_slv_board_id        ( 5'd0           )   // 
        ,.slv_board_id        ( slv_board_id           )   // 
        ,.pul_motor_flag        ( pul_motor0_flag           )   // 
        ,.m2s_pulm_msg        ( pul_motor0_r_msg[0]           )   // 
        ,.s2m_pulm_msg        ( pul_motor0_msg[0]           )   // 
-       ,.i_axis_limb        ( ~di_regoin_msg[0][32]           )   // 负限位到位开关
-       ,.i_axis_zero        ( ~di_regoin_msg[0][31]           )   // 零位到位开关
+       ,.i_axis_limb        ( ~di_regoin_msg[0][35]           )   // 负限位到位开关
+       ,.i_axis_zero        ( ~di_regoin_msg[0][34]           )   // 零位到位开关
        ,.i_servo_done        ( ~di_regoin_msg[0][14]           )   // 伺服定位完成
        ,.i_servo_ready        ( ~di_regoin_msg[0][15]           )   // 伺服就绪
     );
@@ -1911,7 +1911,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_37 --A0038_分拣库_Z轴---
     ec_slv_pul_axis
     #(
-         .REG_SPACE_BIAS     ( 20'd66048)
+         .REG_SPACE_BIAS     ( 20'h10200)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_slv_pul_axis_37
@@ -1953,7 +1953,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_38 --A0039_分拣库_R轴---
     ec_slv_pul_axis
     #(
-         .REG_SPACE_BIAS     ( 20'd66560)
+         .REG_SPACE_BIAS     ( 20'h10400)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_slv_pul_axis_38
@@ -1997,7 +1997,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_39 --A0040_分拣库_桁架夹爪---
     ec_2di_2do
     #(
-         .REG_SPACE_BIAS     ( 20'd67072)
+         .REG_SPACE_BIAS     ( 20'h10600)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_2di_2do_39
@@ -2036,7 +2036,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_40 --A0041_机器人托盘入口滑台---
     ec_3di_2do
     #(
-         .REG_SPACE_BIAS     ( 20'd69120)
+         .REG_SPACE_BIAS     ( 20'h10e00)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_3di_2do_40
@@ -2076,7 +2076,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_41 --A0042_机器人托盘出口滑台---
     ec_3di_2do
     #(
-         .REG_SPACE_BIAS     ( 20'd69632)
+         .REG_SPACE_BIAS     ( 20'h11000)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_3di_2do_41
@@ -2116,7 +2116,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_42 --A0043_[1号-A]正常上料滑台---
     ec_3di_2do
     #(
-         .REG_SPACE_BIAS     ( 20'd70144)
+         .REG_SPACE_BIAS     ( 20'h11200)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_3di_2do_42
@@ -2156,7 +2156,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_43 --A0044_[1号-B]正常上料滑台---
     ec_3di_2do
     #(
-         .REG_SPACE_BIAS     ( 20'd67584)
+         .REG_SPACE_BIAS     ( 20'h10800)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_3di_2do_43
@@ -2196,7 +2196,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_44 --A0045_[2号-A]正常下料滑台---
     ec_3di_2do
     #(
-         .REG_SPACE_BIAS     ( 20'd70656)
+         .REG_SPACE_BIAS     ( 20'h11400)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_3di_2do_44
@@ -2236,7 +2236,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_45 --A0046_[2号-B]正常下料滑台---
     ec_3di_2do
     #(
-         .REG_SPACE_BIAS     ( 20'd68096)
+         .REG_SPACE_BIAS     ( 20'h10a00)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_3di_2do_45
@@ -2276,7 +2276,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_46 --A0047_[3号-A]异常下料滑台---
     ec_3di_2do
     #(
-         .REG_SPACE_BIAS     ( 20'd71168)
+         .REG_SPACE_BIAS     ( 20'h11600)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_3di_2do_46
@@ -2316,7 +2316,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_47 --A0048_[3号-B]异常下料滑台---
     ec_3di_2do
     #(
-         .REG_SPACE_BIAS     ( 20'd68608)
+         .REG_SPACE_BIAS     ( 20'h10c00)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_3di_2do_47
@@ -2354,7 +2354,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_48 --A0049_分拣库_打标机卡盘R轴---
     ec_slv_pul_axis
     #(
-         .REG_SPACE_BIAS     ( 20'd72704)
+         .REG_SPACE_BIAS     ( 20'h11c00)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_slv_pul_axis_48
@@ -2396,7 +2396,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_49 --A0050_分拣库_打标机卡盘Y轴---
     ec_slv_pul_axis
     #(
-         .REG_SPACE_BIAS     ( 20'd73216)
+         .REG_SPACE_BIAS     ( 20'h11e00)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_slv_pul_axis_49
@@ -2438,7 +2438,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_50 --A0051_分拣库_打标机倾角轴---
     ec_slv_pul_axis
     #(
-         .REG_SPACE_BIAS     ( 20'd73728)
+         .REG_SPACE_BIAS     ( 20'h12000)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_slv_pul_axis_50
@@ -2479,7 +2479,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_51 --A0052_分拣库_打标机升降Z轴---
     ec_slv_pul_axis
     #(
-         .REG_SPACE_BIAS     ( 20'd74240)
+         .REG_SPACE_BIAS     ( 20'h12200)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_slv_pul_axis_51
@@ -2521,7 +2521,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_52 --A0053_打标机---
     ec_feijie_marker
     #(
-         .REG_SPACE_BIAS     ( 20'd76288)
+         .REG_SPACE_BIAS     ( 20'h12a00)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_feijie_marker_52
@@ -2554,7 +2554,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_53 --A0054_分拣库_打标机卡盘---
     ec_2di_3do
     #(
-         .REG_SPACE_BIAS     ( 20'd72192)
+         .REG_SPACE_BIAS     ( 20'h11a00)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_2di_3do_53
@@ -2590,7 +2590,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_55 --A0056_砂轮有无检测传感器---
     ec_16di
     #(
-         .REG_SPACE_BIAS     ( 20'd75776)
+         .REG_SPACE_BIAS     ( 20'h12800)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_16di_55
@@ -2641,7 +2641,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_56 --A0057_分拣库_三色灯蜂鸣器---
     ec_3led_buzzer
     #(
-         .REG_SPACE_BIAS     ( 20'd74752)
+         .REG_SPACE_BIAS     ( 20'h12400)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_3led_buzzer_56
@@ -2680,7 +2680,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_57 --A0058_分拣库_电子手轮---
     ec_pulmotor_handwheel
     #(
-         .REG_SPACE_BIAS     ( 20'd71680)
+         .REG_SPACE_BIAS     ( 20'h11800)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_pulmotor_handwheel_57
@@ -2726,7 +2726,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_58 --A0059_三坐标房清洗机侧自动门---
     ec_2di_2do
     #(
-         .REG_SPACE_BIAS     ( 20'd58368)
+         .REG_SPACE_BIAS     ( 20'he400)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_2di_2do_58
@@ -2765,7 +2765,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_59 --A0060_三坐标房地轨侧自动门---
     ec_2di_2do
     #(
-         .REG_SPACE_BIAS     ( 20'd58880)
+         .REG_SPACE_BIAS     ( 20'he600)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_2di_2do_59
@@ -2804,7 +2804,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_60 --A0061_三坐标房去毛刺机侧自动门---
     ec_2di_2do
     #(
-         .REG_SPACE_BIAS     ( 20'd59392)
+         .REG_SPACE_BIAS     ( 20'he800)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_2di_2do_60
@@ -2841,7 +2841,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_61 --A0062_主机器人地轨---
     ec_can_servo
     #(
-         .REG_SPACE_BIAS     ( 20'd64512)
+         .REG_SPACE_BIAS     ( 20'hfc00)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_can_servo_61
@@ -2875,7 +2875,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_62 --A0063_短桁架1---
     ec_can_servo
     #(
-         .REG_SPACE_BIAS     ( 20'd60416)
+         .REG_SPACE_BIAS     ( 20'hec00)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_can_servo_62
@@ -2909,7 +2909,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_63 --A0064_长桁架1---
     ec_can_servo
     #(
-         .REG_SPACE_BIAS     ( 20'd60928)
+         .REG_SPACE_BIAS     ( 20'hee00)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_can_servo_63
@@ -2940,7 +2940,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_64 --A0065_长桁架2---
     ec_can_servo
     #(
-         .REG_SPACE_BIAS     ( 20'd61440)
+         .REG_SPACE_BIAS     ( 20'hf000)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_can_servo_64
@@ -2971,7 +2971,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_66 --A0067_打磨机器人---
     ec_fanuc_robot
     #(
-         .REG_SPACE_BIAS     ( 20'd75264)
+         .REG_SPACE_BIAS     ( 20'h12600)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_fanuc_robot_66
@@ -3006,7 +3006,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_67 --A0068_去毛刺机_三色灯蜂鸣器---
     ec_3led_buzzer
     #(
-         .REG_SPACE_BIAS     ( 20'd80896)
+         .REG_SPACE_BIAS     ( 20'h13c00)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_3led_buzzer_67
@@ -3047,7 +3047,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_68 --A0069_去毛刺卡盘---
     ec_2di_3do
     #(
-         .REG_SPACE_BIAS     ( 20'd77312)
+         .REG_SPACE_BIAS     ( 20'h12e00)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_2di_3do_68
@@ -3085,7 +3085,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_69 --A0070_去毛刺机_磨头夹爪---
     ec_2di_2do
     #(
-         .REG_SPACE_BIAS     ( 20'd76800)
+         .REG_SPACE_BIAS     ( 20'h12c00)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_2di_2do_69
@@ -3124,7 +3124,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_70 --A0071_去毛刺机_自动门---
     ec_4di_2do
     #(
-         .REG_SPACE_BIAS     ( 20'd78848)
+         .REG_SPACE_BIAS     ( 20'h13400)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_4di_2do_70
@@ -3163,7 +3163,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_71 --A0072_毛刺刀架库信号检测组---
     ec_16di
     #(
-         .REG_SPACE_BIAS     ( 20'd80384)
+         .REG_SPACE_BIAS     ( 20'h13a00)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_16di_71
@@ -3210,7 +3210,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_72 --A0081_去毛刺机_旋转台伺服电机---
     ec_slv_pul_axis
     #(
-         .REG_SPACE_BIAS     ( 20'd77824)
+         .REG_SPACE_BIAS     ( 20'h13000)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_slv_pul_axis_72
@@ -3251,7 +3251,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_73 --A0074_去毛刺机_防爆除尘器---
     ec_1do
     #(
-         .REG_SPACE_BIAS     ( 20'd79360)
+         .REG_SPACE_BIAS     ( 20'h13600)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_1do_73
@@ -3285,7 +3285,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_74 --A0075_去毛刺机_水冷机---
     ec_1do
     #(
-         .REG_SPACE_BIAS     ( 20'd79872)
+         .REG_SPACE_BIAS     ( 20'h13800)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_1do_74
@@ -3318,7 +3318,7 @@ ec_superisys_485_modbus_rtu_28
 	// // --- flow_comp_75 --A0080_去毛刺机_变频磨头旋转电机---
     // ec_slv_dv300_485
     // #(
-    //      .REG_SPACE_BIAS     ( 20'd78336)
+    //      .REG_SPACE_BIAS     ( 20'h13200)
     //     ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     // )
     // ec_slv_dv300_485_75
@@ -3350,7 +3350,7 @@ ec_superisys_485_modbus_rtu_28
     // );
 ec_dv300_485_modbus_rtu
 #(
-        .REG_SPACE_BIAS         (20'd78336                ), //组件基地址
+        .REG_SPACE_BIAS         (20'h13200                ), //组件基地址
         .REG_SPACE_SIZE         (`REG_SPACE_SIZE          ), //组件偏移地址
         .CLK_FREQ               (156250000                )  //100MHz = 100000000
 )
@@ -3387,7 +3387,7 @@ ec_dv300_485_modbus_rtu_75
 	// --- flow_comp_76 --A0077_短桁架1#机器人夹爪---
     ec_2di_2do
     #(
-         .REG_SPACE_BIAS     ( 20'd61952)
+         .REG_SPACE_BIAS     ( 20'hf200)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_2di_2do_76
@@ -3426,7 +3426,7 @@ ec_dv300_485_modbus_rtu_75
 	// --- flow_comp_77 --A0078_长桁架1#机器人夹爪---
     ec_2di_2do
     #(
-         .REG_SPACE_BIAS     ( 20'd62976)
+         .REG_SPACE_BIAS     ( 20'hf600)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_2di_2do_77
@@ -3465,7 +3465,7 @@ ec_dv300_485_modbus_rtu_75
 	// --- flow_comp_78 --A0079_长桁架2#机器人夹爪---
     ec_2di_2do
     #(
-         .REG_SPACE_BIAS     ( 20'd62464)
+         .REG_SPACE_BIAS     ( 20'hf400)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_2di_2do_78
@@ -3502,7 +3502,7 @@ ec_dv300_485_modbus_rtu_75
 	// --- flow_comp_79 --A0082_固定机器人夹爪物料检测信号---
     ec_1di
     #(
-         .REG_SPACE_BIAS     ( 20'd59904)
+         .REG_SPACE_BIAS     ( 20'hea00)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_1di_79
@@ -3536,7 +3536,7 @@ ec_dv300_485_modbus_rtu_75
 	// --- flow_comp_80 --A0083_6号机床旋转机构---
     ec_2di_2do
     #(
-         .REG_SPACE_BIAS     ( 20'd99840)
+         .REG_SPACE_BIAS     ( 20'h18600)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_2di_2do_80
@@ -3573,7 +3573,7 @@ ec_dv300_485_modbus_rtu_75
 	// // --- flow_comp_83 -----长桁架1#夹爪RFID读写器
     // ec_sp_rfid
     // #(
-    //      .REG_SPACE_BIAS     (20'd63488)
+    //      .REG_SPACE_BIAS     (20'hf800)
     //     ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
     // )
     // ec_sp_rfid_83
@@ -3599,7 +3599,7 @@ ec_dv300_485_modbus_rtu_75
 
 ec_superisys_485_modbus_rtu
 #(
-        .REG_SPACE_BIAS         (20'd63488                ), //组件基地址
+        .REG_SPACE_BIAS         (20'hf800                ), //组件基地址
         .REG_SPACE_SIZE         (`REG_SPACE_SIZE          ), //组件偏移地址
         .CLK_FREQ               (156250000                )  //100MHz = 100000000
 )
@@ -3641,7 +3641,7 @@ ec_superisys_485_modbus_rtu_83
 	// // --- flow_comp_84 -----长桁架2#夹爪RFID读写器
     // ec_sp_rfid
     // #(
-    //      .REG_SPACE_BIAS     (20'd64000)
+    //      .REG_SPACE_BIAS     (20'hfa00)
     //     ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
     // )
     // ec_sp_rfid_84
@@ -3667,7 +3667,7 @@ ec_superisys_485_modbus_rtu_83
 
 ec_superisys_485_modbus_rtu
 #(
-        .REG_SPACE_BIAS         (20'd64000                ), //组件基地址
+        .REG_SPACE_BIAS         (20'hfa00                ), //组件基地址
         .REG_SPACE_SIZE         (`REG_SPACE_SIZE          ), //组件偏移地址
         .CLK_FREQ               (156250000                )  //100MHz = 100000000
 )
@@ -3710,7 +3710,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_85 --A0088_1号机床线边托盘检测组---
     ec_5di
     #(
-         .REG_SPACE_BIAS     ( 20'd81920)
+         .REG_SPACE_BIAS     ( 20'h14000)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_5di_85
@@ -3746,7 +3746,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_86 --A0089_2号机床线边托盘检测组---
     ec_5di
     #(
-         .REG_SPACE_BIAS     ( 20'd82432)
+         .REG_SPACE_BIAS     ( 20'h14200)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_5di_86
@@ -3782,7 +3782,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_87 --A0090_3号机床线边托盘检测组---
     ec_5di
     #(
-         .REG_SPACE_BIAS     ( 20'd82944)
+         .REG_SPACE_BIAS     ( 20'h14400)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_5di_87
@@ -3818,7 +3818,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_88 --A0091_4号机床线边托盘检测组---
     ec_5di
     #(
-         .REG_SPACE_BIAS     ( 20'd86016)
+         .REG_SPACE_BIAS     ( 20'h15000)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_5di_88
@@ -3854,7 +3854,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_89 --A0092_5号机床线边托盘检测组---
     ec_5di
     #(
-         .REG_SPACE_BIAS     ( 20'd87040)
+         .REG_SPACE_BIAS     ( 20'h15400)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_5di_89
@@ -3890,7 +3890,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_90 --A0093_6号机床线边托盘检测组---
     ec_5di
     #(
-         .REG_SPACE_BIAS     ( 20'd85504)
+         .REG_SPACE_BIAS     ( 20'h14e00)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_5di_90
@@ -3926,7 +3926,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_91 --A0094_7号机床线边托盘检测组---
     ec_5di
     #(
-         .REG_SPACE_BIAS     ( 20'd83968)
+         .REG_SPACE_BIAS     ( 20'h14800)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_5di_91
@@ -3962,7 +3962,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_92 --A0095_8号机床线边托盘检测组---
     ec_5di
     #(
-         .REG_SPACE_BIAS     ( 20'd86528)
+         .REG_SPACE_BIAS     ( 20'h15200)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_5di_92
@@ -3998,7 +3998,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_93 --A0096_9号机床线边托盘检测组---
     ec_5di
     #(
-         .REG_SPACE_BIAS     ( 20'd84992)
+         .REG_SPACE_BIAS     ( 20'h14c00)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_5di_93
@@ -4036,7 +4036,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_94 --A0097_机床1顶部围栏自动门---
     ec_2di_2do
     #(
-         .REG_SPACE_BIAS     ( 20'd91648)
+         .REG_SPACE_BIAS     ( 20'h16600)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_2di_2do_94
@@ -4075,7 +4075,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_95 --A0098_机床2顶部围栏自动门---
     ec_2di_2do
     #(
-         .REG_SPACE_BIAS     ( 20'd91136)
+         .REG_SPACE_BIAS     ( 20'h16400)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_2di_2do_95
@@ -4114,7 +4114,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_96 --A0099_机床3顶部围栏自动门---
     ec_2di_2do
     #(
-         .REG_SPACE_BIAS     ( 20'd90624)
+         .REG_SPACE_BIAS     ( 20'h16200)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_2di_2do_96
@@ -4153,7 +4153,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_97 --A0100_机床4顶部围栏自动门---
     ec_2di_2do
     #(
-         .REG_SPACE_BIAS     ( 20'd89088)
+         .REG_SPACE_BIAS     ( 20'h15c00)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_2di_2do_97
@@ -4192,7 +4192,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_98 --A0101_机床5顶部围栏自动门---
     ec_2di_2do
     #(
-         .REG_SPACE_BIAS     ( 20'd89600)
+         .REG_SPACE_BIAS     ( 20'h15e00)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_2di_2do_98
@@ -4231,7 +4231,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_99 --A0102_机床6顶部围栏自动门---
     ec_2di_2do
     #(
-         .REG_SPACE_BIAS     ( 20'd90112)
+         .REG_SPACE_BIAS     ( 20'h16000)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_2di_2do_99
@@ -4270,7 +4270,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_100 --A0103_机床7顶部围栏自动门---
     ec_2di_2do
     #(
-         .REG_SPACE_BIAS     ( 20'd88064)
+         .REG_SPACE_BIAS     ( 20'h15800)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_2di_2do_100
@@ -4309,7 +4309,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_101 --A0104_机床8顶部围栏自动门---
     ec_2di_2do
     #(
-         .REG_SPACE_BIAS     ( 20'd88576)
+         .REG_SPACE_BIAS     ( 20'h15a00)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_2di_2do_101
@@ -4348,7 +4348,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_102 --A0105_机床9顶部围栏自动门---
     ec_2di_2do
     #(
-         .REG_SPACE_BIAS     ( 20'd87552)
+         .REG_SPACE_BIAS     ( 20'h15600)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_2di_2do_102
@@ -4385,7 +4385,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_103 --A0106_检测站缓存单位感测信号---
     ec_1di
     #(
-         .REG_SPACE_BIAS     ( 20'd81408)
+         .REG_SPACE_BIAS     ( 20'h13e00)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_1di_103
@@ -4418,7 +4418,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_105 --A0108_A区1#安全门锁---
     ec_sf_door
     #(
-         .REG_SPACE_BIAS     ( 20'd94208)
+         .REG_SPACE_BIAS     ( 20'h17000)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_sf_door_105
@@ -4454,7 +4454,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_106 --A0109_A区2#安全门锁---
     ec_sf_door
     #(
-         .REG_SPACE_BIAS     ( 20'd94720)
+         .REG_SPACE_BIAS     ( 20'h17200)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_sf_door_106
@@ -4490,7 +4490,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_107 --A0110_A区3#安全门锁---
     ec_sf_door
     #(
-         .REG_SPACE_BIAS     ( 20'd93696)
+         .REG_SPACE_BIAS     ( 20'h16e00)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_sf_door_107
@@ -4526,7 +4526,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_108 --A0111_B区1#安全门锁---
     ec_sf_door
     #(
-         .REG_SPACE_BIAS     ( 20'd98816)
+         .REG_SPACE_BIAS     ( 20'h18200)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_sf_door_108
@@ -4562,7 +4562,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_109 --A0112_B区2#安全门锁---
     ec_sf_door
     #(
-         .REG_SPACE_BIAS     ( 20'd97280)
+         .REG_SPACE_BIAS     ( 20'h17c00)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_sf_door_109
@@ -4598,7 +4598,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_110 --A0113_B区3#安全门锁---
     ec_sf_door
     #(
-         .REG_SPACE_BIAS     ( 20'd96768)
+         .REG_SPACE_BIAS     ( 20'h17a00)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_sf_door_110
@@ -4634,7 +4634,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_111 --A0114_C区1#安全门锁---
     ec_sf_door
     #(
-         .REG_SPACE_BIAS     ( 20'd98304)
+         .REG_SPACE_BIAS     ( 20'h18000)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_sf_door_111
@@ -4670,7 +4670,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_112 --A0115_C区2#安全门锁---
     ec_sf_door
     #(
-         .REG_SPACE_BIAS     ( 20'd97792)
+         .REG_SPACE_BIAS     ( 20'h17e00)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_sf_door_112
@@ -4706,7 +4706,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_113 --A0116_C区3#安全门锁---
     ec_sf_door
     #(
-         .REG_SPACE_BIAS     ( 20'd96256)
+         .REG_SPACE_BIAS     ( 20'h17800)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_sf_door_113
@@ -4742,7 +4742,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_114 --A0117_地轨首端安全门锁---
     ec_sf_door
     #(
-         .REG_SPACE_BIAS     ( 20'd95232)
+         .REG_SPACE_BIAS     ( 20'h17400)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_sf_door_114
@@ -4778,7 +4778,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_115 --A0118_地轨尾端安全门锁---
     ec_sf_door
     #(
-         .REG_SPACE_BIAS     ( 20'd95744)
+         .REG_SPACE_BIAS     ( 20'h17600)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_sf_door_115
@@ -4814,7 +4814,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_116 --A0119_清洗机吹气---
     ec_1do
     #(
-         .REG_SPACE_BIAS     ( 20'd57856)
+         .REG_SPACE_BIAS     ( 20'he200)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_1do_116
@@ -4851,7 +4851,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_118 --A0121_6号机床_三色灯蜂鸣器---
     ec_3led_buzzer
     #(
-         .REG_SPACE_BIAS     ( 20'd83456)
+         .REG_SPACE_BIAS     ( 20'h14600)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_3led_buzzer_118
@@ -4892,7 +4892,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_122 --A0340_7号机床旋转机构---
     ec_2di_2do
     #(
-         .REG_SPACE_BIAS     ( 20'd84480)
+         .REG_SPACE_BIAS     ( 20'h14a00)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_2di_2do_122
@@ -4931,7 +4931,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_123 --A0342_8号机床旋转机构---
     ec_2di_2do
     #(
-         .REG_SPACE_BIAS     ( 20'd99328)
+         .REG_SPACE_BIAS     ( 20'h18400)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_2di_2do_123
@@ -4970,7 +4970,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_124 --A0344_9号机床旋转机构---
     ec_2di_2do
     #(
-         .REG_SPACE_BIAS     ( 20'd100352)
+         .REG_SPACE_BIAS     ( 20'h18800)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_2di_2do_124
@@ -5007,7 +5007,7 @@ ec_superisys_485_modbus_rtu_84
 	// // --- flow_comp_125 --A0124_EMCC60主控板---
     // ec_emcc60_board
     // #(
-    //      .REG_SPACE_BIAS     ( 20'd100864)
+    //      .REG_SPACE_BIAS     ( 20'h18a00)
     //     ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     // )
     // ec_emcc60_board_125
@@ -5038,7 +5038,7 @@ ec_superisys_485_modbus_rtu_84
 	// // --- flow_comp_126 --A0161_B区C区控制柜1#分控板---
     // eecc30
     // #(
-    //      .REG_SPACE_BIAS     ( 20'd92160)
+    //      .REG_SPACE_BIAS     ( 20'h16800)
     //     ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     // )
     // eecc30_126
@@ -5069,7 +5069,7 @@ ec_superisys_485_modbus_rtu_84
 	// // --- flow_comp_127 --A0162_B区C区控制柜2#分控板---
     // eecc30
     // #(
-    //      .REG_SPACE_BIAS     ( 20'd92672)
+    //      .REG_SPACE_BIAS     ( 20'h16a00)
     //     ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     // )
     // eecc30_127
@@ -5100,7 +5100,7 @@ ec_superisys_485_modbus_rtu_84
 	// // --- flow_comp_128 --A0172_装卸站控制柜1#分控板---
     // eecc30
     // #(
-    //      .REG_SPACE_BIAS     ( 20'd93184)
+    //      .REG_SPACE_BIAS     ( 20'h16c00)
     //     ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     // )
     // eecc30_128
@@ -5131,7 +5131,7 @@ ec_superisys_485_modbus_rtu_84
 	// // --- flow_comp_129 --A0173_装卸站控制柜2#分控板---
     // eecc30
     // #(
-    //      .REG_SPACE_BIAS     ( 20'd101376)
+    //      .REG_SPACE_BIAS     ( 20'h18c00)
     //     ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     // )
     // eecc30_129
@@ -5162,7 +5162,7 @@ ec_superisys_485_modbus_rtu_84
 	// // --- flow_comp_130 --A0245_去毛刺机分控板---
     // eecc30
     // #(
-    //      .REG_SPACE_BIAS     ( 20'd57344)
+    //      .REG_SPACE_BIAS     ( 20'he000)
     //     ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     // )
     // eecc30_130
@@ -5193,7 +5193,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_134 --A0268_6#设备工装8电驱动---
     ec_s7_plc
     #(
-         .REG_SPACE_BIAS     ( 20'd102912)
+         .REG_SPACE_BIAS     ( 20'h19200)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_s7_plc_134
@@ -5224,7 +5224,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_135 --A0269_7#设备工装8电驱动---
     ec_s7_plc
     #(
-         .REG_SPACE_BIAS     ( 20'd103424)
+         .REG_SPACE_BIAS     ( 20'h19400)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_s7_plc_135
@@ -5255,7 +5255,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_136 --A0270_8#设备工装8电驱动---
     ec_s7_plc
     #(
-         .REG_SPACE_BIAS     ( 20'd103936)
+         .REG_SPACE_BIAS     ( 20'h19600)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_s7_plc_136
@@ -5286,7 +5286,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_137 --A0271_9#设备工装8电驱动---
     ec_s7_plc
     #(
-         .REG_SPACE_BIAS     ( 20'd104448)
+         .REG_SPACE_BIAS     ( 20'h19800)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_s7_plc_137
