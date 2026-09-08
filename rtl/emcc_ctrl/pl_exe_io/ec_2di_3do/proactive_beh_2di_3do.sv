@@ -359,39 +359,24 @@ module proactive_beh_2di_3do#(
     always@(posedge clk_i)begin
         if(rst_i || !a_en)
             a_alm_num <= 8'd0;
-		else if(curr_state == S_BHA_PRE_DET && timout)
-			a_alm_num <= 8'd100+a_bhv_id_r-1;
-		else if(curr_state == S_READY_10_ACK && ack_tx_result == IRQ_NO_OK)	
-			a_alm_num <= ack_ps_alart_num;    
-		else if(curr_state == S_READY_10_ACK && timout)	
-			a_alm_num <= 8'd100+a_bhv_id_r-1;
-		else if(curr_state == S_BHA_POST_DET && timout)
-			case(a_bhv_id_r)
-				1:	a_alm_num <= 8'd100+a_bhv_id_r-1;
-				2:	a_alm_num <= 8'd100+a_bhv_id_r-1;
-				3:	a_alm_num <= 8'd100+a_bhv_id_r-1;
-				4:	a_alm_num <= 8'd100+a_bhv_id_r-1;
-				5:	a_alm_num <= 8'd100+a_bhv_id_r-1;
-				6:	a_alm_num <= 8'd100+a_bhv_id_r-1;
-				7:	a_alm_num <= 8'd100+a_bhv_id_r-1;
-				8:	a_alm_num <= 8'd100+a_bhv_id_r-1;
-				9:	a_alm_num <= 8'd100+a_bhv_id_r-1;
-				10:	a_alm_num <= 8'd100+a_bhv_id_r-1;
-				11:	a_alm_num <= 8'd100+a_bhv_id_r-1;
-				12:	a_alm_num <= 8'd100+a_bhv_id_r-1;
-				13:	a_alm_num <= 8'd100+a_bhv_id_r-1;
-				14:	a_alm_num <= 8'd100+a_bhv_id_r-1;
-				15:	a_alm_num <= 8'd100+a_bhv_id_r-1;
-			endcase
+        else if(curr_state == S_BHA_PRE_DET && timout)						
+			a_alm_num <= 8'd100;
+        else if(curr_state == S_READY_10_ACK && ack_tx_result == IRQ_NO_OK)	
+            a_alm_num <= ack_ps_alart_num;    
+        else if(curr_state == S_READY_10_ACK && timout)						
+            a_alm_num <= 8'd101;      
+		else if(curr_state_1d == S_BHA_POST_DET && curr_state == S_ALERT_40)
+			a_alm_num <= 8'd102;  
 		else if(curr_state == S_SUCC_30_ACK && ack_tx_result == IRQ_NO_OK)	
 			a_alm_num <= ack_ps_alart_num;
 		else if(curr_state == S_SUCC_30_ACK && timout)						
-			a_alm_num <= 8'd130+a_bhv_id_r-1;
+            a_alm_num <= 8'd103;
 		else if(curr_state == S_IDLE)
 			a_alm_num <= 8'd0;
-		else
-			a_alm_num <= a_alm_num;
-		end
+        else
+            a_alm_num <= a_alm_num;
+    end
+
 
     //Timeout count
     always@(posedge clk_i)begin
