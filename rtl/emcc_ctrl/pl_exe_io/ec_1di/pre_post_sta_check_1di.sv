@@ -83,13 +83,12 @@ module pre_post_sta_check_1di#(
 		a_post_sta_allow <= {A_BHA_NUM{1'b0}};
 	else if(a_en)begin
 		a_post_sta_allow <= {A_BHA_NUM{1'b0}};
-		
-		if(a_bhv_id == 1 && di == 0)	//invalid
+		if(di == 0)	//invalid
 			a_post_sta_allow[0] <= 1'b1;
 		else
 			a_post_sta_allow[0] <= 1'b0;
 			
-		if(a_bhv_id == 2 && di == 1)	//valid
+		if(di == 1)	//valid
 			a_post_sta_allow[1] <= 1'b1;
 		else
 			a_post_sta_allow[1] <= 1'b0;
