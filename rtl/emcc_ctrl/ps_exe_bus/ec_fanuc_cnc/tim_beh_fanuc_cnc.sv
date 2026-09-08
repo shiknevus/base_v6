@@ -25,7 +25,7 @@ module tim_beh_fanuc_cnc(
 	,input                  	i_time_1ms_vld
 	,input                  	i_time_1s_vld
 
-	,output		[19:0]			task_time_cnt
+	,output	reg	[19:0]			task_time_cnt
 
 	,input						pre_sta_allow
 	,input						post_sta_allow
@@ -40,9 +40,7 @@ module tim_beh_fanuc_cnc(
 	,output reg [7:0]			c_alm_num
 	,output	reg	[31:0]			state_monitor_o
 
-	,input 		[19:0]			c_gap_crl0		//timer0 period (s), 0 = disabled
-	,input 		[19:0]			c_gap_crl1		//timer1 period (s), 0 = disabled
-	,input 		[19:0]			c_gap_crl2		//timer2 period (s), 0 = disabled
+	,input 		[19:0]			c_gap_crl
 
 	,output reg              	irq_o
 	,input                   	irq_ack_i
@@ -98,17 +96,6 @@ module tim_beh_fanuc_cnc(
 		end
     end
 
-	//timer counters (count i_time_1s_vld; hold at expiry, restart on irq30 ack)
-	reg [19:0]	timer_cnt0;
-	reg [19:0]	timer_cnt1;
-	reg [19:0]	timer_cnt2;
-
-	wire		expire0 = (c_gap_crl0 != 20'd0) && (timer_cnt0 >= c_gap_crl0 - 1'b1);
-	wire		expire1 = (c_gap_crl1 != 20'd0) && (timer_cnt1 >= c_gap_crl1 - 1'b1);
-	wire		expire2 = (c_gap_crl2 != 20'd0) && (timer_cnt2 >= c_gap_crl2 - 1'b1);
-
-	reg	[1:0]	src;	//expired timer index 0/1/2, latched at transaction start
-
 	always@(posedge clk_i)begin
 	if(rst_i)begin
 		ack_beh_id 	 	<=	8'd0;
@@ -133,13 +120,19 @@ module tim_beh_fanuc_cnc(
 		end
 	end
 
-	wire ack_match_any = c_tx_result_vld && (ack_beh_id == c_bhv_id);
-
 	always@(posedge clk_i)begin
 	if(rst_i)
 		curr_state_1d <= 8'd0;
 	else
 		curr_state_1d <= curr_state;
+	end
+
+	//Current behavior number
+	always @(posedge clk_i) begin
+		if(rst_i)
+			c_bhv_id <= 8'd150;
+		else
+			c_bhv_id <= 8'd150;
 	end
 
 	reg match_10;
@@ -180,7 +173,7 @@ module tim_beh_fanuc_cnc(
 	always @(*) begin
         case (curr_state)
             S_IDLE: begin
-                if (c_en && (expire0 || expire1 || expire2))
+                if (c_en && c_gap_crl != 20'd0)
                     next_state = S_BHA_PRE_DET;
                 else
                     next_state = S_IDLE;
@@ -197,7 +190,10 @@ module tim_beh_fanuc_cnc(
             end
 
 			S_EXE:begin
-				next_state = S_READY_10;
+				if(task_time_cnt >= c_gap_crl - 1)		//Timer finished
+					next_state = S_READY_10;
+				else
+					next_state = S_EXE;
 			end
 
 			S_READY_10: begin        //Send 10 interrupt
@@ -258,53 +254,6 @@ module tim_beh_fanuc_cnc(
         endcase
     end
 
-	//expired source latch (priority timer0 > timer1 > timer2)
-	always@(posedge clk_i) begin
-		if(rst_i || !c_en)
-			src <= 2'd0;
-		else if(curr_state == S_IDLE) begin
-			if(expire0)      src <= 2'd0;
-			else if(expire1) src <= 2'd1;
-			else if(expire2) src <= 2'd2;
-		end
-	end
-
-	//current timer behavior number
-	always@(posedge clk_i) begin
-		if(rst_i || !c_en)
-			c_bhv_id <= 8'd0;
-		else if(curr_state != S_IDLE)
-			c_bhv_id <= 8'd150 + src;
-		else
-			c_bhv_id <= 8'd0;
-	end
-
-	//timer counters: count while enabled, hold when expired, restart on irq30 ack
-	always@(posedge clk_i) begin
-		if(rst_i || !c_en) begin
-			timer_cnt0 <= 20'd0;
-			timer_cnt1 <= 20'd0;
-			timer_cnt2 <= 20'd0;
-		end else begin
-			//restart the acknowledged source (30 ack, any result)
-			if(ack_match_any && src == 2'd0)
-				timer_cnt0 <= 20'd0;
-			else if(!expire0 && (curr_state == S_IDLE))
-				timer_cnt0 <= timer_cnt0 + i_time_1s_vld;
-
-			if(ack_match_any && src == 2'd1)
-				timer_cnt1 <= 20'd0;
-			else if(!expire1 && (curr_state == S_IDLE))
-				timer_cnt1 <= timer_cnt1 + i_time_1s_vld;
-
-			if(ack_match_any && src == 2'd2)
-				timer_cnt2 <= 20'd0;
-			else if(!expire2 && (curr_state == S_IDLE))
-				timer_cnt2 <= timer_cnt2 + i_time_1s_vld;
-		end
-	end
-
-	assign task_time_cnt = timer_cnt0;
 
 	//Channel C busy signal
 	assign ec_chc_st = (curr_state != S_IDLE)?1'b1:1'b0;
@@ -391,6 +340,86 @@ module tim_beh_fanuc_cnc(
         else
             timout <= 1'b0;
     end
+
+	//===============================================================================================================
+	//------------------------------------------------ user logic start ---------------------------------------------
+	//===============================================================================================================
+
+localparam TASK_IDLE     = 3'd0;
+localparam TASK_COUNT    = 3'd1;
+localparam TASK_IRQ_WAIT = 3'd2;
+localparam TASK_BACK     = 3'd3;
+
+reg [2:0] curr_state1;
+reg [2:0] next_state1;
+
+always @(posedge clk_i) begin
+    if (rst_i)
+        curr_state1 <= TASK_IDLE;
+    else
+        curr_state1 <= next_state1;
+end
+
+always @(*) begin
+    next_state1 = TASK_IDLE;
+    case (curr_state1)
+
+        TASK_IDLE: begin
+            if (!c_en || c_gap_crl == 20'd0)
+                next_state1 = TASK_IDLE;
+            else
+                next_state1 = TASK_COUNT;
+        end
+
+        TASK_COUNT: begin
+            if (task_time_cnt >= c_gap_crl - 1)
+                next_state1 = TASK_IRQ_WAIT;
+            else
+                next_state1 = TASK_COUNT;
+        end
+
+        TASK_IRQ_WAIT: begin
+            if (irq_ack_i)		//After the interrupt is responded to, start counting again.
+                next_state1 = TASK_BACK;
+            else
+                next_state1 = TASK_IRQ_WAIT;
+        end
+
+        TASK_BACK: begin
+            next_state1 = TASK_IDLE;
+        end
+
+        default: next_state1 = TASK_IDLE;
+
+    endcase
+end
+
+always @(posedge clk_i) begin
+    if (rst_i) begin
+        task_time_cnt <= 'd0;
+    end else begin
+        case (curr_state1)
+            TASK_IDLE:
+                task_time_cnt <= 'd0;
+
+            TASK_COUNT: begin
+                if (task_time_cnt >= c_gap_crl - 1)
+                    task_time_cnt <= 'd0;
+                else
+                    task_time_cnt <= task_time_cnt + i_time_1s_vld;
+            end
+
+            TASK_IRQ_WAIT:
+                task_time_cnt <= 'd0;
+
+            TASK_BACK:
+                task_time_cnt <= 'd0;
+
+            default:
+                task_time_cnt <= 'd0;
+        endcase
+    end
+end
 
 
 endmodule
