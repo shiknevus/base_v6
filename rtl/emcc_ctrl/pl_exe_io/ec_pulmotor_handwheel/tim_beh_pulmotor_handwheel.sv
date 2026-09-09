@@ -214,13 +214,20 @@ module tim_beh_pulmotor_handwheel#(
 			
 			S_BHA_PRE_DET: begin	//curr_state = 1
 				if(pre_sta_allow[0]) begin	//行为id 150
-					next_state = S_READY_10;
+					next_state = S_EXE;
 				end else if(timout) begin
 					next_state = S_ALERT_40;			
 				end else begin
 					next_state = S_BHA_PRE_DET;
 				end
             end
+			
+			S_EXE:begin	//5
+				if(task_time_cnt >= loop_time_ms - 1)		//Timer finished
+					next_state = S_READY_10;
+				else
+					next_state = S_EXE;
+			end
 			
 			S_READY_10: begin        //2
 				next_state = S_READY_10_ACK;
@@ -236,26 +243,9 @@ module tim_beh_pulmotor_handwheel#(
 			end
 			
 			S_EXE_20: begin	//4
-				next_state = S_EXE;
+				next_state = S_BHA_POST_DET;
             end
-			
-			S_EXE:begin	//5
-				if(task_time_cnt >= loop_time_ms - 1)		//Timer finished
-					next_state = S_BHA_POST_DET;
-				else
-					next_state = S_EXE;
-			end
-			
-			//S_EXE_20_ACK: begin
-			//	if(match_20) 	//Transaction 20 Acknowledged OK
-            //        next_state = S_EXE;
-            //    else if(ack_tx_result == IRQ_NO_OK || timout)
-            //        next_state = S_ALERT_40;
-            //    else
-            //        next_state = S_EXE_20_ACK;
-			//end
 
-			
 			S_BHA_POST_DET: begin	//curr_state = 6
 				if(post_sta_allow[0]) begin
 					next_state = S_SUCC_30;
