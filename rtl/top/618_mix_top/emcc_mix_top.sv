@@ -1893,7 +1893,7 @@ ec_superisys_485_modbus_rtu_28
 	  .o_intr_irq            ( map_irq[124]       )
 
        ,.i_axis_limf        ( ~di_regoin_msg[0][33]           )   // 正限位到位开关
-       ,.pul_motor_r_flag        ( pul_motor1_r_flag           )   // 
+       ,.pul_motor_r_flag        ( pul_motor0_r_flag           )   // 
        ,.cur_slv_board_id        ( 5'd0           )   // 
        ,.slv_board_id        ( slv_board_id           )   // 
        ,.pul_motor_flag        ( pul_motor0_flag           )   // 
@@ -1935,7 +1935,7 @@ ec_superisys_485_modbus_rtu_28
 	  .o_intr_irq            ( map_irq[125]       )
 
        ,.i_axis_limf        ( ~di_regoin_msg[0][36]           )   // 正限位到位开关
-       ,.pul_motor_r_flag        ( pul_motor1_r_flag           )   // 
+       ,.pul_motor_r_flag        ( pul_motor2_r_flag           )   // 
        ,.cur_slv_board_id        ( 5'd0           )   // 
        ,.slv_board_id        ( slv_board_id           )   // 
        ,.pul_motor_flag        ( pul_motor2_flag           )   // 
@@ -1977,7 +1977,7 @@ ec_superisys_485_modbus_rtu_28
 	  .o_intr_irq            ( map_irq[126]       )
 
        ,.i_axis_limf        ( ~di_regoin_msg[0][39]           )   // 正限位到位开关
-       ,.pul_motor_r_flag        ( pul_motor1_r_flag           )   // 
+       ,.pul_motor_r_flag        ( pul_motor3_r_flag           )   // 
        ,.cur_slv_board_id        ( 5'd0           )   // 
        ,.slv_board_id        ( slv_board_id           )   // 
        ,.pul_motor_flag        ( pul_motor3_flag           )   // 
@@ -2378,7 +2378,7 @@ ec_superisys_485_modbus_rtu_28
 	  .o_intr_irq            ( map_irq[138]       )
 
        ,.i_axis_limf        ( ~di_regoin_msg[0][53]           )   // 正限位到位开关
-       ,.pul_motor_r_flag        ( pul_motor1_r_flag           )   // 
+       ,.pul_motor_r_flag        ( pul_motor0_r_flag           )   // 
        ,.cur_slv_board_id        ( 5'd1           )   // 
        ,.slv_board_id        ( slv_board_id           )   // 
        ,.pul_motor_flag        ( pul_motor0_flag           )   // 
@@ -2462,7 +2462,7 @@ ec_superisys_485_modbus_rtu_28
 	  .o_intr_irq            ( map_irq[140]       )
 
        ,.i_axis_limf        ( ~di_regoin_msg[0][47]           )   // 正限位到位开关
-       ,.pul_motor_r_flag        ( pul_motor1_r_flag           )   // 
+       ,.pul_motor_r_flag        ( pul_motor2_r_flag           )   // 
        ,.cur_slv_board_id        ( 5'd1           )   // 
        ,.slv_board_id        ( slv_board_id           )   // 
        ,.pul_motor_flag        ( pul_motor2_flag           )   // 
@@ -2503,7 +2503,7 @@ ec_superisys_485_modbus_rtu_28
 	  .o_intr_irq            ( map_irq[141]       )
 
        ,.i_axis_limf        ( ~di_regoin_msg[0][50]           )   // 正限位到位开关
-       ,.pul_motor_r_flag        ( pul_motor1_r_flag           )   // 
+       ,.pul_motor_r_flag        ( pul_motor3_r_flag           )   // 
        ,.cur_slv_board_id        ( 5'd1           )   // 
        ,.slv_board_id        ( slv_board_id           )   // 
        ,.pul_motor_flag        ( pul_motor3_flag           )   // 
@@ -3233,7 +3233,7 @@ ec_superisys_485_modbus_rtu_28
       .o_st_rd_data          ( sub_comp_rd_dat[148]    ),
 	  .o_intr_irq            ( map_irq[148]       )
 
-       ,.pul_motor_r_flag        ( pul_motor1_r_flag           )   // 
+       ,.pul_motor_r_flag        ( pul_motor2_r_flag           )   // 
        ,.cur_slv_board_id        ( 5'd2           )   // 
        ,.slv_board_id        ( slv_board_id           )   // 
        ,.pul_motor_flag        ( pul_motor2_flag           )   // 
