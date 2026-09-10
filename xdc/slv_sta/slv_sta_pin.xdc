@@ -218,8 +218,13 @@ set_property IOSTANDARD LVCMOS33 [get_ports {datain[*]}]
 set_property BITSTREAM.CONFIG.SPI_BUSWIDTH 4 [current_design]
 ###############################################################################
 set_property PACKAGE_PIN J1 [get_ports {i_dv_alarm[0]}]
-#set_property PACKAGE_PIN K4 [get_ports {o_dv_pulse[0]}]
-set_property PACKAGE_PIN L4 [get_ports {o_dv_pulse[0]}]
+
+#slv v1.0
+set_property PACKAGE_PIN K4 [get_ports {o_dv_pulse[0]}]
+
+# #slv v1.1
+# set_property PACKAGE_PIN L4 [get_ports {o_dv_pulse[0]}]
+
 set_property PACKAGE_PIN K6 [get_ports {o_dv_dir[0]}]
 set_property PACKAGE_PIN H3 [get_ports {o_dv_reset[0]}]
 set_property PACKAGE_PIN J2 [get_ports {o_dv_son[0]}]
