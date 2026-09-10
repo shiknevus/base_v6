@@ -2471,6 +2471,7 @@ ec_superisys_485_modbus_rtu_28
        ,.i_axis_limb        ( ~di_regoin_msg[0][49]           )   // 负限位到位开关
        ,.i_axis_zero        ( ~di_regoin_msg[0][48]           )   // 零位到位开关
        ,.i_servo_done        ( ~di_regoin_msg[0][24]           )   // 伺服定位完成
+       ,.i_servo_ready        ( ~di_regoin_msg[0][25]           )   // 伺服就绪
     );
 
 	
@@ -2577,7 +2578,7 @@ ec_superisys_485_modbus_rtu_28
       .o_st_rd_data          ( sub_comp_rd_dat[137]    ),
 	  .o_intr_irq            ( map_irq[137]       )
 
-       ,.i_pos        ( ~di_regoin_msg[0][25]           )   // 位置到位开关
+       ,.i_pos        ( 1'b0           )   // 位置到位开关
        ,.o_dri1        ( o_dri1_53           )   // 夹紧驱动信号
        ,.o_dri2        ( o_dri2_53           )   // 放松驱动信号
     );
