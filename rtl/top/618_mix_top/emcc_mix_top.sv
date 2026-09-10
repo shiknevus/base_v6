@@ -102,11 +102,11 @@ module emcc_mix_top
     wire                        sub_comp_rd_vld[COMP_BIAS_NUM+COMP_NUM-1:COMP_BIAS_NUM];
     wire    [PS_REG_DWIDTH-1:0] sub_comp_rd_dat[COMP_BIAS_NUM+COMP_NUM-1:COMP_BIAS_NUM];
     
-//    emcc_token_if #(.DATA_WIDTH(TOKEN_DWIDTH))  roller_s00_token_if[BIAS_NUM+COMP_NUM-1:BIAS_NUM]();
-//    emcc_token_if #(.DATA_WIDTH(TOKEN_DWIDTH))  roller_s01_token_if[BIAS_NUM+COMP_NUM-1:BIAS_NUM]();
-//    emcc_token_if #(.DATA_WIDTH(TOKEN_DWIDTH))  roller_s02_token_if[BIAS_NUM+COMP_NUM-1:BIAS_NUM]();
+    emcc_token_if #(.DATA_WIDTH(TOKEN_DWIDTH))  roller_s00_token_if[BIAS_NUM+COMP_NUM-1:BIAS_NUM]();
+    emcc_token_if #(.DATA_WIDTH(TOKEN_DWIDTH))  roller_s01_token_if[BIAS_NUM+COMP_NUM-1:BIAS_NUM]();
+    emcc_token_if #(.DATA_WIDTH(TOKEN_DWIDTH))  roller_s02_token_if[BIAS_NUM+COMP_NUM-1:BIAS_NUM]();
 	
-	// emcc_flow_if flow_cfg_if[BIAS_NUM+COMP_NUM-1:BIAS_NUM]();
+	emcc_flow_if flow_cfg_if[BIAS_NUM+COMP_NUM-1:BIAS_NUM]();
 	
 	wire time_1ms_vld   = i_time_1ms_vld  ;
     wire time_10ms_vld  = i_time_10ms_vld ;
@@ -186,285 +186,6 @@ module emcc_mix_top
    
     assign ov_dbg_enable = 0;
 	assign do_relay_mst_msg = do_mst_msg;
-    //---- do_mst_msg: tie unused bits to 1'b1 ----
-    assign do_mst_msg[0] = 1'b1;
-    assign do_mst_msg[2] = 1'b1;
-    assign do_mst_msg[5] = 1'b1;
-    assign do_mst_msg[15] = 1'b1;
-    assign do_mst_msg[16] = 1'b1;
-    assign do_mst_msg[17] = 1'b1;
-    assign do_mst_msg[18] = 1'b1;
-    assign do_mst_msg[19] = 1'b1;
-    assign do_mst_msg[20] = 1'b1;
-    assign do_mst_msg[21] = 1'b1;
-    assign do_mst_msg[22] = 1'b1;
-    assign do_mst_msg[23] = 1'b1;
-    assign do_mst_msg[24] = 1'b1;
-    assign do_mst_msg[25] = 1'b1;
-    assign do_mst_msg[26] = 1'b1;
-    assign do_mst_msg[27] = 1'b1;
-    assign do_mst_msg[28] = 1'b1;
-    assign do_mst_msg[29] = 1'b1;
-    assign do_mst_msg[30] = 1'b1;
-    assign do_mst_msg[31] = 1'b1;
-    //---- do_regoin_r_msg: tie unused bits/elements to 1'b1 ----
-    assign do_regoin_r_msg[0][4] = 1'b1;
-    assign do_regoin_r_msg[0][5] = 1'b1;
-    assign do_regoin_r_msg[0][6] = 1'b1;
-    assign do_regoin_r_msg[0][7] = 1'b1;
-    assign do_regoin_r_msg[0][28] = 1'b1;
-    assign do_regoin_r_msg[0][29] = 1'b1;
-    assign do_regoin_r_msg[0][30] = 1'b1;
-    assign do_regoin_r_msg[0][31] = 1'b1;
-    assign do_regoin_r_msg[0][32] = 1'b1;
-    assign do_regoin_r_msg[0][33] = 1'b1;
-    assign do_regoin_r_msg[0][34] = 1'b1;
-    assign do_regoin_r_msg[0][35] = 1'b1;
-    assign do_regoin_r_msg[0][36] = 1'b1;
-    assign do_regoin_r_msg[0][37] = 1'b1;
-    assign do_regoin_r_msg[0][38] = 1'b1;
-    assign do_regoin_r_msg[0][39] = 1'b1;
-    assign do_regoin_r_msg[0][40] = 1'b1;
-    assign do_regoin_r_msg[0][41] = 1'b1;
-    assign do_regoin_r_msg[0][42] = 1'b1;
-    assign do_regoin_r_msg[0][43] = 1'b1;
-    assign do_regoin_r_msg[0][44] = 1'b1;
-    assign do_regoin_r_msg[0][45] = 1'b1;
-    assign do_regoin_r_msg[0][46] = 1'b1;
-    assign do_regoin_r_msg[0][47] = 1'b1;
-    assign do_regoin_r_msg[0][48] = 1'b1;
-    assign do_regoin_r_msg[0][49] = 1'b1;
-    assign do_regoin_r_msg[0][50] = 1'b1;
-    assign do_regoin_r_msg[0][51] = 1'b1;
-    assign do_regoin_r_msg[0][52] = 1'b1;
-    assign do_regoin_r_msg[0][53] = 1'b1;
-    assign do_regoin_r_msg[0][54] = 1'b1;
-    assign do_regoin_r_msg[0][55] = 1'b1;
-    assign do_regoin_r_msg[0][56] = 1'b1;
-    assign do_regoin_r_msg[0][57] = 1'b1;
-    assign do_regoin_r_msg[0][58] = 1'b1;
-    assign do_regoin_r_msg[0][59] = 1'b1;
-    assign do_regoin_r_msg[0][60] = 1'b1;
-    assign do_regoin_r_msg[0][61] = 1'b1;
-    assign do_regoin_r_msg[0][62] = 1'b1;
-    assign do_regoin_r_msg[0][63] = 1'b1;
-    assign do_regoin_r_msg[1][6] = 1'b1;
-    assign do_regoin_r_msg[1][7] = 1'b1;
-    assign do_regoin_r_msg[1][8] = 1'b1;
-    assign do_regoin_r_msg[1][9] = 1'b1;
-    assign do_regoin_r_msg[1][10] = 1'b1;
-    assign do_regoin_r_msg[1][11] = 1'b1;
-    assign do_regoin_r_msg[1][12] = 1'b1;
-    assign do_regoin_r_msg[1][13] = 1'b1;
-    assign do_regoin_r_msg[1][14] = 1'b1;
-    assign do_regoin_r_msg[1][15] = 1'b1;
-    assign do_regoin_r_msg[1][16] = 1'b1;
-    assign do_regoin_r_msg[1][17] = 1'b1;
-    assign do_regoin_r_msg[1][18] = 1'b1;
-    assign do_regoin_r_msg[1][19] = 1'b1;
-    assign do_regoin_r_msg[1][20] = 1'b1;
-    assign do_regoin_r_msg[1][21] = 1'b1;
-    assign do_regoin_r_msg[1][22] = 1'b1;
-    assign do_regoin_r_msg[1][23] = 1'b1;
-    assign do_regoin_r_msg[1][24] = 1'b1;
-    assign do_regoin_r_msg[1][25] = 1'b1;
-    assign do_regoin_r_msg[1][26] = 1'b1;
-    assign do_regoin_r_msg[1][27] = 1'b1;
-    assign do_regoin_r_msg[1][33] = 1'b1;
-    assign do_regoin_r_msg[1][34] = 1'b1;
-    assign do_regoin_r_msg[1][35] = 1'b1;
-    assign do_regoin_r_msg[1][36] = 1'b1;
-    assign do_regoin_r_msg[1][37] = 1'b1;
-    assign do_regoin_r_msg[1][38] = 1'b1;
-    assign do_regoin_r_msg[1][39] = 1'b1;
-    assign do_regoin_r_msg[1][40] = 1'b1;
-    assign do_regoin_r_msg[1][41] = 1'b1;
-    assign do_regoin_r_msg[1][42] = 1'b1;
-    assign do_regoin_r_msg[1][43] = 1'b1;
-    assign do_regoin_r_msg[1][44] = 1'b1;
-    assign do_regoin_r_msg[1][45] = 1'b1;
-    assign do_regoin_r_msg[1][46] = 1'b1;
-    assign do_regoin_r_msg[1][47] = 1'b1;
-    assign do_regoin_r_msg[1][48] = 1'b1;
-    assign do_regoin_r_msg[1][49] = 1'b1;
-    assign do_regoin_r_msg[1][50] = 1'b1;
-    assign do_regoin_r_msg[1][51] = 1'b1;
-    assign do_regoin_r_msg[1][52] = 1'b1;
-    assign do_regoin_r_msg[1][53] = 1'b1;
-    assign do_regoin_r_msg[1][54] = 1'b1;
-    assign do_regoin_r_msg[1][55] = 1'b1;
-    assign do_regoin_r_msg[1][56] = 1'b1;
-    assign do_regoin_r_msg[1][57] = 1'b1;
-    assign do_regoin_r_msg[1][58] = 1'b1;
-    assign do_regoin_r_msg[1][59] = 1'b1;
-    assign do_regoin_r_msg[1][60] = 1'b1;
-    assign do_regoin_r_msg[1][61] = 1'b1;
-    assign do_regoin_r_msg[1][62] = 1'b1;
-    assign do_regoin_r_msg[1][63] = 1'b1;
-    assign do_regoin_r_msg[2][4] = 1'b1;
-    assign do_regoin_r_msg[2][5] = 1'b1;
-    assign do_regoin_r_msg[2][6] = 1'b1;
-    assign do_regoin_r_msg[2][14] = 1'b1;
-    assign do_regoin_r_msg[2][15] = 1'b1;
-    assign do_regoin_r_msg[2][24] = 1'b1;
-    assign do_regoin_r_msg[2][25] = 1'b1;
-    assign do_regoin_r_msg[2][26] = 1'b1;
-    assign do_regoin_r_msg[2][27] = 1'b1;
-    assign do_regoin_r_msg[2][28] = 1'b1;
-    assign do_regoin_r_msg[2][30] = 1'b1;
-    assign do_regoin_r_msg[2][32] = 1'b1;
-    assign do_regoin_r_msg[2][33] = 1'b1;
-    assign do_regoin_r_msg[2][34] = 1'b1;
-    assign do_regoin_r_msg[2][35] = 1'b1;
-    assign do_regoin_r_msg[2][36] = 1'b1;
-    assign do_regoin_r_msg[2][37] = 1'b1;
-    assign do_regoin_r_msg[2][38] = 1'b1;
-    assign do_regoin_r_msg[2][39] = 1'b1;
-    assign do_regoin_r_msg[2][40] = 1'b1;
-    assign do_regoin_r_msg[2][41] = 1'b1;
-    assign do_regoin_r_msg[2][42] = 1'b1;
-    assign do_regoin_r_msg[2][43] = 1'b1;
-    assign do_regoin_r_msg[2][44] = 1'b1;
-    assign do_regoin_r_msg[2][45] = 1'b1;
-    assign do_regoin_r_msg[2][46] = 1'b1;
-    assign do_regoin_r_msg[2][47] = 1'b1;
-    assign do_regoin_r_msg[2][48] = 1'b1;
-    assign do_regoin_r_msg[2][49] = 1'b1;
-    assign do_regoin_r_msg[2][50] = 1'b1;
-    assign do_regoin_r_msg[2][51] = 1'b1;
-    assign do_regoin_r_msg[2][52] = 1'b1;
-    assign do_regoin_r_msg[2][53] = 1'b1;
-    assign do_regoin_r_msg[2][54] = 1'b1;
-    assign do_regoin_r_msg[2][55] = 1'b1;
-    assign do_regoin_r_msg[2][56] = 1'b1;
-    assign do_regoin_r_msg[2][57] = 1'b1;
-    assign do_regoin_r_msg[2][58] = 1'b1;
-    assign do_regoin_r_msg[2][59] = 1'b1;
-    assign do_regoin_r_msg[2][60] = 1'b1;
-    assign do_regoin_r_msg[2][61] = 1'b1;
-    assign do_regoin_r_msg[2][62] = 1'b1;
-    assign do_regoin_r_msg[2][63] = 1'b1;
-    assign do_regoin_r_msg[3][7] = 1'b1;
-    assign do_regoin_r_msg[3][8] = 1'b1;
-    assign do_regoin_r_msg[3][9] = 1'b1;
-    assign do_regoin_r_msg[3][10] = 1'b1;
-    assign do_regoin_r_msg[3][11] = 1'b1;
-    assign do_regoin_r_msg[3][12] = 1'b1;
-    assign do_regoin_r_msg[3][13] = 1'b1;
-    assign do_regoin_r_msg[3][14] = 1'b1;
-    assign do_regoin_r_msg[3][15] = 1'b1;
-    assign do_regoin_r_msg[3][16] = 1'b1;
-    assign do_regoin_r_msg[3][17] = 1'b1;
-    assign do_regoin_r_msg[3][18] = 1'b1;
-    assign do_regoin_r_msg[3][19] = 1'b1;
-    assign do_regoin_r_msg[3][20] = 1'b1;
-    assign do_regoin_r_msg[3][21] = 1'b1;
-    assign do_regoin_r_msg[3][22] = 1'b1;
-    assign do_regoin_r_msg[3][23] = 1'b1;
-    assign do_regoin_r_msg[3][28] = 1'b1;
-    assign do_regoin_r_msg[3][29] = 1'b1;
-    assign do_regoin_r_msg[3][30] = 1'b1;
-    assign do_regoin_r_msg[3][31] = 1'b1;
-    assign do_regoin_r_msg[3][32] = 1'b1;
-    assign do_regoin_r_msg[3][33] = 1'b1;
-    assign do_regoin_r_msg[3][34] = 1'b1;
-    assign do_regoin_r_msg[3][35] = 1'b1;
-    assign do_regoin_r_msg[3][36] = 1'b1;
-    assign do_regoin_r_msg[3][37] = 1'b1;
-    assign do_regoin_r_msg[3][38] = 1'b1;
-    assign do_regoin_r_msg[3][39] = 1'b1;
-    assign do_regoin_r_msg[3][40] = 1'b1;
-    assign do_regoin_r_msg[3][41] = 1'b1;
-    assign do_regoin_r_msg[3][42] = 1'b1;
-    assign do_regoin_r_msg[3][43] = 1'b1;
-    assign do_regoin_r_msg[3][44] = 1'b1;
-    assign do_regoin_r_msg[3][45] = 1'b1;
-    assign do_regoin_r_msg[3][46] = 1'b1;
-    assign do_regoin_r_msg[3][47] = 1'b1;
-    assign do_regoin_r_msg[3][48] = 1'b1;
-    assign do_regoin_r_msg[3][49] = 1'b1;
-    assign do_regoin_r_msg[3][50] = 1'b1;
-    assign do_regoin_r_msg[3][51] = 1'b1;
-    assign do_regoin_r_msg[3][52] = 1'b1;
-    assign do_regoin_r_msg[3][53] = 1'b1;
-    assign do_regoin_r_msg[3][54] = 1'b1;
-    assign do_regoin_r_msg[3][55] = 1'b1;
-    assign do_regoin_r_msg[3][56] = 1'b1;
-    assign do_regoin_r_msg[3][57] = 1'b1;
-    assign do_regoin_r_msg[3][58] = 1'b1;
-    assign do_regoin_r_msg[3][59] = 1'b1;
-    assign do_regoin_r_msg[3][60] = 1'b1;
-    assign do_regoin_r_msg[3][61] = 1'b1;
-    assign do_regoin_r_msg[3][62] = 1'b1;
-    assign do_regoin_r_msg[3][63] = 1'b1;
-    assign do_regoin_r_msg[4][0] = 1'b1;
-    assign do_regoin_r_msg[4][4] = 1'b1;
-    assign do_regoin_r_msg[4][5] = 1'b1;
-    assign do_regoin_r_msg[4][6] = 1'b1;
-    assign do_regoin_r_msg[4][19] = 1'b1;
-    assign do_regoin_r_msg[4][20] = 1'b1;
-    assign do_regoin_r_msg[4][21] = 1'b1;
-    assign do_regoin_r_msg[4][22] = 1'b1;
-    assign do_regoin_r_msg[4][23] = 1'b1;
-    assign do_regoin_r_msg[4][24] = 1'b1;
-    assign do_regoin_r_msg[4][25] = 1'b1;
-    assign do_regoin_r_msg[4][26] = 1'b1;
-    assign do_regoin_r_msg[4][27] = 1'b1;
-    assign do_regoin_r_msg[4][28] = 1'b1;
-    assign do_regoin_r_msg[4][29] = 1'b1;
-    assign do_regoin_r_msg[4][30] = 1'b1;
-    assign do_regoin_r_msg[4][31] = 1'b1;
-    assign do_regoin_r_msg[4][40] = 1'b1;
-    assign do_regoin_r_msg[4][41] = 1'b1;
-    assign do_regoin_r_msg[4][42] = 1'b1;
-    assign do_regoin_r_msg[4][43] = 1'b1;
-    assign do_regoin_r_msg[4][44] = 1'b1;
-    assign do_regoin_r_msg[4][45] = 1'b1;
-    assign do_regoin_r_msg[4][46] = 1'b1;
-    assign do_regoin_r_msg[4][47] = 1'b1;
-    assign do_regoin_r_msg[4][48] = 1'b1;
-    assign do_regoin_r_msg[4][49] = 1'b1;
-    assign do_regoin_r_msg[4][50] = 1'b1;
-    assign do_regoin_r_msg[4][51] = 1'b1;
-    assign do_regoin_r_msg[4][52] = 1'b1;
-    assign do_regoin_r_msg[4][53] = 1'b1;
-    assign do_regoin_r_msg[4][54] = 1'b1;
-    assign do_regoin_r_msg[4][55] = 1'b1;
-    assign do_regoin_r_msg[4][56] = 1'b1;
-    assign do_regoin_r_msg[4][57] = 1'b1;
-    assign do_regoin_r_msg[4][58] = 1'b1;
-    assign do_regoin_r_msg[4][59] = 1'b1;
-    assign do_regoin_r_msg[4][60] = 1'b1;
-    assign do_regoin_r_msg[4][61] = 1'b1;
-    assign do_regoin_r_msg[4][62] = 1'b1;
-    assign do_regoin_r_msg[4][63] = 1'b1;
-    assign do_regoin_r_msg[5] = {64{1'b1}};
-    assign do_regoin_r_msg[6] = {64{1'b1}};
-    assign do_regoin_r_msg[7] = {64{1'b1}};
-    assign do_regoin_r_msg[8] = {64{1'b1}};
-    assign do_regoin_r_msg[9] = {64{1'b1}};
-    assign do_regoin_r_msg[10] = {64{1'b1}};
-    assign do_regoin_r_msg[11] = {64{1'b1}};
-    assign do_regoin_r_msg[12] = {64{1'b1}};
-    assign do_regoin_r_msg[13] = {64{1'b1}};
-    assign do_regoin_r_msg[14] = {64{1'b1}};
-    assign do_regoin_r_msg[15] = {64{1'b1}};
-    assign do_regoin_r_msg[16] = {64{1'b1}};
-    assign do_regoin_r_msg[17] = {64{1'b1}};
-    assign do_regoin_r_msg[18] = {64{1'b1}};
-    assign do_regoin_r_msg[19] = {64{1'b1}};
-    assign do_regoin_r_msg[20] = {64{1'b1}};
-    assign do_regoin_r_msg[21] = {64{1'b1}};
-    assign do_regoin_r_msg[22] = {64{1'b1}};
-    assign do_regoin_r_msg[23] = {64{1'b1}};
-    assign do_regoin_r_msg[24] = {64{1'b1}};
-    assign do_regoin_r_msg[25] = {64{1'b1}};
-    assign do_regoin_r_msg[26] = {64{1'b1}};
-    assign do_regoin_r_msg[27] = {64{1'b1}};
-    assign do_regoin_r_msg[28] = {64{1'b1}};
-    assign do_regoin_r_msg[29] = {64{1'b1}};
-    assign do_regoin_r_msg[30] = {64{1'b1}};
-    assign do_regoin_r_msg[31] = {64{1'b1}};
 	pkg_route
     #(
          .RAM_DEPTH             (RAM_DEPTH          )
@@ -614,7 +335,177 @@ module emcc_mix_top
     assign  slv_board_id = slv_sta_msg_addr[RAM_AWIDTH-1:9];
 	
 	
-		
+	    assign do_mst_msg[0:0] = 1'b1 ;
+    assign do_mst_msg[2:2] = 1'b1 ;
+    assign do_mst_msg[5:5] = 1'b1 ;
+    assign do_mst_msg[15:15] = 1'b1 ;
+    assign do_mst_msg[16:16] = 1'b1 ;
+    assign do_mst_msg[17:17] = 1'b1 ;
+    assign do_mst_msg[18:18] = 1'b1 ;
+    assign do_mst_msg[19:19] = 1'b1 ;
+    assign do_mst_msg[20:20] = 1'b1 ;
+    assign do_mst_msg[21:21] = 1'b1 ;
+    assign do_mst_msg[22:22] = 1'b1 ;
+    assign do_mst_msg[23:23] = 1'b1 ;
+    assign do_mst_msg[24:24] = 1'b1 ;
+    assign do_mst_msg[25:25] = 1'b1 ;
+    assign do_mst_msg[26:26] = 1'b1 ;
+    assign do_mst_msg[27:27] = 1'b1 ;
+    assign do_mst_msg[28:28] = 1'b1 ;
+    assign do_mst_msg[29:29] = 1'b1 ;
+    assign do_mst_msg[30:30] = 1'b1 ;
+    assign do_mst_msg[31:31] = 1'b1 ;
+    assign do_regoin_r_msg[3][7:7] = 1'b1 ;
+    assign do_regoin_r_msg[3][8:8] = 1'b1 ;
+    assign do_regoin_r_msg[3][9:9] = 1'b1 ;
+    assign do_regoin_r_msg[3][10:10] = 1'b1 ;
+    assign do_regoin_r_msg[3][11:11] = 1'b1 ;
+    assign do_regoin_r_msg[3][12:12] = 1'b1 ;
+    assign do_regoin_r_msg[3][13:13] = 1'b1 ;
+    assign do_regoin_r_msg[3][14:14] = 1'b1 ;
+    assign do_regoin_r_msg[3][15:15] = 1'b1 ;
+    assign do_regoin_r_msg[3][16:16] = 1'b1 ;
+    assign do_regoin_r_msg[3][17:17] = 1'b1 ;
+    assign do_regoin_r_msg[3][18:18] = 1'b1 ;
+    assign do_regoin_r_msg[3][19:19] = 1'b1 ;
+    assign do_regoin_r_msg[3][20:20] = 1'b1 ;
+    assign do_regoin_r_msg[3][21:21] = 1'b1 ;
+    assign do_regoin_r_msg[3][22:22] = 1'b1 ;
+    assign do_regoin_r_msg[3][23:23] = 1'b1 ;
+    assign do_regoin_r_msg[3][28:28] = 1'b1 ;
+    assign do_regoin_r_msg[3][29:29] = 1'b1 ;
+    assign do_regoin_r_msg[3][30:30] = 1'b1 ;
+    assign do_regoin_r_msg[3][31:31] = 1'b1 ;
+    assign do_regoin_r_msg[3][32:32] = 1'b1 ;
+    assign do_regoin_r_msg[3][33:33] = 1'b1 ;
+    assign do_regoin_r_msg[3][34:34] = 1'b1 ;
+    assign do_regoin_r_msg[3][35:35] = 1'b1 ;
+    assign do_regoin_r_msg[3][36:36] = 1'b1 ;
+    assign do_regoin_r_msg[3][37:37] = 1'b1 ;
+    assign do_regoin_r_msg[3][38:38] = 1'b1 ;
+    assign do_regoin_r_msg[3][39:39] = 1'b1 ;
+    assign do_regoin_r_msg[3][40:40] = 1'b1 ;
+    assign do_regoin_r_msg[3][41:41] = 1'b1 ;
+    assign do_regoin_r_msg[3][42:42] = 1'b1 ;
+    assign do_regoin_r_msg[3][43:43] = 1'b1 ;
+    assign do_regoin_r_msg[3][44:44] = 1'b1 ;
+    assign do_regoin_r_msg[3][45:45] = 1'b1 ;
+    assign do_regoin_r_msg[3][46:46] = 1'b1 ;
+    assign do_regoin_r_msg[3][47:47] = 1'b1 ;
+    assign do_regoin_r_msg[4][0:0] = 1'b1 ;
+    assign do_regoin_r_msg[4][4:4] = 1'b1 ;
+    assign do_regoin_r_msg[4][5:5] = 1'b1 ;
+    assign do_regoin_r_msg[4][6:6] = 1'b1 ;
+    assign do_regoin_r_msg[4][19:19] = 1'b1 ;
+    assign do_regoin_r_msg[4][20:20] = 1'b1 ;
+    assign do_regoin_r_msg[4][21:21] = 1'b1 ;
+    assign do_regoin_r_msg[4][22:22] = 1'b1 ;
+    assign do_regoin_r_msg[4][23:23] = 1'b1 ;
+    assign do_regoin_r_msg[4][24:24] = 1'b1 ;
+    assign do_regoin_r_msg[4][25:25] = 1'b1 ;
+    assign do_regoin_r_msg[4][26:26] = 1'b1 ;
+    assign do_regoin_r_msg[4][27:27] = 1'b1 ;
+    assign do_regoin_r_msg[4][28:28] = 1'b1 ;
+    assign do_regoin_r_msg[4][29:29] = 1'b1 ;
+    assign do_regoin_r_msg[4][30:30] = 1'b1 ;
+    assign do_regoin_r_msg[4][31:31] = 1'b1 ;
+    assign do_regoin_r_msg[4][40:40] = 1'b1 ;
+    assign do_regoin_r_msg[4][41:41] = 1'b1 ;
+    assign do_regoin_r_msg[4][42:42] = 1'b1 ;
+    assign do_regoin_r_msg[4][43:43] = 1'b1 ;
+    assign do_regoin_r_msg[4][44:44] = 1'b1 ;
+    assign do_regoin_r_msg[4][45:45] = 1'b1 ;
+    assign do_regoin_r_msg[4][46:46] = 1'b1 ;
+    assign do_regoin_r_msg[4][47:47] = 1'b1 ;
+    assign do_regoin_r_msg[0][4:4] = 1'b1 ;
+    assign do_regoin_r_msg[0][5:5] = 1'b1 ;
+    assign do_regoin_r_msg[0][6:6] = 1'b1 ;
+    assign do_regoin_r_msg[0][7:7] = 1'b1 ;
+    assign do_regoin_r_msg[0][28:28] = 1'b1 ;
+    assign do_regoin_r_msg[0][29:29] = 1'b1 ;
+    assign do_regoin_r_msg[0][30:30] = 1'b1 ;
+    assign do_regoin_r_msg[0][31:31] = 1'b1 ;
+    assign do_regoin_r_msg[0][32:32] = 1'b1 ;
+    assign do_regoin_r_msg[0][33:33] = 1'b1 ;
+    assign do_regoin_r_msg[0][34:34] = 1'b1 ;
+    assign do_regoin_r_msg[0][35:35] = 1'b1 ;
+    assign do_regoin_r_msg[0][36:36] = 1'b1 ;
+    assign do_regoin_r_msg[0][37:37] = 1'b1 ;
+    assign do_regoin_r_msg[0][38:38] = 1'b1 ;
+    assign do_regoin_r_msg[0][39:39] = 1'b1 ;
+    assign do_regoin_r_msg[0][40:40] = 1'b1 ;
+    assign do_regoin_r_msg[0][41:41] = 1'b1 ;
+    assign do_regoin_r_msg[0][42:42] = 1'b1 ;
+    assign do_regoin_r_msg[0][43:43] = 1'b1 ;
+    assign do_regoin_r_msg[0][44:44] = 1'b1 ;
+    assign do_regoin_r_msg[0][45:45] = 1'b1 ;
+    assign do_regoin_r_msg[0][46:46] = 1'b1 ;
+    assign do_regoin_r_msg[0][47:47] = 1'b1 ;
+    assign do_regoin_r_msg[1][6:6] = 1'b1 ;
+    assign do_regoin_r_msg[1][7:7] = 1'b1 ;
+    assign do_regoin_r_msg[1][8:8] = 1'b1 ;
+    assign do_regoin_r_msg[1][9:9] = 1'b1 ;
+    assign do_regoin_r_msg[1][10:10] = 1'b1 ;
+    assign do_regoin_r_msg[1][11:11] = 1'b1 ;
+    assign do_regoin_r_msg[1][12:12] = 1'b1 ;
+    assign do_regoin_r_msg[1][13:13] = 1'b1 ;
+    assign do_regoin_r_msg[1][14:14] = 1'b1 ;
+    assign do_regoin_r_msg[1][15:15] = 1'b1 ;
+    assign do_regoin_r_msg[1][16:16] = 1'b1 ;
+    assign do_regoin_r_msg[1][17:17] = 1'b1 ;
+    assign do_regoin_r_msg[1][18:18] = 1'b1 ;
+    assign do_regoin_r_msg[1][19:19] = 1'b1 ;
+    assign do_regoin_r_msg[1][20:20] = 1'b1 ;
+    assign do_regoin_r_msg[1][21:21] = 1'b1 ;
+    assign do_regoin_r_msg[1][22:22] = 1'b1 ;
+    assign do_regoin_r_msg[1][23:23] = 1'b1 ;
+    assign do_regoin_r_msg[1][24:24] = 1'b1 ;
+    assign do_regoin_r_msg[1][25:25] = 1'b1 ;
+    assign do_regoin_r_msg[1][26:26] = 1'b1 ;
+    assign do_regoin_r_msg[1][27:27] = 1'b1 ;
+    assign do_regoin_r_msg[1][33:33] = 1'b1 ;
+    assign do_regoin_r_msg[1][34:34] = 1'b1 ;
+    assign do_regoin_r_msg[1][35:35] = 1'b1 ;
+    assign do_regoin_r_msg[1][36:36] = 1'b1 ;
+    assign do_regoin_r_msg[1][37:37] = 1'b1 ;
+    assign do_regoin_r_msg[1][38:38] = 1'b1 ;
+    assign do_regoin_r_msg[1][39:39] = 1'b1 ;
+    assign do_regoin_r_msg[1][40:40] = 1'b1 ;
+    assign do_regoin_r_msg[1][41:41] = 1'b1 ;
+    assign do_regoin_r_msg[1][42:42] = 1'b1 ;
+    assign do_regoin_r_msg[1][43:43] = 1'b1 ;
+    assign do_regoin_r_msg[1][44:44] = 1'b1 ;
+    assign do_regoin_r_msg[1][45:45] = 1'b1 ;
+    assign do_regoin_r_msg[1][46:46] = 1'b1 ;
+    assign do_regoin_r_msg[1][47:47] = 1'b1 ;
+    assign do_regoin_r_msg[2][4:4] = 1'b1 ;
+    assign do_regoin_r_msg[2][5:5] = 1'b1 ;
+    assign do_regoin_r_msg[2][6:6] = 1'b1 ;
+    assign do_regoin_r_msg[2][14:14] = 1'b1 ;
+    assign do_regoin_r_msg[2][15:15] = 1'b1 ;
+    assign do_regoin_r_msg[2][24:24] = 1'b1 ;
+    assign do_regoin_r_msg[2][25:25] = 1'b1 ;
+    assign do_regoin_r_msg[2][26:26] = 1'b1 ;
+    assign do_regoin_r_msg[2][27:27] = 1'b1 ;
+    assign do_regoin_r_msg[2][28:28] = 1'b1 ;
+    assign do_regoin_r_msg[2][30:30] = 1'b1 ;
+    assign do_regoin_r_msg[2][32:32] = 1'b1 ;
+    assign do_regoin_r_msg[2][33:33] = 1'b1 ;
+    assign do_regoin_r_msg[2][34:34] = 1'b1 ;
+    assign do_regoin_r_msg[2][35:35] = 1'b1 ;
+    assign do_regoin_r_msg[2][36:36] = 1'b1 ;
+    assign do_regoin_r_msg[2][37:37] = 1'b1 ;
+    assign do_regoin_r_msg[2][38:38] = 1'b1 ;
+    assign do_regoin_r_msg[2][39:39] = 1'b1 ;
+    assign do_regoin_r_msg[2][40:40] = 1'b1 ;
+    assign do_regoin_r_msg[2][41:41] = 1'b1 ;
+    assign do_regoin_r_msg[2][42:42] = 1'b1 ;
+    assign do_regoin_r_msg[2][43:43] = 1'b1 ;
+    assign do_regoin_r_msg[2][44:44] = 1'b1 ;
+    assign do_regoin_r_msg[2][45:45] = 1'b1 ;
+    assign do_regoin_r_msg[2][46:46] = 1'b1 ;
+    assign do_regoin_r_msg[2][47:47] = 1'b1 ;
+	
 	
 	wire ext_emerg_stop;
 	wire ext_pause_sig ;
@@ -738,6 +629,7 @@ module emcc_mix_top
     assign  emcc_irq[113]   = map_irq[113];
     assign  emcc_irq[87]   = map_irq[87];
     assign  emcc_irq[191]   = map_irq[191];
+    assign  emcc_irq[202]   = map_irq[202];
     assign  emcc_irq[120]   = map_irq[120];
     assign  emcc_irq[121]   = map_irq[121];
     assign  emcc_irq[156]   = map_irq[156];
@@ -762,7 +654,7 @@ module emcc_mix_top
 	// --- flow_comp_1 --A0001_磨床1---
     ec_siemens_cnc
     #(
-         .REG_SPACE_BIAS     ( 20'h6400)
+         .REG_SPACE_BIAS     ( 20'd25600)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_siemens_cnc_1
@@ -793,7 +685,7 @@ module emcc_mix_top
 	// --- flow_comp_2 --A0002_磨床2---
     ec_siemens_cnc
     #(
-         .REG_SPACE_BIAS     ( 20'h8800)
+         .REG_SPACE_BIAS     ( 20'd34816)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_siemens_cnc_2
@@ -824,7 +716,7 @@ module emcc_mix_top
 	// --- flow_comp_3 --A0003_磨床3---
     ec_siemens_cnc
     #(
-         .REG_SPACE_BIAS     ( 20'hac00)
+         .REG_SPACE_BIAS     ( 20'd44032)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_siemens_cnc_3
@@ -855,7 +747,7 @@ module emcc_mix_top
 	// --- flow_comp_4 --A0004_磨床4---
     ec_siemens_cnc
     #(
-         .REG_SPACE_BIAS     ( 20'hb000)
+         .REG_SPACE_BIAS     ( 20'd45056)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_siemens_cnc_4
@@ -886,7 +778,7 @@ module emcc_mix_top
 	// --- flow_comp_5 --A0005_磨床5---
     ec_siemens_cnc
     #(
-         .REG_SPACE_BIAS     ( 20'hb200)
+         .REG_SPACE_BIAS     ( 20'd45568)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_siemens_cnc_5
@@ -917,7 +809,7 @@ module emcc_mix_top
 	// --- flow_comp_6 --A0006_磨床6---
     ec_siemens_cnc
     #(
-         .REG_SPACE_BIAS     ( 20'hae00)
+         .REG_SPACE_BIAS     ( 20'd44544)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_siemens_cnc_6
@@ -948,7 +840,7 @@ module emcc_mix_top
 	// --- flow_comp_7 --A0007_磨床7---
     ec_siemens_cnc
     #(
-         .REG_SPACE_BIAS     ( 20'hb400)
+         .REG_SPACE_BIAS     ( 20'd46080)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_siemens_cnc_7
@@ -979,7 +871,7 @@ module emcc_mix_top
 	// --- flow_comp_8 --A0008_磨床8---
     ec_siemens_cnc
     #(
-         .REG_SPACE_BIAS     ( 20'hb600)
+         .REG_SPACE_BIAS     ( 20'd46592)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_siemens_cnc_8
@@ -1010,7 +902,7 @@ module emcc_mix_top
 	// --- flow_comp_9 --A0009_磨床9---
     ec_siemens_cnc
     #(
-         .REG_SPACE_BIAS     ( 20'hb800)
+         .REG_SPACE_BIAS     ( 20'd47104)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_siemens_cnc_9
@@ -1041,7 +933,7 @@ module emcc_mix_top
 	// --- flow_comp_11 --A0011_海克斯康三坐标1---
     ec_hex_coordinate
     #(
-         .REG_SPACE_BIAS     ( 20'hbc00)
+         .REG_SPACE_BIAS     ( 20'd48128)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_hex_coordinate_11
@@ -1072,7 +964,7 @@ module emcc_mix_top
 	// --- flow_comp_12 --A0012_海克斯康三坐标2---
     ec_hex_coordinate
     #(
-         .REG_SPACE_BIAS     ( 20'hbe00)
+         .REG_SPACE_BIAS     ( 20'd48640)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_hex_coordinate_12
@@ -1103,7 +995,7 @@ module emcc_mix_top
 	// --- flow_comp_13 --A0013_海克斯康影像测量仪---
     ec_hex_coordinate
     #(
-         .REG_SPACE_BIAS     ( 20'hc000)
+         .REG_SPACE_BIAS     ( 20'd49152)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_hex_coordinate_13
@@ -1136,7 +1028,7 @@ module emcc_mix_top
 	// --- flow_comp_14 --A0014_1#三坐标卡盘---
     ec_2di_3do
     #(
-         .REG_SPACE_BIAS     ( 20'hc600)
+         .REG_SPACE_BIAS     ( 20'd50688)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_2di_3do_14
@@ -1160,12 +1052,14 @@ module emcc_mix_top
 	  .o_intr_irq            ( map_irq[95]       )
 
        ,.i_pos        ( ~di_mst_msg[50]           )   // 位置到位开关
-       ,.o_dri1        ( o_dri1_14           )   // 夹紧驱动信号
-       ,.o_dri2        ( o_dri2_14           )   // 放松驱动信号
+       ,.o_dri1        ( o_dri1_14           )   // 卡盘开驱动信号
+       ,.o_dri2        ( o_dri2_14           )   // 卡盘关驱动信号
+       ,.o_dri        (            )   // 
+       ,.i_poa        ( 1'b0           )   // 
     );
 
-    assign do_regoin_r_msg[ 2][17] = ~o_dri1_14;
-    assign do_regoin_r_msg[ 2][16] = ~o_dri2_14;
+    assign do_regoin_r_msg[2][17] = ~o_dri1_14;
+    assign do_regoin_r_msg[2][16] = ~o_dri2_14;
 	
 	
 	wire   o_dri2_15;
@@ -1174,7 +1068,7 @@ module emcc_mix_top
 	// --- flow_comp_15 --A0015_2#三坐标卡盘---
     ec_2di_3do
     #(
-         .REG_SPACE_BIAS     ( 20'hc800)
+         .REG_SPACE_BIAS     ( 20'd51200)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_2di_3do_15
@@ -1198,12 +1092,14 @@ module emcc_mix_top
 	  .o_intr_irq            ( map_irq[96]       )
 
        ,.i_pos        ( ~di_mst_msg[51]           )   // 位置到位开关
-       ,.o_dri1        ( o_dri1_15           )   // 夹紧驱动信号
-       ,.o_dri2        ( o_dri2_15           )   // 放松驱动信号
+       ,.o_dri1        ( o_dri1_15           )   // 卡盘开驱动信号
+       ,.o_dri2        ( o_dri2_15           )   // 卡盘关驱动信号
+       ,.o_dri        (            )   // 
+       ,.i_poa        ( 1'b0           )   // 
     );
 
-    assign do_regoin_r_msg[ 2][18] = ~o_dri2_15;
-    assign do_regoin_r_msg[ 2][19] = ~o_dri1_15;
+    assign do_regoin_r_msg[2][18] = ~o_dri2_15;
+    assign do_regoin_r_msg[2][19] = ~o_dri1_15;
 	
 	
 	wire   o_dri1_16;
@@ -1212,7 +1108,7 @@ module emcc_mix_top
 	// --- flow_comp_16 --A0016_影像测量仪卡盘---
     ec_2di_3do
     #(
-         .REG_SPACE_BIAS     ( 20'hca00)
+         .REG_SPACE_BIAS     ( 20'd51712)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_2di_3do_16
@@ -1236,19 +1132,21 @@ module emcc_mix_top
 	  .o_intr_irq            ( map_irq[97]       )
 
        ,.i_pos        ( ~di_mst_msg[54]           )   // 位置到位开关
-       ,.o_dri1        ( o_dri1_16           )   // 夹紧驱动信号
-       ,.o_dri2        ( o_dri2_16           )   // 放松驱动信号
+       ,.o_dri1        ( o_dri1_16           )   // 卡盘开驱动信号
+       ,.o_dri2        ( o_dri2_16           )   // 卡盘关驱动信号
+       ,.o_dri        (            )   // 
+       ,.i_poa        ( 1'b0           )   // 
     );
 
-    assign do_regoin_r_msg[ 2][21] = ~o_dri1_16;
-    assign do_regoin_r_msg[ 2][20] = ~o_dri2_16;
+    assign do_regoin_r_msg[2][21] = ~o_dri1_16;
+    assign do_regoin_r_msg[2][20] = ~o_dri2_16;
 	
 	
 	
 	// --- flow_comp_17 --A0017_蓝鲸清洗机---
     ec_lanj_washer
     #(
-         .REG_SPACE_BIAS     ( 20'hba00)
+         .REG_SPACE_BIAS     ( 20'd47616)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_lanj_washer_17
@@ -1279,7 +1177,7 @@ module emcc_mix_top
 	// --- flow_comp_18 --A0018_主地轨搬运机器人---
     ec_fanuc_robot
     #(
-         .REG_SPACE_BIAS     ( 20'hd800)
+         .REG_SPACE_BIAS     ( 20'd55296)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_fanuc_robot_18
@@ -1310,7 +1208,7 @@ module emcc_mix_top
 	// --- flow_comp_19 --A0019_短桁架1#机器人---
     ec_fanuc_robot
     #(
-         .REG_SPACE_BIAS     ( 20'hce00)
+         .REG_SPACE_BIAS     ( 20'd52736)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_fanuc_robot_19
@@ -1341,7 +1239,7 @@ module emcc_mix_top
 	// --- flow_comp_20 --A0020_长桁架1#机器人---
     ec_fanuc_robot
     #(
-         .REG_SPACE_BIAS     ( 20'hd000)
+         .REG_SPACE_BIAS     ( 20'd53248)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_fanuc_robot_20
@@ -1372,7 +1270,7 @@ module emcc_mix_top
 	// --- flow_comp_21 --A0021_长桁架2#机器人---
     ec_fanuc_robot
     #(
-         .REG_SPACE_BIAS     ( 20'hd200)
+         .REG_SPACE_BIAS     ( 20'd53760)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_fanuc_robot_21
@@ -1403,7 +1301,7 @@ module emcc_mix_top
 	// --- flow_comp_22 --A0022_搬运机器人---
     ec_fanuc_robot
     #(
-         .REG_SPACE_BIAS     ( 20'hc200)
+         .REG_SPACE_BIAS     ( 20'd49664)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_fanuc_robot_22
@@ -1436,7 +1334,7 @@ module emcc_mix_top
 	// --- flow_comp_23 --A0023_地轨机器人托盘搬运夹爪---
     ec_trayclaw
     #(
-         .REG_SPACE_BIAS     ( 20'hd600)
+         .REG_SPACE_BIAS     ( 20'd54784)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_trayclaw_23
@@ -1464,6 +1362,8 @@ module emcc_mix_top
        ,.i_material_arr        ( di_mst_msg[17]           )   // 物料感测开关
        ,.o_claw_unlock        ( o_claw_unlock_23           )   // 解锁驱动信号
        ,.i_close_arr        ( ~di_mst_msg[23]           )   // 锁紧到位开关
+       ,.o_claw_blow        (            )   // 
+       ,.i_airtight_arr        ( 1'b0           )   // 
     );
 
     assign do_mst_msg[1] = ~o_claw_press_23;
@@ -1476,7 +1376,7 @@ module emcc_mix_top
 	// --- flow_comp_24 --A0024_地轨机器人砂轮搬运夹爪---
     ec_2di_2do
     #(
-         .REG_SPACE_BIAS     ( 20'hda00)
+         .REG_SPACE_BIAS     ( 20'd55808)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_2di_2do_24
@@ -1515,7 +1415,7 @@ module emcc_mix_top
 	// --- flow_comp_25 --A0025_搬运机器人夹爪---
     ec_2di_2do
     #(
-         .REG_SPACE_BIAS     ( 20'hc400)
+         .REG_SPACE_BIAS     ( 20'd50176)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_2di_2do_25
@@ -1544,44 +1444,43 @@ module emcc_mix_top
        ,.o_dri2        ( o_dri2_25           )   // 驱动信号2
     );
 
-    assign do_regoin_r_msg[ 2][22] = ~o_dri1_25;
-    assign do_regoin_r_msg[ 2][23] = ~o_dri2_25;
+    assign do_regoin_r_msg[2][22] = ~o_dri1_25;
+    assign do_regoin_r_msg[2][23] = ~o_dri2_25;
 	
 	
 	
-	// // --- flow_comp_26 -----地轨机器人_RFID读写器
+	// // --- flow_comp_26 --A0026_地轨机器人_RFID读写器---
     // ec_sp_rfid
     // #(
-    //      .REG_SPACE_BIAS     (20'hdc00)
-    //     ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
+    //      .REG_SPACE_BIAS     ( 20'd56320)
+    //     ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     // )
     // ec_sp_rfid_26
     // (
-    //   .clk_i                 ( clk               ),
+      
+	//   .clk_i                 ( clk               ),
     //   .rst                   ( reset             ),
-	//   .ps_reg_clk            ( ps_reg_clk               ),
-    //   .ps_reg_reset          ( ps_reg_reset             ),
+	//   .ps_reg_clk            ( ps_reg_clk        ),
+    //   .ps_reg_reset          ( ps_reg_reset      ),
 	  
-	//   .i_time_1ms_vld        (time_1ms_vld         ),
-	//   .i_time_1s_vld         (time_1s_vld          ),
+	//   .i_time_1ms_vld        ( time_1ms_vld      ),
+	//   .i_time_1s_vld         ( time_1s_vld       ),
 
-	//   .i_st_wr_en            ( ps_reg_we                ),
-	//   .i_st_wr_addr          ( ps_reg_addr              ),
-    //   .i_st_wr_data          ( ps_reg_wr_dat            ),
-    //   .i_st_rd_en            ( ps_reg_re                ),
-    //   .i_st_rd_addr          ( ps_reg_rd_addr           ),
+	//   .i_st_wr_en            ( ps_reg_we         ),
+	//   .i_st_wr_addr          ( ps_reg_addr       ),
+    //   .i_st_wr_data          ( ps_reg_wr_dat     ),
+    //   .i_st_rd_en            ( ps_reg_re         ),
+    //   .i_st_rd_addr          ( ps_reg_rd_addr    ),
 	//   .o_st_rd_vld           ( sub_comp_rd_vld[106]    ),
     //   .o_st_rd_data          ( sub_comp_rd_dat[106]    ),
 	//   .o_intr_irq            ( map_irq[106]       )
-	
-	//   ,.o_user_req        ( rs485_1_user_req[0]           )   // RS485端口
-    //   ,.i_user_grant        ( rs485_1_user_grant[0]           )   // 
-    //   ,.o_uart_tx        ( rs485_1_user_tx[0]           )   // 
-    //   ,.i_uart_rx        ( rs485_1_user_rx[0]           )   // 
-    //   ,.o_uart_de        ( rs485_1_user_de[0]           )   // 
 
+    //    ,.o_user_req        ( rs485_1_user_req[0]           )   // RS485端口
+    //    ,.i_user_grant        ( rs485_1_user_grant[0]           )   // 
+    //    ,.o_uart_tx        ( rs485_1_user_tx[0]           )   // 
+    //    ,.i_uart_rx        ( rs485_1_user_rx[0]           )   // 
+    //    ,.o_uart_de        ( rs485_1_user_de[0]           )   // 
     // );
-
 ec_superisys_485_modbus_rtu
 #(
         .REG_SPACE_BIAS         (20'hdc00                ), //组件基地址
@@ -1620,34 +1519,40 @@ ec_superisys_485_modbus_rtu_26
         .rs485_ch_flag          ( rs485_00_flag           ), //recv en
         .s2m_rs485_msg          ( rs485_00_msg[0]         )  //recv data
     );
-
 	
 	
-	// // --- flow_comp_27 -----短桁架1#夹爪RFID读写器
+	
+	// // --- flow_comp_27 --A0027_短桁架1#夹爪RFID读写器---
     // ec_sp_rfid
     // #(
-    //      .REG_SPACE_BIAS     (20'hd400)
-    //     ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
+    //      .REG_SPACE_BIAS     ( 20'd54272)
+    //     ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     // )
     // ec_sp_rfid_27
     // (
-    //   .clk_i                 ( clk               ),
+      
+	//   .clk_i                 ( clk               ),
     //   .rst                   ( reset             ),
-	//   .ps_reg_clk            ( ps_reg_clk               ),
-    //   .ps_reg_reset          ( ps_reg_reset             ),
+	//   .ps_reg_clk            ( ps_reg_clk        ),
+    //   .ps_reg_reset          ( ps_reg_reset      ),
 	  
-	//   .i_time_1ms_vld        (time_1ms_vld         ),
-	//   .i_time_1s_vld         (time_1s_vld          ),
+	//   .i_time_1ms_vld        ( time_1ms_vld      ),
+	//   .i_time_1s_vld         ( time_1s_vld       ),
 
-	//   .i_st_wr_en            ( ps_reg_we                ),
-	//   .i_st_wr_addr          ( ps_reg_addr              ),
-    //   .i_st_wr_data          ( ps_reg_wr_dat            ),
-    //   .i_st_rd_en            ( ps_reg_re                ),
-    //   .i_st_rd_addr          ( ps_reg_rd_addr           ),
+	//   .i_st_wr_en            ( ps_reg_we         ),
+	//   .i_st_wr_addr          ( ps_reg_addr       ),
+    //   .i_st_wr_data          ( ps_reg_wr_dat     ),
+    //   .i_st_rd_en            ( ps_reg_re         ),
+    //   .i_st_rd_addr          ( ps_reg_rd_addr    ),
 	//   .o_st_rd_vld           ( sub_comp_rd_vld[102]    ),
     //   .o_st_rd_data          ( sub_comp_rd_dat[102]    ),
 	//   .o_intr_irq            ( map_irq[102]       )
 
+    //    ,.o_user_req        ( rs485_1_user_req[1]           )   // RS485端口
+    //    ,.i_user_grant        ( rs485_1_user_grant[1]           )   // 
+    //    ,.o_uart_tx        ( rs485_1_user_tx[1]           )   // 
+    //    ,.i_uart_rx        ( rs485_1_user_rx[1]           )   // 
+    //    ,.o_uart_de        ( rs485_1_user_de[1]           )   // 
     // );
 
 ec_superisys_485_modbus_rtu
@@ -1688,36 +1593,42 @@ ec_superisys_485_modbus_rtu_27
         .rs485_ch_flag         (                          ), //recv en
         .s2m_rs485_msg         (                          )  //recv data
     );
-  
 	
 	
-	// // --- flow_comp_28 -----固定机器人_RFID读写器
+	
+	// // --- flow_comp_28 --A0028_固定机器人_RFID读写器---
     // ec_sp_rfid
     // #(
-    //      .REG_SPACE_BIAS     (20'hcc00)
-    //     ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
+    //      .REG_SPACE_BIAS     ( 20'd52224)
+    //     ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     // )
     // ec_sp_rfid_28
     // (
-    //   .clk_i                 ( clk               ),
+      
+	//   .clk_i                 ( clk               ),
     //   .rst                   ( reset             ),
-	//   .ps_reg_clk            ( ps_reg_clk               ),
-    //   .ps_reg_reset          ( ps_reg_reset             ),
+	//   .ps_reg_clk            ( ps_reg_clk        ),
+    //   .ps_reg_reset          ( ps_reg_reset      ),
 	  
-	//   .i_time_1ms_vld        (time_1ms_vld         ),
-	//   .i_time_1s_vld         (time_1s_vld          ),
+	//   .i_time_1ms_vld        ( time_1ms_vld      ),
+	//   .i_time_1s_vld         ( time_1s_vld       ),
 
-	//   .i_st_wr_en            ( ps_reg_we                ),
-	//   .i_st_wr_addr          ( ps_reg_addr              ),
-    //   .i_st_wr_data          ( ps_reg_wr_dat            ),
-    //   .i_st_rd_en            ( ps_reg_re                ),
-    //   .i_st_rd_addr          ( ps_reg_rd_addr           ),
+	//   .i_st_wr_en            ( ps_reg_we         ),
+	//   .i_st_wr_addr          ( ps_reg_addr       ),
+    //   .i_st_wr_data          ( ps_reg_wr_dat     ),
+    //   .i_st_rd_en            ( ps_reg_re         ),
+    //   .i_st_rd_addr          ( ps_reg_rd_addr    ),
 	//   .o_st_rd_vld           ( sub_comp_rd_vld[98]    ),
     //   .o_st_rd_data          ( sub_comp_rd_dat[98]    ),
 	//   .o_intr_irq            ( map_irq[98]       )
 
+    //    ,.o_user_req        ( rs485_1_user_req[2]           )   // RS485端口
+    //    ,.i_user_grant        ( rs485_1_user_grant[2]           )   // 
+    //    ,.o_uart_tx        ( rs485_1_user_tx[2]           )   // 
+    //    ,.i_uart_rx        ( rs485_1_user_rx[2]           )   // 
+    //    ,.o_uart_de        ( rs485_1_user_de[2]           )   // 
     // );
-	
+
 ec_superisys_485_modbus_rtu
 #(
         .REG_SPACE_BIAS         (20'hcc00                ), //组件基地址
@@ -1756,13 +1667,14 @@ ec_superisys_485_modbus_rtu_28
         .rs485_ch_flag          ( 0                       ), //recv en
         .s2m_rs485_msg          ( 0                       )  //recv data
     );
-  
 
-    
-	// --- flow_comp_32 -----
+	
+	
+	
+	// --- flow_comp_32 --A0032_砂轮手爪放置组件---
     ec_1di
     #(
-         .REG_SPACE_BIAS     ( 20'h18e00)
+         .REG_SPACE_BIAS     ( 20'd101888)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_1di_32
@@ -1785,7 +1697,7 @@ ec_superisys_485_modbus_rtu_28
       .o_st_rd_data          ( sub_comp_rd_dat[195]    ),
 	  .o_intr_irq            ( map_irq[195]       )
 
-       ,.i_sign1_check        ( ~di_mst_msg[27]           )   // 单位检测信号
+       ,.i_sign1_check        ( di_mst_msg[27]           )   // 单位检测信号
     );
 
 	
@@ -1794,7 +1706,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_33 --A0033_双托盘信号组件---
     ec_2di
     #(
-         .REG_SPACE_BIAS     ( 20'h19000)
+         .REG_SPACE_BIAS     ( 20'd102400)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_2di_33
@@ -1817,8 +1729,8 @@ ec_superisys_485_modbus_rtu_28
       .o_st_rd_data          ( sub_comp_rd_dat[196]    ),
 	  .o_intr_irq            ( map_irq[196]       )
 
-       ,.i_sign1_check        ( ~di_mst_msg[28]           )   // 感测开关1
-       ,.i_sign2_check        ( ~di_mst_msg[29]           )   // 感测开关2
+       ,.i_sign1_check        ( di_mst_msg[28]           )   // 感测开关1
+       ,.i_sign2_check        ( di_mst_msg[29]           )   // 感测开关2
     );
 
 	
@@ -1827,7 +1739,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_35 --A0036_分拣库_X轴---
     ec_slv_pul_axis
     #(
-         .REG_SPACE_BIAS     ( 20'hfe00)
+         .REG_SPACE_BIAS     ( 20'd65024)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_slv_pul_axis_35
@@ -1869,7 +1781,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_36 --A0037_分拣库_Y轴---
     ec_slv_pul_axis
     #(
-         .REG_SPACE_BIAS     ( 20'h10000)
+         .REG_SPACE_BIAS     ( 20'd65536)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_slv_pul_axis_36
@@ -1893,7 +1805,7 @@ ec_superisys_485_modbus_rtu_28
 	  .o_intr_irq            ( map_irq[124]       )
 
        ,.i_axis_limf        ( ~di_regoin_msg[0][33]           )   // 正限位到位开关
-       ,.pul_motor_r_flag        ( pul_motor1_r_flag           )   // 
+       ,.pul_motor_r_flag        ( pul_motor0_r_flag           )   // 
        ,.cur_slv_board_id        ( 5'd0           )   // 
        ,.slv_board_id        ( slv_board_id           )   // 
        ,.pul_motor_flag        ( pul_motor0_flag           )   // 
@@ -1911,7 +1823,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_37 --A0038_分拣库_Z轴---
     ec_slv_pul_axis
     #(
-         .REG_SPACE_BIAS     ( 20'h10200)
+         .REG_SPACE_BIAS     ( 20'd66048)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_slv_pul_axis_37
@@ -1935,7 +1847,7 @@ ec_superisys_485_modbus_rtu_28
 	  .o_intr_irq            ( map_irq[125]       )
 
        ,.i_axis_limf        ( ~di_regoin_msg[0][36]           )   // 正限位到位开关
-       ,.pul_motor_r_flag        ( pul_motor1_r_flag           )   // 
+       ,.pul_motor_r_flag        ( pul_motor2_r_flag           )   // 
        ,.cur_slv_board_id        ( 5'd0           )   // 
        ,.slv_board_id        ( slv_board_id           )   // 
        ,.pul_motor_flag        ( pul_motor2_flag           )   // 
@@ -1953,7 +1865,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_38 --A0039_分拣库_R轴---
     ec_slv_pul_axis
     #(
-         .REG_SPACE_BIAS     ( 20'h10400)
+         .REG_SPACE_BIAS     ( 20'd66560)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_slv_pul_axis_38
@@ -1977,7 +1889,7 @@ ec_superisys_485_modbus_rtu_28
 	  .o_intr_irq            ( map_irq[126]       )
 
        ,.i_axis_limf        ( ~di_regoin_msg[0][39]           )   // 正限位到位开关
-       ,.pul_motor_r_flag        ( pul_motor1_r_flag           )   // 
+       ,.pul_motor_r_flag        ( pul_motor3_r_flag           )   // 
        ,.cur_slv_board_id        ( 5'd0           )   // 
        ,.slv_board_id        ( slv_board_id           )   // 
        ,.pul_motor_flag        ( pul_motor3_flag           )   // 
@@ -1997,7 +1909,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_39 --A0040_分拣库_桁架夹爪---
     ec_2di_2do
     #(
-         .REG_SPACE_BIAS     ( 20'h10600)
+         .REG_SPACE_BIAS     ( 20'd67072)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_2di_2do_39
@@ -2026,8 +1938,8 @@ ec_superisys_485_modbus_rtu_28
        ,.o_dri2        ( o_dri2_39           )   // 驱动信号2
     );
 
-    assign do_regoin_r_msg[ 0][27] = ~o_dri2_39;
-    assign do_regoin_r_msg[ 0][26] = ~o_dri1_39;
+    assign do_regoin_r_msg[0][27] = ~o_dri2_39;
+    assign do_regoin_r_msg[0][26] = ~o_dri1_39;
 	
 	
 	wire   o_dri2_40;
@@ -2036,7 +1948,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_40 --A0041_机器人托盘入口滑台---
     ec_3di_2do
     #(
-         .REG_SPACE_BIAS     ( 20'h10e00)
+         .REG_SPACE_BIAS     ( 20'd69120)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_3di_2do_40
@@ -2066,8 +1978,8 @@ ec_superisys_485_modbus_rtu_28
        ,.o_dri2        ( o_dri2_40           )   // 位置2驱动信号
     );
 
-    assign do_regoin_r_msg[ 0][21] = ~o_dri2_40;
-    assign do_regoin_r_msg[ 0][20] = ~o_dri1_40;
+    assign do_regoin_r_msg[0][21] = ~o_dri2_40;
+    assign do_regoin_r_msg[0][20] = ~o_dri1_40;
 	
 	
 	wire   o_dri2_41;
@@ -2076,7 +1988,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_41 --A0042_机器人托盘出口滑台---
     ec_3di_2do
     #(
-         .REG_SPACE_BIAS     ( 20'h11000)
+         .REG_SPACE_BIAS     ( 20'd69632)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_3di_2do_41
@@ -2106,8 +2018,8 @@ ec_superisys_485_modbus_rtu_28
        ,.o_dri2        ( o_dri2_41           )   // 位置2驱动信号
     );
 
-    assign do_regoin_r_msg[ 0][23] = ~o_dri2_41;
-    assign do_regoin_r_msg[ 0][22] = ~o_dri1_41;
+    assign do_regoin_r_msg[0][23] = ~o_dri2_41;
+    assign do_regoin_r_msg[0][22] = ~o_dri1_41;
 	
 	
 	wire   o_dri1_42;
@@ -2116,7 +2028,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_42 --A0043_[1号-A]正常上料滑台---
     ec_3di_2do
     #(
-         .REG_SPACE_BIAS     ( 20'h11200)
+         .REG_SPACE_BIAS     ( 20'd70144)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_3di_2do_42
@@ -2146,8 +2058,8 @@ ec_superisys_485_modbus_rtu_28
        ,.o_dri2        ( o_dri2_42           )   // 位置2驱动信号
     );
 
-    assign do_regoin_r_msg[ 0][8] = ~o_dri1_42;
-    assign do_regoin_r_msg[ 0][9] = ~o_dri2_42;
+    assign do_regoin_r_msg[0][8] = ~o_dri1_42;
+    assign do_regoin_r_msg[0][9] = ~o_dri2_42;
 	
 	
 	wire   o_dri1_43;
@@ -2156,7 +2068,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_43 --A0044_[1号-B]正常上料滑台---
     ec_3di_2do
     #(
-         .REG_SPACE_BIAS     ( 20'h10800)
+         .REG_SPACE_BIAS     ( 20'd67584)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_3di_2do_43
@@ -2186,8 +2098,8 @@ ec_superisys_485_modbus_rtu_28
        ,.o_dri2        ( o_dri2_43           )   // 位置2驱动信号
     );
 
-    assign do_regoin_r_msg[ 0][10] = ~o_dri1_43;
-    assign do_regoin_r_msg[ 0][11] = ~o_dri2_43;
+    assign do_regoin_r_msg[0][10] = ~o_dri1_43;
+    assign do_regoin_r_msg[0][11] = ~o_dri2_43;
 	
 	
 	wire   o_dri1_44;
@@ -2196,7 +2108,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_44 --A0045_[2号-A]正常下料滑台---
     ec_3di_2do
     #(
-         .REG_SPACE_BIAS     ( 20'h11400)
+         .REG_SPACE_BIAS     ( 20'd70656)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_3di_2do_44
@@ -2226,8 +2138,8 @@ ec_superisys_485_modbus_rtu_28
        ,.o_dri2        ( o_dri2_44           )   // 位置2驱动信号
     );
 
-    assign do_regoin_r_msg[ 0][12] = ~o_dri1_44;
-    assign do_regoin_r_msg[ 0][13] = ~o_dri2_44;
+    assign do_regoin_r_msg[0][12] = ~o_dri1_44;
+    assign do_regoin_r_msg[0][13] = ~o_dri2_44;
 	
 	
 	wire   o_dri1_45;
@@ -2236,7 +2148,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_45 --A0046_[2号-B]正常下料滑台---
     ec_3di_2do
     #(
-         .REG_SPACE_BIAS     ( 20'h10a00)
+         .REG_SPACE_BIAS     ( 20'd68096)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_3di_2do_45
@@ -2266,8 +2178,8 @@ ec_superisys_485_modbus_rtu_28
        ,.o_dri2        ( o_dri2_45           )   // 位置2驱动信号
     );
 
-    assign do_regoin_r_msg[ 0][14] = ~o_dri1_45;
-    assign do_regoin_r_msg[ 0][15] = ~o_dri2_45;
+    assign do_regoin_r_msg[0][14] = ~o_dri1_45;
+    assign do_regoin_r_msg[0][15] = ~o_dri2_45;
 	
 	
 	wire   o_dri2_46;
@@ -2276,7 +2188,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_46 --A0047_[3号-A]异常下料滑台---
     ec_3di_2do
     #(
-         .REG_SPACE_BIAS     ( 20'h11600)
+         .REG_SPACE_BIAS     ( 20'd71168)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_3di_2do_46
@@ -2306,8 +2218,8 @@ ec_superisys_485_modbus_rtu_28
        ,.o_dri2        ( o_dri2_46           )   // 位置2驱动信号
     );
 
-    assign do_regoin_r_msg[ 0][17] = ~o_dri2_46;
-    assign do_regoin_r_msg[ 0][16] = ~o_dri1_46;
+    assign do_regoin_r_msg[0][17] = ~o_dri2_46;
+    assign do_regoin_r_msg[0][16] = ~o_dri1_46;
 	
 	
 	wire   o_dri2_47;
@@ -2316,7 +2228,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_47 --A0048_[3号-B]异常下料滑台---
     ec_3di_2do
     #(
-         .REG_SPACE_BIAS     ( 20'h10c00)
+         .REG_SPACE_BIAS     ( 20'd68608)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_3di_2do_47
@@ -2346,15 +2258,15 @@ ec_superisys_485_modbus_rtu_28
        ,.o_dri2        ( o_dri2_47           )   // 位置2驱动信号
     );
 
-    assign do_regoin_r_msg[ 0][19] = ~o_dri2_47;
-    assign do_regoin_r_msg[ 0][18] = ~o_dri1_47;
+    assign do_regoin_r_msg[0][19] = ~o_dri2_47;
+    assign do_regoin_r_msg[0][18] = ~o_dri1_47;
 	
 	
 	
 	// --- flow_comp_48 --A0049_分拣库_打标机卡盘R轴---
     ec_slv_pul_axis
     #(
-         .REG_SPACE_BIAS     ( 20'h11c00)
+         .REG_SPACE_BIAS     ( 20'd72704)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_slv_pul_axis_48
@@ -2378,7 +2290,7 @@ ec_superisys_485_modbus_rtu_28
 	  .o_intr_irq            ( map_irq[138]       )
 
        ,.i_axis_limf        ( ~di_regoin_msg[0][53]           )   // 正限位到位开关
-       ,.pul_motor_r_flag        ( pul_motor1_r_flag           )   // 
+       ,.pul_motor_r_flag        ( pul_motor0_r_flag           )   // 
        ,.cur_slv_board_id        ( 5'd1           )   // 
        ,.slv_board_id        ( slv_board_id           )   // 
        ,.pul_motor_flag        ( pul_motor0_flag           )   // 
@@ -2396,7 +2308,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_49 --A0050_分拣库_打标机卡盘Y轴---
     ec_slv_pul_axis
     #(
-         .REG_SPACE_BIAS     ( 20'h11e00)
+         .REG_SPACE_BIAS     ( 20'd73216)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_slv_pul_axis_49
@@ -2438,7 +2350,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_50 --A0051_分拣库_打标机倾角轴---
     ec_slv_pul_axis
     #(
-         .REG_SPACE_BIAS     ( 20'h12000)
+         .REG_SPACE_BIAS     ( 20'd73728)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_slv_pul_axis_50
@@ -2462,7 +2374,7 @@ ec_superisys_485_modbus_rtu_28
 	  .o_intr_irq            ( map_irq[140]       )
 
        ,.i_axis_limf        ( ~di_regoin_msg[0][47]           )   // 正限位到位开关
-       ,.pul_motor_r_flag        ( pul_motor1_r_flag           )   // 
+       ,.pul_motor_r_flag        ( pul_motor2_r_flag           )   // 
        ,.cur_slv_board_id        ( 5'd1           )   // 
        ,.slv_board_id        ( slv_board_id           )   // 
        ,.pul_motor_flag        ( pul_motor2_flag           )   // 
@@ -2471,6 +2383,7 @@ ec_superisys_485_modbus_rtu_28
        ,.i_axis_limb        ( ~di_regoin_msg[0][49]           )   // 负限位到位开关
        ,.i_axis_zero        ( ~di_regoin_msg[0][48]           )   // 零位到位开关
        ,.i_servo_done        ( ~di_regoin_msg[0][24]           )   // 伺服定位完成
+       ,.i_servo_ready        ( ~di_regoin_msg[0][25]           )   // 
     );
 
 	
@@ -2479,7 +2392,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_51 --A0052_分拣库_打标机升降Z轴---
     ec_slv_pul_axis
     #(
-         .REG_SPACE_BIAS     ( 20'h12200)
+         .REG_SPACE_BIAS     ( 20'd74240)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_slv_pul_axis_51
@@ -2503,7 +2416,7 @@ ec_superisys_485_modbus_rtu_28
 	  .o_intr_irq            ( map_irq[141]       )
 
        ,.i_axis_limf        ( ~di_regoin_msg[0][50]           )   // 正限位到位开关
-       ,.pul_motor_r_flag        ( pul_motor1_r_flag           )   // 
+       ,.pul_motor_r_flag        ( pul_motor3_r_flag           )   // 
        ,.cur_slv_board_id        ( 5'd1           )   // 
        ,.slv_board_id        ( slv_board_id           )   // 
        ,.pul_motor_flag        ( pul_motor3_flag           )   // 
@@ -2521,7 +2434,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_52 --A0053_打标机---
     ec_feijie_marker
     #(
-         .REG_SPACE_BIAS     ( 20'h12a00)
+         .REG_SPACE_BIAS     ( 20'd76288)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_feijie_marker_52
@@ -2554,7 +2467,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_53 --A0054_分拣库_打标机卡盘---
     ec_2di_3do
     #(
-         .REG_SPACE_BIAS     ( 20'h11a00)
+         .REG_SPACE_BIAS     ( 20'd72192)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_2di_3do_53
@@ -2577,20 +2490,22 @@ ec_superisys_485_modbus_rtu_28
       .o_st_rd_data          ( sub_comp_rd_dat[137]    ),
 	  .o_intr_irq            ( map_irq[137]       )
 
-       ,.i_pos        ( ~di_regoin_msg[0][25]           )   // 位置到位开关
-       ,.o_dri1        ( o_dri1_53           )   // 夹紧驱动信号
-       ,.o_dri2        ( o_dri2_53           )   // 放松驱动信号
+       ,.i_pos        ( 1'b0           )   // 位置到位开关
+       ,.o_dri1        ( o_dri1_53           )   // 卡盘开驱动信号
+       ,.o_dri2        ( o_dri2_53           )   // 卡盘关驱动信号
+       ,.o_dri        (            )   // 
+       ,.i_poa        ( 1'b0           )   // 
     );
 
-    assign do_regoin_r_msg[ 0][25] = ~o_dri1_53;
-    assign do_regoin_r_msg[ 0][24] = ~o_dri2_53;
+    assign do_regoin_r_msg[0][25] = ~o_dri1_53;
+    assign do_regoin_r_msg[0][24] = ~o_dri2_53;
 	
 	
 	
 	// --- flow_comp_55 --A0056_砂轮有无检测传感器---
     ec_16di
     #(
-         .REG_SPACE_BIAS     ( 20'h12800)
+         .REG_SPACE_BIAS     ( 20'd75776)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_16di_55
@@ -2613,22 +2528,22 @@ ec_superisys_485_modbus_rtu_28
       .o_st_rd_data          ( sub_comp_rd_dat[144]    ),
 	  .o_intr_irq            ( map_irq[144]       )
 
-       ,.i_sign1_check        ( ~di_mst_msg[36]           )   // 感测开关1
-       ,.i_sign10_check        ( ~di_mst_msg[9]           )   // 感测开关10
-       ,.i_sign11_check        ( ~di_mst_msg[8]           )   // 感测开关11
-       ,.i_sign12_check        ( ~di_mst_msg[7]           )   // 感测开关12
-       ,.i_sign13_check        ( ~di_mst_msg[6]           )   // 感测开关13
-       ,.i_sign14_check        ( ~di_mst_msg[5]           )   // 感测开关14
-       ,.i_sign15_check        ( ~di_mst_msg[4]           )   // 感测开关15
-       ,.i_sign16_check        ( ~di_mst_msg[3]           )   // 感测开关16
-       ,.i_sign2_check        ( ~di_mst_msg[35]           )   // 感测开关2
-       ,.i_sign3_check        ( ~di_mst_msg[61]           )   // 感测开关3
-       ,.i_sign4_check        ( ~di_mst_msg[60]           )   // 感测开关4
-       ,.i_sign5_check        ( ~di_mst_msg[59]           )   // 感测开关5
-       ,.i_sign6_check        ( ~di_mst_msg[58]           )   // 感测开关6
-       ,.i_sign7_check        ( ~di_mst_msg[57]           )   // 感测开关7
-       ,.i_sign8_check        ( ~di_mst_msg[56]           )   // 感测开关8
-       ,.i_sign9_check        ( ~di_mst_msg[10]           )   // 感测开关9
+       ,.i_sign1_check        ( di_mst_msg[36]           )   // 感测开关1
+       ,.i_sign10_check        ( di_mst_msg[9]           )   // 感测开关10
+       ,.i_sign11_check        ( di_mst_msg[8]           )   // 感测开关11
+       ,.i_sign12_check        ( di_mst_msg[7]           )   // 感测开关12
+       ,.i_sign13_check        ( di_mst_msg[6]           )   // 感测开关13
+       ,.i_sign14_check        ( di_mst_msg[5]           )   // 感测开关14
+       ,.i_sign15_check        ( di_mst_msg[4]           )   // 感测开关15
+       ,.i_sign16_check        ( di_mst_msg[3]           )   // 感测开关16
+       ,.i_sign2_check        ( di_mst_msg[35]           )   // 感测开关2
+       ,.i_sign3_check        ( di_mst_msg[61]           )   // 感测开关3
+       ,.i_sign4_check        ( di_mst_msg[60]           )   // 感测开关4
+       ,.i_sign5_check        ( di_mst_msg[59]           )   // 感测开关5
+       ,.i_sign6_check        ( di_mst_msg[58]           )   // 感测开关6
+       ,.i_sign7_check        ( di_mst_msg[57]           )   // 感测开关7
+       ,.i_sign8_check        ( di_mst_msg[56]           )   // 感测开关8
+       ,.i_sign9_check        ( di_mst_msg[10]           )   // 感测开关9
     );
 
 	
@@ -2641,7 +2556,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_56 --A0057_分拣库_三色灯蜂鸣器---
     ec_3led_buzzer
     #(
-         .REG_SPACE_BIAS     ( 20'h12400)
+         .REG_SPACE_BIAS     ( 20'd74752)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_3led_buzzer_56
@@ -2670,17 +2585,17 @@ ec_superisys_485_modbus_rtu_28
        ,.o_led_r        ( o_led_r_56           )   // 红色端口
     );
 
-    assign do_regoin_r_msg[ 0][1] = ~o_led_y_56;
-    assign do_regoin_r_msg[ 0][3] = ~o_bz_56;
-    assign do_regoin_r_msg[ 0][0] = ~o_led_r_56;
-    assign do_regoin_r_msg[ 0][2] = ~o_led_g_56;
+    assign do_regoin_r_msg[0][1] = ~o_led_y_56;
+    assign do_regoin_r_msg[0][3] = ~o_bz_56;
+    assign do_regoin_r_msg[0][0] = ~o_led_r_56;
+    assign do_regoin_r_msg[0][2] = ~o_led_g_56;
 	
 	
 	
 	// --- flow_comp_57 --A0058_分拣库_电子手轮---
     ec_pulmotor_handwheel
     #(
-         .REG_SPACE_BIAS     ( 20'h11800)
+         .REG_SPACE_BIAS     ( 20'd71680)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_pulmotor_handwheel_57
@@ -2726,7 +2641,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_58 --A0059_三坐标房清洗机侧自动门---
     ec_2di_2do
     #(
-         .REG_SPACE_BIAS     ( 20'he400)
+         .REG_SPACE_BIAS     ( 20'd58368)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_2di_2do_58
@@ -2765,7 +2680,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_59 --A0060_三坐标房地轨侧自动门---
     ec_2di_2do
     #(
-         .REG_SPACE_BIAS     ( 20'he600)
+         .REG_SPACE_BIAS     ( 20'd58880)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_2di_2do_59
@@ -2804,7 +2719,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_60 --A0061_三坐标房去毛刺机侧自动门---
     ec_2di_2do
     #(
-         .REG_SPACE_BIAS     ( 20'he800)
+         .REG_SPACE_BIAS     ( 20'd59392)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_2di_2do_60
@@ -2841,7 +2756,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_61 --A0062_主机器人地轨---
     ec_can_servo
     #(
-         .REG_SPACE_BIAS     ( 20'hfc00)
+         .REG_SPACE_BIAS     ( 20'd64512)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_can_servo_61
@@ -2875,7 +2790,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_62 --A0063_短桁架1---
     ec_can_servo
     #(
-         .REG_SPACE_BIAS     ( 20'hec00)
+         .REG_SPACE_BIAS     ( 20'd60416)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_can_servo_62
@@ -2909,7 +2824,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_63 --A0064_长桁架1---
     ec_can_servo
     #(
-         .REG_SPACE_BIAS     ( 20'hee00)
+         .REG_SPACE_BIAS     ( 20'd60928)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_can_servo_63
@@ -2932,6 +2847,9 @@ ec_superisys_485_modbus_rtu_28
       .o_st_rd_data          ( sub_comp_rd_dat[115]    ),
 	  .o_intr_irq            ( map_irq[115]       )
 
+       ,.i_axis_zero        ( 1'b0           )   // 
+       ,.i_axis_limb        ( 1'b0           )   // 
+       ,.i_axis_limf        ( 1'b0           )   // 
     );
 
 	
@@ -2940,7 +2858,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_64 --A0065_长桁架2---
     ec_can_servo
     #(
-         .REG_SPACE_BIAS     ( 20'hf000)
+         .REG_SPACE_BIAS     ( 20'd61440)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_can_servo_64
@@ -2963,6 +2881,9 @@ ec_superisys_485_modbus_rtu_28
       .o_st_rd_data          ( sub_comp_rd_dat[116]    ),
 	  .o_intr_irq            ( map_irq[116]       )
 
+       ,.i_axis_zero        ( 1'b0           )   // 
+       ,.i_axis_limb        ( 1'b0           )   // 
+       ,.i_axis_limf        ( 1'b0           )   // 
     );
 
 	
@@ -2971,7 +2892,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_66 --A0067_打磨机器人---
     ec_fanuc_robot
     #(
-         .REG_SPACE_BIAS     ( 20'h12600)
+         .REG_SPACE_BIAS     ( 20'd75264)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_fanuc_robot_66
@@ -3006,7 +2927,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_67 --A0068_去毛刺机_三色灯蜂鸣器---
     ec_3led_buzzer
     #(
-         .REG_SPACE_BIAS     ( 20'h13c00)
+         .REG_SPACE_BIAS     ( 20'd80896)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_3led_buzzer_67
@@ -3035,10 +2956,10 @@ ec_superisys_485_modbus_rtu_28
        ,.o_led_r        ( o_led_r_67           )   // 红色端口
     );
 
-    assign do_regoin_r_msg[ 2][1] = ~o_led_y_67;
-    assign do_regoin_r_msg[ 2][3] = ~o_bz_67;
-    assign do_regoin_r_msg[ 2][2] = ~o_led_g_67;
-    assign do_regoin_r_msg[ 2][0] = ~o_led_r_67;
+    assign do_regoin_r_msg[2][1] = ~o_led_y_67;
+    assign do_regoin_r_msg[2][3] = ~o_bz_67;
+    assign do_regoin_r_msg[2][2] = ~o_led_g_67;
+    assign do_regoin_r_msg[2][0] = ~o_led_r_67;
 	
 	
 	wire   o_dri1_68;
@@ -3047,7 +2968,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_68 --A0069_去毛刺卡盘---
     ec_2di_3do
     #(
-         .REG_SPACE_BIAS     ( 20'h12e00)
+         .REG_SPACE_BIAS     ( 20'd77312)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_2di_3do_68
@@ -3071,12 +2992,14 @@ ec_superisys_485_modbus_rtu_28
 	  .o_intr_irq            ( map_irq[147]       )
 
        ,.i_pos        ( ~di_regoin_msg[2][51]           )   // 位置到位开关
-       ,.o_dri1        ( o_dri1_68           )   // 夹紧驱动信号
-       ,.o_dri2        ( o_dri2_68           )   // 放松驱动信号
+       ,.o_dri1        ( o_dri1_68           )   // 卡盘开驱动信号
+       ,.o_dri2        ( o_dri2_68           )   // 卡盘关驱动信号
+       ,.o_dri        (            )   // 
+       ,.i_poa        ( 1'b0           )   // 
     );
 
-    assign do_regoin_r_msg[ 2][9] = ~o_dri1_68;
-    assign do_regoin_r_msg[ 2][8] = ~o_dri2_68;
+    assign do_regoin_r_msg[2][9] = ~o_dri1_68;
+    assign do_regoin_r_msg[2][8] = ~o_dri2_68;
 	
 	
 	wire   o_dri1_69;
@@ -3085,7 +3008,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_69 --A0070_去毛刺机_磨头夹爪---
     ec_2di_2do
     #(
-         .REG_SPACE_BIAS     ( 20'h12c00)
+         .REG_SPACE_BIAS     ( 20'd76800)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_2di_2do_69
@@ -3114,8 +3037,8 @@ ec_superisys_485_modbus_rtu_28
        ,.o_dri2        ( o_dri2_69           )   // 驱动信号2
     );
 
-    assign do_regoin_r_msg[ 2][13] = ~o_dri1_69;
-    assign do_regoin_r_msg[ 2][12] = ~o_dri2_69;
+    assign do_regoin_r_msg[2][13] = ~o_dri1_69;
+    assign do_regoin_r_msg[2][12] = ~o_dri2_69;
 	
 	
 	wire   o_dri1_70;
@@ -3124,7 +3047,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_70 --A0071_去毛刺机_自动门---
     ec_4di_2do
     #(
-         .REG_SPACE_BIAS     ( 20'h13400)
+         .REG_SPACE_BIAS     ( 20'd78848)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_4di_2do_70
@@ -3155,15 +3078,15 @@ ec_superisys_485_modbus_rtu_28
        ,.o_dri2        ( o_dri2_70           )   // 门关驱动信号
     );
 
-    assign do_regoin_r_msg[ 2][11] = ~o_dri1_70;
-    assign do_regoin_r_msg[ 2][10] = ~o_dri2_70;
+    assign do_regoin_r_msg[2][11] = ~o_dri1_70;
+    assign do_regoin_r_msg[2][10] = ~o_dri2_70;
 	
 	
 	
 	// --- flow_comp_71 --A0072_毛刺刀架库信号检测组---
     ec_16di
     #(
-         .REG_SPACE_BIAS     ( 20'h13a00)
+         .REG_SPACE_BIAS     ( 20'd80384)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_16di_71
@@ -3186,22 +3109,22 @@ ec_superisys_485_modbus_rtu_28
       .o_st_rd_data          ( sub_comp_rd_dat[153]    ),
 	  .o_intr_irq            ( map_irq[153]       )
 
-       ,.i_sign1_check        ( ~di_regoin_msg[3][60]           )   // 感测开关1
-       ,.i_sign10_check        ( ~di_regoin_msg[3][69]           )   // 感测开关10
-       ,.i_sign11_check        ( ~di_regoin_msg[3][70]           )   // 感测开关11
-       ,.i_sign12_check        ( ~di_regoin_msg[3][71]           )   // 感测开关12
-       ,.i_sign13_check        ( ~di_regoin_msg[3][72]           )   // 感测开关13
-       ,.i_sign14_check        ( ~di_regoin_msg[3][73]           )   // 感测开关14
-       ,.i_sign15_check        ( ~di_regoin_msg[3][74]           )   // 感测开关15
-       ,.i_sign16_check        ( ~di_regoin_msg[3][75]           )   // 感测开关16
-       ,.i_sign2_check        ( ~di_regoin_msg[3][61]           )   // 感测开关2
-       ,.i_sign3_check        ( ~di_regoin_msg[3][62]           )   // 感测开关3
-       ,.i_sign4_check        ( ~di_regoin_msg[3][63]           )   // 感测开关4
-       ,.i_sign5_check        ( ~di_regoin_msg[3][64]           )   // 感测开关5
-       ,.i_sign6_check        ( ~di_regoin_msg[3][65]           )   // 感测开关6
-       ,.i_sign7_check        ( ~di_regoin_msg[3][66]           )   // 感测开关7
-       ,.i_sign8_check        ( ~di_regoin_msg[3][67]           )   // 感测开关8
-       ,.i_sign9_check        ( ~di_regoin_msg[3][68]           )   // 感测开关9
+       ,.i_sign1_check        ( di_regoin_msg[3][60]           )   // 感测开关1
+       ,.i_sign10_check        ( di_regoin_msg[3][69]           )   // 感测开关10
+       ,.i_sign11_check        ( di_regoin_msg[3][70]           )   // 感测开关11
+       ,.i_sign12_check        ( di_regoin_msg[3][71]           )   // 感测开关12
+       ,.i_sign13_check        ( di_regoin_msg[3][72]           )   // 感测开关13
+       ,.i_sign14_check        ( di_regoin_msg[3][73]           )   // 感测开关14
+       ,.i_sign15_check        ( di_regoin_msg[3][74]           )   // 感测开关15
+       ,.i_sign16_check        ( di_regoin_msg[3][75]           )   // 感测开关16
+       ,.i_sign2_check        ( di_regoin_msg[3][61]           )   // 感测开关2
+       ,.i_sign3_check        ( di_regoin_msg[3][62]           )   // 感测开关3
+       ,.i_sign4_check        ( di_regoin_msg[3][63]           )   // 感测开关4
+       ,.i_sign5_check        ( di_regoin_msg[3][64]           )   // 感测开关5
+       ,.i_sign6_check        ( di_regoin_msg[3][65]           )   // 感测开关6
+       ,.i_sign7_check        ( di_regoin_msg[3][66]           )   // 感测开关7
+       ,.i_sign8_check        ( di_regoin_msg[3][67]           )   // 感测开关8
+       ,.i_sign9_check        ( di_regoin_msg[3][68]           )   // 感测开关9
     );
 
 	
@@ -3210,7 +3133,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_72 --A0081_去毛刺机_旋转台伺服电机---
     ec_slv_pul_axis
     #(
-         .REG_SPACE_BIAS     ( 20'h13000)
+         .REG_SPACE_BIAS     ( 20'd77824)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_slv_pul_axis_72
@@ -3233,7 +3156,7 @@ ec_superisys_485_modbus_rtu_28
       .o_st_rd_data          ( sub_comp_rd_dat[148]    ),
 	  .o_intr_irq            ( map_irq[148]       )
 
-       ,.pul_motor_r_flag        ( pul_motor1_r_flag           )   // 
+       ,.pul_motor_r_flag        ( pul_motor2_r_flag           )   // 
        ,.cur_slv_board_id        ( 5'd2           )   // 
        ,.slv_board_id        ( slv_board_id           )   // 
        ,.pul_motor_flag        ( pul_motor2_flag           )   // 
@@ -3242,6 +3165,8 @@ ec_superisys_485_modbus_rtu_28
        ,.i_axis_zero        ( ~di_regoin_msg[2][42]           )   // 零位到位开关
        ,.i_servo_done        ( di_regoin_msg[2][44]           )   // 伺服定位完成
        ,.i_servo_ready        ( di_regoin_msg[2][43]           )   // 伺服就绪
+       ,.i_axis_limf        ( 1'b0           )   // 
+       ,.i_axis_limb        ( 1'b0           )   // 
     );
 
 	
@@ -3251,7 +3176,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_73 --A0074_去毛刺机_防爆除尘器---
     ec_1do
     #(
-         .REG_SPACE_BIAS     ( 20'h13600)
+         .REG_SPACE_BIAS     ( 20'd79360)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_1do_73
@@ -3277,7 +3202,7 @@ ec_superisys_485_modbus_rtu_28
        ,.o_sig_dri        ( o_sig_dri_73           )   // 单驱动信号
     );
 
-    assign do_regoin_r_msg[ 2][29] = ~o_sig_dri_73;
+    assign do_regoin_r_msg[2][29] = ~o_sig_dri_73;
 	
 	
 	wire   o_sig_dri_74;
@@ -3285,7 +3210,7 @@ ec_superisys_485_modbus_rtu_28
 	// --- flow_comp_74 --A0075_去毛刺机_水冷机---
     ec_1do
     #(
-         .REG_SPACE_BIAS     ( 20'h13800)
+         .REG_SPACE_BIAS     ( 20'd79872)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_1do_74
@@ -3311,14 +3236,14 @@ ec_superisys_485_modbus_rtu_28
        ,.o_sig_dri        ( o_sig_dri_74           )   // 单驱动信号
     );
 
-    assign do_regoin_r_msg[ 2][31] = ~o_sig_dri_74;
+    assign do_regoin_r_msg[2][31] = ~o_sig_dri_74;
 	
 	
 	
 	// // --- flow_comp_75 --A0080_去毛刺机_变频磨头旋转电机---
     // ec_slv_dv300_485
     // #(
-    //      .REG_SPACE_BIAS     ( 20'h13200)
+    //      .REG_SPACE_BIAS     ( 20'd78336)
     //     ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     // )
     // ec_slv_dv300_485_75
@@ -3387,7 +3312,7 @@ ec_dv300_485_modbus_rtu_75
 	// --- flow_comp_76 --A0077_短桁架1#机器人夹爪---
     ec_2di_2do
     #(
-         .REG_SPACE_BIAS     ( 20'hf200)
+         .REG_SPACE_BIAS     ( 20'd61952)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_2di_2do_76
@@ -3426,7 +3351,7 @@ ec_dv300_485_modbus_rtu_75
 	// --- flow_comp_77 --A0078_长桁架1#机器人夹爪---
     ec_2di_2do
     #(
-         .REG_SPACE_BIAS     ( 20'hf600)
+         .REG_SPACE_BIAS     ( 20'd62976)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_2di_2do_77
@@ -3455,8 +3380,8 @@ ec_dv300_485_modbus_rtu_75
        ,.o_dri2        ( o_dri2_77           )   // 驱动信号2
     );
 
-    assign do_regoin_r_msg[ 3][25] = ~o_dri2_77;
-    assign do_regoin_r_msg[ 3][24] = ~o_dri1_77;
+    assign do_regoin_r_msg[3][25] = ~o_dri2_77;
+    assign do_regoin_r_msg[3][24] = ~o_dri1_77;
 	
 	
 	wire   o_dri1_78;
@@ -3465,7 +3390,7 @@ ec_dv300_485_modbus_rtu_75
 	// --- flow_comp_78 --A0079_长桁架2#机器人夹爪---
     ec_2di_2do
     #(
-         .REG_SPACE_BIAS     ( 20'hf400)
+         .REG_SPACE_BIAS     ( 20'd62464)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_2di_2do_78
@@ -3494,15 +3419,15 @@ ec_dv300_485_modbus_rtu_75
        ,.o_dri2        ( o_dri2_78           )   // 驱动信号2
     );
 
-    assign do_regoin_r_msg[ 3][26] = ~o_dri1_78;
-    assign do_regoin_r_msg[ 3][27] = ~o_dri2_78;
+    assign do_regoin_r_msg[3][26] = ~o_dri1_78;
+    assign do_regoin_r_msg[3][27] = ~o_dri2_78;
 	
 	
 	
 	// --- flow_comp_79 --A0082_固定机器人夹爪物料检测信号---
     ec_1di
     #(
-         .REG_SPACE_BIAS     ( 20'hea00)
+         .REG_SPACE_BIAS     ( 20'd59904)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_1di_79
@@ -3525,7 +3450,7 @@ ec_dv300_485_modbus_rtu_75
       .o_st_rd_data          ( sub_comp_rd_dat[113]    ),
 	  .o_intr_irq            ( map_irq[113]       )
 
-       ,.i_sign1_check        ( ~di_mst_msg[30]           )   // 单位检测信号
+       ,.i_sign1_check        ( di_mst_msg[30]           )   // 单位检测信号
     );
 
 	
@@ -3536,7 +3461,7 @@ ec_dv300_485_modbus_rtu_75
 	// --- flow_comp_80 --A0083_6号机床旋转机构---
     ec_2di_2do
     #(
-         .REG_SPACE_BIAS     ( 20'h18600)
+         .REG_SPACE_BIAS     ( 20'd99840)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_2di_2do_80
@@ -3565,38 +3490,78 @@ ec_dv300_485_modbus_rtu_75
        ,.o_dri2        ( o_dri2_80           )   // 驱动信号2
     );
 
-    assign do_regoin_r_msg[ 4][32] = ~o_dri1_80;
-    assign do_regoin_r_msg[ 4][33] = ~o_dri2_80;
+    assign do_regoin_r_msg[4][32] = ~o_dri1_80;
+    assign do_regoin_r_msg[4][33] = ~o_dri2_80;
 	
 	
 	
-	// // --- flow_comp_83 -----长桁架1#夹爪RFID读写器
+	// --- flow_comp_81 --A0084_OCR 字符识别---
+    ec_ocr_camera
+    #(
+         .REG_SPACE_BIAS     ( 20'd105472)
+        ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
+    )
+    ec_ocr_camera_81
+    (
+      
+	  .clk_i                 ( clk               ),
+      .rst                   ( reset             ),
+	  .ps_reg_clk            ( ps_reg_clk        ),
+      .ps_reg_reset          ( ps_reg_reset      ),
+	  
+	  .i_time_1ms_vld        ( time_1ms_vld      ),
+	  .i_time_1s_vld         ( time_1s_vld       ),
+
+	  .i_st_wr_en            ( ps_reg_we         ),
+	  .i_st_wr_addr          ( ps_reg_addr       ),
+      .i_st_wr_data          ( ps_reg_wr_dat     ),
+      .i_st_rd_en            ( ps_reg_re         ),
+      .i_st_rd_addr          ( ps_reg_rd_addr    ),
+	  .o_st_rd_vld           ( sub_comp_rd_vld[202]    ),
+      .o_st_rd_data          ( sub_comp_rd_dat[202]    ),
+	  .o_intr_irq            ( map_irq[202]       )
+
+    );
+
+	
+	
+	
+	// // --- flow_comp_83 --A0086_长桁架1#夹爪RFID读写器---
     // ec_sp_rfid
     // #(
-    //      .REG_SPACE_BIAS     (20'hf800)
-    //     ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
+    //      .REG_SPACE_BIAS     ( 20'd63488)
+    //     ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     // )
     // ec_sp_rfid_83
     // (
-    //   .clk_i                 ( clk               ),
+      
+	//   .clk_i                 ( clk               ),
     //   .rst                   ( reset             ),
-	//   .ps_reg_clk            ( ps_reg_clk               ),
-    //   .ps_reg_reset          ( ps_reg_reset             ),
+	//   .ps_reg_clk            ( ps_reg_clk        ),
+    //   .ps_reg_reset          ( ps_reg_reset      ),
 	  
-	//   .i_time_1ms_vld        (time_1ms_vld         ),
-	//   .i_time_1s_vld         (time_1s_vld          ),
+	//   .i_time_1ms_vld        ( time_1ms_vld      ),
+	//   .i_time_1s_vld         ( time_1s_vld       ),
 
-	//   .i_st_wr_en            ( ps_reg_we                ),
-	//   .i_st_wr_addr          ( ps_reg_addr              ),
-    //   .i_st_wr_data          ( ps_reg_wr_dat            ),
-    //   .i_st_rd_en            ( ps_reg_re                ),
-    //   .i_st_rd_addr          ( ps_reg_rd_addr           ),
+	//   .i_st_wr_en            ( ps_reg_we         ),
+	//   .i_st_wr_addr          ( ps_reg_addr       ),
+    //   .i_st_wr_data          ( ps_reg_wr_dat     ),
+    //   .i_st_rd_en            ( ps_reg_re         ),
+    //   .i_st_rd_addr          ( ps_reg_rd_addr    ),
 	//   .o_st_rd_vld           ( sub_comp_rd_vld[120]    ),
     //   .o_st_rd_data          ( sub_comp_rd_dat[120]    ),
 	//   .o_intr_irq            ( map_irq[120]       )
 
+    //    ,.cur_slv_board_id        ( 5'd3           )   // RS485端口
+    //    ,.slv_board_id        ( slv_board_id           )   // 
+    //    ,.rs485_ch_r_flag        ( rs485_00_r_flag           )   // 
+    //    ,.rs485_ch_flag        ( rs485_00_flag           )   // 
+    //    ,.m2s_rs485_msg        ( rs485_00_send_msg[3]           )   // 
+    //    ,.s2m_rs485_msg        ( rs485_00_msg[3]           )   // 
     // );
 
+	
+	
 ec_superisys_485_modbus_rtu
 #(
         .REG_SPACE_BIAS         (20'hf800                ), //组件基地址
@@ -3635,37 +3600,42 @@ ec_superisys_485_modbus_rtu_83
         .rs485_ch_flag          ( 0                       ), //recv en
         .s2m_rs485_msg          ( 0                       )  //recv data
     );
-  
-	
-	
-	// // --- flow_comp_84 -----长桁架2#夹爪RFID读写器
+
+	// // --- flow_comp_84 --A0087_长桁架2#夹爪RFID读写器---
     // ec_sp_rfid
     // #(
-    //      .REG_SPACE_BIAS     (20'hfa00)
-    //     ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE           )
+    //      .REG_SPACE_BIAS     ( 20'd64000)
+    //     ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     // )
     // ec_sp_rfid_84
     // (
-    //   .clk_i                 ( clk               ),
+      
+	//   .clk_i                 ( clk               ),
     //   .rst                   ( reset             ),
-	//   .ps_reg_clk            ( ps_reg_clk               ),
-    //   .ps_reg_reset          ( ps_reg_reset             ),
+	//   .ps_reg_clk            ( ps_reg_clk        ),
+    //   .ps_reg_reset          ( ps_reg_reset      ),
 	  
-	//   .i_time_1ms_vld        (time_1ms_vld         ),
-	//   .i_time_1s_vld         (time_1s_vld          ),
+	//   .i_time_1ms_vld        ( time_1ms_vld      ),
+	//   .i_time_1s_vld         ( time_1s_vld       ),
 
-	//   .i_st_wr_en            ( ps_reg_we                ),
-	//   .i_st_wr_addr          ( ps_reg_addr              ),
-    //   .i_st_wr_data          ( ps_reg_wr_dat            ),
-    //   .i_st_rd_en            ( ps_reg_re                ),
-    //   .i_st_rd_addr          ( ps_reg_rd_addr           ),
+	//   .i_st_wr_en            ( ps_reg_we         ),
+	//   .i_st_wr_addr          ( ps_reg_addr       ),
+    //   .i_st_wr_data          ( ps_reg_wr_dat     ),
+    //   .i_st_rd_en            ( ps_reg_re         ),
+    //   .i_st_rd_addr          ( ps_reg_rd_addr    ),
 	//   .o_st_rd_vld           ( sub_comp_rd_vld[121]    ),
     //   .o_st_rd_data          ( sub_comp_rd_dat[121]    ),
 	//   .o_intr_irq            ( map_irq[121]       )
 
+    //    ,.cur_slv_board_id        ( 5'd3           )   // RS485端口
+    //    ,.slv_board_id        ( slv_board_id           )   // 
+    //    ,.rs485_ch_r_flag        ( rs485_00_r_flag           )   // 
+    //    ,.rs485_ch_flag        ( rs485_00_flag           )   // 
+    //    ,.m2s_rs485_msg        ( rs485_00_send_msg[3]           )   // 
+    //    ,.s2m_rs485_msg        ( rs485_00_msg[3]           )   // 
     // );
 
-ec_superisys_485_modbus_rtu
+	ec_superisys_485_modbus_rtu
 #(
         .REG_SPACE_BIAS         (20'hfa00                ), //组件基地址
         .REG_SPACE_SIZE         (`REG_SPACE_SIZE          ), //组件偏移地址
@@ -3703,14 +3673,12 @@ ec_superisys_485_modbus_rtu_84
         .rs485_ch_flag          ( 0                       ), //recv en
         .s2m_rs485_msg          ( 0                       )  //recv data
     );
-
-	
 	
 	
 	// --- flow_comp_85 --A0088_1号机床线边托盘检测组---
     ec_5di
     #(
-         .REG_SPACE_BIAS     ( 20'h14000)
+         .REG_SPACE_BIAS     ( 20'd81920)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_5di_85
@@ -3746,7 +3714,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_86 --A0089_2号机床线边托盘检测组---
     ec_5di
     #(
-         .REG_SPACE_BIAS     ( 20'h14200)
+         .REG_SPACE_BIAS     ( 20'd82432)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_5di_86
@@ -3782,7 +3750,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_87 --A0090_3号机床线边托盘检测组---
     ec_5di
     #(
-         .REG_SPACE_BIAS     ( 20'h14400)
+         .REG_SPACE_BIAS     ( 20'd82944)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_5di_87
@@ -3818,7 +3786,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_88 --A0091_4号机床线边托盘检测组---
     ec_5di
     #(
-         .REG_SPACE_BIAS     ( 20'h15000)
+         .REG_SPACE_BIAS     ( 20'd86016)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_5di_88
@@ -3854,7 +3822,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_89 --A0092_5号机床线边托盘检测组---
     ec_5di
     #(
-         .REG_SPACE_BIAS     ( 20'h15400)
+         .REG_SPACE_BIAS     ( 20'd87040)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_5di_89
@@ -3890,7 +3858,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_90 --A0093_6号机床线边托盘检测组---
     ec_5di
     #(
-         .REG_SPACE_BIAS     ( 20'h14e00)
+         .REG_SPACE_BIAS     ( 20'd85504)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_5di_90
@@ -3926,7 +3894,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_91 --A0094_7号机床线边托盘检测组---
     ec_5di
     #(
-         .REG_SPACE_BIAS     ( 20'h14800)
+         .REG_SPACE_BIAS     ( 20'd83968)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_5di_91
@@ -3962,7 +3930,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_92 --A0095_8号机床线边托盘检测组---
     ec_5di
     #(
-         .REG_SPACE_BIAS     ( 20'h15200)
+         .REG_SPACE_BIAS     ( 20'd86528)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_5di_92
@@ -3998,7 +3966,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_93 --A0096_9号机床线边托盘检测组---
     ec_5di
     #(
-         .REG_SPACE_BIAS     ( 20'h14c00)
+         .REG_SPACE_BIAS     ( 20'd84992)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_5di_93
@@ -4036,7 +4004,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_94 --A0097_机床1顶部围栏自动门---
     ec_2di_2do
     #(
-         .REG_SPACE_BIAS     ( 20'h16600)
+         .REG_SPACE_BIAS     ( 20'd91648)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_2di_2do_94
@@ -4065,8 +4033,8 @@ ec_superisys_485_modbus_rtu_84
        ,.o_dri2        ( o_dri2_94           )   // 驱动信号2
     );
 
-    assign do_regoin_r_msg[ 1][0] = ~o_dri1_94;
-    assign do_regoin_r_msg[ 1][1] = ~o_dri2_94;
+    assign do_regoin_r_msg[1][0] = ~o_dri1_94;
+    assign do_regoin_r_msg[1][1] = ~o_dri2_94;
 	
 	
 	wire   o_dri2_95;
@@ -4075,7 +4043,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_95 --A0098_机床2顶部围栏自动门---
     ec_2di_2do
     #(
-         .REG_SPACE_BIAS     ( 20'h16400)
+         .REG_SPACE_BIAS     ( 20'd91136)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_2di_2do_95
@@ -4104,8 +4072,8 @@ ec_superisys_485_modbus_rtu_84
        ,.o_dri2        ( o_dri2_95           )   // 驱动信号2
     );
 
-    assign do_regoin_r_msg[ 1][3] = ~o_dri2_95;
-    assign do_regoin_r_msg[ 1][2] = ~o_dri1_95;
+    assign do_regoin_r_msg[1][3] = ~o_dri2_95;
+    assign do_regoin_r_msg[1][2] = ~o_dri1_95;
 	
 	
 	wire   o_dri1_96;
@@ -4114,7 +4082,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_96 --A0099_机床3顶部围栏自动门---
     ec_2di_2do
     #(
-         .REG_SPACE_BIAS     ( 20'h16200)
+         .REG_SPACE_BIAS     ( 20'd90624)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_2di_2do_96
@@ -4143,8 +4111,8 @@ ec_superisys_485_modbus_rtu_84
        ,.o_dri2        ( o_dri2_96           )   // 驱动信号2
     );
 
-    assign do_regoin_r_msg[ 1][4] = ~o_dri1_96;
-    assign do_regoin_r_msg[ 1][5] = ~o_dri2_96;
+    assign do_regoin_r_msg[1][4] = ~o_dri1_96;
+    assign do_regoin_r_msg[1][5] = ~o_dri2_96;
 	
 	
 	wire   o_dri1_97;
@@ -4153,7 +4121,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_97 --A0100_机床4顶部围栏自动门---
     ec_2di_2do
     #(
-         .REG_SPACE_BIAS     ( 20'h15c00)
+         .REG_SPACE_BIAS     ( 20'd89088)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_2di_2do_97
@@ -4182,8 +4150,8 @@ ec_superisys_485_modbus_rtu_84
        ,.o_dri2        ( o_dri2_97           )   // 驱动信号2
     );
 
-    assign do_regoin_r_msg[ 4][7] = ~o_dri1_97;
-    assign do_regoin_r_msg[ 4][8] = ~o_dri2_97;
+    assign do_regoin_r_msg[4][7] = ~o_dri1_97;
+    assign do_regoin_r_msg[4][8] = ~o_dri2_97;
 	
 	
 	wire   o_dri1_98;
@@ -4192,7 +4160,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_98 --A0101_机床5顶部围栏自动门---
     ec_2di_2do
     #(
-         .REG_SPACE_BIAS     ( 20'h15e00)
+         .REG_SPACE_BIAS     ( 20'd89600)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_2di_2do_98
@@ -4221,8 +4189,8 @@ ec_superisys_485_modbus_rtu_84
        ,.o_dri2        ( o_dri2_98           )   // 驱动信号2
     );
 
-    assign do_regoin_r_msg[ 4][9] = ~o_dri1_98;
-    assign do_regoin_r_msg[ 4][10] = ~o_dri2_98;
+    assign do_regoin_r_msg[4][9] = ~o_dri1_98;
+    assign do_regoin_r_msg[4][10] = ~o_dri2_98;
 	
 	
 	wire   o_dri1_99;
@@ -4231,7 +4199,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_99 --A0102_机床6顶部围栏自动门---
     ec_2di_2do
     #(
-         .REG_SPACE_BIAS     ( 20'h16000)
+         .REG_SPACE_BIAS     ( 20'd90112)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_2di_2do_99
@@ -4260,8 +4228,8 @@ ec_superisys_485_modbus_rtu_84
        ,.o_dri2        ( o_dri2_99           )   // 驱动信号2
     );
 
-    assign do_regoin_r_msg[ 4][11] = ~o_dri1_99;
-    assign do_regoin_r_msg[ 4][12] = ~o_dri2_99;
+    assign do_regoin_r_msg[4][11] = ~o_dri1_99;
+    assign do_regoin_r_msg[4][12] = ~o_dri2_99;
 	
 	
 	wire   o_dri2_100;
@@ -4270,7 +4238,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_100 --A0103_机床7顶部围栏自动门---
     ec_2di_2do
     #(
-         .REG_SPACE_BIAS     ( 20'h15800)
+         .REG_SPACE_BIAS     ( 20'd88064)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_2di_2do_100
@@ -4299,8 +4267,8 @@ ec_superisys_485_modbus_rtu_84
        ,.o_dri2        ( o_dri2_100           )   // 驱动信号2
     );
 
-    assign do_regoin_r_msg[ 4][14] = ~o_dri2_100;
-    assign do_regoin_r_msg[ 4][13] = ~o_dri1_100;
+    assign do_regoin_r_msg[4][14] = ~o_dri2_100;
+    assign do_regoin_r_msg[4][13] = ~o_dri1_100;
 	
 	
 	wire   o_dri2_101;
@@ -4309,7 +4277,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_101 --A0104_机床8顶部围栏自动门---
     ec_2di_2do
     #(
-         .REG_SPACE_BIAS     ( 20'h15a00)
+         .REG_SPACE_BIAS     ( 20'd88576)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_2di_2do_101
@@ -4338,8 +4306,8 @@ ec_superisys_485_modbus_rtu_84
        ,.o_dri2        ( o_dri2_101           )   // 驱动信号2
     );
 
-    assign do_regoin_r_msg[ 4][16] = ~o_dri2_101;
-    assign do_regoin_r_msg[ 4][15] = ~o_dri1_101;
+    assign do_regoin_r_msg[4][16] = ~o_dri2_101;
+    assign do_regoin_r_msg[4][15] = ~o_dri1_101;
 	
 	
 	wire   o_dri1_102;
@@ -4348,7 +4316,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_102 --A0105_机床9顶部围栏自动门---
     ec_2di_2do
     #(
-         .REG_SPACE_BIAS     ( 20'h15600)
+         .REG_SPACE_BIAS     ( 20'd87552)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_2di_2do_102
@@ -4377,15 +4345,15 @@ ec_superisys_485_modbus_rtu_84
        ,.o_dri2        ( o_dri2_102           )   // 驱动信号2
     );
 
-    assign do_regoin_r_msg[ 4][17] = ~o_dri1_102;
-    assign do_regoin_r_msg[ 4][18] = ~o_dri2_102;
+    assign do_regoin_r_msg[4][17] = ~o_dri1_102;
+    assign do_regoin_r_msg[4][18] = ~o_dri2_102;
 	
 	
 	
 	// --- flow_comp_103 --A0106_检测站缓存单位感测信号---
     ec_1di
     #(
-         .REG_SPACE_BIAS     ( 20'h13e00)
+         .REG_SPACE_BIAS     ( 20'd81408)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_1di_103
@@ -4418,7 +4386,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_105 --A0108_A区1#安全门锁---
     ec_sf_door
     #(
-         .REG_SPACE_BIAS     ( 20'h17000)
+         .REG_SPACE_BIAS     ( 20'd94208)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_sf_door_105
@@ -4444,9 +4412,12 @@ ec_superisys_485_modbus_rtu_84
        ,.i_lock_monitor        ( ~di_regoin_msg[1][26]           )   // 锁监控常闭DO端口
        ,.i_open_req_key        ( ~di_regoin_msg[1][27]           )   // 开门请求绿色按钮
        ,.o_lock_open        ( o_lock_open_105           )   // 电磁锁A1
+       ,.i_close_confirm_key        ( 1'b0           )   // 
+       ,.i_door_monitor        ( 1'b0           )   // 
+       ,.o_key_light        (            )   // 
     );
 
-    assign do_regoin_r_msg[ 1][28] = ~o_lock_open_105;
+    assign do_regoin_r_msg[1][28] = ~o_lock_open_105;
 	
 	
 	wire   o_lock_open_106;
@@ -4454,7 +4425,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_106 --A0109_A区2#安全门锁---
     ec_sf_door
     #(
-         .REG_SPACE_BIAS     ( 20'h17200)
+         .REG_SPACE_BIAS     ( 20'd94720)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_sf_door_106
@@ -4480,9 +4451,12 @@ ec_superisys_485_modbus_rtu_84
        ,.i_lock_monitor        ( di_regoin_msg[1][29]           )   // 锁监控常闭DO端口
        ,.i_open_req_key        ( ~di_regoin_msg[1][30]           )   // 开门请求绿色按钮
        ,.o_lock_open        ( o_lock_open_106           )   // 电磁锁A1
+       ,.i_close_confirm_key        ( 1'b0           )   // 
+       ,.i_door_monitor        ( 1'b0           )   // 
+       ,.o_key_light        (            )   // 
     );
 
-    assign do_regoin_r_msg[ 1][29] = ~o_lock_open_106;
+    assign do_regoin_r_msg[1][29] = ~o_lock_open_106;
 	
 	
 	wire   o_lock_open_107;
@@ -4490,7 +4464,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_107 --A0110_A区3#安全门锁---
     ec_sf_door
     #(
-         .REG_SPACE_BIAS     ( 20'h16e00)
+         .REG_SPACE_BIAS     ( 20'd93696)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_sf_door_107
@@ -4516,9 +4490,12 @@ ec_superisys_485_modbus_rtu_84
        ,.i_lock_monitor        ( ~di_regoin_msg[1][32]           )   // 锁监控常闭DO端口
        ,.i_open_req_key        ( ~di_regoin_msg[1][33]           )   // 开门请求绿色按钮
        ,.o_lock_open        ( o_lock_open_107           )   // 电磁锁A1
+       ,.i_close_confirm_key        ( 1'b0           )   // 
+       ,.i_door_monitor        ( 1'b0           )   // 
+       ,.o_key_light        (            )   // 
     );
 
-    assign do_regoin_r_msg[ 1][30] = ~o_lock_open_107;
+    assign do_regoin_r_msg[1][30] = ~o_lock_open_107;
 	
 	
 	wire   o_lock_open_108;
@@ -4526,7 +4503,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_108 --A0111_B区1#安全门锁---
     ec_sf_door
     #(
-         .REG_SPACE_BIAS     ( 20'h18200)
+         .REG_SPACE_BIAS     ( 20'd98816)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_sf_door_108
@@ -4552,9 +4529,12 @@ ec_superisys_485_modbus_rtu_84
        ,.i_lock_monitor        ( ~di_regoin_msg[3][4]           )   // 锁监控常闭DO端口
        ,.i_open_req_key        ( ~di_regoin_msg[3][5]           )   // 开门请求绿色按钮
        ,.o_lock_open        ( o_lock_open_108           )   // 电磁锁A1
+       ,.i_close_confirm_key        ( 1'b0           )   // 
+       ,.i_door_monitor        ( 1'b0           )   // 
+       ,.o_key_light        (            )   // 
     );
 
-    assign do_regoin_r_msg[ 4][1] = ~o_lock_open_108;
+    assign do_regoin_r_msg[4][1] = ~o_lock_open_108;
 	
 	
 	wire   o_lock_open_109;
@@ -4562,7 +4542,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_109 --A0112_B区2#安全门锁---
     ec_sf_door
     #(
-         .REG_SPACE_BIAS     ( 20'h17c00)
+         .REG_SPACE_BIAS     ( 20'd97280)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_sf_door_109
@@ -4588,9 +4568,12 @@ ec_superisys_485_modbus_rtu_84
        ,.i_lock_monitor        ( ~di_regoin_msg[3][7]           )   // 锁监控常闭DO端口
        ,.i_open_req_key        ( ~di_regoin_msg[3][8]           )   // 开门请求绿色按钮
        ,.o_lock_open        ( o_lock_open_109           )   // 电磁锁A1
+       ,.i_close_confirm_key        ( 1'b0           )   // 
+       ,.i_door_monitor        ( 1'b0           )   // 
+       ,.o_key_light        (            )   // 
     );
 
-    assign do_regoin_r_msg[ 4][2] = ~o_lock_open_109;
+    assign do_regoin_r_msg[4][2] = ~o_lock_open_109;
 	
 	
 	wire   o_lock_open_110;
@@ -4598,7 +4581,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_110 --A0113_B区3#安全门锁---
     ec_sf_door
     #(
-         .REG_SPACE_BIAS     ( 20'h17a00)
+         .REG_SPACE_BIAS     ( 20'd96768)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_sf_door_110
@@ -4624,9 +4607,12 @@ ec_superisys_485_modbus_rtu_84
        ,.i_lock_monitor        ( ~di_regoin_msg[3][10]           )   // 锁监控常闭DO端口
        ,.i_open_req_key        ( ~di_regoin_msg[3][11]           )   // 开门请求绿色按钮
        ,.o_lock_open        ( o_lock_open_110           )   // 电磁锁A1
+       ,.i_close_confirm_key        ( 1'b0           )   // 
+       ,.i_door_monitor        ( 1'b0           )   // 
+       ,.o_key_light        (            )   // 
     );
 
-    assign do_regoin_r_msg[ 4][3] = ~o_lock_open_110;
+    assign do_regoin_r_msg[4][3] = ~o_lock_open_110;
 	
 	
 	wire   o_lock_open_111;
@@ -4634,7 +4620,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_111 --A0114_C区1#安全门锁---
     ec_sf_door
     #(
-         .REG_SPACE_BIAS     ( 20'h18000)
+         .REG_SPACE_BIAS     ( 20'd98304)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_sf_door_111
@@ -4660,9 +4646,12 @@ ec_superisys_485_modbus_rtu_84
        ,.i_lock_monitor        ( ~di_regoin_msg[3][13]           )   // 锁监控常闭DO端口
        ,.i_open_req_key        ( ~di_regoin_msg[3][47]           )   // 开门请求绿色按钮
        ,.o_lock_open        ( o_lock_open_111           )   // 电磁锁A1
+       ,.i_close_confirm_key        ( 1'b0           )   // 
+       ,.i_door_monitor        ( 1'b0           )   // 
+       ,.o_key_light        (            )   // 
     );
 
-    assign do_regoin_r_msg[ 3][4] = ~o_lock_open_111;
+    assign do_regoin_r_msg[3][4] = ~o_lock_open_111;
 	
 	
 	wire   o_lock_open_112;
@@ -4670,7 +4659,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_112 --A0115_C区2#安全门锁---
     ec_sf_door
     #(
-         .REG_SPACE_BIAS     ( 20'h17e00)
+         .REG_SPACE_BIAS     ( 20'd97792)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_sf_door_112
@@ -4696,9 +4685,12 @@ ec_superisys_485_modbus_rtu_84
        ,.i_lock_monitor        ( ~di_regoin_msg[3][49]           )   // 锁监控常闭DO端口
        ,.i_open_req_key        ( ~di_regoin_msg[3][50]           )   // 开门请求绿色按钮
        ,.o_lock_open        ( o_lock_open_112           )   // 电磁锁A1
+       ,.i_close_confirm_key        ( 1'b0           )   // 
+       ,.i_door_monitor        ( 1'b0           )   // 
+       ,.o_key_light        (            )   // 
     );
 
-    assign do_regoin_r_msg[ 3][5] = ~o_lock_open_112;
+    assign do_regoin_r_msg[3][5] = ~o_lock_open_112;
 	
 	
 	wire   o_lock_open_113;
@@ -4706,7 +4698,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_113 --A0116_C区3#安全门锁---
     ec_sf_door
     #(
-         .REG_SPACE_BIAS     ( 20'h17800)
+         .REG_SPACE_BIAS     ( 20'd96256)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_sf_door_113
@@ -4732,9 +4724,12 @@ ec_superisys_485_modbus_rtu_84
        ,.i_lock_monitor        ( ~di_regoin_msg[3][52]           )   // 锁监控常闭DO端口
        ,.i_open_req_key        ( ~di_regoin_msg[3][53]           )   // 开门请求绿色按钮
        ,.o_lock_open        ( o_lock_open_113           )   // 电磁锁A1
+       ,.i_close_confirm_key        ( 1'b0           )   // 
+       ,.i_door_monitor        ( 1'b0           )   // 
+       ,.o_key_light        (            )   // 
     );
 
-    assign do_regoin_r_msg[ 3][6] = ~o_lock_open_113;
+    assign do_regoin_r_msg[3][6] = ~o_lock_open_113;
 	
 	
 	wire   o_lock_open_114;
@@ -4742,7 +4737,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_114 --A0117_地轨首端安全门锁---
     ec_sf_door
     #(
-         .REG_SPACE_BIAS     ( 20'h17400)
+         .REG_SPACE_BIAS     ( 20'd95232)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_sf_door_114
@@ -4768,9 +4763,12 @@ ec_superisys_485_modbus_rtu_84
        ,.i_lock_monitor        ( ~di_regoin_msg[1][38]           )   // 锁监控常闭DO端口
        ,.i_open_req_key        ( ~di_regoin_msg[1][39]           )   // 开门请求绿色按钮
        ,.o_lock_open        ( o_lock_open_114           )   // 电磁锁A1
+       ,.i_close_confirm_key        ( 1'b0           )   // 
+       ,.i_door_monitor        ( 1'b0           )   // 
+       ,.o_key_light        (            )   // 
     );
 
-    assign do_regoin_r_msg[ 1][32] = ~o_lock_open_114;
+    assign do_regoin_r_msg[1][32] = ~o_lock_open_114;
 	
 	
 	wire   o_lock_open_115;
@@ -4778,7 +4776,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_115 --A0118_地轨尾端安全门锁---
     ec_sf_door
     #(
-         .REG_SPACE_BIAS     ( 20'h17600)
+         .REG_SPACE_BIAS     ( 20'd95744)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_sf_door_115
@@ -4804,9 +4802,12 @@ ec_superisys_485_modbus_rtu_84
        ,.i_lock_monitor        ( ~di_regoin_msg[1][35]           )   // 锁监控常闭DO端口
        ,.i_open_req_key        ( ~di_regoin_msg[1][36]           )   // 开门请求绿色按钮
        ,.o_lock_open        ( o_lock_open_115           )   // 电磁锁A1
+       ,.i_close_confirm_key        ( 1'b0           )   // 
+       ,.i_door_monitor        ( 1'b0           )   // 
+       ,.o_key_light        (            )   // 
     );
 
-    assign do_regoin_r_msg[ 1][31] = ~o_lock_open_115;
+    assign do_regoin_r_msg[1][31] = ~o_lock_open_115;
 	
 	
 	wire   o_sig_dri_116;
@@ -4814,7 +4815,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_116 --A0119_清洗机吹气---
     ec_1do
     #(
-         .REG_SPACE_BIAS     ( 20'he200)
+         .REG_SPACE_BIAS     ( 20'd57856)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_1do_116
@@ -4840,7 +4841,7 @@ ec_superisys_485_modbus_rtu_84
        ,.o_sig_dri        ( o_sig_dri_116           )   // 单驱动信号
     );
 
-    assign do_regoin_r_msg[ 2][7] = ~o_sig_dri_116;
+    assign do_regoin_r_msg[2][7] = ~o_sig_dri_116;
 	
 	
 	wire   o_bz_118;
@@ -4851,7 +4852,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_118 --A0121_6号机床_三色灯蜂鸣器---
     ec_3led_buzzer
     #(
-         .REG_SPACE_BIAS     ( 20'h14600)
+         .REG_SPACE_BIAS     ( 20'd83456)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_3led_buzzer_118
@@ -4880,10 +4881,10 @@ ec_superisys_485_modbus_rtu_84
        ,.o_led_r        ( o_led_r_118           )   // 红色端口
     );
 
-    assign do_regoin_r_msg[ 3][3] = ~o_bz_118;
-    assign do_regoin_r_msg[ 3][2] = ~o_led_g_118;
-    assign do_regoin_r_msg[ 3][0] = ~o_led_r_118;
-    assign do_regoin_r_msg[ 3][1] = ~o_led_y_118;
+    assign do_regoin_r_msg[3][3] = ~o_bz_118;
+    assign do_regoin_r_msg[3][2] = ~o_led_g_118;
+    assign do_regoin_r_msg[3][0] = ~o_led_r_118;
+    assign do_regoin_r_msg[3][1] = ~o_led_y_118;
 	
 	
 	wire   o_dri1_122;
@@ -4892,7 +4893,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_122 --A0340_7号机床旋转机构---
     ec_2di_2do
     #(
-         .REG_SPACE_BIAS     ( 20'h14a00)
+         .REG_SPACE_BIAS     ( 20'd84480)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_2di_2do_122
@@ -4921,8 +4922,8 @@ ec_superisys_485_modbus_rtu_84
        ,.o_dri2        ( o_dri2_122           )   // 驱动信号2
     );
 
-    assign do_regoin_r_msg[ 4][34] = ~o_dri1_122;
-    assign do_regoin_r_msg[ 4][35] = ~o_dri2_122;
+    assign do_regoin_r_msg[4][34] = ~o_dri1_122;
+    assign do_regoin_r_msg[4][35] = ~o_dri2_122;
 	
 	
 	wire   o_dri1_123;
@@ -4931,7 +4932,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_123 --A0342_8号机床旋转机构---
     ec_2di_2do
     #(
-         .REG_SPACE_BIAS     ( 20'h18400)
+         .REG_SPACE_BIAS     ( 20'd99328)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_2di_2do_123
@@ -4960,8 +4961,8 @@ ec_superisys_485_modbus_rtu_84
        ,.o_dri2        ( o_dri2_123           )   // 驱动信号2
     );
 
-    assign do_regoin_r_msg[ 4][36] = ~o_dri1_123;
-    assign do_regoin_r_msg[ 4][37] = ~o_dri2_123;
+    assign do_regoin_r_msg[4][36] = ~o_dri1_123;
+    assign do_regoin_r_msg[4][37] = ~o_dri2_123;
 	
 	
 	wire   o_dri1_124;
@@ -4970,7 +4971,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_124 --A0344_9号机床旋转机构---
     ec_2di_2do
     #(
-         .REG_SPACE_BIAS     ( 20'h18800)
+         .REG_SPACE_BIAS     ( 20'd100352)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_2di_2do_124
@@ -4999,15 +5000,15 @@ ec_superisys_485_modbus_rtu_84
        ,.o_dri2        ( o_dri2_124           )   // 驱动信号2
     );
 
-    assign do_regoin_r_msg[ 4][38] = ~o_dri1_124;
-    assign do_regoin_r_msg[ 4][39] = ~o_dri2_124;
+    assign do_regoin_r_msg[4][38] = ~o_dri1_124;
+    assign do_regoin_r_msg[4][39] = ~o_dri2_124;
 	
 	
 	
 	// // --- flow_comp_125 --A0124_EMCC60主控板---
     // ec_emcc60_board
     // #(
-    //      .REG_SPACE_BIAS     ( 20'h18a00)
+    //      .REG_SPACE_BIAS     ( 20'd100864)
     //     ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     // )
     // ec_emcc60_board_125
@@ -5038,7 +5039,7 @@ ec_superisys_485_modbus_rtu_84
 	// // --- flow_comp_126 --A0161_B区C区控制柜1#分控板---
     // eecc30
     // #(
-    //      .REG_SPACE_BIAS     ( 20'h16800)
+    //      .REG_SPACE_BIAS     ( 20'd92160)
     //     ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     // )
     // eecc30_126
@@ -5069,7 +5070,7 @@ ec_superisys_485_modbus_rtu_84
 	// // --- flow_comp_127 --A0162_B区C区控制柜2#分控板---
     // eecc30
     // #(
-    //      .REG_SPACE_BIAS     ( 20'h16a00)
+    //      .REG_SPACE_BIAS     ( 20'd92672)
     //     ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     // )
     // eecc30_127
@@ -5100,7 +5101,7 @@ ec_superisys_485_modbus_rtu_84
 	// // --- flow_comp_128 --A0172_装卸站控制柜1#分控板---
     // eecc30
     // #(
-    //      .REG_SPACE_BIAS     ( 20'h16c00)
+    //      .REG_SPACE_BIAS     ( 20'd93184)
     //     ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     // )
     // eecc30_128
@@ -5131,7 +5132,7 @@ ec_superisys_485_modbus_rtu_84
 	// // --- flow_comp_129 --A0173_装卸站控制柜2#分控板---
     // eecc30
     // #(
-    //      .REG_SPACE_BIAS     ( 20'h18c00)
+    //      .REG_SPACE_BIAS     ( 20'd101376)
     //     ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     // )
     // eecc30_129
@@ -5162,7 +5163,7 @@ ec_superisys_485_modbus_rtu_84
 	// // --- flow_comp_130 --A0245_去毛刺机分控板---
     // eecc30
     // #(
-    //      .REG_SPACE_BIAS     ( 20'he000)
+    //      .REG_SPACE_BIAS     ( 20'd57344)
     //     ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     // )
     // eecc30_130
@@ -5193,7 +5194,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_134 --A0268_6#设备工装8电驱动---
     ec_s7_plc
     #(
-         .REG_SPACE_BIAS     ( 20'h19200)
+         .REG_SPACE_BIAS     ( 20'd102912)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_s7_plc_134
@@ -5224,7 +5225,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_135 --A0269_7#设备工装8电驱动---
     ec_s7_plc
     #(
-         .REG_SPACE_BIAS     ( 20'h19400)
+         .REG_SPACE_BIAS     ( 20'd103424)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_s7_plc_135
@@ -5255,7 +5256,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_136 --A0270_8#设备工装8电驱动---
     ec_s7_plc
     #(
-         .REG_SPACE_BIAS     ( 20'h19600)
+         .REG_SPACE_BIAS     ( 20'd103936)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_s7_plc_136
@@ -5286,7 +5287,7 @@ ec_superisys_485_modbus_rtu_84
 	// --- flow_comp_137 --A0271_9#设备工装8电驱动---
     ec_s7_plc
     #(
-         .REG_SPACE_BIAS     ( 20'h19800)
+         .REG_SPACE_BIAS     ( 20'd104448)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
     ec_s7_plc_137
