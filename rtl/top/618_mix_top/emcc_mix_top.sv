@@ -3161,8 +3161,8 @@ ec_superisys_485_modbus_rtu_28
        ,.m2s_pulm_msg        ( pul_motor2_r_msg[2]           )   // 
        ,.s2m_pulm_msg        ( pul_motor2_msg[2]           )   // 
        ,.i_axis_zero        ( ~di_regoin_msg[2][42]           )   // 零位到位开关
-       ,.i_servo_done        ( di_regoin_msg[2][44]           )   // 伺服定位完成
-       ,.i_servo_ready        ( di_regoin_msg[2][43]           )   // 伺服就绪
+       ,.i_servo_done        ( ~di_regoin_msg[2][44]           )   // 伺服定位完成
+       ,.i_servo_ready        ( ~di_regoin_msg[2][43]           )   // 伺服就绪
        ,.i_axis_limf        ( 1'b0           )   // 
        ,.i_axis_limb        ( 1'b0           )   // 
     );
