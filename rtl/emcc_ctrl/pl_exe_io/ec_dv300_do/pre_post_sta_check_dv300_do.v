@@ -59,6 +59,9 @@ module pre_post_sta_check_dv300_do#(
 		,output	reg	[B_BHA_NUM-1:0]		b_post_sta_allow
 		,output	reg						c_pre_sta_allow	
 		,output	reg						c_post_sta_allow
+
+		,input							i_error
+		,input							rcfg_rst
     );
 	
 	//========================================================================================//
@@ -66,17 +69,29 @@ module pre_post_sta_check_dv300_do#(
 	//========================================================================================//
 	
 	//pre status
+	wire device_safe;
+	assign device_safe =(~unit_st && ~m_st && ~m_saf_st && ~link_m_saf_st);
 	
-	localparam	A_BHA_NUM1 = A_BHA_NUM - 2;
-	
+	wire [A_BHA_NUM-1:0]	a_pre_sta	;
+
+	assign	a_pre_sta[0 ] = (a_bhv_id == 1 ) && ~i_error;    // HOME: always allowed
+	assign	a_pre_sta[1 ] = (a_bhv_id == 2 ) && ~i_error;
+	assign	a_pre_sta[2 ] = (a_bhv_id == 3 ) ;
+	assign	a_pre_sta[4 ] = (a_bhv_id == 5 ) && device_safe && ~i_error;//[safe]
+	assign	a_pre_sta[5 ] = (a_bhv_id == 6 ) && device_safe && ~i_error;//[safe]
+
 	always@(posedge clk_i)
 	begin
+		integer i;
 		if(rst_i || !a_en)
 			a_pre_sta_allow <= {A_BHA_NUM{1'b0}};
-		else if(!unit_st && !m_st && !m_saf_st && !link_m_saf_st)
-			a_pre_sta_allow <= {A_BHA_NUM{1'b1}};
-		else
-			a_pre_sta_allow <= {{2'b00},{A_BHA_NUM1{1'b1}}};
+		else begin
+			a_pre_sta_allow <= {A_BHA_NUM{1'b0}};
+			for(i = 0; i < A_BHA_NUM; i = i + 1) begin
+				if(a_pre_sta[i])
+					a_pre_sta_allow[i] <= 1'b1;
+			end
+		end
 	end
 	
 	//post status
@@ -95,15 +110,20 @@ module pre_post_sta_check_dv300_do#(
 	//========================================================================================//
 	//---------------------------------  Channel B check -------------------------------------//
 	//========================================================================================//
+	
+	wire [B_BHA_NUM-1:0]	b_pre_sta	;
+
+	assign	b_pre_sta[99] = (rcfg_rst==1'b1)?1'b1:1'b0;    // reset
 
 	always@(posedge clk_i)
 	begin
-		if(rst_i) begin
+		integer i;
+		if(rst_i)
 			b_pre_sta_allow <= {B_BHA_NUM{1'b0}};
-		end else if(b_en) begin
-			b_pre_sta_allow <= {B_BHA_NUM{1'b1}};
-		end else begin
+		else if(!b_en)
 			b_pre_sta_allow <= {B_BHA_NUM{1'b0}};
+		else begin
+			b_pre_sta_allow <= b_pre_sta;
 		end
 	end
 

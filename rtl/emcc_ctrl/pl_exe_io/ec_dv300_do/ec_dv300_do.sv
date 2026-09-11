@@ -45,6 +45,8 @@ module ec_dv300_do#(
 		output					o_spdx2			,
 		output					o_spdx3			,
 		output					o_spdx4			,
+		input					i_error			,
+		output					o_rst			,
 		
 		output 	            	o_intr_irq	
     );
@@ -332,11 +334,12 @@ module ec_dv300_do#(
 	//,.param23			    (param23		)
 	//,.param24			    (param24		)
 	//,.param25			    (param25		)
-	//,.param26			    (param26		)
+	,.param26			    (param26		)
 	//,.param27			    (param27		)
 	//,.param28			    (param28		)
 	//,.param29			    (param29		)
 	//,.param30				(param30		)
+	
 	,.irq_reg1	            (irq_reg1		)
 	,.irq_reg2	            (irq_reg2		)
 	,.a_st                  (ec_cha_st		)
@@ -371,8 +374,8 @@ module ec_dv300_do#(
 	//,.param69               (param69		)
 	//,.param70               (param70		)
 	,.debug_reg1			(debug_reg1		)
-	,.debug_reg2			({{26{1'b0}},o_spdx4,o_spdx3,o_spdx2,o_spdx1,o_rev,o_fwd})
-	//,.debug_reg3			(debug_reg3		)
+	,.debug_reg2			(debug_reg2		)
+	,.debug_reg3			({{24{1'b0}},o_rst,i_error,o_spdx4,o_spdx3,o_spdx2,o_spdx1,o_rev,o_fwd}		)
 	//,.debug_reg4			(debug_reg4		)
 	//,.debug_reg5			(debug_reg5		)
 	);
@@ -397,7 +400,7 @@ module ec_dv300_do#(
     ,.a_alm_num            	(a_alm_num      	)
     ,.o_fwd					(o_fwd				)
 	,.o_rev                 (o_rev				)
-	,.i_speed_cfg           (param16			)
+
 	,.a_bhv_id_r			(a_bhv_id_r			)
 	,.state_monitor_o		(debug_reg1			)
     ,.irq_o                	(irq_a				)
@@ -421,9 +424,10 @@ module ec_dv300_do#(
 	,.ec_chb_st             (ec_chb_st			)
 	,.b_tx_id               (b_tx_id			)
 	,.b_alm_num             (b_alm_num			)
-	//,.do_o				    (do_o				)
 	,.irq_o			        (irq_o				)
 	,.irq_ack_i	            (irq_ack_i			)	
+	,.state_monitor_o		(debug_reg2			)
+	,.o_rst					(o_rst				)
     );
 	 
 	tim_beh_dv300_do tim_beh_dv300_do_u0(
@@ -479,6 +483,8 @@ module ec_dv300_do#(
 		.b_post_sta_allow	(b_post_sta_allow),	
 		.c_pre_sta_allow	(c_pre_sta_allow),	
 		.c_post_sta_allow	(c_post_sta_allow)	
+		,.i_error               (i_error			)
+		,.rcfg_rst             (param26				)
     );
 	
 	irq_3i1o_arbitrator irq_3i1o_arbitrator_u0(

@@ -43,6 +43,7 @@ module proactive_beh_dv300_do#(
 
 	,output	reg					o_fwd		
 	,output	reg					o_rev
+	,input						i_error
 
 	,output reg	[7:0]           a_bhv_id_r
 	,output	reg	[31:0]			state_monitor_o
@@ -409,7 +410,7 @@ module proactive_beh_dv300_do#(
 	always@(posedge i_clk)
 	begin
 		if(i_rst)
-			do_o <= 2'b00;
+			begin o_fwd <= 1'b0; o_rev <= 1'b0; end
 		else if(curr_state == S_EXE)
 			case(a_bhv_id_r)
 				8'd1:begin o_fwd <= 1'b1; o_rev <= 1'b0;end

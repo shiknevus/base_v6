@@ -94,7 +94,7 @@ module ps_rw_pl_reg_dv300_do#(
 	//,output		reg 	[7:0]		param23			
 	//,output		reg 	[7:0]		param24			
 	//,output		reg 	[7:0]		param25			
-	//,output		reg 				param26			
+	,output		reg 				param26			
 	//,output		reg 				param27			
 	//,output		reg 				param28			
 	//,output		reg 				param29			
@@ -148,7 +148,7 @@ module ps_rw_pl_reg_dv300_do#(
 	//,input 							param70   
 	,input 				[31:0]		debug_reg1
 	,input 				[31:0]		debug_reg2
-	//,input 				[31:0]		debug_reg3
+	,input 				[31:0]		debug_reg3
 	//,input 				[31:0]		debug_reg4
 	//,input 				[31:0]		debug_reg5
 	);
@@ -261,7 +261,7 @@ module ps_rw_pl_reg_dv300_do#(
 			//param23				<=	8'd0	   	;
 			//param24				<=	8'd0	   	;
 			//param25				<=	8'd0	   	;
-			//param26				<=	1'd0	   	;
+			param26				<=	1'd0	   	;
 			//param27				<=	1'd0	   	;
 			//param28				<=	1'd0	   	;
 			//param29				<=	1'd0	   	;
@@ -337,7 +337,7 @@ module ps_rw_pl_reg_dv300_do#(
 			//param23			<=	(wr_task_vld && wr_task_addr == `PARAM23		) ? i_st_wr_data[7:0] 	: param23	;
 			//param24			<=	(wr_task_vld && wr_task_addr == `PARAM24		) ? i_st_wr_data[7:0] 	: param24	;
 			//param25			<=	(wr_task_vld && wr_task_addr == `PARAM25		) ? i_st_wr_data[7:0] 	: param25	;
-			//param26			<=	(wr_task_vld && wr_task_addr == `PARAM26		) ? i_st_wr_data[0]		: param26	;
+			param26			<=	(wr_task_vld && wr_task_addr == `PARAM26		) ? i_st_wr_data[0]		: param26	;
 			//param27			<=	(wr_task_vld && wr_task_addr == `PARAM27		) ? i_st_wr_data[0]		: param27	;
 			//param28			<=	(wr_task_vld && wr_task_addr == `PARAM28		) ? i_st_wr_data[0]		: param28	;
 			//param29			<=	(wr_task_vld && wr_task_addr == `PARAM29		) ? i_st_wr_data[0]		: param29	;
@@ -403,7 +403,7 @@ module ps_rw_pl_reg_dv300_do#(
 		
 		`DEBUG_REG1		:	o_st_rd_data <= debug_reg1			;
 		`DEBUG_REG2		:	o_st_rd_data <= debug_reg2			;
-		//`DEBUG_REG3		:	o_st_rd_data <= debug_reg3			;
+		`DEBUG_REG3		:	o_st_rd_data <= debug_reg3			;
 		//`DEBUG_REG4		:	o_st_rd_data <= debug_reg4			;
         //`DEBUG_REG5		:	o_st_rd_data <= debug_reg5			;
 
@@ -459,7 +459,7 @@ module ps_rw_pl_reg_dv300_do#(
 		//`PARAM23		:	o_st_rd_data <= {24'd0,param23		};
 		//`PARAM24		:	o_st_rd_data <= {24'd0,param24		};
 		//`PARAM25		:	o_st_rd_data <= {24'd0,param25		};
-		//`PARAM26		:	o_st_rd_data <= {31'd0,param26		};
+		`PARAM26		:	o_st_rd_data <= {31'd0,param26		};
 		//`PARAM27		:	o_st_rd_data <= {31'd0,param27		};
 		//`PARAM28		:	o_st_rd_data <= {31'd0,param28		};
 		//`PARAM29		:	o_st_rd_data <= {31'd0,param29		};
