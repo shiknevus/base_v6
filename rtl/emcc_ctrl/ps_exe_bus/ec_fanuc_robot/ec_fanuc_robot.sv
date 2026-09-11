@@ -43,7 +43,7 @@ module ec_fanuc_robot#(
     );
 
 	localparam		A_BHA_NUM	=	8;	// behaviors 1-8
-	localparam		B_BHA_NUM	=	1;
+	localparam		B_BHA_NUM	=	5;
 	localparam		C_BHA_NUM	=	1;
 
 	//PS-PL

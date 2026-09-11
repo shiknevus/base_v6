@@ -42,7 +42,7 @@ module ec_s7_plc#(
 		output 	            	o_intr_irq
     );
 
-	localparam		A_BHA_NUM	=	2;	// behavior 2
+	localparam		A_BHA_NUM	=	4;	// behavior 2
 	localparam		B_BHA_NUM	=	1;
 	localparam		C_BHA_NUM	=	1;
 

@@ -1,34 +1,34 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
-// Company:
-// Engineer:
-//
+// Company: 
+// Engineer: 
+// 
 // Create Date: 2026/06/30 10:25:54
-// Design Name:
-// Module Name:
-// Project Name:
-// Target Devices:
-// Tool Versions:
-// Description: ASS00581 FANUC Welding Robot V6.0
-//
-// Dependencies:
-//
+// Design Name: 
+// Module Name: ec_dv300_do
+// Project Name: 
+// Target Devices: 
+// Tool Versions: 
+// Description: 
+// 
+// Dependencies: 
+// 
 // Revision:
 // Revision 0.01 - File Created
 // Additional Comments:
-//
+// 
 //////////////////////////////////////////////////////////////////////////////////
+`define DEBUG
 
-
-module ec_fanuc_hj_robot#(
-		parameter  				REG_SPACE_BIAS 		= 	2000	,
-		parameter  				REG_SPACE_SIZE 		= 	512
+module ec_dv300_do#(
+		parameter  				REG_SPACE_BIAS 		= 	2000	,	//Component offset address
+		parameter  				REG_SPACE_SIZE 		= 	512			//Component register size
 )(
 		input					clk_i			,
 		input					rst				,
 		input                   i_time_1ms_vld  ,
 		input                   i_time_1s_vld   ,
-
+		
 		input					ps_reg_clk		,
 		input					ps_reg_reset	,
 		input  		            i_st_wr_en		,
@@ -39,54 +39,61 @@ module ec_fanuc_hj_robot#(
 		output 		 [31:0]     o_st_rd_data    ,
 		output 		            o_st_rd_vld     ,
 
-		output 	            	o_intr_irq
+		output					o_fwd			,
+		output					o_rev			,
+		output					o_spdx1			,
+		output					o_spdx2			,
+		output					o_spdx3			,
+		output					o_spdx4			,
+		
+		output 	            	o_intr_irq	
     );
-
-	localparam		A_BHA_NUM	=	3;	// behaviors 1-7
-	localparam		B_BHA_NUM	=	5;
-	localparam		C_BHA_NUM	=	1;
-
-	//PS-PL
-	wire 	[7:0]	unit_id         ;
-	wire 	[3:0]	unit_ectrl      ;
-	wire 	[3:0]	unit_st         ;
-	wire 	[7:0]	m_id            ;
-	wire 	[3:0]	m_ectrl         ;
-	wire 	[3:0]	m_st            ;
-	wire 	[3:0]	m_wk_mod        ;
-	wire 			m_saf_st        ;
-	wire 			link_m_saf_st   ;
+	
+	localparam		A_BHA_NUM	=	6;	
+	localparam		B_BHA_NUM	=	1;	
+	
+	
+	//PS-PL    
+	wire 	[7:0]	unit_id         ;     	
+	wire 	[3:0]	unit_ectrl      ;       
+	wire 	[3:0]	unit_st         ;       
+	wire 	[7:0]	m_id            ;     	
+	wire 	[3:0]	m_ectrl         ;       
+	wire 	[3:0]	m_st            ;       
+	wire 	[3:0]	m_wk_mod        ;       
+	wire 			m_saf_st        ;       
+	wire 			link_m_saf_st   ;     
 	wire 	[9:0]	sc_id			;		
 	wire 	[13:0]	ec_id           ;       
-	wire 			rst_en_n        ;
+	wire 			rst_en_n        ;	
 
-	wire	[7:0]	a_bhv_id        ;
-	wire			a_bhv_vld        ;
-	wire	[31:0]	a_task_id       ;
-	wire	[19:0]	a_tx_ot         ;
-	wire	[31:0]	a_tx_result_rpt ;
-	wire	[19:0]	b_tx_ot         ;
-	wire	[31:0]	b_tx_result_rpt ;
+	wire	[7:0]	a_bhv_id        ;       
+	wire			a_bhv_vld        ;       
+	wire	[31:0]	a_task_id       ;       
+	wire	[19:0]	a_tx_ot         ;       
+	wire	[31:0]	a_tx_result_rpt ;       
+	wire	[19:0]	b_tx_ot         ;       
+	wire	[31:0]	b_tx_result_rpt ;       
 	wire			b_en			;
-	wire	[19:0]	c_tx_ot         ;
-	wire	[19:0]	c_gap_crl       ;
-	wire	[31:0]	c_tx_result_rpt ;
+	wire	[19:0]	c_tx_ot         ;       
+	wire	[19:0]	c_gap_crl       ;       
+	wire	[31:0]	c_tx_result_rpt ;    
 	wire			c_en			;
-
+	
 	//PL-PS
-	wire 			ec_cha_st     ;
-	wire 			ec_chb_st     ;
-	wire 			ec_chc_st     ;
-	wire	[7:0]	a_bhv_typ     ;
-	wire	[7:0]	a_tx_id       ;
-	wire	[7:0]	a_alm_num     ;
-	wire	[7:0]	b_bhv_id      ;
-	wire	[7:0]	b_tx_id       ;
-	wire	[7:0]	b_alm_num     ;
-	wire	[7:0]	c_bhv_id      ;
-	wire	[7:0]	c_tx_id       ;
-	wire	[7:0]	c_alm_num     ;
-
+	wire 			ec_cha_st     ;		
+	wire 			ec_chb_st     ;     
+	wire 			ec_chc_st     ;     
+	wire	[7:0]	a_bhv_typ     ;       
+	wire	[7:0]	a_tx_id       ;     
+	wire	[7:0]	a_alm_num     ;     
+	wire	[7:0]	b_bhv_id      ;            
+	wire	[7:0]	b_tx_id       ;     
+	wire	[7:0]	b_alm_num     ;     
+	wire	[7:0]	c_bhv_id      ;        
+	wire	[7:0]	c_tx_id       ;     
+	wire	[7:0]	c_alm_num     ;  
+	
 	//PS-PL
 	wire [31:0]		param1			;
 	wire [31:0]		param2			;
@@ -118,7 +125,7 @@ module ec_fanuc_hj_robot#(
 	wire 			param28			;
 	wire 			param29			;
 	wire 			param30			;
-
+	
 	//PL-PS
 	wire 	[31:0]	param51 ;
 	wire 	[31:0]	param52 ;
@@ -141,97 +148,60 @@ module ec_fanuc_hj_robot#(
 	wire 			param69 ;
 	wire 			param70 ;
 
-	wire	[19:0]	task_time_cnt	;
 
-	wire	[31:0]	debug_reg1 ;
-	wire	[31:0]	debug_reg2 ;
-	wire	[31:0]	debug_reg3 ;
-	wire	[31:0]	debug_reg4 ;
-	wire	[31:0]	debug_reg5 ;
-
-	assign param52 = {26'd0, ec_chc_st, ec_chb_st, ec_cha_st};	//component status readback
-
+	wire	[31:0]	task_time_cnt	;
+	
 	wire			a_tx_result_vld;
 	wire			b_tx_result_vld;
 	wire			c_tx_result_vld;
-
-	//valid signal sync
-	reg 		r_a_tx_result_vld ;
-	reg 		r_b_tx_result_vld ;
-	reg 		r_c_tx_result_vld ;
-	reg 		r_a_bhv_vld       ;
-
-	reg 		sync_a_tx_result_vld ;
-	reg 		sync_b_tx_result_vld ;
-	reg 		sync_c_tx_result_vld ;
-	reg 		sync_a_bhv_vld       ;
-
-always@(posedge clk_i)
-	begin
-		if(!rst_en_n)begin
-			r_a_tx_result_vld 		<= 1'b0;
-			r_b_tx_result_vld 		<= 1'b0;
-			r_c_tx_result_vld 		<= 1'b0;
-			r_a_bhv_vld       		<= 1'b0;
-
-			sync_a_tx_result_vld 	<= 1'b0;
-			sync_b_tx_result_vld 	<= 1'b0;
-			sync_c_tx_result_vld 	<= 1'b0;
-			sync_a_bhv_vld       	<= 1'b0;
-		end else begin
-			r_a_tx_result_vld		<= a_tx_result_vld;
-			r_b_tx_result_vld		<= b_tx_result_vld;
-			r_c_tx_result_vld		<= c_tx_result_vld;
-			r_a_bhv_vld      		<= a_bhv_vld      ;
-
-			sync_a_tx_result_vld 	<= r_a_tx_result_vld;
-			sync_b_tx_result_vld 	<= r_b_tx_result_vld;
-			sync_c_tx_result_vld 	<= r_c_tx_result_vld;
-			sync_a_bhv_vld       	<= r_a_bhv_vld      ;
-		end
-	end
-
+	
 	wire 	[A_BHA_NUM-1:0]	a_pre_sta_allow   ;
 	wire 	[A_BHA_NUM-1:0]	a_post_sta_allow  ;
 	wire 	[B_BHA_NUM-1:0]	b_pre_sta_allow   ;
 	wire 	[B_BHA_NUM-1:0]	b_post_sta_allow  ;
 	wire 					c_pre_sta_allow   ;
 	wire 					c_post_sta_allow  ;
-
+	
 	wire	irq_a  ;
 	wire	irq_b  ;
 	wire	irq_c  ;
-
+	
 	wire 	irq_a_grant;
 	wire 	irq_b_grant;
 	wire 	irq_c_grant;
-
+	
 	wire	irq_busy_o	;
-
+	
 	wire 	[31:0]	irq_reg1 ;
 	wire 	[31:0]	irq_reg2 ;
-
+	
 	wire	rst_i;
 	assign	rst_i = !rst_en_n;
-
+	
 	wire	[3:0]	chl_priority;
 	wire	[31:0]	a_task_bhv_id;
 	wire			a_en;
 	wire 	[31:0]	bhv_en;
-
+	
 	wire	[7:0]	a_bhv_id_r;
+	
 
-
+	assign o_spdx1 = param16[0];
+    assign o_spdx2 = param16[1];
+    assign o_spdx3 = param16[2];
+    assign o_spdx4 = param16[3];
+	
+	`ifdef DEBUG
 		reg			ro_intr_irq;
 		reg	[7:0]	irq_posedge_cnt;
 		reg	[7:0]	irq_negedge_cnt;
-
+		
 		always@(posedge clk_i)
 		begin
 			ro_intr_irq <= o_intr_irq;
 		end
-
-
+		
+		
 		always@(posedge clk_i)
 		begin
 			if(rst_i)begin
@@ -246,7 +216,7 @@ always@(posedge clk_i)
 				end else begin
 					irq_posedge_cnt <= irq_posedge_cnt;
 				end
-
+				
 				if({ro_intr_irq,o_intr_irq} == 2'b10)begin	//falling
 					irq_negedge_cnt <= irq_negedge_cnt+1;
 				end else begin
@@ -254,11 +224,49 @@ always@(posedge clk_i)
 				end
 			end
 		end
-
-	ps_rw_pl_reg_fanuc_hj_robot#(
+	`endif
+	
+	//valid signal sync
+	reg 		r_a_tx_result_vld ;
+	reg 		r_b_tx_result_vld ;
+	reg 		r_c_tx_result_vld ;
+	reg 		r_a_bhv_vld       ;
+	
+	reg 		sync_a_tx_result_vld ;
+	reg 		sync_b_tx_result_vld ;
+	reg 		sync_c_tx_result_vld ;
+	reg 		sync_a_bhv_vld       ;
+	
+	always@(posedge clk_i)
+	begin
+		if(rst_i)begin
+			r_a_tx_result_vld 		<= 1'b0;
+			r_b_tx_result_vld 		<= 1'b0;
+			r_c_tx_result_vld 		<= 1'b0;
+			r_a_bhv_vld       		<= 1'b0;
+			
+			sync_a_tx_result_vld 	<= 1'b0;
+			sync_b_tx_result_vld 	<= 1'b0;
+			sync_c_tx_result_vld 	<= 1'b0;
+			sync_a_bhv_vld       	<= 1'b0;
+		end else begin
+			r_a_tx_result_vld		<= a_tx_result_vld;
+			r_b_tx_result_vld		<= b_tx_result_vld;
+			r_c_tx_result_vld		<= c_tx_result_vld;
+			r_a_bhv_vld      		<= a_bhv_vld      ;
+			
+			sync_a_tx_result_vld 	<= r_a_tx_result_vld;
+			sync_b_tx_result_vld 	<= r_b_tx_result_vld;
+			sync_c_tx_result_vld 	<= r_c_tx_result_vld;
+			sync_a_bhv_vld       	<= r_a_bhv_vld      ;
+		end
+	end
+	
+	
+	ps_rw_pl_reg_dv300_do#(
 		.REG_SPACE_BIAS 	(REG_SPACE_BIAS		),
 		.REG_SPACE_SIZE 	(REG_SPACE_SIZE		)
-)ps_rw_pl_reg_fanuc_hj_robot_u0(
+)ps_rw_pl_reg_dv300_do_u0(
 	.clk_i			        (ps_reg_clk		)
 	,.rst_i			        (ps_reg_reset	)
 	,.i_st_wr_en		    (i_st_wr_en		)
@@ -268,7 +276,7 @@ always@(posedge clk_i)
     ,.i_st_rd_addr	        (i_st_rd_addr 	)
     ,.o_st_rd_data	        (o_st_rd_data 	)
 	,.o_st_rd_vld 	        (o_st_rd_vld  	)
-	,.rst_en_n              (rst_en_n		)	//board error
+	,.rst_en_n              (rst_en_n		)
 	,.ec_id                 (ec_id			)
 	,.sc_id			        (sc_id			)
 	,.chl_priority	        (chl_priority	)
@@ -306,7 +314,7 @@ always@(posedge clk_i)
 	//,.param5			    (param5			)
 	//,.param6			    (param6			)
 	//,.param7			    (param7			)
-	,.param8			    (param8			)
+	//,.param8			    (param8			)
 	//,.param9			    (param9			)
 	//,.param10			    (param10		)
 	//,.param11			    (param11		)
@@ -314,7 +322,7 @@ always@(posedge clk_i)
 	//,.param13			    (param13		)
 	//,.param14			    (param14		)
 	//,.param15			    (param15		)
-	//,.param16			    (param16		)
+	,.param16			    (param16		)
 	//,.param17			    (param17		)
 	//,.param18			    (param18		)
 	//,.param19			    (param19		)
@@ -324,7 +332,7 @@ always@(posedge clk_i)
 	//,.param23			    (param23		)
 	//,.param24			    (param24		)
 	//,.param25			    (param25		)
-	,.param26			    (param26		)
+	//,.param26			    (param26		)
 	//,.param27			    (param27		)
 	//,.param28			    (param28		)
 	//,.param29			    (param29		)
@@ -343,7 +351,7 @@ always@(posedge clk_i)
 	,.c_tsc_id              (c_tx_id  		)
 	,.c_bhv_id              (c_bhv_id 		)
 	//,.param51               (param51		)
-	,.param52               (param52		)
+	//,.param52               (param52		)
 	//,.param53               (param53		)
 	//,.param54               (param54		)
 	//,.param55               (param55		)
@@ -357,47 +365,48 @@ always@(posedge clk_i)
 	//,.param63               (param63		)
 	//,.param64               (param64		)
 	//,.param65               (param65		)
-	//,.param66               (param66		)
-	//,.param67               (param67		)
+	// ,.param66               (param66		)
+	// ,.param67               (param67		)
 	//,.param68               (param68		)
 	//,.param69               (param69		)
 	//,.param70               (param70		)
 	,.debug_reg1			(debug_reg1		)
-	,.debug_reg2			(debug_reg2		)
-	,.debug_reg3			(debug_reg3		)
+	,.debug_reg2			({{26{1'b0}},o_spdx4,o_spdx3,o_spdx2,o_spdx1,o_rev,o_fwd})
+	//,.debug_reg3			(debug_reg3		)
 	//,.debug_reg4			(debug_reg4		)
 	//,.debug_reg5			(debug_reg5		)
 	);
 
-	proactive_beh_fanuc_hj_robot#(
-	.BHA_NUM 				(A_BHA_NUM  	 	)	//Number of active behaviors
-)proactive_beh_fanuc_hj_robot_u0(
+	proactive_beh_dv300_do#(	
+	.BHA_NUM 				(A_BHA_NUM  	 )	//Number of active behaviors
+)proactive_beh_dv300_do_u0(
     .clk_i                 	(clk_i				)
     ,.rst_i                	(rst_i				)
     ,.i_time_1ms_vld       	(i_time_1ms_vld 	)
     ,.i_time_1s_vld        	(i_time_1s_vld  	)
     ,.pre_sta_allow        	(a_pre_sta_allow	)
     ,.post_sta_allow       	(a_post_sta_allow	)
-	,.a_en			       	(a_en				)
+	,.a_en			       	(1'b1				)
     ,.a_bhv_id             	(a_bhv_id       	)
-    ,.a_bhv_vld            	(sync_a_bhv_vld     )
+    ,.a_bhv_vld            	(sync_a_bhv_vld      	)
     ,.a_tx_ot              	(a_tx_ot        	)
     ,.a_tx_result_rpt	   	(a_tx_result_rpt	)
-	,.a_tx_result_vld      	(sync_a_tx_result_vld)
+	,.a_tx_result_vld      	(sync_a_tx_result_vld	)
     ,.ec_cha_st            	(ec_cha_st			)
     ,.a_tx_id              	(a_tx_id        	)
     ,.a_alm_num            	(a_alm_num      	)
+    ,.o_fwd					(o_fwd				)
+	,.o_rev                 (o_rev				)
+	,.i_speed_cfg           (param16			)
 	,.a_bhv_id_r			(a_bhv_id_r			)
-	,.state_monitor_o		(debug_reg1		)
+	,.state_monitor_o		(debug_reg1			)
     ,.irq_o                	(irq_a				)
     ,.irq_ack_i       		(irq_a_grant		)
-	,.i_m_wk_mod			(m_wk_mod			)
-	,.i_link_lock			(param26			)
     );
 
-	status_beh_fanuc_hj_robot#(
+	status_beh_dv300_do#(
 		.BHA_NUM(B_BHA_NUM	)
-)status_beh_fanuc_hj_robot_u0(
+)status_beh_dv300_do_u0(
 	.clk_i			        (clk_i				)
 	,.rst_i			        (rst_i				)
 	,.i_time_1ms_vld		(i_time_1ms_vld 	)
@@ -412,20 +421,20 @@ always@(posedge clk_i)
 	,.ec_chb_st             (ec_chb_st			)
 	,.b_tx_id               (b_tx_id			)
 	,.b_alm_num             (b_alm_num			)
-	,.irq_o			        (irq_b				)
-	,.state_monitor_o		(debug_reg2		)
-	,.irq_ack_i	            (irq_b_grant		)
+	//,.do_o				    (do_o				)
+	,.irq_o			        (irq_o				)
+	,.irq_ack_i	            (irq_ack_i			)	
     );
-
-	tim_beh_fanuc_hj_robot tim_beh_fanuc_hj_robot_u0(
-    .clk_i                      (clk_i          	)
+	 
+	tim_beh_dv300_do tim_beh_dv300_do_u0(
+	.clk_i                      (clk_i          	)
 	,.rst_i              	    (rst_i         		)
 	,.i_time_1ms_vld   	        (i_time_1ms_vld 	)
 	,.i_time_1s_vld    	        (i_time_1s_vld  	)
 	,.task_time_cnt	            (task_time_cnt		)
 	,.pre_sta_allow		        (c_pre_sta_allow	)
 	,.post_sta_allow	        (c_post_sta_allow	)
-	,.c_en				        (1'b1				)
+	,.c_en				        (1'b0				)
 	,.c_bhv_id                  (c_bhv_id			)
 	,.c_tx_ot          	        (c_tx_ot			)
 	,.c_tx_result_rpt  	        (c_tx_result_rpt	)
@@ -433,47 +442,45 @@ always@(posedge clk_i)
 	,.ec_chc_st	                (ec_chc_st			)
 	,.c_tx_id         	        (c_tx_id			)
 	,.c_alm_num                 (c_alm_num			)
-	,.c_gap_crl				(c_gap_crl			)
-	,.irq_o 					(irq_c				)
-	,.state_monitor_o		(debug_reg3		)
-	,.irq_ack_i                 (irq_c_grant		)
-   );
-
-		pre_post_sta_check_fanuc_hj_robot#(
-			.A_BHA_NUM			(A_BHA_NUM	 		)    ,
-			.B_BHA_NUM			(B_BHA_NUM	 		)    ,
-			.C_BHA_NUM			(C_BHA_NUM	 		)
-)pre_post_sta_check_fanuc_hj_robot_u0(
-			.clk_i				(clk_i			),
-			.rst_i				(rst_i			),
-			.unit_id         	(unit_id        ),
-			.unit_ectrl      	(unit_ectrl     ),
-			.unit_st         	(unit_st        ),
-			.m_id            	(m_id           ),
-			.m_ectrl         	(m_ectrl        ),
-			.m_st            	(m_st           ),
-			.m_wk_mod        	(m_wk_mod       ),
-			.m_saf_st        	(m_saf_st       ),
-			.link_m_saf_st   	(link_m_saf_st  ),
-			.a_bhv_id			(a_bhv_id_r		),
-			.b_bhv_id			(b_bhv_id		),
-			.c_bhv_id			(c_bhv_id		),
-			.a_en				(a_en			),
-			.b_en				(1'b0			),
-			.c_en				(1'b1			),
-			.ec_cha_st			(ec_cha_st		),
-			.ec_chb_st       	(ec_chb_st		),
-			.ec_chc_st       	(ec_chc_st		),
-			.c_circle_time		(c_gap_crl		),
-			.task_time_cnt		(task_time_cnt	),
-			.a_pre_sta_allow	(a_pre_sta_allow),
-			.a_post_sta_allow	(a_post_sta_allow),
-			.b_pre_sta_allow	(b_pre_sta_allow),
-			.b_post_sta_allow	(b_post_sta_allow),
-			.c_pre_sta_allow	(c_pre_sta_allow),
-			.c_post_sta_allow	(c_post_sta_allow)
+	,.c_gap_crl                 (c_gap_crl			)
+	,.irq_o 					(irq_o				)
+	,.irq_ack_i                 (irq_ack_i			)
+	);
+	
+	pre_post_sta_check_dv300_do#(
+		.A_BHA_NUM			(A_BHA_NUM	 )    ,	
+		.B_BHA_NUM			(B_BHA_NUM	 )    
+)pre_post_sta_check_dv300_do_u0(
+		.clk_i				(clk_i			),
+		.rst_i				(rst_i			),
+		.unit_id         	(unit_id        ),
+		.unit_ectrl      	(unit_ectrl     ),
+		.unit_st         	(unit_st        ),
+		.m_id            	(m_id           ),
+		.m_ectrl         	(m_ectrl        ),
+		.m_st            	(m_st           ),
+		.m_wk_mod        	(m_wk_mod       ),
+		.m_saf_st        	(m_saf_st       ),
+		.link_m_saf_st   	(link_m_saf_st  ),
+		.a_bhv_id			(a_bhv_id_r		),
+		.b_bhv_id			(b_bhv_id		),
+		.c_bhv_id			(c_bhv_id		),
+		.a_en				(1'b1			),
+		.b_en				(1'b0			),	
+		.c_en				(1'b0			),	
+		.ec_cha_st			(ec_cha_st		),
+		.ec_chb_st       	(ec_chb_st		),
+		.ec_chc_st       	(ec_chc_st		),
+		.c_circle_time		(c_gap_crl		),	
+		.task_time_cnt		(task_time_cnt	),	
+		.a_pre_sta_allow	(a_pre_sta_allow),	
+		.a_post_sta_allow	(a_post_sta_allow),	
+		.b_pre_sta_allow	(b_pre_sta_allow),	
+		.b_post_sta_allow	(b_post_sta_allow),	
+		.c_pre_sta_allow	(c_pre_sta_allow),	
+		.c_post_sta_allow	(c_post_sta_allow)	
     );
-
+	
 	irq_3i1o_arbitrator irq_3i1o_arbitrator_u0(
 		.clk_i              (clk_i            	)
 		,.rst_i             (rst_i           	)
@@ -499,7 +506,12 @@ always@(posedge clk_i)
 		,.irq_reg2_o		(irq_reg2			)
 		,.irq_o				(o_intr_irq			)
 		,.irq_busy_o		(irq_busy_o			)
-		,.irq_receive_ack_i (sync_a_tx_result_vld || sync_b_tx_result_vld || sync_c_tx_result_vld)
+		,.irq_receive_ack_i (sync_a_tx_result_vld || sync_b_tx_result_vld || sync_c_tx_result_vld)	
     );
-
+	
+	
+	
+	
+	
+	
 endmodule
