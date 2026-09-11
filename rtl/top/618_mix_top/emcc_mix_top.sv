@@ -1439,7 +1439,7 @@ module emcc_mix_top
 	  .o_intr_irq            ( map_irq[94]       )
 
        ,.i_pos1        ( ~di_regoin_msg[2][16]           )   // 位置1到位开关
-       ,.i_pos2        ( ~di_regoin_msg[2][14]           )   // 位置2到位开关
+       ,.i_pos2        ( ~di_regoin_msg[2][15]           )   // 位置2到位开关
        ,.o_dri1        ( o_dri1_25           )   // 驱动信号1
        ,.o_dri2        ( o_dri2_25           )   // 驱动信号2
     );
