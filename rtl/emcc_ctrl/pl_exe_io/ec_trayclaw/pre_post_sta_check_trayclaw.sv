@@ -87,8 +87,10 @@ module pre_post_sta_check_trayclaw#(
 	//post status
 	wire [A_BHA_NUM-1:0]	a_post_sta	;
 	
-	assign	a_post_sta[0] = (a_bhv_id == 1 && i_close_arr == 1'b1 && i_airtight_arr == 1'b1 && i_open_arr == 1'b0);
-	assign	a_post_sta[1] = (a_bhv_id == 2 && i_close_arr == 1'b0 && i_airtight_arr == 1'b0 && i_open_arr == 1'b1);
+	//assign	a_post_sta[0] = (a_bhv_id == 1 && i_close_arr == 1'b1 && i_airtight_arr == 1'b1 && i_open_arr == 1'b0);
+	//assign	a_post_sta[1] = (a_bhv_id == 2 && i_close_arr == 1'b0 && i_airtight_arr == 1'b0 && i_open_arr == 1'b1);
+	assign	a_post_sta[0] = (a_bhv_id == 1 && i_close_arr == 1'b1 && i_open_arr == 1'b0);
+	assign	a_post_sta[1] = (a_bhv_id == 2 && i_close_arr == 1'b0 && i_open_arr == 1'b1);
 	assign	a_post_sta[2] = (a_bhv_id == 3);
 	assign	a_post_sta[3] = (a_bhv_id == 4);
 	assign	a_post_sta[4] = (a_bhv_id == 5 && i_material_arr == 1'b1);	
