@@ -81,7 +81,7 @@ module pre_post_sta_check_dv300_do#(
 	assign	a_pre_sta[5 ] = (a_bhv_id == 6 ) && device_safe && ~i_error;//[safe]
 
 	always@(posedge clk_i)
-	begin
+	begin:a_allow
 		integer i;
 		if(rst_i || !a_en)
 			a_pre_sta_allow <= {A_BHA_NUM{1'b0}};
@@ -117,7 +117,6 @@ module pre_post_sta_check_dv300_do#(
 
 	always@(posedge clk_i)
 	begin
-		integer i;
 		if(rst_i)
 			b_pre_sta_allow <= {B_BHA_NUM{1'b0}};
 		else if(!b_en)
