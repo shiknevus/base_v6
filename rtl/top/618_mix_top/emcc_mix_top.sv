@@ -3083,13 +3083,13 @@ ec_superisys_485_modbus_rtu_28
 	
 	
 	
-	// --- flow_comp_71 --A0072_毛刺刀架库信号检测组---
+	// --- flow_comp_138 --A0072_毛刺刀架库信号检测组---
     ec_16di
     #(
          .REG_SPACE_BIAS     ( 20'd80384)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
-    ec_16di_71
+    ec_16di_138
     (
       
 	  .clk_i                 ( clk               ),
@@ -3109,25 +3109,23 @@ ec_superisys_485_modbus_rtu_28
       .o_st_rd_data          ( sub_comp_rd_dat[153]    ),
 	  .o_intr_irq            ( map_irq[153]       )
 
-       ,.i_sign1_check        ( di_regoin_msg[3][60]           )   // 感测开关1
-       ,.i_sign10_check        ( di_regoin_msg[3][69]           )   // 感测开关10
-       ,.i_sign11_check        ( di_regoin_msg[3][70]           )   // 感测开关11
-       ,.i_sign12_check        ( di_regoin_msg[3][71]           )   // 感测开关12
-       ,.i_sign13_check        ( di_regoin_msg[3][72]           )   // 感测开关13
-       ,.i_sign14_check        ( di_regoin_msg[3][73]           )   // 感测开关14
-       ,.i_sign15_check        ( di_regoin_msg[3][74]           )   // 感测开关15
-       ,.i_sign16_check        ( di_regoin_msg[3][75]           )   // 感测开关16
-       ,.i_sign2_check        ( di_regoin_msg[3][61]           )   // 感测开关2
-       ,.i_sign3_check        ( di_regoin_msg[3][62]           )   // 感测开关3
-       ,.i_sign4_check        ( di_regoin_msg[3][63]           )   // 感测开关4
-       ,.i_sign5_check        ( di_regoin_msg[3][64]           )   // 感测开关5
-       ,.i_sign6_check        ( di_regoin_msg[3][65]           )   // 感测开关6
-       ,.i_sign7_check        ( di_regoin_msg[3][66]           )   // 感测开关7
-       ,.i_sign8_check        ( di_regoin_msg[3][67]           )   // 感测开关8
-       ,.i_sign9_check        ( di_regoin_msg[3][68]           )   // 感测开关9
+       ,.i_sign1_check        ( di_regoin_msg[2][65]           )   // 感测开关1
+       ,.i_sign10_check        ( di_regoin_msg[2][74]           )   // 感测开关10
+       ,.i_sign11_check        ( di_regoin_msg[2][75]           )   // 感测开关11
+       ,.i_sign12_check        ( di_regoin_msg[2][76]           )   // 感测开关12
+       ,.i_sign13_check        ( di_regoin_msg[2][77]           )   // 感测开关13
+       ,.i_sign14_check        ( di_regoin_msg[2][78]           )   // 感测开关14
+       ,.i_sign15_check        ( di_regoin_msg[2][79]           )   // 感测开关15
+       ,.i_sign2_check        ( di_regoin_msg[2][66]           )   // 感测开关2
+       ,.i_sign3_check        ( di_regoin_msg[2][67]           )   // 感测开关3
+       ,.i_sign4_check        ( di_regoin_msg[2][68]           )   // 感测开关4
+       ,.i_sign5_check        ( di_regoin_msg[2][69]           )   // 感测开关5
+       ,.i_sign6_check        ( di_regoin_msg[2][70]           )   // 感测开关6
+       ,.i_sign7_check        ( di_regoin_msg[2][71]           )   // 感测开关7
+       ,.i_sign8_check        ( di_regoin_msg[2][72]           )   // 感测开关8
+       ,.i_sign9_check        ( di_regoin_msg[2][73]           )   // 感测开关9
+       ,.i_sign16_check        ( 1'b0           )   // 
     );
-
-	
 	
 	
 	// --- flow_comp_72 --A0081_去毛刺机_旋转台伺服电机---
