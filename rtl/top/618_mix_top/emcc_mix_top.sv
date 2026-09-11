@@ -102,11 +102,6 @@ module emcc_mix_top
     wire                        sub_comp_rd_vld[COMP_BIAS_NUM+COMP_NUM-1:COMP_BIAS_NUM];
     wire    [PS_REG_DWIDTH-1:0] sub_comp_rd_dat[COMP_BIAS_NUM+COMP_NUM-1:COMP_BIAS_NUM];
     
-    //emcc_token_if #(.DATA_WIDTH(TOKEN_DWIDTH))  roller_s00_token_if[BIAS_NUM+COMP_NUM-1:BIAS_NUM]();
-    //emcc_token_if #(.DATA_WIDTH(TOKEN_DWIDTH))  roller_s01_token_if[BIAS_NUM+COMP_NUM-1:BIAS_NUM]();
-    //emcc_token_if #(.DATA_WIDTH(TOKEN_DWIDTH))  roller_s02_token_if[BIAS_NUM+COMP_NUM-1:BIAS_NUM]();
-	
-	//emcc_flow_if flow_cfg_if[BIAS_NUM+COMP_NUM-1:BIAS_NUM]();
 	
 	wire time_1ms_vld   = i_time_1ms_vld  ;
     wire time_10ms_vld  = i_time_10ms_vld ;
@@ -481,13 +476,6 @@ module emcc_mix_top
     assign do_regoin_r_msg[2][4:4] = 1'b1 ;
     assign do_regoin_r_msg[2][5:5] = 1'b1 ;
     assign do_regoin_r_msg[2][6:6] = 1'b1 ;
-    assign do_regoin_r_msg[2][14:14] = 1'b1 ;
-    assign do_regoin_r_msg[2][15:15] = 1'b1 ;
-    assign do_regoin_r_msg[2][24:24] = 1'b1 ;
-    assign do_regoin_r_msg[2][25:25] = 1'b1 ;
-    assign do_regoin_r_msg[2][26:26] = 1'b1 ;
-    assign do_regoin_r_msg[2][27:27] = 1'b1 ;
-    assign do_regoin_r_msg[2][28:28] = 1'b1 ;
     assign do_regoin_r_msg[2][30:30] = 1'b1 ;
     assign do_regoin_r_msg[2][32:32] = 1'b1 ;
     assign do_regoin_r_msg[2][33:33] = 1'b1 ;
@@ -561,7 +549,12 @@ module emcc_mix_top
     assign  emcc_irq[198]   = map_irq[198];
     assign  emcc_irq[199]   = map_irq[199];
     assign  emcc_irq[200]   = map_irq[200];
+    assign  emcc_irq[153]   = map_irq[153];
+    assign  emcc_irq[203]   = map_irq[203];
     assign  emcc_irq[95]   = map_irq[95];
+    assign  emcc_irq[204]   = map_irq[204];
+    assign  emcc_irq[205]   = map_irq[205];
+    assign  emcc_irq[206]   = map_irq[206];
     assign  emcc_irq[96]   = map_irq[96];
     assign  emcc_irq[97]   = map_irq[97];
     assign  emcc_irq[89]   = map_irq[89];
@@ -618,7 +611,6 @@ module emcc_mix_top
     assign  emcc_irq[146]   = map_irq[146];
     assign  emcc_irq[86]   = map_irq[86];
     assign  emcc_irq[150]   = map_irq[150];
-    assign  emcc_irq[153]   = map_irq[153];
     assign  emcc_irq[148]   = map_irq[148];
     assign  emcc_irq[151]   = map_irq[151];
     assign  emcc_irq[152]   = map_irq[152];
@@ -1519,7 +1511,7 @@ ec_superisys_485_modbus_rtu_26
         .rs485_ch_flag          ( rs485_00_flag           ), //recv en
         .s2m_rs485_msg          ( rs485_00_msg[0]         )  //recv data
     );
-	
+
 	
 	
 	// // --- flow_comp_27 --A0027_短桁架1#夹爪RFID读写器---
@@ -1554,7 +1546,7 @@ ec_superisys_485_modbus_rtu_26
     //    ,.i_uart_rx        ( rs485_1_user_rx[1]           )   // 
     //    ,.o_uart_de        ( rs485_1_user_de[1]           )   // 
     // );
-
+	
 ec_superisys_485_modbus_rtu
 #(
         .REG_SPACE_BIAS         (20'hd400                ), //组件基地址
@@ -1593,8 +1585,8 @@ ec_superisys_485_modbus_rtu_27
         .rs485_ch_flag         (                          ), //recv en
         .s2m_rs485_msg         (                          )  //recv data
     );
-	
-	
+
+
 	
 	// // --- flow_comp_28 --A0028_固定机器人_RFID读写器---
     // ec_sp_rfid
@@ -1628,7 +1620,7 @@ ec_superisys_485_modbus_rtu_27
     //    ,.i_uart_rx        ( rs485_1_user_rx[2]           )   // 
     //    ,.o_uart_de        ( rs485_1_user_de[2]           )   // 
     // );
-
+	
 ec_superisys_485_modbus_rtu
 #(
         .REG_SPACE_BIAS         (20'hcc00                ), //组件基地址
@@ -1668,8 +1660,8 @@ ec_superisys_485_modbus_rtu_28
         .s2m_rs485_msg          ( 0                       )  //recv data
     );
 
-	
-	
+
+
 	
 	// --- flow_comp_32 --A0032_砂轮手爪放置组件---
     ec_1di
@@ -3083,51 +3075,6 @@ ec_superisys_485_modbus_rtu_28
 	
 	
 	
-	// --- flow_comp_138 --A0072_毛刺刀架库信号检测组---
-    ec_16di
-    #(
-         .REG_SPACE_BIAS     ( 20'd80384)
-        ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
-    )
-    ec_16di_138
-    (
-      
-	  .clk_i                 ( clk               ),
-      .rst                   ( reset             ),
-	  .ps_reg_clk            ( ps_reg_clk        ),
-      .ps_reg_reset          ( ps_reg_reset      ),
-	  
-	  .i_time_1ms_vld        ( time_1ms_vld      ),
-	  .i_time_1s_vld         ( time_1s_vld       ),
-
-	  .i_st_wr_en            ( ps_reg_we         ),
-	  .i_st_wr_addr          ( ps_reg_addr       ),
-      .i_st_wr_data          ( ps_reg_wr_dat     ),
-      .i_st_rd_en            ( ps_reg_re         ),
-      .i_st_rd_addr          ( ps_reg_rd_addr    ),
-	  .o_st_rd_vld           ( sub_comp_rd_vld[153]    ),
-      .o_st_rd_data          ( sub_comp_rd_dat[153]    ),
-	  .o_intr_irq            ( map_irq[153]       )
-
-       ,.i_sign1_check        ( di_regoin_msg[2][65]           )   // 感测开关1
-       ,.i_sign10_check        ( di_regoin_msg[2][74]           )   // 感测开关10
-       ,.i_sign11_check        ( di_regoin_msg[2][75]           )   // 感测开关11
-       ,.i_sign12_check        ( di_regoin_msg[2][76]           )   // 感测开关12
-       ,.i_sign13_check        ( di_regoin_msg[2][77]           )   // 感测开关13
-       ,.i_sign14_check        ( di_regoin_msg[2][78]           )   // 感测开关14
-       ,.i_sign15_check        ( di_regoin_msg[2][79]           )   // 感测开关15
-       ,.i_sign2_check        ( di_regoin_msg[2][66]           )   // 感测开关2
-       ,.i_sign3_check        ( di_regoin_msg[2][67]           )   // 感测开关3
-       ,.i_sign4_check        ( di_regoin_msg[2][68]           )   // 感测开关4
-       ,.i_sign5_check        ( di_regoin_msg[2][69]           )   // 感测开关5
-       ,.i_sign6_check        ( di_regoin_msg[2][70]           )   // 感测开关6
-       ,.i_sign7_check        ( di_regoin_msg[2][71]           )   // 感测开关7
-       ,.i_sign8_check        ( di_regoin_msg[2][72]           )   // 感测开关8
-       ,.i_sign9_check        ( di_regoin_msg[2][73]           )   // 感测开关9
-       ,.i_sign16_check        ( 1'b0           )   // 
-    );
-	
-	
 	// --- flow_comp_72 --A0081_去毛刺机_旋转台伺服电机---
     ec_slv_pul_axis
     #(
@@ -3237,71 +3184,57 @@ ec_superisys_485_modbus_rtu_28
     assign do_regoin_r_msg[2][31] = ~o_sig_dri_74;
 	
 	
+	wire   o_spdx1_75;
+	wire   o_spdx4_75;
+	wire   o_spdx3_75;
+	wire   o_fwd_75;
+	wire   o_rst_75;
+	wire   o_rev_75;
+	wire   o_spdx2_75;
 	
-	// // --- flow_comp_75 --A0080_去毛刺机_变频磨头旋转电机---
-    // ec_slv_dv300_485
-    // #(
-    //      .REG_SPACE_BIAS     ( 20'd78336)
-    //     ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
-    // )
-    // ec_slv_dv300_485_75
-    // (
+	// --- flow_comp_75 --A0080_去毛刺机_变频磨头旋转电机---
+    ec_dv300_do
+    #(
+         .REG_SPACE_BIAS     ( 20'd78336)
+        ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
+    )
+    ec_dv300_do_75
+    (
       
-	//   .clk_i                 ( clk               ),
-    //   .rst                   ( reset             ),
-	//   .ps_reg_clk            ( ps_reg_clk        ),
-    //   .ps_reg_reset          ( ps_reg_reset      ),
+	  .clk_i                 ( clk               ),
+      .rst                   ( reset             ),
+	  .ps_reg_clk            ( ps_reg_clk        ),
+      .ps_reg_reset          ( ps_reg_reset      ),
 	  
-	//   .i_time_1ms_vld        ( time_1ms_vld      ),
-	//   .i_time_1s_vld         ( time_1s_vld       ),
+	  .i_time_1ms_vld        ( time_1ms_vld      ),
+	  .i_time_1s_vld         ( time_1s_vld       ),
 
-	//   .i_st_wr_en            ( ps_reg_we         ),
-	//   .i_st_wr_addr          ( ps_reg_addr       ),
-    //   .i_st_wr_data          ( ps_reg_wr_dat     ),
-    //   .i_st_rd_en            ( ps_reg_re         ),
-    //   .i_st_rd_addr          ( ps_reg_rd_addr    ),
-	//   .o_st_rd_vld           ( sub_comp_rd_vld[149]    ),
-    //   .o_st_rd_data          ( sub_comp_rd_dat[149]    ),
-	//   .o_intr_irq            ( map_irq[149]       )
+	  .i_st_wr_en            ( ps_reg_we         ),
+	  .i_st_wr_addr          ( ps_reg_addr       ),
+      .i_st_wr_data          ( ps_reg_wr_dat     ),
+      .i_st_rd_en            ( ps_reg_re         ),
+      .i_st_rd_addr          ( ps_reg_rd_addr    ),
+	  .o_st_rd_vld           ( sub_comp_rd_vld[149]    ),
+      .o_st_rd_data          ( sub_comp_rd_dat[149]    ),
+	  .o_intr_irq            ( map_irq[149]       )
 
-    //    ,.cur_slv_board_id        ( 5'd2           )   // 伺服驱动
-    //    ,.slv_board_id        ( slv_board_id           )   // 
-    //    ,.rs485_ch_r_flag        ( rs485_00_r_flag           )   // 
-    //    ,.rs485_ch_flag        ( rs485_00_flag           )   // 
-    //    ,.m2s_rs485_msg        ( rs485_00_send_msg[2]           )   // 
-    //    ,.s2m_rs485_msg        ( rs485_00_msg[2]           )   // 
-    // );
-ec_dv300_485_modbus_rtu
-#(
-        .REG_SPACE_BIAS         (20'h13200                ), //组件基地址
-        .REG_SPACE_SIZE         (`REG_SPACE_SIZE          ), //组件偏移地址
-        .CLK_FREQ               (156250000                )  //100MHz = 100000000
-)
-ec_dv300_485_modbus_rtu_75
-(
-        .clk_i                  ( clk                     ),
-        .rst                    ( reset                   ),
-        .i_time_1ms_vld         ( time_1ms_vld            ),
-        .i_time_1s_vld          ( time_1s_vld             ),
-        .ps_reg_clk             ( ps_reg_clk              ),
-        .ps_reg_reset           ( ps_reg_reset            ),
-        .i_st_wr_en             ( ps_reg_we               ),//bram总线
-        .i_st_wr_addr           ( ps_reg_addr             ),
-        .i_st_wr_data           ( ps_reg_wr_dat           ),
-        .i_st_rd_en             ( ps_reg_re               ),
-        .i_st_rd_addr           ( ps_reg_rd_addr          ),
-        .o_st_rd_data           ( sub_comp_rd_dat[149]    ),
-        .o_st_rd_vld            ( sub_comp_rd_vld[149]    ),
-        .o_intr_irq             ( map_irq[149]            ),//组件中断请求
-        
-        //--- 主板Uart接口
-        .i_uart_rx              ( rs485_1_user_rx[6]      ),
-        .o_uart_tx              ( rs485_1_user_tx[6]      ),
-        .o_uart_de              ( rs485_1_user_de[6]      ),
-        .o_user_req             ( rs485_1_user_req[6]     ),
-        .i_user_grant           ( rs485_1_user_grant[6]   )
+       ,.o_rev        ( o_rev_75           )   // DI-反转驱动
+       ,.i_error        ( ~di_regoin_msg[2][5]           )   // JB1-变频器故障
+       ,.o_rst        ( o_rst_75           )   // 外部复位
+       ,.o_spdx1        ( o_spdx1_75           )   // X5-多段速选择1
+       ,.o_spdx2        ( o_spdx2_75           )   // X6-多段速选择2
+       ,.o_spdx3        ( o_spdx3_75           )   // X4-多段速选择3
+       ,.o_spdx4        ( o_spdx4_75           )   // X3-多段速选择4
+       ,.o_fwd        ( o_fwd_75           )   // X1-正转驱动
     );
 
+    assign do_regoin_r_msg[2][26] = ~o_spdx1_75;
+    assign do_regoin_r_msg[2][24] = ~o_spdx4_75;
+    assign do_regoin_r_msg[2][25] = ~o_spdx3_75;
+    assign do_regoin_r_msg[2][14] = ~o_fwd_75;
+    assign do_regoin_r_msg[2][28] = ~o_rst_75;
+    assign do_regoin_r_msg[2][15] = ~o_rev_75;
+    assign do_regoin_r_msg[2][27] = ~o_spdx2_75;
 	
 	
 	wire   o_dri1_76;
@@ -3671,7 +3604,7 @@ ec_superisys_485_modbus_rtu_84
         .rs485_ch_flag          ( 0                       ), //recv en
         .s2m_rs485_msg          ( 0                       )  //recv data
     );
-	
+
 	
 	// --- flow_comp_85 --A0088_1号机床线边托盘检测组---
     ec_5di
@@ -5308,6 +5241,209 @@ ec_superisys_485_modbus_rtu_84
       .o_st_rd_data          ( sub_comp_rd_dat[200]    ),
 	  .o_intr_irq            ( map_irq[200]       )
 
+    );
+
+	
+	
+	
+	// --- flow_comp_138 --A0072_毛刺刀架库信号检测组---
+    ec_16di
+    #(
+         .REG_SPACE_BIAS     ( 20'd80384)
+        ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
+    )
+    ec_16di_138
+    (
+      
+	  .clk_i                 ( clk               ),
+      .rst                   ( reset             ),
+	  .ps_reg_clk            ( ps_reg_clk        ),
+      .ps_reg_reset          ( ps_reg_reset      ),
+	  
+	  .i_time_1ms_vld        ( time_1ms_vld      ),
+	  .i_time_1s_vld         ( time_1s_vld       ),
+
+	  .i_st_wr_en            ( ps_reg_we         ),
+	  .i_st_wr_addr          ( ps_reg_addr       ),
+      .i_st_wr_data          ( ps_reg_wr_dat     ),
+      .i_st_rd_en            ( ps_reg_re         ),
+      .i_st_rd_addr          ( ps_reg_rd_addr    ),
+	  .o_st_rd_vld           ( sub_comp_rd_vld[153]    ),
+      .o_st_rd_data          ( sub_comp_rd_dat[153]    ),
+	  .o_intr_irq            ( map_irq[153]       )
+
+       ,.i_sign1_check        ( di_regoin_msg[2][65]           )   // 感测开关1
+       ,.i_sign10_check        ( di_regoin_msg[2][74]           )   // 感测开关10
+       ,.i_sign11_check        ( di_regoin_msg[2][75]           )   // 感测开关11
+       ,.i_sign12_check        ( di_regoin_msg[2][76]           )   // 感测开关12
+       ,.i_sign13_check        ( di_regoin_msg[2][77]           )   // 感测开关13
+       ,.i_sign14_check        ( di_regoin_msg[2][78]           )   // 感测开关14
+       ,.i_sign15_check        ( di_regoin_msg[2][79]           )   // 感测开关15
+       ,.i_sign2_check        ( di_regoin_msg[2][66]           )   // 感测开关2
+       ,.i_sign3_check        ( di_regoin_msg[2][67]           )   // 感测开关3
+       ,.i_sign4_check        ( di_regoin_msg[2][68]           )   // 感测开关4
+       ,.i_sign5_check        ( di_regoin_msg[2][69]           )   // 感测开关5
+       ,.i_sign6_check        ( di_regoin_msg[2][70]           )   // 感测开关6
+       ,.i_sign7_check        ( di_regoin_msg[2][71]           )   // 感测开关7
+       ,.i_sign8_check        ( di_regoin_msg[2][72]           )   // 感测开关8
+       ,.i_sign9_check        ( di_regoin_msg[2][73]           )   // 感测开关9
+       ,.i_sign16_check        ( 1'b0           )   // 
+    );
+
+	
+	
+	
+	// --- flow_comp_139 --A0364_主机器人地轨[脉冲]---
+    ec_pul_axis
+    #(
+         .REG_SPACE_BIAS     ( 20'd105984)
+        ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
+    )
+    ec_pul_axis_139
+    (
+      
+	  .clk_i                 ( clk               ),
+      .rst                   ( reset             ),
+	  .ps_reg_clk            ( ps_reg_clk        ),
+      .ps_reg_reset          ( ps_reg_reset      ),
+	  
+	  .i_time_1ms_vld        ( time_1ms_vld      ),
+	  .i_time_1s_vld         ( time_1s_vld       ),
+
+	  .i_st_wr_en            ( ps_reg_we         ),
+	  .i_st_wr_addr          ( ps_reg_addr       ),
+      .i_st_wr_data          ( ps_reg_wr_dat     ),
+      .i_st_rd_en            ( ps_reg_re         ),
+      .i_st_rd_addr          ( ps_reg_rd_addr    ),
+	  .o_st_rd_vld           ( sub_comp_rd_vld[203]    ),
+      .o_st_rd_data          ( sub_comp_rd_dat[203]    ),
+	  .o_intr_irq            ( map_irq[203]       )
+
+       ,.i_servo_done        ( 1'b0           )   // 
+       ,.i_axis_zero        ( 1'b0           )   // 
+       ,.i_axis_limf        ( 1'b0           )   // 
+       ,.i_axis_limb        ( 1'b0           )   // 
+       ,.i_servo_ready        ( 1'b0           )   // 
+    );
+
+	
+	
+	
+	// --- flow_comp_140 --A0365_短桁架1[脉冲]---
+    ec_pul_axis
+    #(
+         .REG_SPACE_BIAS     ( 20'd106496)
+        ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
+    )
+    ec_pul_axis_140
+    (
+      
+	  .clk_i                 ( clk               ),
+      .rst                   ( reset             ),
+	  .ps_reg_clk            ( ps_reg_clk        ),
+      .ps_reg_reset          ( ps_reg_reset      ),
+	  
+	  .i_time_1ms_vld        ( time_1ms_vld      ),
+	  .i_time_1s_vld         ( time_1s_vld       ),
+
+	  .i_st_wr_en            ( ps_reg_we         ),
+	  .i_st_wr_addr          ( ps_reg_addr       ),
+      .i_st_wr_data          ( ps_reg_wr_dat     ),
+      .i_st_rd_en            ( ps_reg_re         ),
+      .i_st_rd_addr          ( ps_reg_rd_addr    ),
+	  .o_st_rd_vld           ( sub_comp_rd_vld[204]    ),
+      .o_st_rd_data          ( sub_comp_rd_dat[204]    ),
+	  .o_intr_irq            ( map_irq[204]       )
+
+       ,.i_servo_done        ( 1'b0           )   // 
+       ,.i_axis_zero        ( 1'b0           )   // 
+       ,.i_axis_limf        ( 1'b0           )   // 
+       ,.i_axis_limb        ( 1'b0           )   // 
+       ,.i_servo_ready        ( 1'b0           )   // 
+    );
+
+	
+	
+	
+	// --- flow_comp_141 --A0363_长桁架2[脉冲]---
+    ec_slv_pul_axis
+    #(
+         .REG_SPACE_BIAS     ( 20'd107008)
+        ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
+    )
+    ec_slv_pul_axis_141
+    (
+      
+	  .clk_i                 ( clk               ),
+      .rst                   ( reset             ),
+	  .ps_reg_clk            ( ps_reg_clk        ),
+      .ps_reg_reset          ( ps_reg_reset      ),
+	  
+	  .i_time_1ms_vld        ( time_1ms_vld      ),
+	  .i_time_1s_vld         ( time_1s_vld       ),
+
+	  .i_st_wr_en            ( ps_reg_we         ),
+	  .i_st_wr_addr          ( ps_reg_addr       ),
+      .i_st_wr_data          ( ps_reg_wr_dat     ),
+      .i_st_rd_en            ( ps_reg_re         ),
+      .i_st_rd_addr          ( ps_reg_rd_addr    ),
+	  .o_st_rd_vld           ( sub_comp_rd_vld[205]    ),
+      .o_st_rd_data          ( sub_comp_rd_dat[205]    ),
+	  .o_intr_irq            ( map_irq[205]       )
+
+       ,.i_axis_limf        ( di_regoin_msg[3][19]           )   // 正限位到位开关
+       ,.pul_motor_r_flag        ( pul_motor1_r_flag           )   // 
+       ,.cur_slv_board_id        ( 5'd3           )   // 
+       ,.slv_board_id        ( slv_board_id           )   // 
+       ,.pul_motor_flag        ( pul_motor1_flag           )   // 
+       ,.m2s_pulm_msg        ( pul_motor1_r_msg[3]           )   // 
+       ,.s2m_pulm_msg        ( pul_motor1_msg[3]           )   // 
+       ,.i_axis_limb        ( di_regoin_msg[3][17]           )   // 负限位到位开关
+       ,.i_axis_zero        ( di_regoin_msg[3][18]           )   // 零位到位开关
+       ,.i_servo_done        ( di_regoin_msg[3][39]           )   // 伺服定位完成
+       ,.i_servo_ready        ( di_regoin_msg[3][40]           )   // 伺服就绪
+    );
+
+	
+	
+	
+	// --- flow_comp_142 --A0362_长桁架1[脉冲]---
+    ec_slv_pul_axis
+    #(
+         .REG_SPACE_BIAS     ( 20'd107520)
+        ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
+    )
+    ec_slv_pul_axis_142
+    (
+      
+	  .clk_i                 ( clk               ),
+      .rst                   ( reset             ),
+	  .ps_reg_clk            ( ps_reg_clk        ),
+      .ps_reg_reset          ( ps_reg_reset      ),
+	  
+	  .i_time_1ms_vld        ( time_1ms_vld      ),
+	  .i_time_1s_vld         ( time_1s_vld       ),
+
+	  .i_st_wr_en            ( ps_reg_we         ),
+	  .i_st_wr_addr          ( ps_reg_addr       ),
+      .i_st_wr_data          ( ps_reg_wr_dat     ),
+      .i_st_rd_en            ( ps_reg_re         ),
+      .i_st_rd_addr          ( ps_reg_rd_addr    ),
+	  .o_st_rd_vld           ( sub_comp_rd_vld[206]    ),
+      .o_st_rd_data          ( sub_comp_rd_dat[206]    ),
+	  .o_intr_irq            ( map_irq[206]       )
+
+       ,.i_axis_limf        ( di_regoin_msg[3][16]           )   // 正限位到位开关
+       ,.pul_motor_r_flag        ( pul_motor0_r_flag           )   // 
+       ,.cur_slv_board_id        ( 5'd3           )   // 
+       ,.slv_board_id        ( slv_board_id           )   // 
+       ,.pul_motor_flag        ( pul_motor0_flag           )   // 
+       ,.m2s_pulm_msg        ( pul_motor0_r_msg[3]           )   // 
+       ,.s2m_pulm_msg        ( pul_motor0_msg[3]           )   // 
+       ,.i_axis_limb        ( di_regoin_msg[3][14]           )   // 负限位到位开关
+       ,.i_axis_zero        ( di_regoin_msg[3][15]           )   // 零位到位开关
+       ,.i_servo_done        ( di_regoin_msg[3][37]           )   // 伺服定位完成
+       ,.i_servo_ready        ( di_regoin_msg[3][38]           )   // 伺服就绪
     );
 
 	
