@@ -51,7 +51,7 @@ module Positioner_std #(
    
    localparam  MODE_T    	 = 32'h00;
    localparam  MODE_S 		 = 32'h10;
-   localparam  UNIT_DT     = ({P_DIV_WIDTH{1'b1}}/(10**8));
+   localparam [P_DIV_WIDTH:0] UNIT_DT = ({1'b1, {P_DIV_WIDTH{1'b0}}} + BASE_REFCLK / 2) / BASE_REFCLK;
    
    ////////////////// Division
    reg                        spd_div_start;
