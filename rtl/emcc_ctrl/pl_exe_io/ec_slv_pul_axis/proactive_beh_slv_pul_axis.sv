@@ -95,6 +95,7 @@ module proactive_beh_slv_pul_axis#(
 	
 
 	,output wire signed [31:0]			r_pf_abspos //postion
+	,output wire						dv_alarm //remote drive alm
 //----------------------------------------------------- user logic end -------------------------------------------------------//
     );
 
@@ -481,7 +482,6 @@ module proactive_beh_slv_pul_axis#(
 		reg [31:0] s2m_10tmp;
 		reg [31:0] s2m_11tmp;
 
-		wire       dv_alarm;
 		wire       slv_action_busy;
 		wire       slv_action_done;
 		wire       slv_action_error;

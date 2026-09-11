@@ -133,8 +133,8 @@ module ps_rw_pl_reg_pul_axis#(
 	,input 				[7:0]		c_tsc_id   
 	,input 				[7:0]		c_bhv_id    
 
-	,input 				[31:0]		param51 
-	//,input 				[31:0]		param52 
+	,input 				[31:0]		param51
+	,input 				[31:0]		param52
 	//,input 				[31:0]		param53   
 	//,input 				[31:0]		param54   
 	//,input 				[31:0]		param55   
@@ -146,13 +146,13 @@ module ps_rw_pl_reg_pul_axis#(
 	//,input 				[7:0]		param61   
 	//,input 				[7:0]		param62   
 	//,input 				[7:0]		param63   
-	//,input 				[7:0]		param64   
-	//,input 				[7:0]		param65   
-	//,input 							param66   
-	//,input 							param67   
-	//,input 							param68   
-	//,input 							param69   
-	//,input 							param70   
+	,input 				[7:0]		param64   //[0]fwd limit
+	,input 				[7:0]		param65   //[0]servo ready
+	,input 							param66   //servo done
+	,input 							param67   //bwd limit
+	,input 							param68   //origin
+	,input 							param69   //drive input alm
+	,input 							param70   //drive output son
 	,input 				[31:0]		debug_reg1
 	,input 				[31:0]		debug_reg2
 	,input 				[31:0]		debug_reg3
@@ -397,7 +397,7 @@ module ps_rw_pl_reg_pul_axis#(
 		`C_BHV_ID 		: 	o_st_rd_data <= {24'd0,	c_bhv_id  	}; 
 
 		`PARAM51		:	o_st_rd_data <= param51     		;
-		//`PARAM52		:	o_st_rd_data <= param52     		;
+		`PARAM52		:	o_st_rd_data <= param52     		;
 		//`PARAM53		:	o_st_rd_data <= param53     		;
 		//`PARAM54		:	o_st_rd_data <= param54     		;
 		//`PARAM55		:	o_st_rd_data <= param55     		;
@@ -409,13 +409,13 @@ module ps_rw_pl_reg_pul_axis#(
 		//`PARAM61		:	o_st_rd_data <= {24'd0,param61  	};
 		//`PARAM62		:	o_st_rd_data <= {24'd0,param62  	};
 		//`PARAM63		:	o_st_rd_data <= {24'd0,param63  	};
-		//`PARAM64		:	o_st_rd_data <= {24'd0,param64  	};
-		//`PARAM65		:	o_st_rd_data <= {24'd0,param65  	};
-		//`PARAM66		:	o_st_rd_data <= {31'd0,param66  	};
-		//`PARAM67		:	o_st_rd_data <= {31'd0,param67  	};
-		//`PARAM68		:	o_st_rd_data <= {31'd0,param68  	};
-		//`PARAM69		:	o_st_rd_data <= {31'd0,param69  	};
-		//`PARAM70		:	o_st_rd_data <= {31'd0,param70  	};
+		`PARAM64		:	o_st_rd_data <= {24'd0,param64  	};
+		`PARAM65		:	o_st_rd_data <= {24'd0,param65  	};
+		`PARAM66		:	o_st_rd_data <= {31'd0,param66  	};
+		`PARAM67		:	o_st_rd_data <= {31'd0,param67  	};
+		`PARAM68		:	o_st_rd_data <= {31'd0,param68  	};
+		`PARAM69		:	o_st_rd_data <= {31'd0,param69  	};
+		`PARAM70		:	o_st_rd_data <= {31'd0,param70  	};
 		
 		`DEBUG_REG1		:	o_st_rd_data <= debug_reg1			;
 		`DEBUG_REG2		:	o_st_rd_data <= debug_reg2			;
