@@ -294,6 +294,8 @@ module ec_slv_pul_axis#(
 	wire 			b_clr_stop	;
 	wire 			b_reset		;
 	wire 			b_son		;
+	wire 			dv_alarm	;
+	wire 			i_dv_alarm	;
 	wire 			b_pause		;
 	wire 			b_stop		;
 //----------------------------------------------------- user logic end -------------------------------------------------------//
@@ -401,7 +403,7 @@ module ec_slv_pul_axis#(
 	,.c_tsc_id              (c_tx_id  		)
 	,.c_bhv_id              (c_bhv_id 		)
 	,.param51               (param51		)
-	//,.param52               (param52		)
+	,.param52               ({29'd0,b_reset,b_son,param16[0]}	)	//out cmd [2]rst [1]son [0]dir
 	//,.param53               (param53		)
 	//,.param54               (param54		)
 	//,.param55               (param55		)
@@ -413,13 +415,13 @@ module ec_slv_pul_axis#(
 	//,.param61               (param61		)
 	//,.param62               (param62		)
 	//,.param63               (param63		)
-	//,.param64               (param64		)
-	//,.param65               (param65		)
-	//,.param66               (param66		)
-	//,.param67               (param67		)
-	//,.param68               (param68		)
-	//,.param69               (param69		)
-	//,.param70               (param70		)
+	,.param64               ({7'd0,i_axis_limf}	)	//fwd limit
+	,.param65               ({7'd0,i_servo_ready}	)	//servo ready
+	,.param66               (i_servo_done		)	//servo done
+	,.param67               (i_axis_limb		)	//bwd limit
+	,.param68               (i_axis_zero		)	//origin
+	,.param69               (dv_alarm		)	//remote drive alm
+	,.param70               (b_son			)	//son cmd to slv
 	,.debug_reg1			(debug_reg1		)
 	,.debug_reg2			(debug_reg2		)
 	,.debug_reg3			(debug_reg3		)
@@ -490,6 +492,7 @@ module ec_slv_pul_axis#(
 	,.r_pf_abspos			(param51				)
 	,.i_drive_on			(b_son					)
 	,.i_drive_reset			(b_reset				)
+	,.dv_alarm				(dv_alarm				)
 //----------------------------------------------------- user logic end -------------------------------------------------------//
     );
 

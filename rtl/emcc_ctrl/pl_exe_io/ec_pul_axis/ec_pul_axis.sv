@@ -396,7 +396,7 @@ module ec_pul_axis#(
 	,.c_tsc_id              (c_tx_id  		)
 	,.c_bhv_id              (c_bhv_id 		)
 	,.param51               (param51		)
-	//,.param52               (param52		)
+	,.param52               ({30'd0,o_dv_dir,o_dv_pulse}	)	//diff out [1]dir [0]pulse
 	//,.param53               (param53		)
 	//,.param54               (param54		)
 	//,.param55               (param55		)
@@ -408,13 +408,13 @@ module ec_pul_axis#(
 	//,.param61               (param61		)
 	//,.param62               (param62		)
 	//,.param63               (param63		)
-	//,.param64               (param64		)
-	//,.param65               (param65		)
-	//,.param66               (param66		)
-	//,.param67               (param67		)
-	//,.param68               (param68		)
-	//,.param69               (param69		)
-	//,.param70               (param70		)
+	,.param64               ({7'd0,i_axis_limf}	)	//fwd limit
+	,.param65               ({7'd0,i_servo_ready}	)	//servo ready
+	,.param66               (i_servo_done		)	//servo done
+	,.param67               (i_axis_limb		)	//bwd limit
+	,.param68               (i_axis_zero		)	//origin
+	,.param69               (i_dv_alarm		)	//drive input alm
+	,.param70               (o_dv_son		)	//drive output son
 	,.debug_reg1			(debug_reg1		)
 	,.debug_reg2			(debug_reg2		)
 	,.debug_reg3			(debug_reg3		)
