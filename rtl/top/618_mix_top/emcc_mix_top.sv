@@ -1441,227 +1441,6 @@ module emcc_mix_top
 	
 	
 	
-	// // --- flow_comp_26 --A0026_地轨机器人_RFID读写器---
-    // ec_sp_rfid
-    // #(
-    //      .REG_SPACE_BIAS     ( 20'd56320)
-    //     ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
-    // )
-    // ec_sp_rfid_26
-    // (
-      
-	//   .clk_i                 ( clk               ),
-    //   .rst                   ( reset             ),
-	//   .ps_reg_clk            ( ps_reg_clk        ),
-    //   .ps_reg_reset          ( ps_reg_reset      ),
-	  
-	//   .i_time_1ms_vld        ( time_1ms_vld      ),
-	//   .i_time_1s_vld         ( time_1s_vld       ),
-
-	//   .i_st_wr_en            ( ps_reg_we         ),
-	//   .i_st_wr_addr          ( ps_reg_addr       ),
-    //   .i_st_wr_data          ( ps_reg_wr_dat     ),
-    //   .i_st_rd_en            ( ps_reg_re         ),
-    //   .i_st_rd_addr          ( ps_reg_rd_addr    ),
-	//   .o_st_rd_vld           ( sub_comp_rd_vld[106]    ),
-    //   .o_st_rd_data          ( sub_comp_rd_dat[106]    ),
-	//   .o_intr_irq            ( map_irq[106]       )
-
-    //    ,.o_user_req        ( rs485_1_user_req[0]           )   // RS485端口
-    //    ,.i_user_grant        ( rs485_1_user_grant[0]           )   // 
-    //    ,.o_uart_tx        ( rs485_1_user_tx[0]           )   // 
-    //    ,.i_uart_rx        ( rs485_1_user_rx[0]           )   // 
-    //    ,.o_uart_de        ( rs485_1_user_de[0]           )   // 
-    // );
-ec_superisys_485_modbus_rtu
-#(
-        .REG_SPACE_BIAS         (20'hdc00                ), //组件基地址
-        .REG_SPACE_SIZE         (`REG_SPACE_SIZE          ), //组件偏移地址
-        .CLK_FREQ               (156250000                )  //100MHz = 100000000
-)
-ec_superisys_485_modbus_rtu_26
-(
-        .clk_i                  ( clk                     ),
-        .rst                    ( reset                   ),
-        .i_time_1ms_vld         ( time_1ms_vld            ),
-        .i_time_1s_vld          ( time_1s_vld             ),
-        .ps_reg_clk             ( ps_reg_clk              ),
-        .ps_reg_reset           ( ps_reg_reset            ),
-        .i_st_wr_en             ( ps_reg_we               ),//bram总线
-        .i_st_wr_addr           ( ps_reg_addr             ),
-        .i_st_wr_data           ( ps_reg_wr_dat           ),
-        .i_st_rd_en             ( ps_reg_re               ),
-        .i_st_rd_addr           ( ps_reg_rd_addr          ),
-        .o_st_rd_data           ( sub_comp_rd_dat[106]    ),
-        .o_st_rd_vld            ( sub_comp_rd_vld[106]    ),
-        .o_intr_irq             ( map_irq[106]            ),//组件中断请求
-        
-        //--- 主板Uart接口
-        .i_uart_rx              ( rs485_1_user_rx[0]      ),
-        .o_uart_tx              ( rs485_1_user_tx[0]      ),
-        .o_uart_de              ( rs485_1_user_de[0]      ),
-        .o_user_req             ( rs485_1_user_req[0]     ),
-        .i_user_grant           ( rs485_1_user_grant[0]   ),
-
-         //--- 从板接口 use clk domain 156.25MHz --
-        .cur_slv_board_id       ( 0                       ), //
-        .slv_board_id           ( slv_board_id            ), 
-        .rs485_ch_r_flag        ( rs485_00_r_flag         ), //send en
-        .m2s_rs485_msg          ( rs485_00_send_msg[0]    ), //send data
-        .rs485_ch_flag          ( rs485_00_flag           ), //recv en
-        .s2m_rs485_msg          ( rs485_00_msg[0]         )  //recv data
-    );
-
-	
-	
-	// // --- flow_comp_27 --A0027_短桁架1#夹爪RFID读写器---
-    // ec_sp_rfid
-    // #(
-    //      .REG_SPACE_BIAS     ( 20'd54272)
-    //     ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
-    // )
-    // ec_sp_rfid_27
-    // (
-      
-	//   .clk_i                 ( clk               ),
-    //   .rst                   ( reset             ),
-	//   .ps_reg_clk            ( ps_reg_clk        ),
-    //   .ps_reg_reset          ( ps_reg_reset      ),
-	  
-	//   .i_time_1ms_vld        ( time_1ms_vld      ),
-	//   .i_time_1s_vld         ( time_1s_vld       ),
-
-	//   .i_st_wr_en            ( ps_reg_we         ),
-	//   .i_st_wr_addr          ( ps_reg_addr       ),
-    //   .i_st_wr_data          ( ps_reg_wr_dat     ),
-    //   .i_st_rd_en            ( ps_reg_re         ),
-    //   .i_st_rd_addr          ( ps_reg_rd_addr    ),
-	//   .o_st_rd_vld           ( sub_comp_rd_vld[102]    ),
-    //   .o_st_rd_data          ( sub_comp_rd_dat[102]    ),
-	//   .o_intr_irq            ( map_irq[102]       )
-
-    //    ,.o_user_req        ( rs485_1_user_req[1]           )   // RS485端口
-    //    ,.i_user_grant        ( rs485_1_user_grant[1]           )   // 
-    //    ,.o_uart_tx        ( rs485_1_user_tx[1]           )   // 
-    //    ,.i_uart_rx        ( rs485_1_user_rx[1]           )   // 
-    //    ,.o_uart_de        ( rs485_1_user_de[1]           )   // 
-    // );
-	
-ec_superisys_485_modbus_rtu
-#(
-        .REG_SPACE_BIAS         (20'hd400                ), //组件基地址
-        .REG_SPACE_SIZE         (`REG_SPACE_SIZE          ), //组件偏移地址
-        .CLK_FREQ               (156250000                )  //100MHz = 100000000
-)
-ec_superisys_485_modbus_rtu_27
-(
-        .clk_i                  ( clk                     ),
-        .rst                    ( reset                   ),
-        .i_time_1ms_vld         ( time_1ms_vld            ),
-        .i_time_1s_vld          ( time_1s_vld             ),
-        .ps_reg_clk             ( ps_reg_clk              ),
-        .ps_reg_reset           ( ps_reg_reset            ),
-        .i_st_wr_en             ( ps_reg_we               ),//bram总线
-        .i_st_wr_addr           ( ps_reg_addr             ),
-        .i_st_wr_data           ( ps_reg_wr_dat           ),
-        .i_st_rd_en             ( ps_reg_re               ),
-        .i_st_rd_addr           ( ps_reg_rd_addr          ),
-        .o_st_rd_data           ( sub_comp_rd_dat[102]    ),
-        .o_st_rd_vld            ( sub_comp_rd_vld[102]    ),
-        .o_intr_irq             ( map_irq[102]            ),//组件中断请求
-        
-        //--- 主板Uart接口
-        .i_uart_rx              ( rs485_1_user_rx[1]      ),
-        .o_uart_tx              ( rs485_1_user_tx[1]      ),
-        .o_uart_de              ( rs485_1_user_de[1]      ),
-        .o_user_req             ( rs485_1_user_req[1]     ),
-        .i_user_grant           ( rs485_1_user_grant[1]   ),
-
-         //--- 从板接口 use clk domain 156.25MHz --
-        .cur_slv_board_id      (                          ), //
-        .slv_board_id          (                          ), 
-        .rs485_ch_r_flag       ( 0                        ), //send en
-        .m2s_rs485_msg         (                          ), //send data
-        .rs485_ch_flag         (                          ), //recv en
-        .s2m_rs485_msg         (                          )  //recv data
-    );
-
-
-	
-	// // --- flow_comp_28 --A0028_固定机器人_RFID读写器---
-    // ec_sp_rfid
-    // #(
-    //      .REG_SPACE_BIAS     ( 20'd52224)
-    //     ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
-    // )
-    // ec_sp_rfid_28
-    // (
-      
-	//   .clk_i                 ( clk               ),
-    //   .rst                   ( reset             ),
-	//   .ps_reg_clk            ( ps_reg_clk        ),
-    //   .ps_reg_reset          ( ps_reg_reset      ),
-	  
-	//   .i_time_1ms_vld        ( time_1ms_vld      ),
-	//   .i_time_1s_vld         ( time_1s_vld       ),
-
-	//   .i_st_wr_en            ( ps_reg_we         ),
-	//   .i_st_wr_addr          ( ps_reg_addr       ),
-    //   .i_st_wr_data          ( ps_reg_wr_dat     ),
-    //   .i_st_rd_en            ( ps_reg_re         ),
-    //   .i_st_rd_addr          ( ps_reg_rd_addr    ),
-	//   .o_st_rd_vld           ( sub_comp_rd_vld[98]    ),
-    //   .o_st_rd_data          ( sub_comp_rd_dat[98]    ),
-	//   .o_intr_irq            ( map_irq[98]       )
-
-    //    ,.o_user_req        ( rs485_1_user_req[2]           )   // RS485端口
-    //    ,.i_user_grant        ( rs485_1_user_grant[2]           )   // 
-    //    ,.o_uart_tx        ( rs485_1_user_tx[2]           )   // 
-    //    ,.i_uart_rx        ( rs485_1_user_rx[2]           )   // 
-    //    ,.o_uart_de        ( rs485_1_user_de[2]           )   // 
-    // );
-	
-ec_superisys_485_modbus_rtu
-#(
-        .REG_SPACE_BIAS         (20'hcc00                ), //组件基地址
-        .REG_SPACE_SIZE         (`REG_SPACE_SIZE          ), //组件偏移地址
-        .CLK_FREQ               (156250000                )  //100MHz = 100000000
-)
-ec_superisys_485_modbus_rtu_28
-(
-        .clk_i                  ( clk                     ),
-        .rst                    ( reset                   ),
-        .i_time_1ms_vld         ( time_1ms_vld            ),
-        .i_time_1s_vld          ( time_1s_vld             ),
-        .ps_reg_clk             ( ps_reg_clk              ),
-        .ps_reg_reset           ( ps_reg_reset            ),
-        .i_st_wr_en             ( ps_reg_we               ),//bram总线
-        .i_st_wr_addr           ( ps_reg_addr             ),
-        .i_st_wr_data           ( ps_reg_wr_dat           ),
-        .i_st_rd_en             ( ps_reg_re               ),
-        .i_st_rd_addr           ( ps_reg_rd_addr          ),
-        .o_st_rd_data           ( sub_comp_rd_dat[98]     ),
-        .o_st_rd_vld            ( sub_comp_rd_vld[98]     ),
-        .o_intr_irq             ( map_irq[98]             ),//组件中断请求
-        
-        //--- 主板Uart接口
-        .i_uart_rx              ( rs485_1_user_rx[2]      ),
-        .o_uart_tx              ( rs485_1_user_tx[2]      ),
-        .o_uart_de              ( rs485_1_user_de[2]      ),
-        .o_user_req             ( rs485_1_user_req[2]     ),
-        .i_user_grant           ( rs485_1_user_grant[2]   ),
-
-         //--- 从板接口 use clk domain 156.25MHz --
-        .cur_slv_board_id       ( 0                       ), //
-        .slv_board_id           ( 0                       ), 
-        .rs485_ch_r_flag        ( 0                       ), //send en
-        .m2s_rs485_msg          (                         ), //send data
-        .rs485_ch_flag          ( 0                       ), //recv en
-        .s2m_rs485_msg          ( 0                       )  //recv data
-    );
-
-
-
 	
 	// --- flow_comp_32 --A0032_砂轮手爪放置组件---
     ec_1di
@@ -3455,157 +3234,6 @@ ec_superisys_485_modbus_rtu_28
     );
 
 	
-	
-	
-	// // --- flow_comp_83 --A0086_长桁架1#夹爪RFID读写器---
-    // ec_sp_rfid
-    // #(
-    //      .REG_SPACE_BIAS     ( 20'd63488)
-    //     ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
-    // )
-    // ec_sp_rfid_83
-    // (
-      
-	//   .clk_i                 ( clk               ),
-    //   .rst                   ( reset             ),
-	//   .ps_reg_clk            ( ps_reg_clk        ),
-    //   .ps_reg_reset          ( ps_reg_reset      ),
-	  
-	//   .i_time_1ms_vld        ( time_1ms_vld      ),
-	//   .i_time_1s_vld         ( time_1s_vld       ),
-
-	//   .i_st_wr_en            ( ps_reg_we         ),
-	//   .i_st_wr_addr          ( ps_reg_addr       ),
-    //   .i_st_wr_data          ( ps_reg_wr_dat     ),
-    //   .i_st_rd_en            ( ps_reg_re         ),
-    //   .i_st_rd_addr          ( ps_reg_rd_addr    ),
-	//   .o_st_rd_vld           ( sub_comp_rd_vld[120]    ),
-    //   .o_st_rd_data          ( sub_comp_rd_dat[120]    ),
-	//   .o_intr_irq            ( map_irq[120]       )
-
-    //    ,.cur_slv_board_id        ( 5'd3           )   // RS485端口
-    //    ,.slv_board_id        ( slv_board_id           )   // 
-    //    ,.rs485_ch_r_flag        ( rs485_00_r_flag           )   // 
-    //    ,.rs485_ch_flag        ( rs485_00_flag           )   // 
-    //    ,.m2s_rs485_msg        ( rs485_00_send_msg[3]           )   // 
-    //    ,.s2m_rs485_msg        ( rs485_00_msg[3]           )   // 
-    // );
-
-	
-	
-ec_superisys_485_modbus_rtu
-#(
-        .REG_SPACE_BIAS         (20'hf800                ), //组件基地址
-        .REG_SPACE_SIZE         (`REG_SPACE_SIZE          ), //组件偏移地址
-        .CLK_FREQ               (156250000                )  //100MHz = 100000000
-)
-ec_superisys_485_modbus_rtu_83
-(
-        .clk_i                  ( clk                     ),
-        .rst                    ( reset                   ),
-        .i_time_1ms_vld         ( time_1ms_vld            ),
-        .i_time_1s_vld          ( time_1s_vld             ),
-        .ps_reg_clk             ( ps_reg_clk              ),
-        .ps_reg_reset           ( ps_reg_reset            ),
-        .i_st_wr_en             ( ps_reg_we               ),//bram总线
-        .i_st_wr_addr           ( ps_reg_addr             ),
-        .i_st_wr_data           ( ps_reg_wr_dat           ),
-        .i_st_rd_en             ( ps_reg_re               ),
-        .i_st_rd_addr           ( ps_reg_rd_addr          ),
-        .o_st_rd_data           ( sub_comp_rd_dat[120]    ),
-        .o_st_rd_vld            ( sub_comp_rd_vld[120]    ),
-        .o_intr_irq             ( map_irq[120]            ),//组件中断请求
-        
-        //--- 主板Uart接口
-        .i_uart_rx              ( rs485_1_user_rx[3]      ),
-        .o_uart_tx              ( rs485_1_user_tx[3]      ),
-        .o_uart_de              ( rs485_1_user_de[3]      ),
-        .o_user_req             ( rs485_1_user_req[3]     ),
-        .i_user_grant           ( rs485_1_user_grant[3]   ),
-
-         //--- 从板接口 use clk domain 156.25MHz --
-        .cur_slv_board_id       ( 0                       ), //
-        .slv_board_id           ( 0                       ), 
-        .rs485_ch_r_flag        ( 0                       ), //send en
-        .m2s_rs485_msg          (                         ), //send data
-        .rs485_ch_flag          ( 0                       ), //recv en
-        .s2m_rs485_msg          ( 0                       )  //recv data
-    );
-
-	// // --- flow_comp_84 --A0087_长桁架2#夹爪RFID读写器---
-    // ec_sp_rfid
-    // #(
-    //      .REG_SPACE_BIAS     ( 20'd64000)
-    //     ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
-    // )
-    // ec_sp_rfid_84
-    // (
-      
-	//   .clk_i                 ( clk               ),
-    //   .rst                   ( reset             ),
-	//   .ps_reg_clk            ( ps_reg_clk        ),
-    //   .ps_reg_reset          ( ps_reg_reset      ),
-	  
-	//   .i_time_1ms_vld        ( time_1ms_vld      ),
-	//   .i_time_1s_vld         ( time_1s_vld       ),
-
-	//   .i_st_wr_en            ( ps_reg_we         ),
-	//   .i_st_wr_addr          ( ps_reg_addr       ),
-    //   .i_st_wr_data          ( ps_reg_wr_dat     ),
-    //   .i_st_rd_en            ( ps_reg_re         ),
-    //   .i_st_rd_addr          ( ps_reg_rd_addr    ),
-	//   .o_st_rd_vld           ( sub_comp_rd_vld[121]    ),
-    //   .o_st_rd_data          ( sub_comp_rd_dat[121]    ),
-	//   .o_intr_irq            ( map_irq[121]       )
-
-    //    ,.cur_slv_board_id        ( 5'd3           )   // RS485端口
-    //    ,.slv_board_id        ( slv_board_id           )   // 
-    //    ,.rs485_ch_r_flag        ( rs485_00_r_flag           )   // 
-    //    ,.rs485_ch_flag        ( rs485_00_flag           )   // 
-    //    ,.m2s_rs485_msg        ( rs485_00_send_msg[3]           )   // 
-    //    ,.s2m_rs485_msg        ( rs485_00_msg[3]           )   // 
-    // );
-
-	ec_superisys_485_modbus_rtu
-#(
-        .REG_SPACE_BIAS         (20'hfa00                ), //组件基地址
-        .REG_SPACE_SIZE         (`REG_SPACE_SIZE          ), //组件偏移地址
-        .CLK_FREQ               (156250000                )  //100MHz = 100000000
-)
-ec_superisys_485_modbus_rtu_84
-(
-        .clk_i                  ( clk                     ),
-        .rst                    ( reset                   ),
-        .i_time_1ms_vld         ( time_1ms_vld            ),
-        .i_time_1s_vld          ( time_1s_vld             ),
-        .ps_reg_clk             ( ps_reg_clk              ),
-        .ps_reg_reset           ( ps_reg_reset            ),
-        .i_st_wr_en             ( ps_reg_we               ),//bram总线
-        .i_st_wr_addr           ( ps_reg_addr             ),
-        .i_st_wr_data           ( ps_reg_wr_dat           ),
-        .i_st_rd_en             ( ps_reg_re               ),
-        .i_st_rd_addr           ( ps_reg_rd_addr          ),
-        .o_st_rd_data           ( sub_comp_rd_dat[121]    ),
-        .o_st_rd_vld            ( sub_comp_rd_vld[121]    ),
-        .o_intr_irq             ( map_irq[121]            ),//组件中断请求
-        
-        //--- 主板Uart接口
-        .i_uart_rx              ( rs485_1_user_rx[4]      ),
-        .o_uart_tx              ( rs485_1_user_tx[4]      ),
-        .o_uart_de              ( rs485_1_user_de[4]      ),
-        .o_user_req             ( rs485_1_user_req[4]     ),
-        .i_user_grant           ( rs485_1_user_grant[4]   ),
-
-         //--- 从板接口 use clk domain 156.25MHz --
-        .cur_slv_board_id       ( 0                       ), //
-        .slv_board_id           ( 0                       ), 
-        .rs485_ch_r_flag        ( 0                       ), //send en
-        .m2s_rs485_msg          (                         ), //send data
-        .rs485_ch_flag          ( 0                       ), //recv en
-        .s2m_rs485_msg          ( 0                       )  //recv data
-    );
-
-	
 	// --- flow_comp_85 --A0088_1号机床线边托盘检测组---
     ec_5di
     #(
@@ -5391,17 +5019,17 @@ ec_superisys_485_modbus_rtu_84
       .o_st_rd_data          ( sub_comp_rd_dat[205]    ),
 	  .o_intr_irq            ( map_irq[205]       )
 
-       ,.i_axis_limf        ( di_regoin_msg[3][19]           )   // 正限位到位开关
+       ,.i_axis_limf        ( ~di_regoin_msg[3][19]           )   // 正限位到位开关
        ,.pul_motor_r_flag        ( pul_motor1_r_flag           )   // 
        ,.cur_slv_board_id        ( 5'd3           )   // 
        ,.slv_board_id        ( slv_board_id           )   // 
        ,.pul_motor_flag        ( pul_motor1_flag           )   // 
        ,.m2s_pulm_msg        ( pul_motor1_r_msg[3]           )   // 
        ,.s2m_pulm_msg        ( pul_motor1_msg[3]           )   // 
-       ,.i_axis_limb        ( di_regoin_msg[3][17]           )   // 负限位到位开关
-       ,.i_axis_zero        ( di_regoin_msg[3][18]           )   // 零位到位开关
-       ,.i_servo_done        ( di_regoin_msg[3][39]           )   // 伺服定位完成
-       ,.i_servo_ready        ( di_regoin_msg[3][40]           )   // 伺服就绪
+       ,.i_axis_limb        ( ~di_regoin_msg[3][17]           )   // 负限位到位开关
+       ,.i_axis_zero        ( ~di_regoin_msg[3][18]           )   // 零位到位开关
+       ,.i_servo_done        ( ~di_regoin_msg[3][59]           )   // 伺服定位完成
+       ,.i_servo_ready        ( ~di_regoin_msg[3][58]           )   // 伺服就绪
     );
 
 	
@@ -5433,17 +5061,17 @@ ec_superisys_485_modbus_rtu_84
       .o_st_rd_data          ( sub_comp_rd_dat[206]    ),
 	  .o_intr_irq            ( map_irq[206]       )
 
-       ,.i_axis_limf        ( di_regoin_msg[3][16]           )   // 正限位到位开关
+       ,.i_axis_limf        ( ~di_regoin_msg[3][16]           )   // 正限位到位开关
        ,.pul_motor_r_flag        ( pul_motor0_r_flag           )   // 
        ,.cur_slv_board_id        ( 5'd3           )   // 
        ,.slv_board_id        ( slv_board_id           )   // 
        ,.pul_motor_flag        ( pul_motor0_flag           )   // 
        ,.m2s_pulm_msg        ( pul_motor0_r_msg[3]           )   // 
        ,.s2m_pulm_msg        ( pul_motor0_msg[3]           )   // 
-       ,.i_axis_limb        ( di_regoin_msg[3][14]           )   // 负限位到位开关
-       ,.i_axis_zero        ( di_regoin_msg[3][15]           )   // 零位到位开关
-       ,.i_servo_done        ( di_regoin_msg[3][37]           )   // 伺服定位完成
-       ,.i_servo_ready        ( di_regoin_msg[3][38]           )   // 伺服就绪
+       ,.i_axis_limb        ( ~di_regoin_msg[3][14]           )   // 负限位到位开关
+       ,.i_axis_zero        ( ~di_regoin_msg[3][15]           )   // 零位到位开关
+       ,.i_servo_done        ( ~di_regoin_msg[3][57]           )   // 伺服定位完成
+       ,.i_servo_ready        ( ~di_regoin_msg[3][56]           )   // 伺服就绪
     );
 
 	
