@@ -2998,7 +2998,7 @@ module emcc_mix_top
 	  .o_intr_irq            ( map_irq[149]       )
 
        ,.o_rev        ( o_rev_75           )   // DI-反转驱动
-       ,.i_error        ( ~di_regoin_msg[2][5]           )   // JB1-变频器故障
+       ,.i_error        ( ~di_regoin_msg[2][57]           )   // JB1-变频器故障
        ,.o_rst        ( o_rst_75           )   // 外部复位
        ,.o_spdx1        ( o_spdx1_75           )   // X5-多段速选择1
        ,.o_spdx2        ( o_spdx2_75           )   // X6-多段速选择2
@@ -3007,13 +3007,12 @@ module emcc_mix_top
        ,.o_fwd        ( o_fwd_75           )   // X1-正转驱动
     );
 
-    assign do_regoin_r_msg[2][26] = ~o_spdx1_75;
-    assign do_regoin_r_msg[2][24] = ~o_spdx4_75;
-    assign do_regoin_r_msg[2][25] = ~o_spdx3_75;
-    assign do_regoin_r_msg[2][14] = ~o_fwd_75;
-    assign do_regoin_r_msg[2][28] = ~o_rst_75;
-    assign do_regoin_r_msg[2][15] = ~o_rev_75;
-    assign do_regoin_r_msg[2][27] = ~o_spdx2_75;
+    assign do_regoin_r_msg[2][41] = ~o_spdx1_75;
+    assign do_regoin_r_msg[2][44] = ~o_spdx4_75;
+    assign do_regoin_r_msg[2][43] = ~o_spdx3_75;
+    assign do_regoin_r_msg[2][24] = ~o_fwd_75;
+    assign do_regoin_r_msg[2][25] = ~o_rev_75;
+    assign do_regoin_r_msg[2][42] = ~o_spdx2_75;
 	
 	
 	wire   o_dri1_76;
