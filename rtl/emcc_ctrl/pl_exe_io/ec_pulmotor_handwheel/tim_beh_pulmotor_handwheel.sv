@@ -223,7 +223,7 @@ module tim_beh_pulmotor_handwheel#(
             end
 			
 			S_EXE:begin	//5
-				if(task_time_cnt >= loop_time_ms - 1)		//Timer finished
+				if(task_time_cnt > loop_time_ms - 1)		//Timer finished
 					next_state = S_READY_10;
 				else
 					next_state = S_EXE;

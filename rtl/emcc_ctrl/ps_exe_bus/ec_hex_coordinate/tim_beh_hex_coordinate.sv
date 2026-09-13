@@ -190,7 +190,7 @@ module tim_beh_hex_coordinate(
             end
 
 			S_EXE:begin
-				if(task_time_cnt >= c_gap_crl - 1)		//Timer finished
+				if(task_time_cnt > c_gap_crl - 1)		//Timer finished
 					next_state = S_READY_10;
 				else
 					next_state = S_EXE;
@@ -372,7 +372,7 @@ always @(*) begin
         end
 
         TASK_COUNT: begin
-            if (task_time_cnt >= c_gap_crl - 1)
+            if (task_time_cnt > c_gap_crl - 1)
                 next_state1 = TASK_IRQ_WAIT;
             else
                 next_state1 = TASK_COUNT;
@@ -403,7 +403,7 @@ always @(posedge clk_i) begin
                 task_time_cnt <= 'd0;
 
             TASK_COUNT: begin
-                if (task_time_cnt >= c_gap_crl - 1)
+                if (task_time_cnt > c_gap_crl - 1)
                     task_time_cnt <= 'd0;
                 else
                     task_time_cnt <= task_time_cnt + i_time_1s_vld;
