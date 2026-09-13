@@ -242,12 +242,12 @@ module ps_rw_pl_reg_pul_axis#(
 			b_tsc_result_vld	<= 	1'b0			;	
 			b_vld_cnt			<=	5'd0			;
 			
-			c_en				<=	1'b1		   	;
+			c_en				<=	1'b0		   	;
 			c_bhv_ot 			<= 	20'd0		   	;
 			c_tsc_result_rpt	<=	32'd0		   	;
 			c_tsc_result_vld	<= 	1'b0			;	
 			c_vld_cnt			<=	5'd0			;
-			c_bhv_gap_crl      	<=	20'd0		   	;
+			c_bhv_gap_crl      	<=	20'd10		   	;
 
 			param1				<=	32'd0	  	;
 			param2				<=	32'd0	  	;

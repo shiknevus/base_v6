@@ -53,26 +53,33 @@ module Positioner_std #(
    localparam  MODE_S 		 = 32'h10;
    localparam [P_DIV_WIDTH:0] UNIT_DT = ({1'b1, {P_DIV_WIDTH{1'b0}}} + BASE_REFCLK / 2) / BASE_REFCLK;
    
+   reg  [1:0]                 fsm_st;
+   wire                       div_reset = reset || (fsm_st == ST_POS_IDLE);
+
    ////////////////// Division
    reg                        spd_div_start;
    reg   [P_DIV_WIDTH-1:0]    spd_div_nom;
-   reg   [P_SPD_WIDTH-1:0]    spd_div_den;
+   reg   [31:0]               spd_div_den; // full acceleration/deceleration range
    wire  [P_DIV_WIDTH-1:0]    spd_div_quo;
    wire                       spd_div_ready;
+   wire                       spd_div_full;
    
    math_div #(
       .n_width(P_DIV_WIDTH),
-      .d_width(P_SPD_WIDTH)
+      .d_width(32),
+      .USE_PAUSE(1)
    ) 
    spd_div (
       .clk     ( clk           ),
-      .rst     ( reset         ),
-      .clk_en  ( spd_div_start ),
+      .rst     ( div_reset     ),
+      .clk_en  ( spd_div_start && !i_pause && !spd_div_full ),
       .nom     ( spd_div_nom   ),
       .den     ( spd_div_den   ),
       .quo     ( spd_div_quo   ),
       .remo    (               ),
-      .ready   ( spd_div_ready )
+      .ready   ( spd_div_ready ),
+      .full    ( spd_div_full  ),
+      .pause   ( i_pause       )
    );
 
    reg                        period_div_start;
@@ -80,24 +87,28 @@ module Positioner_std #(
    reg   [P_SPD_WIDTH-1:0]    period_div_den;
    wire  [P_JERK_WIDTH-1:0]   period_div_quo;
    wire                       period_div_ready;
+   wire                       period_div_full;
 
    math_div #(
       .n_width(P_JERK_WIDTH),
-      .d_width(P_SPD_WIDTH)
+      .d_width(P_SPD_WIDTH),
+      .USE_PAUSE(1)
    ) 
    period_div (
       .clk     ( clk              ),
-      .rst     ( reset            ),
-      .clk_en  ( period_div_start ),
+      .rst     ( div_reset        ),
+      .clk_en  ( period_div_start && !i_pause && !period_div_full ),
       .nom     ( period_div_nom   ),
       .den     ( period_div_den   ),
       .quo     ( period_div_quo   ),
       .remo    (                  ),
-      .ready   ( period_div_ready )
+      .ready   ( period_div_ready ),
+      .full    ( period_div_full  ),
+      .pause   ( i_pause          )
    );
 
    ////////////////// Profile
-   reg  [1:0]                           fsm_st;
+
    
    reg                                  r_pf_dir;
    reg  [31:0]                          r_pf_mode;
@@ -330,14 +341,14 @@ module Positioner_std #(
    reg  [P_DIV_WIDTH-1:0]               r_pf_acc_inv; // 1/ACC
 
    reg  [P_DIV_WIDTH+P_SPD_WIDTH*2-1:0] r_pf_pulse_acc_red_in; // @CLK r_pf_pulse_acc_red_in <= r_pf_spd_p2 * r_pf_acc_inv
-   wire [P_SPD_WIDTH*2-1:0]             r_pf_pulse_acc_red_out;
+   wire [P_SPD_WIDTH*2-2:0]             r_pf_pulse_acc_red_out;
    math_reduce #(P_DIV_WIDTH+P_SPD_WIDTH*2,P_SPD_WIDTH*2-1)
    pulse_acc_reduce (
       .in_acc  ( r_pf_pulse_acc_red_in  ),
       .out_acc ( r_pf_pulse_acc_red_out )
    );
    wire [31:0]                          r_pf_pulse_acc_next; // spd_act^2/acc/2
-   math_sat #(P_SPD_WIDTH*2-1,32)
+   math_sat #(.nbit_in(P_SPD_WIDTH*2-1),.nbit_out(32),.signed_data(0))
    pulse_acc_sat (
       .in_acc  ( r_pf_pulse_acc_red_out ),
       .out_acc ( r_pf_pulse_acc_next    ),
@@ -345,14 +356,14 @@ module Positioner_std #(
    reg  [31:0]                          r_pf_pulse_acc; // @CLK r_pf_pulse_acc <= r_pf_pulse_acc_next
 
    reg  [P_DIV_WIDTH+P_SPD_WIDTH*2-1:0] r_pf_pulse_dec_red_in; // @CLK r_pf_pulse_dec_red_in <= r_pf_spd_p2 * r_pf_dec_inv;
-   wire [P_SPD_WIDTH*2-1:0]             r_pf_pulse_dec_red_out;
+   wire [P_SPD_WIDTH*2-2:0]             r_pf_pulse_dec_red_out;
    math_reduce #(P_DIV_WIDTH+P_SPD_WIDTH*2,P_SPD_WIDTH*2-1)
    pulse_dec_reduce (
       .in_acc  ( r_pf_pulse_dec_red_in  ),
       .out_acc ( r_pf_pulse_dec_red_out )
    );
    wire [31:0]                          r_pf_pulse_dec_next; // spd_act^2/dec/2
-   math_sat #(P_SPD_WIDTH*2-1,32)
+   math_sat #(.nbit_in(P_SPD_WIDTH*2-1),.nbit_out(32),.signed_data(0))
    pulse_dec_sat (
       .in_acc  ( r_pf_pulse_dec_red_out ),
       .out_acc ( r_pf_pulse_dec_next    ),
@@ -360,7 +371,7 @@ module Positioner_std #(
    
    reg  [31:0]                          r_pf_pulse_dec; // @CLK r_pf_pulse_dec <= r_pf_pulse_dec_next
 
-   reg  [31:0]                          r_pf_pulse_cal;
+   reg  [33:0]                          r_pf_pulse_cal; // retain carries in distance comparison
    reg  [31:0]                          r_pf_pulse_act;
    reg  [31:0]                          r_pf_pulse_dif;
    
@@ -444,7 +455,7 @@ module Positioner_std #(
                r_pf_pulse_dec_red_in <= r_pf_spd_p2 * r_pf_dec_inv;
                r_pf_pulse_dec <= r_pf_pulse_dec_next; // pulse_dec = spd^2/dec/2
                
-               r_pf_pulse_cal <= r_pf_pulse_act + r_pf_pulse_dec + r_pf_pulse_dif;
+               r_pf_pulse_cal <= {2'b0,r_pf_pulse_act} + {2'b0,r_pf_pulse_dec} + {2'b0,r_pf_pulse_dif};
             end
             ST_POS_DEC: begin
                // count & period
@@ -483,11 +494,12 @@ module Positioner_std #(
          r_pf_busy  <= 1'b0;
          r_pf_dir   <= 1'b0;
          r_pf_mode  <= 0;
+         r_div_ready <= 1'b0;
+         p_div_ready <= 1'b0;
       end
-      else begin
-         r_div_ready <= spd_div_ready;
-         p_div_ready <= period_div_ready;
-         if(~i_pause)   //change by szzhang 20260813
+      else if(~i_pause) begin
+         r_div_ready <= (fsm_st == ST_POS_IDLE) ? 1'b0 : spd_div_ready;
+         p_div_ready <= (fsm_st == ST_POS_IDLE) ? 1'b0 : period_div_ready;
          case(fsm_st)
             ST_POS_IDLE: begin
                r_pf_busy  <= 1'b0;
@@ -536,6 +548,7 @@ module Positioner_std #(
 
                if(i_pf_stop) begin
                   fsm_st <= ST_POS_IDLE;
+                  r_pf_done <= 1'b1; 
                end
             end
             ST_POS_DEC: begin
@@ -617,8 +630,8 @@ module Positioner_std #(
                r_pulse_number <= 32'd0;
                r_pulse_dir    <= r_pf_dir;
                spd_div_start  <= r_pf_pulse_count==0 || r_pf_pulse_count==1;
-               spd_div_nom    <= {P_DIV_WIDTH+9{1'b1}}; // 2^(DIV_WIDTH+9)
-               spd_div_den    <= r_pf_pulse_count==0 ? r_pf_acc[P_SPD_WIDTH-1:0] : r_pf_dec[P_SPD_WIDTH-1:0]; // ACC or DEC
+               spd_div_nom    <= {P_DIV_WIDTH{1'b1}}; // Q46 reciprocal numerator: 2^46-1
+               spd_div_den    <= r_pf_pulse_count==0 ? r_pf_acc : r_pf_dec; // full 32-bit ACC or DEC
                period_div_start <= r_pf_pulse_count==0 || r_pf_pulse_count==1;
                period_div_nom <= r_pf_pulse_count==0 ? {r_pf_acc_target,{P_JERK_WIDTH-32{1'b0}}} : {r_pf_dec_target,{P_JERK_WIDTH-32{1'b0}}};
                period_div_den <= r_pf_spd;

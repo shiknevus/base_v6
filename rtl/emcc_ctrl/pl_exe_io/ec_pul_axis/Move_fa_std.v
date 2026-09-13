@@ -99,7 +99,7 @@ module Move_fa_std
                    end
                end
                ST_MOVE_START: begin
-                   r_st_error <= 1'b0;
+                   // r_st_error latched until done, change by szzhang 20260913
                    r_pf_start <= ~i_pf_busy;
                    if(i_pf_busy) begin
                        if((i_lim_f & r_pf_dir==DIR_POS) | (i_lim_b & r_pf_dir==DIR_NEG) | ~i_drv_son) begin
@@ -107,7 +107,6 @@ module Move_fa_std
                            r_st_error <= 1'b1;
                        end else if(i_stop) begin
                            r_pf_stop <= 1'b1;
-                           r_st_error <= 1'b0;
                        end
                        if(i_pf_done) begin
                            fsm_st <= r_st_error ? ST_MOVE_ERROR : ST_MOVE_DONE;//change by szzhang 20260813

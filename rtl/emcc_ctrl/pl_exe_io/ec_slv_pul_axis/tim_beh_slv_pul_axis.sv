@@ -192,7 +192,7 @@ module tim_beh_slv_pul_axis#(
             end
 			
 			S_EXE:begin
-				if(task_time_cnt >= c_gap_crl - 1)		//Timer finished
+				if(task_time_cnt > c_gap_crl - 1)		//Timer finished
 					next_state = S_READY_10;
 				else
 					next_state = S_EXE;

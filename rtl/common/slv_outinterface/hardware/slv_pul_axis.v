@@ -475,6 +475,11 @@ always@(posedge clk) begin
 end
 
    ////////////////// Absolute Position (Pulse)
+  // track physical pulse edges, not command cycles, change by szzhang 20260913
+  reg  r_dv_pls_d;
+  always@(posedge clk) r_dv_pls_d <= o_device_pulse;
+  wire w_dv_pls_rise = o_device_pulse & ~r_dv_pls_d;
+
   always@(posedge clk) begin
       if(reset) begin
         r_pf_abspos <= 32'd0;
@@ -482,7 +487,7 @@ end
      else begin
         if(home_done & ~home_busy & ~home_error & ~home_pos_reset)
             r_pf_abspos <= 32'd0;
-        else if(i_rc_pulse_done & o_rc_pulse_start)
+        else if(w_dv_pls_rise)
             r_pf_abspos <= (o_rc_pulse_dir == DIR_POS) ? r_pf_abspos + 1'b1 : r_pf_abspos - 1'b1;
         else
             r_pf_abspos <= r_pf_abspos;

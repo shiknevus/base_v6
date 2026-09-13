@@ -220,9 +220,12 @@ module Home_fa_std
                ST_HOME_STOP: begin
                    r_st_error <= 1'b1;
                    o_pf_start <= 1'b0;
-                   o_pf_stop  <= 1'b0;
+                   o_pf_stop  <= 1'b1; // hold until positioner idle, change by szzhang 20260913
                    o_pf_quickstop <= 1'b0;
-                   fsm_st <= ST_HOME_END;
+                   if(~i_pf_busy) begin
+                      o_pf_stop <= 1'b0;
+                      fsm_st <= ST_HOME_END;
+                   end
                end
                ST_HOME_END: begin
                    fsm_st <= ST_HOME_IDLE;
