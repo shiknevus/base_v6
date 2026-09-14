@@ -24,6 +24,7 @@ module Positioner_std #(
    ,output wire [31:0]      o_pulse_period
    ,output wire [31:0]      o_pulse_number
    ,output wire             o_pulse_dir
+   ,input  wire             i_pulse_busy // wait for the physical output to finish add by szzhang 20260914
    ,input  wire             i_pulse_done
    
 );
@@ -48,12 +49,13 @@ module Positioner_std #(
    localparam  ST_POS_INIT = 1;
    localparam  ST_POS_ACC  = 2;
    localparam  ST_POS_DEC  = 3;
+   localparam  ST_POS_DRAIN = 4;
    
    localparam  MODE_T    	 = 32'h00;
    localparam  MODE_S 		 = 32'h10;
    localparam [P_DIV_WIDTH:0] UNIT_DT = ({1'b1, {P_DIV_WIDTH{1'b0}}} + BASE_REFCLK / 2) / BASE_REFCLK;
    
-   reg  [1:0]                 fsm_st;
+   reg  [2:0]                 fsm_st;
    wire                       div_reset = reset || (fsm_st == ST_POS_IDLE);
 
    ////////////////// Division
@@ -522,8 +524,8 @@ module Positioner_std #(
                   fsm_st <= ST_POS_ACC;
 
                if(i_pf_stop) begin
-                  fsm_st <= ST_POS_IDLE;
-                  r_pf_done <= 1'b1;
+                  fsm_st <= ST_POS_DRAIN;
+                  r_pf_done <= 1'b0;
                end
             end
             ST_POS_ACC: begin
@@ -533,8 +535,8 @@ module Positioner_std #(
                if(r_pf_pulse_first) begin
                   if(r_pf_pulse_count>=r_pf_pulse_period-1'b1)
                      if(r_pf_pulse==1) begin
-                        fsm_st <= ST_POS_IDLE;
-                        r_pf_done <= 1'b1;
+                        fsm_st <= ST_POS_DRAIN;
+                        r_pf_done <= 1'b0;
                      end                     
                      else if(r_pf_pulse<=r_pf_pulse_dif)
                         fsm_st <= ST_POS_DEC;
@@ -547,8 +549,8 @@ module Positioner_std #(
                end
 
                if(i_pf_stop) begin
-                  fsm_st <= ST_POS_IDLE;
-                  r_pf_done <= 1'b1; 
+                  fsm_st <= ST_POS_DRAIN;
+                  r_pf_done <= 1'b0; 
                end
             end
             ST_POS_DEC: begin
@@ -559,26 +561,35 @@ module Positioner_std #(
                   case(r_pf_mode[3:0])
                      0: begin // stop at mini speed
                         if(r_pf_spd<=P_SPD_MIN) begin
-                           fsm_st <= ST_POS_IDLE;
-                           r_pf_done <= 1'b1;
+                           fsm_st <= ST_POS_DRAIN;
+                           r_pf_done <= 1'b0;
                         end
                      end
                      1: begin // stop when reaching target pulse, or quickstop at mini speed
                         if((r_pf_pulse_act==r_pf_pulse-1'b1) | (r_pf_quickstop&r_pf_spd<=P_SPD_MIN)) begin
-                           fsm_st <= ST_POS_IDLE;
-                           r_pf_done <= 1'b1;
+                           fsm_st <= ST_POS_DRAIN;
+                           r_pf_done <= 1'b0;
                         end
                      end
                      default: begin // unknown mode: stop at mini speed, never hang busy
                         if(r_pf_spd<=P_SPD_MIN) begin
-                           fsm_st <= ST_POS_IDLE;
-                           r_pf_done <= 1'b1;
+                           fsm_st <= ST_POS_DRAIN;
+                           r_pf_done <= 1'b0;
                         end
                      end
                   endcase
                end
 
                if(i_pf_stop) begin
+                  fsm_st <= ST_POS_DRAIN;
+                  r_pf_done <= 1'b0;
+               end
+            end
+            ST_POS_DRAIN: begin
+               // Keep busy until the pulse generator has completed its last period.add by szzhang 20260914
+               r_pf_busy <= 1'b1;
+               r_pf_done <= 1'b0;
+               if(!i_pulse_busy) begin
                   fsm_st <= ST_POS_IDLE;
                   r_pf_done <= 1'b1;
                end
@@ -672,7 +683,7 @@ module Positioner_std #(
                r_pulse_start  <= 1'b0;
                r_pulse_period <= P_PERIOD_MIN;
                r_pulse_number <= 32'd0;
-               r_pulse_dir    <= 1'b0;
+               r_pulse_dir    <= r_pf_dir; // retain direction while draining.change by szzhang 20260914
                spd_div_start  <= 1'b0;
                spd_div_nom    <= 0;
                spd_div_den    <= 0;

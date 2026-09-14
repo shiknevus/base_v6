@@ -47,6 +47,7 @@ module Home_fa_std
    localparam ST_HOME_BMIN     = 6;
    localparam ST_HOME_STOP     = 7;
    localparam ST_HOME_END      = 8;
+   localparam ST_HOME_FINISH   = 9;
    ///////////////// PARAMETER ////////////////
    reg [4:0]   fsm_st;
    reg         r_pf_status_lim_f;
@@ -200,7 +201,7 @@ module Home_fa_std
                        r_st_error <= 1'b0;
                        fsm_st <= ST_HOME_STOP;
                    end else if(~i_org) begin
-                       fsm_st <= ST_HOME_END;
+                       fsm_st <= ST_HOME_FINISH;
                        o_pf_stop <= 1'b1;
                    end
                end
@@ -213,7 +214,7 @@ module Home_fa_std
                        r_st_error <= 1'b0;
                        fsm_st <= ST_HOME_STOP;
                    end else if(negedge_org) begin
-                       fsm_st <= ST_HOME_END;
+                       fsm_st <= ST_HOME_FINISH;
                        o_pf_stop <= 1'b1;
                    end
                end
@@ -225,6 +226,16 @@ module Home_fa_std
                    if(~i_pf_busy) begin
                       o_pf_stop <= 1'b0;
                       fsm_st <= ST_HOME_END;
+                   end
+               end
+               ST_HOME_FINISH: begin
+                   // Successful homing also waits for physical pulse completion.
+                   o_pf_start <= 1'b0;
+                   o_pf_stop <= 1'b1;
+                   o_pf_quickstop <= 1'b0;
+                   if(~i_pf_busy) begin
+                       o_pf_stop <= 1'b0;
+                       fsm_st <= ST_HOME_END;
                    end
                end
                ST_HOME_END: begin

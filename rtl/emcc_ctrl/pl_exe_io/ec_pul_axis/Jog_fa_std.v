@@ -46,6 +46,8 @@ module Jog_fa_std
    reg         r_pf_quickstop;
    reg         r_st_error;
    
+   wire motion_fault = (i_lim_f & i_pf_dir==DIR_POS) | (i_lim_b & i_pf_dir==DIR_NEG) | ~i_drv_son;
+
    always@(posedge clk) begin
        if(fsm_st==ST_JOG_IDLE) begin
     	   o_busy <= 1'b0;
@@ -96,14 +98,14 @@ module Jog_fa_std
                    // r_st_error latched until done, change by szzhang 20260913
                    r_pf_start <= ~i_pf_busy;
                    if(i_pf_busy) begin
-                       if((i_lim_f & i_pf_dir==DIR_POS) | (i_lim_b & i_pf_dir==DIR_NEG) | ~i_drv_son) begin
+                       if(motion_fault) begin
                            r_pf_quickstop <= 1'b1;
                            r_st_error <= 1'b1;
                        end else if(i_stop) begin
                            r_pf_stop <= 1'b1;
                        end
                        if(i_pf_done) begin
-                           fsm_st <= r_st_error ? ST_JOG_ERROR : ST_JOG_DONE;//change by szzhang 20260813
+                           fsm_st <= (r_st_error | motion_fault) ? ST_JOG_ERROR : ST_JOG_DONE;//change by szzhang 20260813
                        end
                    end
                end

@@ -673,6 +673,7 @@ wire [31:0]  o_rc_pulse_period;
 wire [31:0]  o_rc_pulse_number;
 wire         o_rc_pulse_dir;
 wire         i_rc_pulse_done;
+wire         i_rc_pulse_busy;
 
 Positioner_std pos_u
 (
@@ -696,11 +697,12 @@ Positioner_std pos_u
   .o_pulse_period ( o_rc_pulse_period  ),
   .o_pulse_number ( o_rc_pulse_number  ),
   .o_pulse_dir    ( o_rc_pulse_dir     ),
-  .i_pulse_done   ( i_rc_pulse_done    )
+  .i_pulse_done   ( i_rc_pulse_done    ),
+  .i_pulse_busy   ( i_rc_pulse_busy    )
 );
 
 // Pulmot_fd pulse generator
-Pulmot_fd Pulmot_fd00
+Pulmot_fd #(.USE_PAUSE(1)) Pulmot_fd00
 (
   .clk              ( clk_i              ),
   .reset            ( rst_i              ),
@@ -710,6 +712,8 @@ Pulmot_fd Pulmot_fd00
   .i_bv_pulse_number( o_rc_pulse_number  ),
   .i_bv_pulse_dir   ( o_rc_pulse_dir     ),
   .o_bv_pulse_done  ( i_rc_pulse_done    ),
+  .o_bv_pulse_busy  ( i_rc_pulse_busy    ),
+  .i_pause          ( i_pause            ),
 
   .i_dv_ready       ( 1'b0               ),
   .i_dv_inp         ( 1'b0               ),
