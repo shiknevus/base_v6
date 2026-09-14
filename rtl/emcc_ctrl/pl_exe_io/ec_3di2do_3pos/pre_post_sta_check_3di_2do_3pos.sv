@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module pre_post_sta_check_3di_2do#(
+module pre_post_sta_check_3di_2do_3pos#(
 		parameter		A_BHA_NUM		=	13      	
 		,parameter		B_BHA_NUM		=	1  
 		,parameter		C_BHA_NUM		=	1  
@@ -86,31 +86,22 @@ module pre_post_sta_check_3di_2do#(
 
 	
 	//post status
-	wire [A_BHA_NUM-1:0]	a_post_sta	;
+	
+	assign	a_post_sta_allow[0 ] = (a_bhv_id == 1 ) && (di_i ==3'b001);
+	assign	a_post_sta_allow[1 ] = (a_bhv_id == 2 ) && (di_i ==3'b010);
+	assign	a_post_sta_allow[2 ] = (a_bhv_id == 3 ) && (di_i ==3'b100);
+	assign	a_post_sta_allow[3 ] = (a_bhv_id == 4 ) ;
+	assign	a_post_sta_allow[4 ] = (a_bhv_id == 5 ) && (di_i ==3'b001);
+	assign	a_post_sta_allow[5 ] = (a_bhv_id == 6 ) && (di_i ==3'b010);
+	assign	a_post_sta_allow[6 ] = (a_bhv_id == 7 ) && (di_i ==3'b100);
+	assign	a_post_sta_allow[7 ] = (a_bhv_id == 8 )	;
+	assign	a_post_sta_allow[8 ] = (a_bhv_id == 9 )	;
+	assign	a_post_sta_allow[9 ] = (a_bhv_id == 10) && (di_i ==3'b001);
+	assign	a_post_sta_allow[10] = (a_bhv_id == 11) && (di_i ==3'b010);
+	assign	a_post_sta_allow[11] = (a_bhv_id == 12) && (di_i ==3'b100);
+	assign	a_post_sta_allow[12] = (a_bhv_id == 13)	;
+	assign	a_post_sta_allow[13] = (a_bhv_id == 14)	;
 
-
-	assign	a_post_sta[0 ] = (a_bhv_id == 1 ) && (di_i[1:0] ==2'b01);
-	assign	a_post_sta[1 ] = (a_bhv_id == 2 ) && (di_i[1:0] ==2'b10);
-	assign	a_post_sta[2 ] = (a_bhv_id == 3 ) ;
-	assign	a_post_sta[3 ] = (a_bhv_id == 4 ) && (di_i[1:0] ==2'b01);
-	assign	a_post_sta[4 ] = (a_bhv_id == 5 ) && (di_i[1:0] ==2'b10);
-	assign	a_post_sta[5 ] = (a_bhv_id == 6 ) && (di_i[1:0] ==2'b00);
-	assign	a_post_sta[6 ] = (a_bhv_id == 7 ) && (di_i[1:0] ==2'b00);
-	assign	a_post_sta[7 ] = (a_bhv_id == 8 ) && (di_i[2] ==1		);
-	assign	a_post_sta[8 ] = (a_bhv_id == 9 ) && (di_i[2] ==0		);
-	assign	a_post_sta[9 ] = (a_bhv_id == 10) && (di_i[1:0] ==2'b01);
-	assign	a_post_sta[10] = (a_bhv_id == 11) && (di_i[1:0] ==2'b10);
-	assign	a_post_sta[11] = (a_bhv_id == 12) && (di_i[1:0] ==2'b00);
-	assign	a_post_sta[12] = (a_bhv_id == 13) && (di_i[1:0] ==2'b00);
-
-
-	always@(posedge clk_i) 
-	begin
-		if(rst_i || !a_en)
-			a_post_sta_allow <= {A_BHA_NUM{1'b0}};
-		else
-			a_post_sta_allow <= a_post_sta;
-	end
 	
 	//========================================================================================//
 	//---------------------------------  Channel B check -------------------------------------//

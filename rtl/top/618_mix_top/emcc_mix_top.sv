@@ -101,8 +101,8 @@ module emcc_mix_top
     wire    [BIAS_NUM+COMP_NUM-1:BIAS_NUM]              map_irq;
     wire                        sub_comp_rd_vld[COMP_BIAS_NUM+COMP_NUM-1:COMP_BIAS_NUM];
     wire    [PS_REG_DWIDTH-1:0] sub_comp_rd_dat[COMP_BIAS_NUM+COMP_NUM-1:COMP_BIAS_NUM];
-    
-	
+
+
 	wire time_1ms_vld   = i_time_1ms_vld  ;
     wire time_10ms_vld  = i_time_10ms_vld ;
     wire time_100ms_vld = i_time_100ms_vld;
@@ -476,6 +476,11 @@ module emcc_mix_top
     assign do_regoin_r_msg[2][4:4] = 1'b1 ;
     assign do_regoin_r_msg[2][5:5] = 1'b1 ;
     assign do_regoin_r_msg[2][6:6] = 1'b1 ;
+    assign do_regoin_r_msg[2][14:14] = 1'b1 ;
+    assign do_regoin_r_msg[2][15:15] = 1'b1 ;
+    assign do_regoin_r_msg[2][26:26] = 1'b1 ;
+    assign do_regoin_r_msg[2][27:27] = 1'b1 ;
+    assign do_regoin_r_msg[2][28:28] = 1'b1 ;
     assign do_regoin_r_msg[2][30:30] = 1'b1 ;
     assign do_regoin_r_msg[2][32:32] = 1'b1 ;
     assign do_regoin_r_msg[2][33:33] = 1'b1 ;
@@ -486,10 +491,6 @@ module emcc_mix_top
     assign do_regoin_r_msg[2][38:38] = 1'b1 ;
     assign do_regoin_r_msg[2][39:39] = 1'b1 ;
     assign do_regoin_r_msg[2][40:40] = 1'b1 ;
-    assign do_regoin_r_msg[2][41:41] = 1'b1 ;
-    assign do_regoin_r_msg[2][42:42] = 1'b1 ;
-    assign do_regoin_r_msg[2][43:43] = 1'b1 ;
-    assign do_regoin_r_msg[2][44:44] = 1'b1 ;
     assign do_regoin_r_msg[2][45:45] = 1'b1 ;
     assign do_regoin_r_msg[2][46:46] = 1'b1 ;
     assign do_regoin_r_msg[2][47:47] = 1'b1 ;
@@ -1439,7 +1440,7 @@ module emcc_mix_top
     assign do_regoin_r_msg[2][22] = ~o_dri1_25;
     assign do_regoin_r_msg[2][23] = ~o_dri2_25;
 	
-	
+
 	
 	
 	// --- flow_comp_32 --A0032_砂轮手爪放置组件---
@@ -2963,13 +2964,12 @@ module emcc_mix_top
     assign do_regoin_r_msg[2][31] = ~o_sig_dri_74;
 	
 	
-	wire   o_spdx1_75;
-	wire   o_spdx4_75;
 	wire   o_spdx3_75;
+	wire   o_spdx1_75;
 	wire   o_fwd_75;
-	wire   o_rst_75;
 	wire   o_rev_75;
 	wire   o_spdx2_75;
+	wire   o_spdx4_75;
 	
 	// --- flow_comp_75 --A0080_去毛刺机_变频磨头旋转电机---
     ec_dv300_do
@@ -2999,32 +2999,32 @@ module emcc_mix_top
 
        ,.o_rev        ( o_rev_75           )   // DI-反转驱动
        ,.i_error        ( ~di_regoin_msg[2][57]           )   // JB1-变频器故障
-       ,.o_rst        ( o_rst_75           )   // 外部复位
        ,.o_spdx1        ( o_spdx1_75           )   // X5-多段速选择1
        ,.o_spdx2        ( o_spdx2_75           )   // X6-多段速选择2
        ,.o_spdx3        ( o_spdx3_75           )   // X4-多段速选择3
        ,.o_spdx4        ( o_spdx4_75           )   // X3-多段速选择4
        ,.o_fwd        ( o_fwd_75           )   // X1-正转驱动
+       ,.o_rst        (            )   // 
     );
 
-    assign do_regoin_r_msg[2][41] = ~o_spdx1_75;
-    assign do_regoin_r_msg[2][44] = ~o_spdx4_75;
-    assign do_regoin_r_msg[2][43] = ~o_spdx3_75;
+    assign do_regoin_r_msg[2][42] = ~o_spdx3_75;
+    assign do_regoin_r_msg[2][43] = ~o_spdx1_75;
     assign do_regoin_r_msg[2][24] = ~o_fwd_75;
     assign do_regoin_r_msg[2][25] = ~o_rev_75;
-    assign do_regoin_r_msg[2][42] = ~o_spdx2_75;
+    assign do_regoin_r_msg[2][44] = ~o_spdx2_75;
+    assign do_regoin_r_msg[2][41] = ~o_spdx4_75;
 	
 	
 	wire   o_dri1_76;
 	wire   o_dri2_76;
 	
 	// --- flow_comp_76 --A0077_短桁架1#机器人夹爪---
-    ec_2di_2do
+    ec_3di_2do_3pos
     #(
          .REG_SPACE_BIAS     ( 20'd61952)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
-    ec_2di_2do_76
+    ec_3di_2do_3pos_76
     (
       
 	  .clk_i                 ( clk               ),
@@ -3046,24 +3046,25 @@ module emcc_mix_top
 
        ,.i_pos1        ( ~di_mst_msg[12]           )   // 位置1到位开关
        ,.i_pos2        ( ~di_mst_msg[11]           )   // 位置2到位开关
-       ,.o_dri1        ( o_dri1_76           )   // 驱动信号1
-       ,.o_dri2        ( o_dri2_76           )   // 驱动信号2
+       ,.i_pos3        ( ~di_mst_msg[13]           )   // 位置3到位开关
+       ,.o_dri1        ( o_dri1_76           )   // 位置1驱动信号
+       ,.o_dri2        ( o_dri2_76           )   // 位置2驱动信号
     );
 
     assign do_mst_msg[6] = ~o_dri1_76;
     assign do_mst_msg[7] = ~o_dri2_76;
 	
 	
-	wire   o_dri2_77;
 	wire   o_dri1_77;
+	wire   o_dri2_77;
 	
 	// --- flow_comp_77 --A0078_长桁架1#机器人夹爪---
-    ec_2di_2do
+    ec_3di_2do_3pos
     #(
          .REG_SPACE_BIAS     ( 20'd62976)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
-    ec_2di_2do_77
+    ec_3di_2do_3pos_77
     (
       
 	  .clk_i                 ( clk               ),
@@ -3085,24 +3086,25 @@ module emcc_mix_top
 
        ,.i_pos1        ( ~di_regoin_msg[3][32]           )   // 位置1到位开关
        ,.i_pos2        ( ~di_regoin_msg[3][33]           )   // 位置2到位开关
-       ,.o_dri1        ( o_dri1_77           )   // 驱动信号1
-       ,.o_dri2        ( o_dri2_77           )   // 驱动信号2
+       ,.i_pos3        ( ~di_regoin_msg[3][56]           )   // 位置3到位开关
+       ,.o_dri1        ( o_dri1_77           )   // 位置1驱动信号
+       ,.o_dri2        ( o_dri2_77           )   // 位置2驱动信号
     );
 
-    assign do_regoin_r_msg[3][25] = ~o_dri2_77;
     assign do_regoin_r_msg[3][24] = ~o_dri1_77;
+    assign do_regoin_r_msg[3][25] = ~o_dri2_77;
 	
 	
 	wire   o_dri1_78;
 	wire   o_dri2_78;
 	
 	// --- flow_comp_78 --A0079_长桁架2#机器人夹爪---
-    ec_2di_2do
+    ec_3di_2do_3pos
     #(
          .REG_SPACE_BIAS     ( 20'd62464)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
-    ec_2di_2do_78
+    ec_3di_2do_3pos_78
     (
       
 	  .clk_i                 ( clk               ),
@@ -3122,10 +3124,11 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[118]    ),
 	  .o_intr_irq            ( map_irq[118]       )
 
-       ,.i_pos1        ( ~di_regoin_msg[3][35]           )   // 位置1到位开关
+       ,.i_pos1        ( ~di_regoin_msg[3][35]           )   // 位置1到位开关	
        ,.i_pos2        ( ~di_regoin_msg[3][36]           )   // 位置2到位开关
-       ,.o_dri1        ( o_dri1_78           )   // 驱动信号1
-       ,.o_dri2        ( o_dri2_78           )   // 驱动信号2
+       ,.i_pos3        ( ~di_regoin_msg[3][57]           )   // 位置3到位开关
+       ,.o_dri1        ( o_dri1_78           )   // 位置1驱动信号
+       ,.o_dri2        ( o_dri2_78           )   // 位置2驱动信号
     );
 
     assign do_regoin_r_msg[3][26] = ~o_dri1_78;
@@ -4563,188 +4566,6 @@ module emcc_mix_top
 	
 	
 	
-	// // --- flow_comp_125 --A0124_EMCC60主控板---
-    // ec_emcc60_board
-    // #(
-    //      .REG_SPACE_BIAS     ( 20'd100864)
-    //     ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
-    // )
-    // ec_emcc60_board_125
-    // (
-      
-	//   .clk_i                 ( clk               ),
-    //   .rst                   ( reset             ),
-	//   .ps_reg_clk            ( ps_reg_clk        ),
-    //   .ps_reg_reset          ( ps_reg_reset      ),
-	  
-	//   .i_time_1ms_vld        ( time_1ms_vld      ),
-	//   .i_time_1s_vld         ( time_1s_vld       ),
-
-	//   .i_st_wr_en            ( ps_reg_we         ),
-	//   .i_st_wr_addr          ( ps_reg_addr       ),
-    //   .i_st_wr_data          ( ps_reg_wr_dat     ),
-    //   .i_st_rd_en            ( ps_reg_re         ),
-    //   .i_st_rd_addr          ( ps_reg_rd_addr    ),
-	//   .o_st_rd_vld           ( sub_comp_rd_vld[193]    ),
-    //   .o_st_rd_data          ( sub_comp_rd_dat[193]    ),
-	//   .o_intr_irq            ( map_irq[193]       )
-
-    // );
-
-	
-	
-	
-	// // --- flow_comp_126 --A0161_B区C区控制柜1#分控板---
-    // eecc30
-    // #(
-    //      .REG_SPACE_BIAS     ( 20'd92160)
-    //     ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
-    // )
-    // eecc30_126
-    // (
-      
-	//   .clk_i                 ( clk               ),
-    //   .rst                   ( reset             ),
-	//   .ps_reg_clk            ( ps_reg_clk        ),
-    //   .ps_reg_reset          ( ps_reg_reset      ),
-	  
-	//   .i_time_1ms_vld        ( time_1ms_vld      ),
-	//   .i_time_1s_vld         ( time_1s_vld       ),
-
-	//   .i_st_wr_en            ( ps_reg_we         ),
-	//   .i_st_wr_addr          ( ps_reg_addr       ),
-    //   .i_st_wr_data          ( ps_reg_wr_dat     ),
-    //   .i_st_rd_en            ( ps_reg_re         ),
-    //   .i_st_rd_addr          ( ps_reg_rd_addr    ),
-	//   .o_st_rd_vld           ( sub_comp_rd_vld[176]    ),
-    //   .o_st_rd_data          ( sub_comp_rd_dat[176]    ),
-	//   .o_intr_irq            ( map_irq[176]       )
-
-    // );
-
-	
-	
-	
-	// // --- flow_comp_127 --A0162_B区C区控制柜2#分控板---
-    // eecc30
-    // #(
-    //      .REG_SPACE_BIAS     ( 20'd92672)
-    //     ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
-    // )
-    // eecc30_127
-    // (
-      
-	//   .clk_i                 ( clk               ),
-    //   .rst                   ( reset             ),
-	//   .ps_reg_clk            ( ps_reg_clk        ),
-    //   .ps_reg_reset          ( ps_reg_reset      ),
-	  
-	//   .i_time_1ms_vld        ( time_1ms_vld      ),
-	//   .i_time_1s_vld         ( time_1s_vld       ),
-
-	//   .i_st_wr_en            ( ps_reg_we         ),
-	//   .i_st_wr_addr          ( ps_reg_addr       ),
-    //   .i_st_wr_data          ( ps_reg_wr_dat     ),
-    //   .i_st_rd_en            ( ps_reg_re         ),
-    //   .i_st_rd_addr          ( ps_reg_rd_addr    ),
-	//   .o_st_rd_vld           ( sub_comp_rd_vld[177]    ),
-    //   .o_st_rd_data          ( sub_comp_rd_dat[177]    ),
-	//   .o_intr_irq            ( map_irq[177]       )
-
-    // );
-
-	
-	
-	
-	// // --- flow_comp_128 --A0172_装卸站控制柜1#分控板---
-    // eecc30
-    // #(
-    //      .REG_SPACE_BIAS     ( 20'd93184)
-    //     ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
-    // )
-    // eecc30_128
-    // (
-      
-	//   .clk_i                 ( clk               ),
-    //   .rst                   ( reset             ),
-	//   .ps_reg_clk            ( ps_reg_clk        ),
-    //   .ps_reg_reset          ( ps_reg_reset      ),
-	  
-	//   .i_time_1ms_vld        ( time_1ms_vld      ),
-	//   .i_time_1s_vld         ( time_1s_vld       ),
-
-	//   .i_st_wr_en            ( ps_reg_we         ),
-	//   .i_st_wr_addr          ( ps_reg_addr       ),
-    //   .i_st_wr_data          ( ps_reg_wr_dat     ),
-    //   .i_st_rd_en            ( ps_reg_re         ),
-    //   .i_st_rd_addr          ( ps_reg_rd_addr    ),
-	//   .o_st_rd_vld           ( sub_comp_rd_vld[178]    ),
-    //   .o_st_rd_data          ( sub_comp_rd_dat[178]    ),
-	//   .o_intr_irq            ( map_irq[178]       )
-
-    // );
-
-	
-	
-	
-	// // --- flow_comp_129 --A0173_装卸站控制柜2#分控板---
-    // eecc30
-    // #(
-    //      .REG_SPACE_BIAS     ( 20'd101376)
-    //     ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
-    // )
-    // eecc30_129
-    // (
-      
-	//   .clk_i                 ( clk               ),
-    //   .rst                   ( reset             ),
-	//   .ps_reg_clk            ( ps_reg_clk        ),
-    //   .ps_reg_reset          ( ps_reg_reset      ),
-	  
-	//   .i_time_1ms_vld        ( time_1ms_vld      ),
-	//   .i_time_1s_vld         ( time_1s_vld       ),
-
-	//   .i_st_wr_en            ( ps_reg_we         ),
-	//   .i_st_wr_addr          ( ps_reg_addr       ),
-    //   .i_st_wr_data          ( ps_reg_wr_dat     ),
-    //   .i_st_rd_en            ( ps_reg_re         ),
-    //   .i_st_rd_addr          ( ps_reg_rd_addr    ),
-	//   .o_st_rd_vld           ( sub_comp_rd_vld[194]    ),
-    //   .o_st_rd_data          ( sub_comp_rd_dat[194]    ),
-	//   .o_intr_irq            ( map_irq[194]       )
-
-    // );
-
-	
-	
-	
-	// // --- flow_comp_130 --A0245_去毛刺机分控板---
-    // eecc30
-    // #(
-    //      .REG_SPACE_BIAS     ( 20'd57344)
-    //     ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
-    // )
-    // eecc30_130
-    // (
-      
-	//   .clk_i                 ( clk               ),
-    //   .rst                   ( reset             ),
-	//   .ps_reg_clk            ( ps_reg_clk        ),
-    //   .ps_reg_reset          ( ps_reg_reset      ),
-	  
-	//   .i_time_1ms_vld        ( time_1ms_vld      ),
-	//   .i_time_1s_vld         ( time_1s_vld       ),
-
-	//   .i_st_wr_en            ( ps_reg_we         ),
-	//   .i_st_wr_addr          ( ps_reg_addr       ),
-    //   .i_st_wr_data          ( ps_reg_wr_dat     ),
-    //   .i_st_rd_en            ( ps_reg_re         ),
-    //   .i_st_rd_addr          ( ps_reg_rd_addr    ),
-	//   .o_st_rd_vld           ( sub_comp_rd_vld[108]    ),
-    //   .o_st_rd_data          ( sub_comp_rd_dat[108]    ),
-	//   .o_intr_irq            ( map_irq[108]       )
-
-    // );
 
 	
 	
