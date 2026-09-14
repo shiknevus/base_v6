@@ -1545,6 +1545,7 @@ module emcc_mix_top
        ,.i_axis_zero        ( ~di_regoin_msg[0][31]           )   // 零位到位开关
        ,.i_servo_done        ( ~di_regoin_msg[0][16]           )   // 伺服定位完成
        ,.i_servo_ready        ( ~di_regoin_msg[0][17]           )   // 伺服就绪
+       ,.i_emerge_stop_signal ( 1'b1            )
     );
 
 	
@@ -1587,6 +1588,7 @@ module emcc_mix_top
        ,.i_axis_zero        ( ~di_regoin_msg[0][34]           )   // 零位到位开关
        ,.i_servo_done        ( ~di_regoin_msg[0][14]           )   // 伺服定位完成
        ,.i_servo_ready        ( ~di_regoin_msg[0][15]           )   // 伺服就绪
+       ,.i_emerge_stop_signal ( 1'b1            )
     );
 
 	
@@ -1629,6 +1631,7 @@ module emcc_mix_top
        ,.i_axis_zero        ( ~di_regoin_msg[0][37]           )   // 零位到位开关
        ,.i_servo_done        ( ~di_regoin_msg[0][18]           )   // 伺服定位完成
        ,.i_servo_ready        ( ~di_regoin_msg[0][19]           )   // 伺服就绪
+       ,.i_emerge_stop_signal ( 1'b1            )
     );
 
 	
@@ -1671,6 +1674,7 @@ module emcc_mix_top
        ,.i_axis_zero        ( ~di_regoin_msg[0][40]           )   // 零位到位开关
        ,.i_servo_done        ( ~di_regoin_msg[0][20]           )   // 伺服定位完成
        ,.i_servo_ready        ( ~di_regoin_msg[0][21]           )   // 伺服就绪
+       ,.i_emerge_stop_signal ( 1'b1            )
     );
 
 	
@@ -2072,6 +2076,7 @@ module emcc_mix_top
        ,.i_axis_zero        ( ~di_regoin_msg[0][54]           )   // 零位到位开关
        ,.i_servo_done        ( ~di_regoin_msg[0][28]           )   // 伺服定位完成
        ,.i_servo_ready        ( ~di_regoin_msg[0][29]           )   // 伺服就绪
+       ,.i_emerge_stop_signal ( 1'b1            )
     );
 
 	
@@ -2114,6 +2119,7 @@ module emcc_mix_top
        ,.i_axis_zero        ( ~di_regoin_msg[0][45]           )   // 零位到位开关
        ,.i_servo_done        ( ~di_regoin_msg[0][22]           )   // 伺服定位完成
        ,.i_servo_ready        ( ~di_regoin_msg[0][23]           )   // 伺服就绪
+       ,.i_emerge_stop_signal ( 1'b1            )
     );
 
 	
@@ -2156,6 +2162,7 @@ module emcc_mix_top
        ,.i_axis_zero        ( ~di_regoin_msg[0][48]           )   // 零位到位开关
        ,.i_servo_done        ( ~di_regoin_msg[0][24]           )   // 伺服定位完成
        ,.i_servo_ready        ( ~di_regoin_msg[0][25]           )   // 
+       ,.i_emerge_stop_signal ( 1'b1            )
     );
 
 	
@@ -2198,6 +2205,7 @@ module emcc_mix_top
        ,.i_axis_zero        ( ~di_regoin_msg[0][51]           )   // 零位到位开关
        ,.i_servo_done        ( ~di_regoin_msg[0][26]           )   // 伺服定位完成
        ,.i_servo_ready        ( ~di_regoin_msg[0][27]           )   // 伺服就绪
+       ,.i_emerge_stop_signal ( 1'b1            )
     );
 
 	
@@ -2892,6 +2900,7 @@ module emcc_mix_top
        ,.i_servo_ready        ( ~di_regoin_msg[2][43]           )   // 伺服就绪
        ,.i_axis_limf        ( 1'b0           )   // 
        ,.i_axis_limb        ( 1'b0           )   // 
+       ,.i_emerge_stop_signal ( 1'b1            )
     );
 
 	
@@ -4772,6 +4781,7 @@ module emcc_mix_top
        ,.i_axis_limf        ( 1'b0           )   // 
        ,.i_axis_limb        ( 1'b0           )   // 
        ,.i_servo_ready        ( 1'b0           )   // 
+       ,.i_emerge_stop_signal ( 1'b0            )
     );
 
 	
@@ -4808,6 +4818,7 @@ module emcc_mix_top
        ,.i_axis_limf        ( 1'b0           )   // 
        ,.i_axis_limb        ( 1'b0           )   // 
        ,.i_servo_ready        ( 1'b0           )   // 
+       ,.i_emerge_stop_signal ( 1'b0            )
     );
 
 	
@@ -4850,6 +4861,7 @@ module emcc_mix_top
        ,.i_axis_zero        ( ~di_regoin_msg[3][18]           )   // 零位到位开关
        ,.i_servo_done        ( ~di_regoin_msg[3][60]           )   // 伺服定位完成
        ,.i_servo_ready        ( ~di_regoin_msg[3][61]           )   // 伺服就绪
+       ,.i_emerge_stop_signal ( 1'b1            )
     );
 
 	
@@ -4892,6 +4904,7 @@ module emcc_mix_top
        ,.i_axis_zero        ( ~di_regoin_msg[3][15]           )   // 零位到位开关
        ,.i_servo_done        ( ~di_regoin_msg[3][58]           )   // 伺服定位完成
        ,.i_servo_ready        ( ~di_regoin_msg[3][59]           )   // 伺服就绪
+       ,.i_emerge_stop_signal ( 1'b1            )
     );
 
 	

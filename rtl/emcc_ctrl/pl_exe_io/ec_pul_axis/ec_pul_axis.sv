@@ -46,7 +46,6 @@ module ec_pul_axis#(
     	,input					i_axis_limb         //axis limit backward
     	,input					i_emerge_stop_signal//emergency stop signal
 
-   		,input  	            i_safe_status 		//safe status unused
 
    		,input  	            i_dv_alarm			//drive alarm
    		,output 	            o_dv_pulse			//axi pulse
@@ -396,7 +395,7 @@ module ec_pul_axis#(
 	,.c_tsc_id              (c_tx_id  		)
 	,.c_bhv_id              (c_bhv_id 		)
 	,.param51               (param51		)
-	,.param52               ({30'd0,o_dv_dir,o_dv_pulse}	)	//diff out [1]dir [0]pulse
+	,.param52               ({29'd0,o_dv_reset,o_dv_dir,o_dv_pulse}	)	//diff out [1]dir [0]pulse
 	//,.param53               (param53		)
 	//,.param54               (param54		)
 	//,.param55               (param55		)
@@ -451,7 +450,6 @@ module ec_pul_axis#(
     ,.i_axis_zero			(i_axis_zero         )
     ,.i_axis_limb			(i_axis_limb        )
     ,.i_emerge_stop_signal	(i_emerge_stop_signal)
-    ,.i_safe_status			(i_safe_status 		)
     ,.i_dv_alarm			(i_dv_alarm			)
     ,.o_dv_pulse			(o_dv_pulse			)
     ,.o_dv_dir				(o_dv_dir			)

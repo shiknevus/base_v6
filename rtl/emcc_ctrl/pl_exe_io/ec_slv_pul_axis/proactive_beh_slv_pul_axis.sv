@@ -54,8 +54,6 @@ module proactive_beh_slv_pul_axis#(
     ,input					    i_axis_limb         //axis limit backward
     ,input					    i_emerge_stop_signal//emergency stop signal
 
-   	,input  	                i_safe_status 		//safe status
-   	,input  	                i_dv_alarm			//drive alarm
    	,input  	                i_pause			    //motor pause (B channel beh 100)
    	,input  	                i_stop			    //motor stop (B channel beh 103)
 
@@ -363,8 +361,8 @@ module proactive_beh_slv_pul_axis#(
             end
 
         endcase
-        // interrupt: i_stop forces A FSM to ALERT_40 (reported with alarm)
-        if(i_stop && curr_state != S_IDLE)
+
+        if((i_stop | ~i_emerge_stop_signal  ) && curr_state != S_IDLE)
             next_state = S_ALERT_40;
     end
 	
@@ -427,6 +425,8 @@ module proactive_beh_slv_pul_axis#(
             a_alm_num <= 8'd105;
         else if(i_stop && curr_state != S_IDLE)
             a_alm_num <= 8'd106;   // stop 
+        else if(~i_emerge_stop_signal && curr_state != S_IDLE)
+            a_alm_num <= 8'd107;   // emergency stop, add by szzhang 20260914
 		else if(curr_state == S_IDLE)
 			a_alm_num <= 8'd0;
         else
@@ -522,7 +522,7 @@ module proactive_beh_slv_pul_axis#(
 											rserv_dir,
 		                                    1'b0, 
 											i_pause,
-		                                    i_stop, 
+		                                    i_stop|(~i_emerge_stop_signal), 
 											action_beat,
 		                                    i_axis_zero,
 											i_axis_limb,

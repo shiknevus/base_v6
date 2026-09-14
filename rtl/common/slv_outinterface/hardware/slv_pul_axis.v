@@ -148,9 +148,10 @@ module slv_pul_axis
    wire [31:0]  o_rc_pulse_number;
    wire         o_rc_pulse_dir;
    wire         i_rc_pulse_done;
+   wire         i_rc_pulse_busy;
    wire         i_rc_dbestop;
   
-   Pulmot_fd Pulmot_fd00
+   Pulmot_fd #(.USE_PAUSE(1)) Pulmot_fd00
    (
       .clk              ( clk                    ),
       .reset            ( reset                  ),
@@ -160,6 +161,8 @@ module slv_pul_axis
       .i_bv_pulse_number( o_rc_pulse_number      ),
       .i_bv_pulse_dir   ( o_rc_pulse_dir         ),
       .o_bv_pulse_done  ( i_rc_pulse_done        ),
+      .o_bv_pulse_busy  ( i_rc_pulse_busy        ),
+      .i_pause          ( i_pause                ),
 
       .i_dv_ready       ( 1'b0                   ),
       .i_dv_inp         ( 1'b0                   ),
@@ -207,7 +210,8 @@ module slv_pul_axis
       .o_pulse_period ( o_rc_pulse_period  ),
       .o_pulse_number ( o_rc_pulse_number  ),
       .o_pulse_dir    ( o_rc_pulse_dir     ),
-      .i_pulse_done   ( i_rc_pulse_done    )
+      .i_pulse_done   ( i_rc_pulse_done    ),
+      .i_pulse_busy   ( i_rc_pulse_busy    )
    );
    
    ////////////////// HOME
