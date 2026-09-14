@@ -54,7 +54,6 @@ module proactive_beh_pul_axis#(
     ,input					    i_axis_limb         //axis limit backward
     ,input					    i_emerge_stop_signal//emergency stop signal
 
-   	,input  	                i_safe_status 		//safe status
    	,input  	                i_dv_alarm			//drive alarm
    	,input  	                i_pause			    //motor pause (B channel beh 100)
    	,input  	                i_stop			    //motor stop (B channel beh 103)
@@ -352,8 +351,8 @@ module proactive_beh_pul_axis#(
             end
 
         endcase
-        // interrupt: i_stop forces A FSM to ALERT_40 (reported with alarm)
-        if(i_stop && curr_state != S_IDLE)
+        
+        if((i_stop | ~i_emerge_stop_signal  ) && curr_state != S_IDLE)
             next_state = S_ALERT_40;
     end
 	
@@ -415,7 +414,9 @@ module proactive_beh_pul_axis#(
 		else if(curr_state == S_BHA_POST_DET && action_error)
             a_alm_num <= 8'd105;
         else if(i_stop && curr_state != S_IDLE)
-            a_alm_num <= 8'd106;   // stop 
+            a_alm_num <= 8'd106;   // stop
+        else if(~i_emerge_stop_signal && curr_state != S_IDLE)
+            a_alm_num <= 8'd107;   // emergency stop, add by szzhang 20260914
 		else if(curr_state == S_IDLE)
 			a_alm_num <= 8'd0;
         else
@@ -498,6 +499,8 @@ end
 localparam DIR_POS = 1'b1;
 localparam DIR_NEG = 1'b0;
 
+wire r_dv_ok = i_servo_ready & i_emerge_stop_signal;//estop active low, add by szzhang 20260914
+
 // 0 register -> default
 function [31:0] zdef(input [31:0] v, input [31:0] d);
     zdef = (v == 32'b0) ? d : v;
@@ -540,7 +543,7 @@ home_u
   .clk            ( clk_i              ),
   .reset          ( rst_i              ),
 
-  .i_drv_son      ( 1'b1               ),
+  .i_drv_son      ( r_dv_ok           ),
   .i_lim_f        ( i_axis_limf        ),
   .i_lim_b        ( i_axis_limb        ),
   .i_org          ( axis_org           ),
@@ -585,7 +588,7 @@ Jog_fa_std jog_u
   .clk            ( clk_i              ),
   .reset          ( rst_i              ),
 
-  .i_drv_son      ( 1'b1               ),
+  .i_drv_son      ( r_dv_ok           ),
   .i_lim_f        ( i_axis_limf        ),
   .i_lim_b        ( i_axis_limb        ),
   .i_org          ( axis_org           ),
@@ -630,7 +633,7 @@ Move_fa_std move_u
   .clk            ( clk_i              ),
   .reset          ( rst_i              ),
 
-  .i_drv_son      ( 1'b1               ),
+  .i_drv_son      ( r_dv_ok           ),
   .i_lim_f        ( i_axis_limf        ),
   .i_lim_b        ( i_axis_limb        ),
   .i_org          ( axis_org           ),
