@@ -403,20 +403,20 @@ module proactive_beh_3di_2do_3pos#(
 			do_o <= 2'b00;
 		else if(curr_state == S_EXE)
 			case(a_bhv_id_r)
-				8'd1	:	do_o <= 2'b10;
-				8'd2	:	do_o <= 2'b01;
-				8'd3	:	do_o <= 2'b01;
+				8'd1	:	do_o <= 2'b01;	//open
+				8'd2	:	do_o <= 2'b10;	//close pos1
+				8'd3	:	do_o <= 2'b10;	//close pos2
 				8'd4	:	do_o <= 2'b00;
 				8'd5	:	do_o <= do_o;
 				8'd6	:	do_o <= do_o;
 				8'd7	:	do_o <= do_o; 
-				8'd8	:	do_o <= 2'b10;
-				8'd9	:	do_o <= 2'b01; 
-				8'd10	:	do_o <= 2'b10;
-				8'd11	:	do_o <= 2'b01;
-				8'd12	:	do_o <= 2'b01;
-				8'd13	:	do_o <= 2'b10;
+				8'd8	:	do_o <= 2'b01;	//open
+				8'd9	:	do_o <= 2'b10; 	//close
+				8'd10	:	do_o <= 2'b01;	//open
+				8'd11	:	do_o <= 2'b10;
+				8'd12	:	do_o <= 2'b10;
 				8'd13	:	do_o <= 2'b01;
+				8'd13	:	do_o <= 2'b10;
 				default	:	do_o <= do_o;
 			endcase
 		else
