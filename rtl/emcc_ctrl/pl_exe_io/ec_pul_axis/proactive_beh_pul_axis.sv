@@ -352,7 +352,7 @@ module proactive_beh_pul_axis#(
 
         endcase
         
-        if((i_stop | ~i_emerge_stop_signal  ) && curr_state != S_IDLE)
+        if((i_stop | ~i_emerge_stop_signal | ~i_dv_alarm ) && curr_state > S_IDLE && curr_state < S_ALERT_40)
             next_state = S_ALERT_40;
     end
 	
@@ -417,6 +417,8 @@ module proactive_beh_pul_axis#(
             a_alm_num <= 8'd106;   // stop
         else if(~i_emerge_stop_signal && curr_state != S_IDLE)
             a_alm_num <= 8'd107;   // emergency stop, add by szzhang 20260914
+        else if(~i_dv_alarm && curr_state != S_IDLE)
+            a_alm_num <= 8'd108;   // alarm, add by szzhang 20260916
 		else if(curr_state == S_IDLE)
 			a_alm_num <= 8'd0;
         else
@@ -499,7 +501,7 @@ end
 localparam DIR_POS = 1'b1;
 localparam DIR_NEG = 1'b0;
 
-wire r_dv_ok = i_servo_ready & i_emerge_stop_signal;//estop active low, add by szzhang 20260914
+wire r_dv_ok = i_servo_ready & i_emerge_stop_signal & i_dv_alarm;//estop and alarm active low, add by szzhang 20260914
 
 // 0 register -> default
 function [31:0] zdef(input [31:0] v, input [31:0] d);
@@ -687,7 +689,7 @@ wire         o_rc_pulse_dir;
 wire         i_rc_pulse_done;
 wire         i_rc_pulse_busy;
 
-Positioner_std pos_u
+Positioner_std #(.BASE_REFCLK(156_250_000)) pos_u
 (
   .clk            ( clk_i              ),
   .reset          ( rst_i              ),
@@ -749,19 +751,19 @@ always@(posedge clk_i) begin
                 action_busy  <= home_busy;
                 action_done  <= home_done;
                 action_error <= home_error;
-                home_stop    <= action_alarm | i_stop;
+                home_stop    <= action_alarm | i_stop | ~i_emerge_stop_signal | ~i_dv_alarm;
             end
             8'd2, 8'd20 : begin
                 action_busy  <= jog_busy;
                 action_done  <= jog_done;
                 action_error <= jog_error;
-                jog_stop     <= action_alarm | i_stop;
+                jog_stop     <= action_alarm | i_stop | ~i_emerge_stop_signal | ~i_dv_alarm;
             end
             8'd3, 8'd21 : begin
                 action_busy  <= move_busy;
                 action_done  <= move_done;
                 action_error <= move_error;
-                move_stop    <= action_alarm | i_stop;
+                move_stop    <= action_alarm | i_stop | ~i_emerge_stop_signal | ~i_dv_alarm;
             end
             default: begin
                 action_busy  <= 1'b0;

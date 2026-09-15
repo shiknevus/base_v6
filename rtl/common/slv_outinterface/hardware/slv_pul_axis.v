@@ -242,7 +242,7 @@ module slv_pul_axis
       .clk            ( clk                ),
       .reset          ( reset              ),
       
-      .i_drv_son      ( action_son         ),
+      .i_drv_son      ( action_son&i_device_alarm ),
       .i_lim_f        ( i_axis_limf        ),
       .i_lim_b        ( i_axis_limb        ),
       .i_org          ( i_axis_zero         ),
@@ -289,7 +289,7 @@ module slv_pul_axis
       .clk            ( clk                ),
       .reset          ( reset              ),
       
-      .i_drv_son      ( 1'b1               ),
+      .i_drv_son      ( action_son&i_device_alarm ),
       .i_lim_f        ( i_axis_limf        ),
       .i_lim_b        ( i_axis_limb        ),
       .i_org          ( i_axis_zero         ),
@@ -335,7 +335,7 @@ module slv_pul_axis
       .clk            ( clk                ),
       .reset          ( reset              ),
       
-      .i_drv_son      ( action_son         ),
+      .i_drv_son      ( action_son&i_device_alarm ),
       .i_lim_f        ( i_axis_limf        ),
       .i_lim_b        ( i_axis_limb        ),
       .i_org          ( i_axis_zero         ),
@@ -389,7 +389,7 @@ module slv_pul_axis
                   act_busy  <= home_busy;
                   if(home_done)  act_done  <= 1'b1;
                   if(home_error) act_error <= 1'b1;
-                  home_stop <= (action_alarm | beat_timeout | action_flag);
+                  home_stop <= (action_alarm | beat_timeout | action_flag | ~i_device_alarm);
                   jog_stop  <= 1'b0;
                   move_stop <= 1'b0;
               end
@@ -397,7 +397,7 @@ module slv_pul_axis
                   act_busy  <= jog_busy;
                   if(jog_done)  act_done  <= 1'b1;
                   if(jog_error) act_error <= 1'b1;
-                  jog_stop  <= (action_alarm | beat_timeout | action_flag);
+                  jog_stop  <= (action_alarm | beat_timeout | action_flag | ~i_device_alarm);
                   home_stop <= 1'b0;
                   move_stop <= 1'b0;
               end
@@ -405,7 +405,7 @@ module slv_pul_axis
                   act_busy  <= move_busy;
                   if(move_done)  act_done  <= 1'b1;
                   if(move_error) act_error <= 1'b1;
-                  move_stop <= (action_alarm | beat_timeout | action_flag);
+                  move_stop <= (action_alarm | beat_timeout | action_flag | ~i_device_alarm);
                   home_stop <= 1'b0;
                   jog_stop  <= 1'b0;
               end
