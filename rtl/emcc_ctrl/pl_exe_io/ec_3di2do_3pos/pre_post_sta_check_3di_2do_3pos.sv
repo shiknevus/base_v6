@@ -72,7 +72,7 @@ module pre_post_sta_check_3di_2do_3pos#(
 
 	//pre status
 	
-	localparam	A_BHA_NUM1 = A_BHA_NUM - 4;
+	localparam	A_BHA_NUM1 = A_BHA_NUM - 5;
 	
 	always@(posedge clk_i)
 	begin
@@ -81,15 +81,15 @@ module pre_post_sta_check_3di_2do_3pos#(
 		else if(!unit_st && !m_st && !m_saf_st && !link_m_saf_st)
 			a_pre_sta_allow <= {A_BHA_NUM{1'b1}};
 		else
-			a_pre_sta_allow <= {4'b0000,{A_BHA_NUM1{1'b1}}};
+			a_pre_sta_allow <= {5'b00000,{A_BHA_NUM1{1'b1}}};
 	end
 
 	
 	//post status
 	
-	assign	a_post_sta_allow[0 ] = (a_bhv_id == 1 ) && (di_i ==3'b001);
-	assign	a_post_sta_allow[1 ] = (a_bhv_id == 2 ) && (di_i ==3'b010);
-	assign	a_post_sta_allow[2 ] = (a_bhv_id == 3 ) && (di_i ==3'b100);
+	assign	a_post_sta_allow[0 ] = (a_bhv_id == 1 ) && (di_i ==3'b001);//open
+	assign	a_post_sta_allow[1 ] = (a_bhv_id == 2 ) && (di_i ==3'b010);//close pos1
+	assign	a_post_sta_allow[2 ] = (a_bhv_id == 3 ) && (di_i ==3'b100);//close pos2
 	assign	a_post_sta_allow[3 ] = (a_bhv_id == 4 ) ;
 	assign	a_post_sta_allow[4 ] = (a_bhv_id == 5 ) && (di_i ==3'b001);
 	assign	a_post_sta_allow[5 ] = (a_bhv_id == 6 ) && (di_i ==3'b010);
