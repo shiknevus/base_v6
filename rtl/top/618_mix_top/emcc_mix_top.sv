@@ -4776,12 +4776,17 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[203]    ),
 	  .o_intr_irq            ( map_irq[203]       )
 
-       ,.i_servo_done        ( 1'b0           )   // 
-       ,.i_axis_zero        ( 1'b0           )   // 
-       ,.i_axis_limf        ( 1'b0           )   // 
-       ,.i_axis_limb        ( 1'b0           )   // 
-       ,.i_servo_ready        ( 1'b0           )   // 
-       ,.i_emerge_stop_signal ( 1'b0            )
+       ,.i_servo_done        ( ~di_mst_msg[44]           )   // 伺服定位完成
+       ,.i_servo_ready        ( ~di_mst_msg[37]           )   // 伺服就绪
+       ,.i_axis_limf        ( ~di_mst_msg[14]           )   // 正限位到位开关
+       ,.i_dv_alarm        ( i_dv_alarm[0]           )   // 
+       ,.o_dv_pulse        ( o_dv_pulse[0]           )   // 
+       ,.o_dv_dir        ( o_dv_dir[0]           )   // 
+       ,.o_dv_reset        ( o_dv_reset[0]           )   // 
+       ,.o_dv_son        ( o_dv_son[0]           )   // 
+       ,.i_axis_limb        ( ~di_mst_msg[16]           )   // 负限位到位开关
+       ,.i_axis_zero        ( ~di_mst_msg[15]           )   // 零位到位开关
+       ,.i_emerge_stop_signal ( 1'b1            )
     );
 
 	
@@ -4813,12 +4818,17 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[204]    ),
 	  .o_intr_irq            ( map_irq[204]       )
 
-       ,.i_servo_done        ( 1'b0           )   // 
-       ,.i_axis_zero        ( 1'b0           )   // 
-       ,.i_axis_limf        ( 1'b0           )   // 
-       ,.i_axis_limb        ( 1'b0           )   // 
-       ,.i_servo_ready        ( 1'b0           )   // 
-       ,.i_emerge_stop_signal ( 1'b0            )
+       ,.i_servo_done        ( ~di_mst_msg[55]           )   // 伺服定位完成
+       ,.i_servo_ready        ( ~di_mst_msg[45]           )   // 伺服就绪
+       ,.i_axis_limf        ( ~di_mst_msg[32]           )   // 正限位到位开关
+       ,.i_dv_alarm        ( i_dv_alarm[2]           )   // 
+       ,.o_dv_pulse        ( o_dv_pulse[2]           )   // 
+       ,.o_dv_dir        ( o_dv_dir[2]           )   // 
+       ,.o_dv_reset        ( o_dv_reset[2]           )   // 
+       ,.o_dv_son        ( o_dv_son[2]           )   // 
+       ,.i_axis_limb        ( ~di_mst_msg[34]           )   // 负限位到位开关
+       ,.i_axis_zero        ( ~di_mst_msg[33]           )   // 零位到位开关
+       ,.i_emerge_stop_signal ( 1'b1            )
     );
 
 	
