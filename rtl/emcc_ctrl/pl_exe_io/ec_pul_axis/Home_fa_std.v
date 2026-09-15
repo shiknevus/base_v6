@@ -26,6 +26,7 @@ module Home_fa_std
    ,output reg              o_pf_start
    ,output reg              o_pf_stop
    ,output reg              o_pf_quickstop
+   ,output wire             o_pf_touchstop //add by szzhang 20260916
    ,input  wire             i_pf_busy
    ,input  wire             i_pf_done
    ,input  wire [31:0]      i_spd_min
@@ -63,6 +64,8 @@ module Home_fa_std
    wire        negedge_lim_b =~i_lim_b& r_lim_b;
    wire        posedge_org   = i_org & ~r_org;
    wire        negedge_org   = ~i_org & r_org;
+
+   assign o_pf_touchstop = o_pf_quickstop & r_pf_status_org; //add by szzhang 20260916
 
    always@(posedge clk) begin
        if(reset) begin
@@ -152,7 +155,7 @@ module Home_fa_std
                        fsm_st <= ST_HOME_STOP;
                    end else if(i_pf_done&i_pf_busy) begin
                        if(r_pf_status_org)
-                           fsm_st <= r_st_error ? ST_HOME_STOP : ST_HOME_FMIN;
+                           fsm_st <= (r_st_error | (r_pf_status_org & ~i_org)) ? ST_HOME_STOP : ST_HOME_FMIN; //change by szzhang 20260916
                        else 
                            fsm_st <= r_st_error ? ST_HOME_STOP : ST_HOME_BACC;
                    end
@@ -187,7 +190,7 @@ module Home_fa_std
                        fsm_st <= ST_HOME_STOP;   
                    end else if(i_pf_done&i_pf_busy) begin
                        if(r_pf_status_org) 
-                           fsm_st <= r_st_error ? ST_HOME_STOP : ST_HOME_FMIN;
+                           fsm_st <= (r_st_error | (r_pf_status_org & ~i_org)) ? ST_HOME_STOP : ST_HOME_FMIN;
                        else
                            fsm_st <= r_st_error ? ST_HOME_STOP : ST_HOME_FACC;
                    end

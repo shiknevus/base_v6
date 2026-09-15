@@ -533,6 +533,7 @@ wire         home_pf_dir;
 wire         home_pf_start;
 wire         home_pf_stop;
 wire         home_pf_quickstop;
+wire         home_pf_touchstop;
 wire         pos_pf_busy;
 wire         pos_pf_done;
 wire         pos_pf_error;
@@ -565,6 +566,7 @@ home_u
   .o_pf_start     ( home_pf_start      ),
   .o_pf_stop      ( home_pf_stop       ),
   .o_pf_quickstop ( home_pf_quickstop  ),
+  .o_pf_touchstop ( home_pf_touchstop  ),
   .i_pf_busy      ( pos_pf_busy        ),
   .i_pf_done      ( pos_pf_done        )
 );
@@ -663,7 +665,14 @@ Move_fa_std move_u
 reg  [31:0]  pos_pf_spd;
 reg  [31:0]  pos_pf_acc;
 reg  [31:0]  pos_pf_dec;
-wire [31:0]  pos_quickstop_dec = dec_max_eff;
+
+wire [32:0]  home_touch_dec_2x = {home_dec_eff, 1'b0};
+wire [31:0]  home_touch_dec = (home_touch_dec_2x > {1'b0, dec_max_eff})
+                            ? dec_max_eff 
+                            : home_touch_dec_2x[31:0];
+wire [31:0]  pos_quickstop_dec = ((a_bhv_id_r == 8'd1) && home_pf_touchstop)
+                              ? home_touch_dec 
+                              : dec_max_eff;
 reg          pos_quickstop;
 reg  [31:0]  pos_pf_mode;
 reg          pos_pf_start;
