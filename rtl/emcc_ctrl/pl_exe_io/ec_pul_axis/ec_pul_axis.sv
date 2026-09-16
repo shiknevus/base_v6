@@ -588,6 +588,9 @@ module ec_pul_axis#(
 
 		,.i_servo_ready			(i_servo_ready      )
     	,.i_servo_done			(i_servo_done       )
+
+		,.i_axis_limf			(i_axis_limf        )
+		,.i_axis_limb			(i_axis_limb        )
 //----------------------------------------------------- user logic end -------------------------------------------------------//
     );
 
