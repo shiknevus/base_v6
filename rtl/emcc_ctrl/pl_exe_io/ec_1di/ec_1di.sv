@@ -417,7 +417,7 @@ module ec_1di#(
 	,.b_tx_id               (b_tx_id			)
 	,.b_alm_num             (b_alm_num			)
 	,.di				    (i_sign1_check		)
-	,.irq_o			        (irq_o				)
+	,.irq_o			        (				)
 	,.irq_ack_i	            (irq_ack_i			)	
     );
 	 
@@ -438,7 +438,7 @@ module ec_1di#(
 	,.c_tx_id         	        (c_tx_id			)
 	,.c_alm_num                 (c_alm_num			)
 	,.c_gap_crl                 (c_gap_crl			)
-	,.irq_o 					(irq_o				)
+	,.irq_o 					(				)
 	,.irq_ack_i                 (irq_ack_i			)
    );
 	

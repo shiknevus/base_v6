@@ -396,7 +396,7 @@ module ec_sys_sf#(
     ,.a_alm_num            	(a_alm_num      	)
 	,.a_bhv_id_r			(a_bhv_id_r			)
 	,.state_monitor_o		(			)
-    ,.irq_o                	(irq_a				)
+    ,.irq_o                	(				)
     ,.irq_ack_i       		(irq_a_grant		)
     );
 
@@ -426,7 +426,7 @@ module ec_sys_sf#(
 	,.i_manul	            (i_manul			)
 	,.i_auto	            (i_auto				)
 	,.state_monitor_o		(debug_reg1			)
-	,.irq_o			        (irq_o				)
+	,.irq_o			        (irq_b				)
 	,.irq_ack_i	            (irq_ack_i			)	
     );
 	 
@@ -449,7 +449,7 @@ module ec_sys_sf#(
 	,.c_tx_id         	        (c_tx_id			)
 	,.c_alm_num                 (c_alm_num			)
 	,.c_gap_crl                 (c_gap_crl			)
-	,.irq_o 					(irq_o				)
+	,.irq_o 					(				)
 	,.irq_ack_i                 (irq_ack_i			)
    );
 	

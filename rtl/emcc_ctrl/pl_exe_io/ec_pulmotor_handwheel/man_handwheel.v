@@ -20,8 +20,8 @@ module man_handwheel
 	
 	,output reg [3:0]       	o_axis_number
 	,output	reg	[7:0]			o_speed_gear
-	,output	reg	[31:0]			o_pulse_cnt
-	,output	reg					o_wheel_dir
+	,output	reg	[31:0]			or_pulse_cnt
+	,output	reg					or_wheel_dir
 	,input						sample_vld
 );
     localparam WHOLE_VALUE  = 100;       
@@ -131,8 +131,8 @@ module man_handwheel
 			o_wheel_dir <= 1'b0;
 		end else if(sample_vld)begin
 			previ <= {i_pulse_a,i_pulse_b};
-            o_pulse_cnt <= 0;
-			o_wheel_dir <= 1'b0;
+            or_pulse_cnt <= o_pulse_cnt;
+			or_wheel_dir <= o_wheel_dir;
 		end else if(aclk_pose)begin
 		    if({i_pulse_a,i_pulse_b} != previ)begin
 		        previ <= {i_pulse_a,i_pulse_b};

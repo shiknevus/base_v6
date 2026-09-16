@@ -406,7 +406,7 @@ module tim_beh_pulmotor_handwheel#(
 	begin
 		if(rst_i)
 			sample_vld <= 1'b0;
-		else if(task_time_cnt >= loop_time_ms-1)
+		else if(task_time_cnt > loop_time_ms-1)
 			sample_vld <= 1'b1;
 		else
 			sample_vld <= 1'b0;

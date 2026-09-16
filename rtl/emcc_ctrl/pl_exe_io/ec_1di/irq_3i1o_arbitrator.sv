@@ -424,18 +424,39 @@ always @(posedge clk_i) begin
 			S_WAIT_IRQ_ACK2:begin
 				if(irq_receive_ack)// Interrupt acknowledge received successfully
 					s_sta <= S_END_DELAY;
-				else if(a_tx_id == 8'd0 || b_tx_id == 8'd0 || c_tx_id == 8'd0)//A/B/C channel 40 timeout
-					s_sta <= S_END_DELAY;
-				else if(cur_chan == 4'hA && a_tx_id == 8'd40 && a_tx_id_1d != a_tx_id)	//A channel 10/30 timeout
-					s_sta <= S_END_DELAY;
-				else if(cur_chan == 4'hB && b_tx_id == 8'd40 && b_tx_id_1d != b_tx_id)	//B channel 10/30 timeout
-					s_sta <= S_END_DELAY;
-				else if(cur_chan == 4'hC && c_tx_id == 8'd40 && b_tx_id_1d != b_tx_id)	//C channel 10/30 timeout
-					s_sta <= S_END_DELAY;
-				else
-					s_sta <= S_WAIT_IRQ_ACK2;
+				else 
+					case(cur_chan)
+						4'hA:begin
+							if(a_tx_id_1d == 8'd40 && a_tx_id_1d != a_tx_id)//A channel 10/30 timeout/Alert
+								s_sta <= S_END_DELAY;
+							else if(a_tx_id == 8'd0)//A channel 40 timeout/Alert
+								s_sta <= S_END_DELAY;
+							else
+								s_sta <= S_WAIT_IRQ_ACK2;
+						end
+						
+						4'hB:begin
+							if(b_tx_id_1d == 8'd40 && b_tx_id_1d != b_tx_id)//B channel 10/30 timeout/Alert
+								s_sta <= S_END_DELAY;
+							else if(b_tx_id == 8'd0)//B channel 40 timeout/Alert
+								s_sta <= S_END_DELAY;
+							else
+								s_sta <= S_WAIT_IRQ_ACK2;
+						end
+						
+						4'hC:begin
+							if(c_tx_id_1d == 8'd40 && c_tx_id_1d != c_tx_id)//C channel 10/30 timeout/Alert
+								s_sta <= S_END_DELAY;
+							else if(c_tx_id == 8'd0)//C channel 40 timeout/Alert
+								s_sta <= S_END_DELAY;
+							else
+								s_sta <= S_WAIT_IRQ_ACK2;
+						end
+						
+						default:s_sta <= s_sta;
+					endcase
 			end
-			
+				
 			S_END_DELAY: begin
 				if(end_cnt >= 4'd8)begin
 					cur_chan <= 4'h0;
@@ -448,7 +469,7 @@ always @(posedge clk_i) begin
 			default:
 				s_sta <= S_IDLE;
 		endcase
-end
+	end
 
 	always@(posedge clk_i)begin
 	if(rst_i)

@@ -70,10 +70,12 @@ always@(posedge i_clk)
 begin
 	if(i_rst)
 		da_da_vld <= 0;
+    else if(state == 33)
+        da_da_vld <= 0;
 	else if(v_value_r != v_value)
 		da_da_vld <= 1;
 	else
-		da_da_vld <= 0;
+		da_da_vld <= da_da_vld;
 end
 
 
