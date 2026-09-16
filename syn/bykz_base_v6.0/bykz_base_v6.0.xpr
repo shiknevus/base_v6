@@ -579,13 +579,6 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_3di2do_3pos/ec_3di_2do_3pos.sv">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_3led_buzzer/ec_3led_buzzer.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -789,13 +782,6 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_3di2do_3pos/pre_post_sta_check_3di_2do_3pos.sv">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_3led_buzzer/pre_post_sta_check_3led_buzzer.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -951,13 +937,6 @@
         </FileInfo>
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_3di2do/proactive_beh_3di_2do.sv">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_3di2do_3pos/proactive_beh_3di_2do_3pos.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
@@ -1133,13 +1112,6 @@
         </FileInfo>
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_3di2do/ps_rw_pl_reg_3di_2do.sv">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_3di2do_3pos/ps_rw_pl_reg_3di_2do_3pos.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
@@ -1328,13 +1300,6 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_3di2do_3pos/status_beh_3di_2do_3pos.sv">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_3led_buzzer/status_beh_3led_buzzer.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -1503,13 +1468,6 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_3di2do_3pos/tim_beh_3di_2do_3pos.sv">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_3led_buzzer/tim_beh_3led_buzzer.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -1638,6 +1596,54 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/top/emcc_mst_top.sv">
         <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_3di2do_3pos/ec_3di_2do_3pos.sv">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_3di2do_3pos/pre_post_sta_check_3di_2do_3pos.sv">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_3di2do_3pos/proactive_beh_3di_2do_3pos.sv">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_3di2do_3pos/ps_rw_pl_reg_3di_2do_3pos.sv">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_3di2do_3pos/status_beh_3di_2do_3pos.sv">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_3di2do_3pos/tim_beh_3di_2do_3pos.sv">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>

@@ -300,8 +300,6 @@ module status_beh_dv300_do#(
             b_alm_num <= 8'd3;    
 		else if(curr_state_1d == S_EXE && curr_state == S_ALERT_40 && b_bhv_id == 8'd100)//The execution of Behavior 100 failed.
 			b_alm_num <= 8'd4;
-		else if(curr_state_1d == S_EXE && curr_state == S_ALERT_40 && b_bhv_id == 8'd101)//The execution of Behavior 101 failed.
-			b_alm_num <= 8'd5;
 		else if(curr_state == S_SUCC_30_ACK && ack_tx_result == IRQ_NO_OK)	//Transaction 30 has a ps response error.
 			b_alm_num <= ack_ps_alart_num;
 		else if(curr_state == S_SUCC_30_ACK && timout)						//For Transaction 30, waiting for the ps response timed out.

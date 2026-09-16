@@ -3028,12 +3028,12 @@ module emcc_mix_top
 	wire   o_dri2_76;
 	
 	// --- flow_comp_76 --A0077_短桁架1#机器人夹爪---
-    ec_3di_2do_3pos
+    ec_2di_2do
     #(
          .REG_SPACE_BIAS     ( 20'd61952)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
-    ec_3di_2do_3pos_76
+    ec_2di_2do_76
     (
       
 	  .clk_i                 ( clk               ),
@@ -3055,7 +3055,7 @@ module emcc_mix_top
 
        ,.i_pos1        ( ~di_mst_msg[12]           )   // 位置1到位开关
        ,.i_pos2        ( ~di_mst_msg[11]           )   // 位置2到位开关
-       ,.i_pos3        ( di_mst_msg[13]           )   // 位置3到位开关
+    //    ,.i_pos3        ( di_mst_msg[13]           )   // 位置3到位开关
        ,.o_dri1        ( o_dri1_76           )   // 位置1驱动信号
        ,.o_dri2        ( o_dri2_76           )   // 位置2驱动信号
     );
@@ -3068,12 +3068,12 @@ module emcc_mix_top
 	wire   o_dri2_77;
 	
 	// --- flow_comp_77 --A0078_长桁架1#机器人夹爪---
-    ec_3di_2do_3pos
+    ec_2di_2do
     #(
          .REG_SPACE_BIAS     ( 20'd62976)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
-    ec_3di_2do_3pos_77
+    ec_2di_2do_77
     (
       
 	  .clk_i                 ( clk               ),
@@ -3095,7 +3095,7 @@ module emcc_mix_top
 
        ,.i_pos1        ( ~di_regoin_msg[3][32]           )   // 位置1到位开关
        ,.i_pos2        ( ~di_regoin_msg[3][33]           )   // 位置2到位开关
-       ,.i_pos3        ( di_regoin_msg[3][56]           )   // 位置3到位开关
+    //    ,.i_pos3        ( di_regoin_msg[3][56]           )   // 位置3到位开关
        ,.o_dri1        ( o_dri1_77           )   // 位置1驱动信号
        ,.o_dri2        ( o_dri2_77           )   // 位置2驱动信号
     );
@@ -3108,12 +3108,12 @@ module emcc_mix_top
 	wire   o_dri2_78;
 	
 	// --- flow_comp_78 --A0079_长桁架2#机器人夹爪---
-    ec_3di_2do_3pos
+    ec_2di_2do
     #(
          .REG_SPACE_BIAS     ( 20'd62464)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
-    ec_3di_2do_3pos_78
+    ec_2di_2do_78
     (
       
 	  .clk_i                 ( clk               ),
@@ -3135,7 +3135,7 @@ module emcc_mix_top
 
        ,.i_pos1        ( ~di_regoin_msg[3][35]           )   // 位置1到位开关	
        ,.i_pos2        ( ~di_regoin_msg[3][36]           )   // 位置2到位开关
-       ,.i_pos3        ( di_regoin_msg[3][57]           )   // 位置3到位开关
+    //    ,.i_pos3        ( di_regoin_msg[3][57]           )   // 位置3到位开关
        ,.o_dri1        ( o_dri1_78           )   // 位置1驱动信号
        ,.o_dri2        ( o_dri2_78           )   // 位置2驱动信号
     );
