@@ -41,6 +41,7 @@ module status_beh_pul_axis#(
 	,output	reg [7:0]			b_tx_id     
 	,output	reg [7:0]			b_alm_num   
 //----------------------------------------------------- user logic begin -----------------------------------------------------//
+	,input						dv_alarm		//drive alm (1=normal)
 	,output wire				o_dv_reset  	//servo reset
 	,output wire				o_dv_son    	//servo enable
 	,output reg					b_pause			//motor pause
@@ -376,23 +377,15 @@ module status_beh_pul_axis#(
 
 	assign o_dv_son   = bh_disable ? ~P_EN_EFF : P_EN_EFF;
 
-	// reset pulse 5ms
-	reg [2:0] rst_cnt;
+	// reset low until alarm cleared, add by szzhang 20260916
 	reg o_dv_reset_r;
 	always@(posedge clk_i) begin
-		if(rst_i || !b_en) begin
+		if(rst_i || !b_en)
 			o_dv_reset_r <= 1'b0;
-			rst_cnt      <= 3'd0;
-		end else if(curr_state == S_EXE && b_bhv_id == 8'd102) begin
+		else if(curr_state == S_EXE && b_bhv_id == 8'd102)
 			o_dv_reset_r <= 1'b1;
-			rst_cnt      <= 3'd5;
-		end else if(o_dv_reset_r && i_time_1ms_vld) begin
-			if(rst_cnt <= 3'd1) begin
-				o_dv_reset_r <= 1'b0;
-				rst_cnt      <= 3'd0;
-			end else
-				rst_cnt <= rst_cnt - 1'b1;
-		end
+		else if(o_dv_reset_r && dv_alarm)
+			o_dv_reset_r <= 1'b0;
 	end
 	assign o_dv_reset = o_dv_reset_r ? P_RST_EFF : ~P_RST_EFF;
 

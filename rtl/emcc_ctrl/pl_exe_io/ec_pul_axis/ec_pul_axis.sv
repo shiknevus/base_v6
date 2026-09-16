@@ -503,6 +503,7 @@ module ec_pul_axis#(
 	,.irq_ack_i	            (irq_b_grant		)	
 
 //----------------------------------------------------- user logic begin -----------------------------------------------------//
+    ,.dv_alarm				(i_dv_alarm			)
     ,.o_dv_reset			(o_dv_reset			)
     ,.o_dv_son				(o_dv_son			)
     ,.b_pause				(b_pause			)
@@ -572,6 +573,8 @@ module ec_pul_axis#(
 		,.action_busy			(action_busy		)
 		,.action_done			(action_done		)
 		,.action_error			(action_error		)
+		,.dv_alarm				(i_dv_alarm			)
+		,.i_emerge_stop_signal	(i_emerge_stop_signal)
 
 		,.rctrl_drive_on		(param21			)
 		,.rctrl_drive_reset		(param29			)

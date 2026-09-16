@@ -65,6 +65,8 @@ module pre_post_sta_check_slv_pul_axis#(
 		,input							action_busy
 		,input							action_done
 		,input							action_error
+		,input							dv_alarm			//drive alm (1=normal)
+		,input							i_emerge_stop_signal	//emergency stop (1=normal)
 
 		,input		[7:0]				rctrl_drive_on  //1.on 2.off
 		,input							rctrl_drive_reset
@@ -95,7 +97,7 @@ module pre_post_sta_check_slv_pul_axis#(
 			home_completed <= 1'b0;
 		else if(a_bhv_id == 8'd1 && action_done && ~action_error)
 			home_completed <= 1'b1;
-		else if(b_bhv_id == 8'd105 && action_error)
+		else if(b_bhv_id == 8'd105 || ~dv_alarm || ~i_emerge_stop_signal|| action_error || ~i_servo_ready || ~device_safe)
 			home_completed <= 1'b0;
 		else begin
 			home_completed <= home_completed;
