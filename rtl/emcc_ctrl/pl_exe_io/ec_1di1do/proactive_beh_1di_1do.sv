@@ -337,24 +337,30 @@ module proactive_beh_1di_1do#(
     always@(posedge clk_i)begin
         if(rst_i || !a_en)
             a_alm_num <= 8'd0;
-        else if(curr_state == S_BHA_PRE_DET && timout)						//The pre - full inspection is not met.
-			a_alm_num <= 8'd100;    
-        else if(curr_state == S_READY_10_ACK && ack_tx_result == IRQ_NO_OK)	//Transaction 10 ps response error
-            a_alm_num <= ack_ps_alart_num;    
-        else if(curr_state == S_READY_10_ACK && timout)						//For Transaction 10, waiting for the ps response timed out.
-            a_alm_num <= 8'd108;    
-		else if(curr_state_1d == S_EXE && curr_state == S_ALERT_40)			//The execution of Behavior 1 failed.
-				a_alm_num <= 8'd109;    
-		else if(curr_state_1d == S_BHA_POST_DET && curr_state == S_ALERT_40)//The post - full inspection is not met.
-				a_alm_num <= 8'd116;    
-		else if(curr_state == S_SUCC_30_ACK && ack_tx_result == IRQ_NO_OK)	//Transaction 30 has a ps response error.
-			a_alm_num <= ack_ps_alart_num;
-		else if(curr_state == S_SUCC_30_ACK && timout)						//For Transaction 30, waiting for the ps response timed out.
-            a_alm_num <= 8'd123;
-		else if(match_40)
+		else if(curr_state == S_IDLE)	//clear logic
 			a_alm_num <= 8'd0;
-        else
-            a_alm_num <= a_alm_num;
+		else if(curr_state == S_READY_10_ACK && ack_tx_result == IRQ_NO_OK)//ps 10 response error num
+			a_alm_num <= ack_ps_alart_num; 	
+		else if(curr_state == S_SUCC_30_ACK && ack_tx_result == IRQ_NO_OK)//ps 30 response error num
+			a_alm_num <= ack_ps_alart_num;	
+		else if(curr_state == S_READY_10_ACK && timout)	//ps 10 response timeout
+			a_alm_num <= 8'd101; 
+		else if(curr_state == S_SUCC_30_ACK && timout)	//ps 30 response timeout
+			a_alm_num <= 8'd103; 
+		else if(curr_state == S_BHA_PRE_DET && timout)	//Not fully satisfied pre-condition
+			a_alm_num <= 8'd100; 
+		else if(curr_state == S_BHA_POST_DET && timout)	//Not fully satisfied post-condition
+			case(a_bhv_id_r)
+				8'd1:a_alm_num <= 8'd110; 
+				8'd2:a_alm_num <= 8'd111; 	
+				8'd4:a_alm_num <= 8'd112; 
+				8'd5:a_alm_num <= 8'd113; 
+				8'd6:a_alm_num <= 8'd114; 
+				8'd7:a_alm_num <= 8'd115; 
+				default:a_alm_num <= a_alm_num;
+			endcase		
+		else
+			a_alm_num <= a_alm_num;
     end
 
     //Timeout count
