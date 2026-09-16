@@ -424,7 +424,7 @@ module ec_wxjc#(
 	,.b_tx_id               (b_tx_id			)
 	,.b_alm_num             (b_alm_num			)
 	//,.do_o				    (do_o				)
-	,.irq_o			        (irq_o				)
+	,.irq_o			        (				)
 	,.irq_ack_i	            (irq_ack_i			)	
     );
 	 
@@ -445,7 +445,7 @@ module ec_wxjc#(
 	,.c_tx_id         	        (c_tx_id			)
 	,.c_alm_num                 (c_alm_num			)
 	,.c_gap_crl                 (c_gap_crl			)
-	,.irq_o 					(irq_o				)
+	,.irq_o 					(				)
 	,.irq_ack_i                 (irq_ack_i			)
 	);
 	

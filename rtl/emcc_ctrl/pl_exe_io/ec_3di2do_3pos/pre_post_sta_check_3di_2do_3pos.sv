@@ -86,23 +86,28 @@ module pre_post_sta_check_3di_2do_3pos#(
 
 	
 	//post status
-	
-	assign	a_post_sta_allow[0 ] = (a_bhv_id == 1 ) && (di_i ==3'b001);//open
-	assign	a_post_sta_allow[1 ] = (a_bhv_id == 2 ) && (di_i ==3'b010);//close pos1
-	assign	a_post_sta_allow[2 ] = (a_bhv_id == 3 ) && (di_i ==3'b100);//close pos2
-	assign	a_post_sta_allow[3 ] = (a_bhv_id == 4 ) ;
-	assign	a_post_sta_allow[4 ] = (a_bhv_id == 5 ) && (di_i ==3'b001);
-	assign	a_post_sta_allow[5 ] = (a_bhv_id == 6 ) && (di_i ==3'b010);
-	assign	a_post_sta_allow[6 ] = (a_bhv_id == 7 ) && (di_i ==3'b100);
-	assign	a_post_sta_allow[7 ] = (a_bhv_id == 8 )	;
-	assign	a_post_sta_allow[8 ] = (a_bhv_id == 9 )	;
-	assign	a_post_sta_allow[9 ] = (a_bhv_id == 10) && (di_i ==3'b001);
-	assign	a_post_sta_allow[10] = (a_bhv_id == 11) && (di_i ==3'b010);
-	assign	a_post_sta_allow[11] = (a_bhv_id == 12) && (di_i ==3'b100);
-	assign	a_post_sta_allow[12] = (a_bhv_id == 13)	;
-	assign	a_post_sta_allow[13] = (a_bhv_id == 14)	;
+	wire	[A_BHA_NUM-1:0]	r_a_post_sta_allow;
 
-	
+	assign	r_a_post_sta_allow[0 ] = (a_bhv_id == 1 ) && (di_i ==3'b001);//open
+	assign	r_a_post_sta_allow[1 ] = (a_bhv_id == 2 ) && (di_i ==3'b010);//close pos1
+	assign	r_a_post_sta_allow[2 ] = (a_bhv_id == 3 ) && (di_i ==3'b100);//close pos2
+	assign	r_a_post_sta_allow[3 ] = (a_bhv_id == 4 ) ;
+	assign	r_a_post_sta_allow[4 ] = (a_bhv_id == 5 ) && (di_i ==3'b001);
+	assign	r_a_post_sta_allow[5 ] = (a_bhv_id == 6 ) && (di_i ==3'b010);
+	assign	r_a_post_sta_allow[6 ] = (a_bhv_id == 7 ) && (di_i ==3'b100);
+	assign	r_a_post_sta_allow[7 ] = (a_bhv_id == 8 )	;
+	assign	r_a_post_sta_allow[8 ] = (a_bhv_id == 9 )	;
+	assign	r_a_post_sta_allow[9 ] = (a_bhv_id == 10) && (di_i ==3'b001);
+	assign	r_a_post_sta_allow[10] = (a_bhv_id == 11) && (di_i ==3'b010);
+	assign	r_a_post_sta_allow[11] = (a_bhv_id == 12) && (di_i ==3'b100);
+	assign	r_a_post_sta_allow[12] = (a_bhv_id == 13)	;
+	assign	r_a_post_sta_allow[13] = (a_bhv_id == 14)	;
+
+	always@(posedge clk_i)
+	begin
+		a_post_sta_allow <= r_a_post_sta_allow;
+	end
+
 	//========================================================================================//
 	//---------------------------------  Channel B check -------------------------------------//
 	//========================================================================================//

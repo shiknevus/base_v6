@@ -427,7 +427,7 @@ module ec_trayclaw#(
 	,.b_tx_id               (b_tx_id			)
 	,.b_alm_num             (b_alm_num			)
 	,.di				    (di_i				)
-	,.irq_o			        (irq_o				)
+	,.irq_o			        (				)
 	,.irq_ack_i	            (irq_ack_i			)	
     );
 	 

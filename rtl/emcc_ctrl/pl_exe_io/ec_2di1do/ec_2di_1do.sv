@@ -423,8 +423,8 @@ module ec_2di_1do#(
 	,.b_tx_id               (b_tx_id			)
 	,.b_alm_num             (b_alm_num			)
 	,.di				    (di_i				)
-	,.irq_o			        (irq_o				)
-	,.irq_ack_i	            (irq_ack_i			)	
+	,.irq_o			        (				)
+	,.irq_ack_i	            (irq_b_grant			)	
     );
 	 
 	tim_beh_2di_1do tim_beh_2di_1do_u0(
@@ -444,8 +444,8 @@ module ec_2di_1do#(
 	,.c_tx_id         	        (c_tx_id			)
 	,.c_alm_num                 (c_alm_num			)
 	,.c_gap_crl                 (c_gap_crl			)
-	,.irq_o 					(irq_o				)
-	,.irq_ack_i                 (irq_ack_i			)
+	,.irq_o 					(				)
+	,.irq_ack_i                 (irq_c_grant			)
    );
 	
 		pre_post_sta_check_2di_1do#(

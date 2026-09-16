@@ -395,7 +395,7 @@ module ec_hw_sdcx#(
     //,.mode_sel				(param16[1:0]		)
 	,.a_en			       	(1'b1				)
     ,.a_bhv_id             	(a_bhv_id       	)
-    ,.a_bhv_vld            	(a_bhv_vld      	)
+    ,.a_bhv_vld            	(sync_a_bhv_vld      	)
     ,.a_tx_ot              	(a_tx_ot        	)
     ,.a_tx_result_rpt	   	(a_tx_result_rpt	)
 	,.a_tx_result_vld      	(sync_a_tx_result_vld	)
@@ -428,7 +428,7 @@ module ec_hw_sdcx#(
 	,.b_tx_id               (b_tx_id			)
 	,.b_alm_num             (b_alm_num			)
 	,.di				    (di_i				)
-	,.irq_o			        (irq_o				)
+	,.irq_o			        (				)
 	,.irq_ack_i	            (irq_ack_i			)	
     );
 	 
@@ -449,7 +449,7 @@ module ec_hw_sdcx#(
 	,.c_tx_id         	        (c_tx_id			)
 	,.c_alm_num                 (c_alm_num			)
 	,.c_gap_crl                 (c_gap_crl			)
-	,.irq_o 					(irq_o				)
+	,.irq_o 					(				)
 	,.irq_ack_i                 (irq_ack_i			)
    );
 	

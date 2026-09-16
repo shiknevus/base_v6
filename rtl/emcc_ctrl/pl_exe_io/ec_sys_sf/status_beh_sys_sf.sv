@@ -158,7 +158,6 @@ module status_beh_sys_sf#(
 		curr_state_1d <= curr_state;
 	end
 
-	reg [7:0] 	b_bhv_id;
 	reg			b_bhv_id_vld;
 	
 	always @(posedge clk_i) begin
@@ -293,7 +292,7 @@ module status_beh_sys_sf#(
         next_state = curr_state;
         case (curr_state)
             S_IDLE: begin
-                if (b_en && ((b_bhv_id >= 8'd1) && (b_bhv_id <= BHA_NUM)) && b_bhv_id_vld)
+                if (b_en && b_bhv_id_vld)
                     next_state = S_READY_10;
                 else
                     next_state = S_IDLE;
@@ -331,7 +330,7 @@ module status_beh_sys_sf#(
 			//end
 			
 			S_BHA_POST_DET: begin	//curr_state = 6
-				if(post_sta_allow[b_bhv_id - 1'b1]) begin
+				if(post_sta_allow[b_bhv_id - 99]) begin
 					next_state = S_SUCC_30;
 				end else if(timout) begin
 					next_state = S_ALERT_40;			
@@ -386,7 +385,7 @@ module status_beh_sys_sf#(
 			ec_chb_st <= 1'b0;
 		else if(curr_state == S_READY_10)
 			ec_chb_st <= 1'b1;
-		else if(curr_state_1d == S_ALERT_40_ACK && curr_state == S_ACTIVE_END1)
+		else if(curr_state == S_ACTIVE_END1)
 			ec_chb_st <= 1'b0;
 		else
 			ec_chb_st <= ec_chb_st;
@@ -502,9 +501,9 @@ module status_beh_sys_sf#(
 			ri_start 	<= {ri_start[0],i_start	};
 		    ri_stop  	<= {ri_stop [0],i_stop 	};
 		    ri_rst   	<= {ri_rst  [0],i_rst  	};
-			ri_estop    <= {ri_estop[0],ri_estop};
-			ri_manul    <= {ri_manul[0],ri_manul};
-			ri_auto	    <= {ri_auto	[0],ri_auto	};
+			ri_estop    <= {ri_estop[0],i_estop	};
+			ri_manul    <= {ri_manul[0],i_manul	};
+			ri_auto	    <= {ri_auto	[0],i_auto	};
 		end
     end
 	
