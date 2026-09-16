@@ -424,8 +424,8 @@ module ec_stacker_cage_check#(
 	,.b_tx_id               (b_tx_id			)
 	,.b_alm_num             (b_alm_num			)
 	//,.do_o				    (do_o				)
-	,.irq_o			        (irq_o				)
-	,.irq_ack_i	            (irq_ack_i			)	
+	,.irq_o			        (				)
+	,.irq_ack_i	            (irq_b_grant			)	
     );
 	 
 	tim_beh_stacker_cage_check tim_beh_stacker_cage_check_u0(
@@ -445,8 +445,8 @@ module ec_stacker_cage_check#(
 	,.c_tx_id         	        (c_tx_id			)
 	,.c_alm_num                 (c_alm_num			)
 	,.c_gap_crl                 (c_gap_crl			)
-	,.irq_o 					(irq_o				)
-	,.irq_ack_i                 (irq_ack_i			)
+	,.irq_o 					(				)
+	,.irq_ack_i                 (irq_c_grant			)
 	);
 	
 	pre_post_sta_check_stacker_cage_check#(

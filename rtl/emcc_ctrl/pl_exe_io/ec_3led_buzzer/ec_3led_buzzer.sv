@@ -18,7 +18,7 @@
 // Additional Comments:
 // 
 //////////////////////////////////////////////////////////////////////////////////
-`define DEBUG
+//`define DEBUG
 
 module ec_3led_buzzer#(
 		parameter  				REG_SPACE_BIAS 		= 	2000	,
@@ -193,77 +193,147 @@ module ec_3led_buzzer#(
 	wire	i_rst = rst_i;
 	
 	
-	`ifdef DEBUG
-		reg			ro_intr_irq;
-		reg	[7:0]	irq_posedge_cnt;
-		reg	[7:0]	irq_negedge_cnt;
-		
-		always@(posedge i_clk)
-		begin
-			ro_intr_irq <= o_intr_irq;
-		end
-		
-		
-		always@(posedge i_clk)
-		begin
-			if(i_rst)begin
-				irq_posedge_cnt <= 8'd0;
-				irq_negedge_cnt <= 8'd0;
-			end else if(a_bhv_vld)begin
-				irq_posedge_cnt <= 8'd0;
-				irq_negedge_cnt <= 8'd0;
-			end else begin
-				if({ro_intr_irq,o_intr_irq} == 2'b01)begin	//rising
-					irq_posedge_cnt <= irq_posedge_cnt+1;
-				end else begin
-					irq_posedge_cnt <= irq_posedge_cnt;
-				end
-				
-				if({ro_intr_irq,o_intr_irq} == 2'b10)begin	//falling
-					irq_negedge_cnt <= irq_negedge_cnt+1;
-				end else begin
-					irq_negedge_cnt <= irq_negedge_cnt;
-				end
-			end
-		end
-	`endif
+	
+	
+	reg		[9:0]	cnt_tim;
+	
+	always@(posedge i_clk)
+	begin
+		if(i_rst)
+			cnt_tim <= 'd0;
+		else if(i_time_1ms_vld)
+			if(cnt_tim >= 499)	//0.5s
+				cnt_tim <= 'd0;
+			else	
+				cnt_tim <= cnt_tim + 1;
+		else
+			cnt_tim <= cnt_tim;
+	end
+	
+	always@(posedge i_clk)
+	begin
+		if(i_rst)
+			o_led_r <= 1'b0;
+		else 
+			case(param3[7:6])
+				2'd0:o_led_r <= 1'b0;
+				2'd1:o_led_r <= 1'b1;
+				2'd2:o_led_r <= (i_time_1ms_vld && cnt_tim >= 499)?(!o_led_r):o_led_r;
+				default:o_led_r <= o_led_r;
+			endcase
+	end
+	
+	always@(posedge i_clk)
+	begin
+		if(i_rst)
+			o_led_g <= 1'b0;
+		else
+			case(param3[5:4])
+				2'd0:o_led_g <= 1'b0;
+				2'd1:o_led_g <= 1'b1;
+				2'd2:o_led_g <= (i_time_1ms_vld && cnt_tim >= 499)?(!o_led_g):o_led_g;
+				default:o_led_g <= o_led_g;
+			endcase
+	end
+	
+	always@(posedge i_clk)
+	begin
+		if(i_rst)
+			o_led_y <= 1'b0;
+		else
+			case(param3[3:2])
+				2'd0:o_led_y <= 1'b0;
+				2'd1:o_led_y <= 1'b1;
+				2'd2:o_led_y <= (i_time_1ms_vld && cnt_tim >= 499)?(!o_led_y):o_led_y;
+				default:o_led_y <= o_led_y;
+			endcase
+	end
+	
+	always@(posedge i_clk)
+	begin
+		if(i_rst)
+			o_bz <= 1'b0;
+		else
+			case(param3[1:0])	//01
+				2'd0:o_bz <= 1'b0;
+				2'd1:o_bz <= 1'b1;
+				2'd2:o_bz <= (i_time_1ms_vld && cnt_tim >= 499)?(!o_bz):o_bz;
+				default:o_bz <= o_bz;
+			endcase
+	end
+	
+	
+	//`ifdef DEBUG
+	//	reg			ro_intr_irq;
+	//	reg	[7:0]	irq_posedge_cnt;
+	//	reg	[7:0]	irq_negedge_cnt;
+	//	
+	//	always@(posedge i_clk)
+	//	begin
+	//		ro_intr_irq <= o_intr_irq;
+	//	end
+	//	
+	//	
+	//	always@(posedge i_clk)
+	//	begin
+	//		if(i_rst)begin
+	//			irq_posedge_cnt <= 8'd0;
+	//			irq_negedge_cnt <= 8'd0;
+	//		end else if(a_bhv_vld)begin
+	//			irq_posedge_cnt <= 8'd0;
+	//			irq_negedge_cnt <= 8'd0;
+	//		end else begin
+	//			if({ro_intr_irq,o_intr_irq} == 2'b01)begin	//rising
+	//				irq_posedge_cnt <= irq_posedge_cnt+1;
+	//			end else begin
+	//				irq_posedge_cnt <= irq_posedge_cnt;
+	//			end
+	//			
+	//			if({ro_intr_irq,o_intr_irq} == 2'b10)begin	//falling
+	//				irq_negedge_cnt <= irq_negedge_cnt+1;
+	//			end else begin
+	//				irq_negedge_cnt <= irq_negedge_cnt;
+	//			end
+	//		end
+	//	end
+	//`endif
 	
 	
 	//valid signal sync
-	reg 		r_a_tx_result_vld ;
-	reg 		r_b_tx_result_vld ;
-	reg 		r_c_tx_result_vld ;
-	reg 		r_a_bhv_vld       ;
-	
-	reg 		sync_a_tx_result_vld ;
-	reg 		sync_b_tx_result_vld ;
-	reg 		sync_c_tx_result_vld ;
-	reg 		sync_a_bhv_vld       ;
-	
-	always@(posedge clk_i)
-	begin
-		if(rst_i)begin
-			r_a_tx_result_vld 		<= 1'b0;
-			r_b_tx_result_vld 		<= 1'b0;
-			r_c_tx_result_vld 		<= 1'b0;
-			r_a_bhv_vld       		<= 1'b0;
-			
-			sync_a_tx_result_vld 	<= 1'b0;
-			sync_b_tx_result_vld 	<= 1'b0;
-			sync_c_tx_result_vld 	<= 1'b0;
-			sync_a_bhv_vld       	<= 1'b0;
-		end else begin
-			r_a_tx_result_vld		<= a_tx_result_vld;
-			r_b_tx_result_vld		<= b_tx_result_vld;
-			r_c_tx_result_vld		<= c_tx_result_vld;
-			r_a_bhv_vld      		<= a_bhv_vld      ;
-			
-			sync_a_tx_result_vld 	<= r_a_tx_result_vld;
-			sync_b_tx_result_vld 	<= r_b_tx_result_vld;
-			sync_c_tx_result_vld 	<= r_c_tx_result_vld;
-			sync_a_bhv_vld       	<= r_a_bhv_vld      ;
-		end
-	end
+	//reg 		r_a_tx_result_vld ;
+	//reg 		r_b_tx_result_vld ;
+	//reg 		r_c_tx_result_vld ;
+	//reg 		r_a_bhv_vld       ;
+	//
+	//reg 		sync_a_tx_result_vld ;
+	//reg 		sync_b_tx_result_vld ;
+	//reg 		sync_c_tx_result_vld ;
+	//reg 		sync_a_bhv_vld       ;
+	//
+	//always@(posedge clk_i)
+	//begin
+	//	if(rst_i)begin
+	//		r_a_tx_result_vld 		<= 1'b0;
+	//		r_b_tx_result_vld 		<= 1'b0;
+	//		r_c_tx_result_vld 		<= 1'b0;
+	//		r_a_bhv_vld       		<= 1'b0;
+	//		
+	//		sync_a_tx_result_vld 	<= 1'b0;
+	//		sync_b_tx_result_vld 	<= 1'b0;
+	//		sync_c_tx_result_vld 	<= 1'b0;
+	//		sync_a_bhv_vld       	<= 1'b0;
+	//	end else begin
+	//		r_a_tx_result_vld		<= a_tx_result_vld;
+	//		r_b_tx_result_vld		<= b_tx_result_vld;
+	//		r_c_tx_result_vld		<= c_tx_result_vld;
+	//		r_a_bhv_vld      		<= a_bhv_vld      ;
+	//		
+	//		sync_a_tx_result_vld 	<= r_a_tx_result_vld;
+	//		sync_b_tx_result_vld 	<= r_b_tx_result_vld;
+	//		sync_c_tx_result_vld 	<= r_c_tx_result_vld;
+	//		sync_a_bhv_vld       	<= r_a_bhv_vld      ;
+	//	end
+	//end
 
 	ps_rw_pl_reg_3led_buzzer#(
 		.REG_SPACE_BIAS 	(REG_SPACE_BIAS		),
@@ -279,36 +349,36 @@ module ec_3led_buzzer#(
     ,.o_st_rd_data	        (o_st_rd_data 	)
 	,.o_st_rd_vld 	        (o_st_rd_vld  	)
 	,.rst_en_n              (rst_en_n		)	//board error
-	,.ec_id                 (ec_id			)
-	,.sc_id			        (sc_id			)
-	,.chl_priority	        (chl_priority	)
-	,.unit_id      	        (unit_id		)
-	,.unit_ectrl            (unit_ectrl		)
-	,.unit_st               (unit_st		)
-	,.m_id         	        (m_id			)
-	,.m_ectrl               (m_ectrl		)
-	,.m_st                  (m_st			)
-	,.m_wk_mod              (m_wk_mod		)
-	,.m_saf_st              (m_saf_st		)
-	,.link_m_saf_st         (link_m_saf_st	)
+	//,.ec_id                 (ec_id			)
+	//,.sc_id			        (sc_id			)
+	//,.chl_priority	        (chl_priority	)
+	//,.unit_id      	        (unit_id		)
+	//,.unit_ectrl            (unit_ectrl		)
+	//,.unit_st               (unit_st		)
+	//,.m_id         	        (m_id			)
+	//,.m_ectrl               (m_ectrl		)
+	//,.m_st                  (m_st			)
+	//,.m_wk_mod              (m_wk_mod		)
+	//,.m_saf_st              (m_saf_st		)
+	//,.link_m_saf_st         (link_m_saf_st	)
 	//,.bhv_en                (bhv_en			)
-	,.a_task_id      	    (a_task_id		)
-	,.a_task_bhv_id	        (a_task_bhv_id	)
-	,.a_en				    (a_en			)
-	,.a_bhv_ot        	    (a_tx_ot		)
-	,.a_tsc_result_rpt	    (a_tx_result_rpt)
-	,.a_tsc_result_vld	    (a_tx_result_vld)
-	,.a_bhv_id       	    (a_bhv_id		)
-	,.a_bhv_vld             (a_bhv_vld		)
-	,.b_en					(b_en			)
-	,.b_bhv_ot 		        (b_tx_ot		)
-	,.b_tsc_result_rpt	    (b_tx_result_rpt)
-	,.b_tsc_result_vld      (b_tx_result_vld)
-	,.c_en				    (c_en			)
-	,.c_bhv_ot			    (c_tx_ot		)
-	,.c_tsc_result_rpt	    (c_tx_result_rpt)
-	,.c_tsc_result_vld	    (c_tx_result_vld)
-	,.c_bhv_gap_crl         (c_gap_crl		)
+	//,.a_task_id      	    (a_task_id		)
+	//,.a_task_bhv_id	        (a_task_bhv_id	)
+	//,.a_en				    (a_en			)
+	//,.a_bhv_ot        	    (a_tx_ot		)
+	//,.a_tsc_result_rpt	    (a_tx_result_rpt)
+	//,.a_tsc_result_vld	    (a_tx_result_vld)
+	//,.a_bhv_id       	    (a_bhv_id		)
+	//,.a_bhv_vld             (a_bhv_vld		)
+	//,.b_en					(b_en			)
+	//,.b_bhv_ot 		        (b_tx_ot		)
+	//,.b_tsc_result_rpt	    (b_tx_result_rpt)
+	//,.b_tsc_result_vld      (b_tx_result_vld)
+	//,.c_en				    (c_en			)
+	//,.c_bhv_ot			    (c_tx_ot		)
+	//,.c_tsc_result_rpt	    (c_tx_result_rpt)
+	//,.c_tsc_result_vld	    (c_tx_result_vld)
+	//,.c_bhv_gap_crl         (c_gap_crl		)
 	//,.param1			    (param1			)	
 	//,.param2			    (param2			)
 	,.param3			    (param3			)//ps crtl
@@ -339,19 +409,19 @@ module ec_3led_buzzer#(
 	//,.param28			    (param28		)
 	//,.param29			    (param29		)
 	//,.param30				(param30		)
-	,.irq_reg1	            (irq_reg1		)
-	,.irq_reg2	            (irq_reg2		)
-	,.a_st                  (ec_cha_st		)
-	,.a_alm_num             (a_alm_num		)
-	,.a_tsc_id              (a_tx_id		)
-	,.b_st                  (ec_chb_st		)
-	,.b_alm_num             (b_alm_num		)
-	,.b_tsc_id              (b_tx_id		)
-	,.b_bhv_id              (b_bhv_id		)
-	,.c_st                  (ec_chc_st 		)
-	,.c_alm_num             (c_alm_num 		)
-	,.c_tsc_id              (c_tx_id  		)
-	,.c_bhv_id              (c_bhv_id 		)
+	//,.irq_reg1	            (irq_reg1		)
+	//,.irq_reg2	            (irq_reg2		)
+	//,.a_st                  (ec_cha_st		)
+	//,.a_alm_num             (a_alm_num		)
+	//,.a_tsc_id              (a_tx_id		)
+	//,.b_st                  (ec_chb_st		)
+	//,.b_alm_num             (b_alm_num		)
+	//,.b_tsc_id              (b_tx_id		)
+	//,.b_bhv_id              (b_bhv_id		)
+	//,.c_st                  (ec_chc_st 		)
+	//,.c_alm_num             (c_alm_num 		)
+	//,.c_tsc_id              (c_tx_id  		)
+	//,.c_bhv_id              (c_bhv_id 		)
 	//,.param51               (param51		)
 	//,.param52               (param52		)
 	//,.param53               (param53		)
@@ -372,150 +442,150 @@ module ec_3led_buzzer#(
 	,.param68               (o_led_g		)
 	,.param69               (o_bz			)
 	//,.param70               (param70		)
-	,.debug_reg1			(debug_reg1		)
-	,.debug_reg2			({16'd0,irq_posedge_cnt,irq_negedge_cnt})
+	//,.debug_reg1			(debug_reg1		)
+	//,.debug_reg2			({16'd0,irq_posedge_cnt,irq_negedge_cnt})
 	//,.debug_reg3			(debug_reg3		)
 	//,.debug_reg4			(debug_reg4		)
 	//,.debug_reg5			(debug_reg5		)
 	);
 
-	proactive_beh_3led_buzzer#(	
-	.BHA_NUM 				(A_BHA_NUM  	 	)	//Number of active behaviors
-)proactive_beh_3led_buzzer_u0(
-    .clk_i                 	(clk_i				)
-    ,.rst_i                	(rst_i				)
-    ,.i_time_1ms_vld       	(i_time_1ms_vld 	)
-    ,.i_time_1s_vld        	(i_time_1s_vld  	)
-    ,.pre_sta_allow        	(a_pre_sta_allow	)
-    ,.post_sta_allow       	(a_post_sta_allow	)
-	,.a_en			       	(1'b0				)
-    ,.a_bhv_id             	(a_bhv_id       	)
-    ,.a_bhv_vld            	(sync_a_bhv_vld      	)
-    ,.a_tx_ot              	(a_tx_ot        	)
-    ,.a_tx_result_rpt	   	(a_tx_result_rpt	)
-	,.a_tx_result_vld      	(sync_a_tx_result_vld	)
-    ,.ec_cha_st            	(ec_cha_st			)
-    ,.a_tx_id              	(a_tx_id        	)
-    ,.a_alm_num            	(a_alm_num      	)
-	,.do_o					(do_o				)
-	,.a_bhv_id_r			(a_bhv_id_r			)
-	,.state_monitor_o		(					)
-    ,.irq_o                	(irq_a				)
-    ,.irq_ack_i       		(irq_a_grant		)
-    );
-
-	 
-	status_beh_3led_buzzer#(
-		.BHA_NUM(B_BHA_NUM	)
-)status_beh_3led_buzzer_u0(
-	.clk_i			        (clk_i				)
-	,.rst_i			        (rst_i				)
-	,.i_time_1ms_vld		(i_time_1ms_vld 	)
-	,.i_time_1s_vld 		(i_time_1s_vld  	)
-	,.pre_sta_allow	        (b_pre_sta_allow	)
-	,.post_sta_allow	    (b_post_sta_allow	)
-	,.b_en	                (1'b1				)
-	,.b_bhv_id              (b_bhv_id			)
-	,.b_tx_ot               (b_tx_ot			)
-	,.b_tx_result_rpt       (b_tx_result_rpt	)
-	,.b_tx_result_vld       (sync_b_tx_result_vld	)
-	,.ec_chb_st             (ec_chb_st			)
-	,.b_tx_id               (b_tx_id			)
-	,.b_alm_num             (b_alm_num			)
-	,.o_led_r               (o_led_r			)
-	,.o_led_y               (o_led_y			)
-	,.o_led_g               (o_led_g			)
-	,.o_bz                  (o_bz   			)
-	,.ctrl_signal           (param3[7:0]		)
-	,.state_monitor_o       (debug_reg1			)
-	,.irq_o			        (irq_b				)
-	,.irq_ack_i	            (irq_b_grant		)	
-    );
-	 
-	tim_beh_3led_buzzer tim_beh_3led_buzzer_u0(
-    .clk_i                      (clk_i          	)
-	,.rst_i              	    (rst_i         		)
-	,.i_time_1ms_vld   	        (i_time_1ms_vld 	)
-	,.i_time_1s_vld    	        (i_time_1s_vld  	)
-	,.task_time_cnt	            (task_time_cnt		)
-	,.pre_sta_allow		        (c_pre_sta_allow	)
-	,.post_sta_allow	        (c_post_sta_allow	)
-	,.c_en				        (1'b0				)
-	,.c_bhv_id                  (c_bhv_id			)
-	,.c_tx_ot          	        (c_tx_ot			)
-	,.c_tx_result_rpt  	        (c_tx_result_rpt	)
-	,.c_tx_result_vld           (sync_c_tx_result_vld	)
-	,.ec_chc_st	                (ec_chc_st			)
-	,.c_tx_id         	        (c_tx_id			)
-	,.c_alm_num                 (c_alm_num			)
-	,.c_gap_crl                 (c_gap_crl			)
-	,.irq_o 					(irq_c				)
-	,.irq_ack_i                 (irq_c_grant		)
-   );
+//	proactive_beh_3led_buzzer#(	
+//	.BHA_NUM 				(A_BHA_NUM  	 	)	//Number of active behaviors
+//	)proactive_beh_3led_buzzer_u0(
+//    .clk_i                 	(clk_i				)
+//    ,.rst_i                	(rst_i				)
+//    ,.i_time_1ms_vld       	(i_time_1ms_vld 	)
+//    ,.i_time_1s_vld        	(i_time_1s_vld  	)
+//    ,.pre_sta_allow        	(a_pre_sta_allow	)
+//    ,.post_sta_allow       	(a_post_sta_allow	)
+//	,.a_en			       	(1'b0				)
+//    ,.a_bhv_id             	(a_bhv_id       	)
+//    ,.a_bhv_vld            	(sync_a_bhv_vld      	)
+//    ,.a_tx_ot              	(a_tx_ot        	)
+//    ,.a_tx_result_rpt	   	(a_tx_result_rpt	)
+//	,.a_tx_result_vld      	(sync_a_tx_result_vld	)
+//    ,.ec_cha_st            	(ec_cha_st			)
+//    ,.a_tx_id              	(a_tx_id        	)
+//    ,.a_alm_num            	(a_alm_num      	)
+//	,.do_o					(do_o				)
+//	,.a_bhv_id_r			(a_bhv_id_r			)
+//	,.state_monitor_o		(					)
+//    ,.irq_o                	(irq_a				)
+//    ,.irq_ack_i       		(irq_a_grant		)
+//    );
+//
+//	 
+//	status_beh_3led_buzzer#(
+//		.BHA_NUM(B_BHA_NUM	)
+//	)status_beh_3led_buzzer_u0(
+//	.clk_i			        (clk_i				)
+//	,.rst_i			        (rst_i				)
+//	,.i_time_1ms_vld		(i_time_1ms_vld 	)
+//	,.i_time_1s_vld 		(i_time_1s_vld  	)
+//	,.pre_sta_allow	        (b_pre_sta_allow	)
+//	,.post_sta_allow	    (b_post_sta_allow	)
+//	,.b_en	                (1'b1				)
+//	,.b_bhv_id              (b_bhv_id			)
+//	,.b_tx_ot               (b_tx_ot			)
+//	,.b_tx_result_rpt       (b_tx_result_rpt	)
+//	,.b_tx_result_vld       (sync_b_tx_result_vld	)
+//	,.ec_chb_st             (ec_chb_st			)
+//	,.b_tx_id               (b_tx_id			)
+//	,.b_alm_num             (b_alm_num			)
+//	,.o_led_r               (o_led_r			)
+//	,.o_led_y               (o_led_y			)
+//	,.o_led_g               (o_led_g			)
+//	,.o_bz                  (o_bz   			)
+//	,.ctrl_signal           (param3[7:0]		)
+//	,.state_monitor_o       (debug_reg1			)
+//	,.irq_o			        (irq_b				)
+//	,.irq_ack_i	            (irq_b_grant		)	
+//    );
+//	 
+//	tim_beh_3led_buzzer tim_beh_3led_buzzer_u0(
+//    .clk_i                      (clk_i          	)
+//	,.rst_i              	    (rst_i         		)
+//	,.i_time_1ms_vld   	        (i_time_1ms_vld 	)
+//	,.i_time_1s_vld    	        (i_time_1s_vld  	)
+//	,.task_time_cnt	            (task_time_cnt		)
+//	,.pre_sta_allow		        (c_pre_sta_allow	)
+//	,.post_sta_allow	        (c_post_sta_allow	)
+//	,.c_en				        (1'b0				)
+//	,.c_bhv_id                  (c_bhv_id			)
+//	,.c_tx_ot          	        (c_tx_ot			)
+//	,.c_tx_result_rpt  	        (c_tx_result_rpt	)
+//	,.c_tx_result_vld           (sync_c_tx_result_vld	)
+//	,.ec_chc_st	                (ec_chc_st			)
+//	,.c_tx_id         	        (c_tx_id			)
+//	,.c_alm_num                 (c_alm_num			)
+//	,.c_gap_crl                 (c_gap_crl			)
+//	,.irq_o 					(irq_c				)
+//	,.irq_ack_i                 (irq_c_grant		)
+//   );
 	
-		pre_post_sta_check_3led_buzzer#(
-			.A_BHA_NUM			(A_BHA_NUM	 		)    ,	
-			.B_BHA_NUM			(B_BHA_NUM	 		)  
-	)pre_post_sta_check_3led_buzzer_u0(
-			.clk_i				(clk_i			),
-			.rst_i				(rst_i			),
-			.i_time_1ms_vld		(i_time_1ms_vld	),
-			.i_time_1s_vld 		(i_time_1s_vld 	),
-			.unit_id         	(unit_id        ),
-			.unit_ectrl      	(unit_ectrl     ),
-			.unit_st         	(unit_st        ),
-			.m_id            	(m_id           ),
-			.m_ectrl         	(m_ectrl        ),
-			.m_st            	(m_st           ),
-			.m_wk_mod        	(m_wk_mod       ),
-			.m_saf_st        	(m_saf_st       ),
-			.link_m_saf_st   	(link_m_saf_st  ),
-			.a_en				(1'b0			),
-			.b_en				(1'b1			),	
-			.c_en				(1'b0			),	
-			.a_bhv_id			(a_bhv_id_r		),
-			.b_bhv_id			(b_bhv_id		),
-			.c_bhv_id			(c_bhv_id		),
-			.ec_cha_st			(ec_cha_st		),
-			.ec_chb_st       	(ec_chb_st		),
-			.ec_chc_st       	(ec_chc_st		),
-			.c_circle_time		(c_gap_crl		),	
-			.task_time_cnt		(task_time_cnt	),	
-			.a_pre_sta_allow	(a_pre_sta_allow),	
-			.a_post_sta_allow	(a_post_sta_allow),	
-			.b_pre_sta_allow	(b_pre_sta_allow),	
-			.b_post_sta_allow	(b_post_sta_allow),	
-			.c_pre_sta_allow	(c_pre_sta_allow),	
-			.c_post_sta_allow	(c_post_sta_allow)	
-		);
+//		pre_post_sta_check_3led_buzzer#(
+//			.A_BHA_NUM			(A_BHA_NUM	 		)    ,	
+//			.B_BHA_NUM			(B_BHA_NUM	 		)  
+//	)pre_post_sta_check_3led_buzzer_u0(
+//			.clk_i				(clk_i			),
+//			.rst_i				(rst_i			),
+//			.i_time_1ms_vld		(i_time_1ms_vld	),
+//			.i_time_1s_vld 		(i_time_1s_vld 	),
+//			.unit_id         	(unit_id        ),
+//			.unit_ectrl      	(unit_ectrl     ),
+//			.unit_st         	(unit_st        ),
+//			.m_id            	(m_id           ),
+//			.m_ectrl         	(m_ectrl        ),
+//			.m_st            	(m_st           ),
+//			.m_wk_mod        	(m_wk_mod       ),
+//			.m_saf_st        	(m_saf_st       ),
+//			.link_m_saf_st   	(link_m_saf_st  ),
+//			.a_en				(1'b0			),
+//			.b_en				(1'b1			),	
+//			.c_en				(1'b0			),	
+//			.a_bhv_id			(a_bhv_id_r		),
+//			.b_bhv_id			(b_bhv_id		),
+//			.c_bhv_id			(c_bhv_id		),
+//			.ec_cha_st			(ec_cha_st		),
+//			.ec_chb_st       	(ec_chb_st		),
+//			.ec_chc_st       	(ec_chc_st		),
+//			.c_circle_time		(c_gap_crl		),	
+//			.task_time_cnt		(task_time_cnt	),	
+//			.a_pre_sta_allow	(a_pre_sta_allow),	
+//			.a_post_sta_allow	(a_post_sta_allow),	
+//			.b_pre_sta_allow	(b_pre_sta_allow),	
+//			.b_post_sta_allow	(b_post_sta_allow),	
+//			.c_pre_sta_allow	(c_pre_sta_allow),	
+//			.c_post_sta_allow	(c_post_sta_allow)	
+//		);
 		
-	irq_3i1o_arbitrator irq_3i1o_arbitrator_u0(
-		.clk_i              (clk_i            	)
-		,.rst_i             (rst_i           	)
-		,.sc_id             (sc_id            	)
-		,.ec_id             (ec_id            	)
-		,.chl_priority		(chl_priority		)
-		,.irq_a_i			(irq_a				)
-		,.irq_a_grant_o		(irq_a_grant		)
-		,.a_bhv_id          (a_bhv_id_r         )
-		,.a_tx_id           (a_tx_id          	)
-		,.a_alm_num         (a_alm_num        	)
-		,.irq_b_i			(irq_b				)
-		,.irq_b_grant_o		(irq_b_grant		)
-		,.b_bhv_id       	(b_bhv_id       	)
-		,.b_tx_id        	(b_tx_id        	)
-		,.b_alm_num      	(b_alm_num      	)
-		,.irq_c_i			(irq_c				)
-		,.irq_c_grant_o		(irq_c_grant		)
-		,.c_bhv_id       	(c_bhv_id       	)
-		,.c_tx_id        	(c_tx_id        	)
-		,.c_alm_num			(c_alm_num			)
-		,.irq_reg1_o		(irq_reg1			)
-		,.irq_reg2_o		(irq_reg2			)
-		,.irq_o				(o_intr_irq			)
-		,.irq_busy_o		(irq_busy_o			)
-		,.irq_receive_ack_i (sync_a_tx_result_vld || sync_b_tx_result_vld || sync_c_tx_result_vld)	
-    );
+//	irq_3i1o_arbitrator irq_3i1o_arbitrator_u0(
+//		.clk_i              (clk_i            	)
+//		,.rst_i             (rst_i           	)
+//		,.sc_id             (sc_id            	)
+//		,.ec_id             (ec_id            	)
+//		,.chl_priority		(chl_priority		)
+//		,.irq_a_i			(irq_a				)
+//		,.irq_a_grant_o		(irq_a_grant		)
+//		,.a_bhv_id          (a_bhv_id_r         )
+//		,.a_tx_id           (a_tx_id          	)
+//		,.a_alm_num         (a_alm_num        	)
+//		,.irq_b_i			(irq_b				)
+//		,.irq_b_grant_o		(irq_b_grant		)
+//		,.b_bhv_id       	(b_bhv_id       	)
+//		,.b_tx_id        	(b_tx_id        	)
+//		,.b_alm_num      	(b_alm_num      	)
+//		,.irq_c_i			(irq_c				)
+//		,.irq_c_grant_o		(irq_c_grant		)
+//		,.c_bhv_id       	(c_bhv_id       	)
+//		,.c_tx_id        	(c_tx_id        	)
+//		,.c_alm_num			(c_alm_num			)
+//		,.irq_reg1_o		(irq_reg1			)
+//		,.irq_reg2_o		(irq_reg2			)
+//		,.irq_o				(o_intr_irq			)
+//		,.irq_busy_o		(irq_busy_o			)
+//		,.irq_receive_ack_i (sync_a_tx_result_vld || sync_b_tx_result_vld || sync_c_tx_result_vld)	
+//    );
 
 	
 	

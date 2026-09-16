@@ -345,7 +345,7 @@ module proactive_beh_slv_pul_axis#(
 
         endcase
 
-        if((i_stop | ~i_emerge_stop_signal  ) && curr_state != S_IDLE)
+		if((i_stop | ~i_emerge_stop_signal | ~dv_alarm ) && (curr_state > S_IDLE && curr_state < S_ALERT_40))
             next_state = S_ALERT_40;
     end
 	
@@ -406,6 +406,8 @@ module proactive_beh_slv_pul_axis#(
             a_alm_num <= 8'd106;   // stop 
         else if(~i_emerge_stop_signal && curr_state != S_IDLE)
             a_alm_num <= 8'd107;   // emergency stop, add by szzhang 20260914
+		else if(~dv_alarm && curr_state != S_IDLE)
+            a_alm_num <= 8'd108;   // alarm, add by szzhang 20260916
 		else if(curr_state == S_IDLE)
 			a_alm_num <= 8'd0;
         else
@@ -499,7 +501,7 @@ module proactive_beh_slv_pul_axis#(
 											rserv_dir,
 		                                    1'b0, 
 											i_pause,
-		                                    i_stop|(~i_emerge_stop_signal), 
+		                                     i_stop|(~i_emerge_stop_signal)|(~dv_alarm),
 											action_beat,
 		                                    i_axis_zero,
 											i_axis_limb,

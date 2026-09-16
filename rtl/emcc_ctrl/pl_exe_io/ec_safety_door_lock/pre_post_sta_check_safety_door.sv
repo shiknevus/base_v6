@@ -125,11 +125,11 @@ module pre_post_sta_check_safety_door#(
 	always@(posedge clk_i)
 	begin
 		if(rst_i) begin
-			a_pre_sta_allow <= {A_BHA_NUM{1'b0}};
+			a_post_sta_allow <= {A_BHA_NUM{1'b0}};
 		end else if(a_en) begin
-			a_pre_sta_allow <= {A_BHA_NUM{1'b1}};
+			a_post_sta_allow <= {A_BHA_NUM{1'b1}};
 		end else begin
-			a_pre_sta_allow <= {A_BHA_NUM{1'b0}};
+			a_post_sta_allow <= {A_BHA_NUM{1'b0}};
 		end
 	end
 	

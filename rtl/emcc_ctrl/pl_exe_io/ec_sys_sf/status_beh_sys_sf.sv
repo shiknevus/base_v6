@@ -330,7 +330,7 @@ module status_beh_sys_sf#(
 			//end
 			
 			S_BHA_POST_DET: begin	//curr_state = 6
-				if(post_sta_allow[b_bhv_id - 1'b1]) begin
+				if(post_sta_allow[b_bhv_id - 99]) begin
 					next_state = S_SUCC_30;
 				end else if(timout) begin
 					next_state = S_ALERT_40;			
@@ -385,7 +385,7 @@ module status_beh_sys_sf#(
 			ec_chb_st <= 1'b0;
 		else if(curr_state == S_READY_10)
 			ec_chb_st <= 1'b1;
-		else if(curr_state_1d == S_ALERT_40_ACK && curr_state == S_ACTIVE_END1)
+		else if(curr_state == S_ACTIVE_END1)
 			ec_chb_st <= 1'b0;
 		else
 			ec_chb_st <= ec_chb_st;
