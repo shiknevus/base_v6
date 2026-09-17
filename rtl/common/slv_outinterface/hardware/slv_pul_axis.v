@@ -114,7 +114,10 @@ module slv_pul_axis
    reg          beat_timeout;
    reg [31:0]   slv_beat_cnt;
    reg          action_beat_d;
-   
+   reg          start_req;
+   reg          home_busy_d, jog_busy_d, move_busy_d;  //delayed busy for accept detect
+   reg  [7:0]   cur_beha_d;
+
    assign o_device_son = rctrl_drive_on ? P_EN_EFF : ~P_EN_EFF;
    assign o_device_reset = rctrl_drive_reset ? P_RST_EFF : ~P_RST_EFF;
    assign device_alarm = i_device_alarm;
@@ -363,9 +366,14 @@ module slv_pul_axis
 
   //behavior mapping (aligned with master ec_pul_axis):
   //  1=HOME  2=JOG  3=MOVE  20=JOG[safe]  21=MOVE[safe]  30=GETPOS
-  assign home_start = (action_son & action_start_pulse & (cur_beha==1)) ? 1'b1 : 1'b0;
-  assign jog_start  = (action_son & action_start_pulse & ((cur_beha==2)||(cur_beha==20))) ? 1'b1 : 1'b0;
-  assign move_start = (action_son & action_start_pulse & ((cur_beha==3)||(cur_beha==21))) ? 1'b1 : 1'b0;
+  assign home_start = (action_son & start_req & (cur_beha==1)) ? 1'b1 : 1'b0;
+  assign jog_start  = (action_son & start_req & ((cur_beha==2)||(cur_beha==20))) ? 1'b1 : 1'b0;
+  assign move_start = (action_son & start_req & ((cur_beha==3)||(cur_beha==21))) ? 1'b1 : 1'b0;
+
+  wire accept_rise = ((cur_beha==1)      && home_busy && ~home_busy_d) ||
+                     (((cur_beha==2)||(cur_beha==20)) && jog_busy && ~jog_busy_d) ||
+                     (((cur_beha==3)||(cur_beha==21)) && move_busy && ~move_busy_d);
+  wire beha_changed = (cur_beha != cur_beha_d);
 
   always @(posedge clk)begin
       if(reset) begin
@@ -374,11 +382,23 @@ module slv_pul_axis
           act_error     <= 1'b0;
           action_start_d<= 1'b0;
           action_ack_r  <= 1'b0;
+          start_req     <= 1'b0;
           home_stop     <= 1'b0;
           jog_stop      <= 1'b0;
           move_stop     <= 1'b0;
+          home_busy_d   <= 1'b0;
+          jog_busy_d    <= 1'b0;
+          move_busy_d   <= 1'b0;
+          cur_beha_d    <= 8'b0;
       end else begin
           action_start_d <= action_start;
+          home_busy_d  <= home_busy;
+          jog_busy_d   <= jog_busy;
+          move_busy_d  <= move_busy;
+          cur_beha_d   <= cur_beha;
+          if(action_start_pulse)             start_req <= 1'b1;
+          else if(accept_rise | beha_changed | action_alarm | beat_timeout | action_flag | ~i_device_alarm)
+                                              start_req <= 1'b0; 
           if(action_start_pulse) begin
               act_done  <= 1'b0;
               act_error <= 1'b0;
@@ -429,48 +449,48 @@ module slv_pul_axis
   always@* begin
       case(cur_beha)
               1: begin
-                  pos_pf_spd   <= home_pf_spd > spd_max_eff ? spd_max_eff : home_pf_spd;
-                  pos_pf_acc   <= home_pf_acc > acc_max_eff ? acc_max_eff : home_pf_acc;
-                  pos_pf_dec   <= home_pf_dec > dec_max_eff ? dec_max_eff : home_pf_dec;
+                  pos_pf_spd    = home_pf_spd > spd_max_eff ? spd_max_eff : home_pf_spd;
+                  pos_pf_acc    = home_pf_acc > acc_max_eff ? acc_max_eff : home_pf_acc;
+                  pos_pf_dec    = home_pf_dec > dec_max_eff ? dec_max_eff : home_pf_dec;
                   pos_pf_mode   = 32'h00;   // home
-                  pos_pf_pulse <= home_pf_pulse;
-                  pos_pf_start <= home_pf_start;
-                  pos_pf_stop  <= home_pf_stop;
-                  pos_pf_dir   <= home_pf_dir;
-                  pos_quickstop<= home_pf_quickstop;
+                  pos_pf_pulse  = home_pf_pulse;
+                  pos_pf_start  = home_pf_start;
+                  pos_pf_stop   = home_pf_stop;
+                  pos_pf_dir    = home_pf_dir;
+                  pos_quickstop = home_pf_quickstop;
               end
               2, 20: begin
-                  pos_pf_spd   <= jog_pf_spd > spd_max_eff ? spd_max_eff : jog_pf_spd;
-                  pos_pf_acc   <= jog_pf_acc > acc_max_eff ? acc_max_eff : jog_pf_acc;
-                  pos_pf_dec   <= jog_pf_dec > dec_max_eff ? dec_max_eff : jog_pf_dec;
+                  pos_pf_spd    = jog_pf_spd > spd_max_eff ? spd_max_eff : jog_pf_spd;
+                  pos_pf_acc    = jog_pf_acc > acc_max_eff ? acc_max_eff : jog_pf_acc;
+                  pos_pf_dec    = jog_pf_dec > dec_max_eff ? dec_max_eff : jog_pf_dec;
                   pos_pf_mode   = 32'h01;   // jog
-                  pos_pf_pulse <= jog_pf_pulse;
-                  pos_pf_start <= jog_pf_start;
-                  pos_pf_stop  <= jog_pf_stop;
-                  pos_pf_dir   <= jog_pf_dir;
-                  pos_quickstop<= jog_pf_quickstop;
+                  pos_pf_pulse  = jog_pf_pulse;
+                  pos_pf_start  = jog_pf_start;
+                  pos_pf_stop   = jog_pf_stop;
+                  pos_pf_dir    = jog_pf_dir;
+                  pos_quickstop = jog_pf_quickstop;
               end
               3, 21: begin
-                  pos_pf_spd   <= move_pf_spd > spd_max_eff ? spd_max_eff : move_pf_spd;
-                  pos_pf_acc   <= move_pf_acc > acc_max_eff ? acc_max_eff : move_pf_acc;
-                  pos_pf_dec   <= move_pf_dec > dec_max_eff ? dec_max_eff : move_pf_dec;
+                  pos_pf_spd    = move_pf_spd > spd_max_eff ? spd_max_eff : move_pf_spd;
+                  pos_pf_acc    = move_pf_acc > acc_max_eff ? acc_max_eff : move_pf_acc;
+                  pos_pf_dec    = move_pf_dec > dec_max_eff ? dec_max_eff : move_pf_dec;
                   pos_pf_mode   = 32'h01;   // move
-                  pos_pf_pulse <= move_pf_pulse;
-                  pos_pf_start <= move_pf_start;
-                  pos_pf_stop  <= move_pf_stop;
-                  pos_pf_dir   <= move_pf_dir;
-                  pos_quickstop<= move_pf_quickstop;
+                  pos_pf_pulse  = move_pf_pulse;
+                  pos_pf_start  = move_pf_start;
+                  pos_pf_stop   = move_pf_stop;
+                  pos_pf_dir    = move_pf_dir;
+                  pos_quickstop = move_pf_quickstop;
               end
               default: begin  // 30: no motion
-                  pos_pf_spd   <= 32'b0;
-                  pos_pf_acc   <= 32'b0;
-                  pos_pf_dec   <= 32'b0;
-                  pos_pf_mode  <= 32'b0;
-                  pos_pf_pulse <= 32'b0;
-                  pos_pf_start <= 1'b0 ;
-                  pos_pf_stop  <= 1'b0 ;
-                  pos_pf_dir   <= 1'b0 ;
-                  pos_quickstop<= 1'b0 ;
+                  pos_pf_spd    = 32'b0;
+                  pos_pf_acc    = 32'b0;
+                  pos_pf_dec    = 32'b0;
+                  pos_pf_mode   = 32'b0;
+                  pos_pf_pulse  = 32'b0;
+                  pos_pf_start  = 1'b0 ;
+                  pos_pf_stop   = 1'b0 ;
+                  pos_pf_dir    = 1'b0 ;
+                  pos_quickstop = 1'b0 ;
               end
           endcase
   end

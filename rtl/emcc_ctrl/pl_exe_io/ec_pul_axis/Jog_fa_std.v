@@ -45,8 +45,9 @@ module Jog_fa_std
    reg         r_pf_stop;
    reg         r_pf_quickstop;
    reg         r_st_error;
-   
-   wire motion_fault = (i_lim_f & i_pf_dir==DIR_POS) | (i_lim_b & i_pf_dir==DIR_NEG) | ~i_drv_son;
+   reg         r_pf_dir; // latched at start, change by szzhang 20260917
+
+   wire motion_fault = (i_lim_f & r_pf_dir==DIR_POS) | (i_lim_b & r_pf_dir==DIR_NEG) | ~i_drv_son;
 
    always@(posedge clk) begin
        if(fsm_st==ST_JOG_IDLE) begin
@@ -76,6 +77,7 @@ module Jog_fa_std
            r_pf_start <= 1'b0;
            r_pf_stop  <= 1'b0;
            r_pf_quickstop <= 1'b0;
+           r_pf_dir   <= DIR_POS;
        end else begin
            case(fsm_st)
                ST_JOG_IDLE: begin
@@ -84,6 +86,7 @@ module Jog_fa_std
                    r_pf_quickstop <= 1'b0;
                    r_st_error <= 1'b0;
                    if(i_start) begin
+                       r_pf_dir <= i_pf_dir; // latch: limit check must not follow live PS writes
                        // only block when moving INTO an active limit; allow jog away
                        if((i_lim_f & i_lim_b) |
                            (i_lim_f & (i_pf_dir == DIR_POS)) |
@@ -107,14 +110,22 @@ module Jog_fa_std
                        if(i_pf_done) begin
                            fsm_st <= (r_st_error | motion_fault) ? ST_JOG_ERROR : ST_JOG_DONE;//change by szzhang 20260813
                        end
+                   // add by szzhang 20260917
+                   end else if(motion_fault) begin
+                       r_st_error <= 1'b1;
+                       fsm_st <= ST_JOG_ERROR;
                    end
                end
                ST_JOG_ERROR: begin
                    r_st_error  <= 1'b1;
                    r_pf_start  <= 1'b0;
-                   r_pf_stop   <= 1'b0;
-                   r_pf_quickstop <= 1'b0;
-                   fsm_st <= ST_JOG_DONE;
+                   r_pf_stop   <= 1'b1;
+                   r_pf_quickstop <= 1'b1;
+                   if(~i_pf_busy) begin
+                       r_pf_stop   <= 1'b0;
+                       r_pf_quickstop <= 1'b0;
+                       fsm_st <= ST_JOG_DONE;
+                   end
                end
                ST_JOG_DONE: begin
                    r_pf_start  <= 1'b0;
@@ -135,7 +146,7 @@ module Jog_fa_std
    assign o_pf_acc       = i_pf_acc  ;
    assign o_pf_dec       = i_pf_dec  ;
    assign o_pf_pulse     = i_pf_pulse;
-   assign o_pf_dir       = i_pf_dir  ;
+   assign o_pf_dir       = r_pf_dir  ;
    assign o_pf_quickstop = r_pf_quickstop;
       
 endmodule
