@@ -139,21 +139,21 @@ module pre_post_sta_check_pul_axis#(
 	//post status
 	wire [A_BHA_NUM-1:0]	a_post_sta	;
 
-	reg action_done_r;
-	always@(posedge clk_i) begin
-		if(rst_i || !a_en || action_busy || action_error)
-			action_done_r <= 1'b0;
-		else if(action_done)
-			action_done_r <= 1'b1;
-		else
-			action_done_r <= action_done_r;
-	end
+	// reg action_done_r;
+	// always@(posedge clk_i) begin
+	// 	if(rst_i || !a_en || action_busy || action_error)
+	// 		action_done_r <= 1'b0;
+	// 	else if(action_done)
+	// 		action_done_r <= 1'b1;
+	// 	else
+	// 		action_done_r <= action_done_r;
+	// end
 
-	assign	a_post_sta[0 ] = (a_bhv_id == 1 )&&action_done_r&&(~action_error) && i_servo_done;
-	assign	a_post_sta[1 ] = (a_bhv_id == 2 )&&action_done_r&&(~action_error) && i_servo_done;
-	assign	a_post_sta[2 ] = (a_bhv_id == 3 )&&action_done_r&&(~action_error) && i_servo_done;
-	assign	a_post_sta[19] = (a_bhv_id == 20)&&action_done_r&&(~action_error) && i_servo_done;
-	assign	a_post_sta[20] = (a_bhv_id == 21)&&action_done_r&&(~action_error) && i_servo_done;
+	assign	a_post_sta[0 ] = (a_bhv_id == 1 )&&action_done&&(~action_error) && i_servo_done;
+	assign	a_post_sta[1 ] = (a_bhv_id == 2 )&&action_done&&(~action_error) && i_servo_done;
+	assign	a_post_sta[2 ] = (a_bhv_id == 3 )&&action_done&&(~action_error) && i_servo_done;
+	assign	a_post_sta[19] = (a_bhv_id == 20)&&action_done&&(~action_error) && i_servo_done;
+	assign	a_post_sta[20] = (a_bhv_id == 21)&&action_done&&(~action_error) && i_servo_done;
 	assign	a_post_sta[29] = (a_bhv_id == 30);
 
 	reg [7:0] a_bhv_id_d;
