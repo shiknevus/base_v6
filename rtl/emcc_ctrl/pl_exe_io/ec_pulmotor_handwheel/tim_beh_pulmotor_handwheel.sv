@@ -429,8 +429,8 @@ module tim_beh_pulmotor_handwheel#(
 		,.i_axis_7       (i_axis_7		)
 		,.o_axis_number  (o_axis_number	)
 		,.o_speed_gear   (o_speed_gear	)
-		,.o_pulse_cnt    (o_pulse_cnt	)
-		,.o_wheel_dir    (o_wheel_dir	)
+		,.or_pulse_cnt    (o_pulse_cnt	)
+		,.or_wheel_dir    (o_wheel_dir	)
 		,.sample_vld     (sample_vld	)
 	);
 				

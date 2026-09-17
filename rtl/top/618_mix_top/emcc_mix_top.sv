@@ -4861,16 +4861,16 @@ module emcc_mix_top
 	  .o_intr_irq            ( map_irq[205]       )
 
        ,.i_axis_limf        ( ~di_regoin_msg[3][19]           )   // 正限位到位开关
-       ,.pul_motor_r_flag        ( pul_motor1_r_flag           )   // 
+       ,.pul_motor_r_flag        ( pul_motor2_r_flag           )   // 
        ,.cur_slv_board_id        ( 5'd3           )   // 
        ,.slv_board_id        ( slv_board_id           )   // 
-       ,.pul_motor_flag        ( pul_motor1_flag           )   // 
-       ,.m2s_pulm_msg        ( pul_motor1_r_msg[3]           )   // 
-       ,.s2m_pulm_msg        ( pul_motor1_msg[3]           )   // 
+       ,.pul_motor_flag        ( pul_motor2_flag           )   // 
+       ,.m2s_pulm_msg        ( pul_motor2_r_msg[3]           )   // 
+       ,.s2m_pulm_msg        ( pul_motor2_msg[3]           )   // 
        ,.i_axis_limb        ( ~di_regoin_msg[3][17]           )   // 负限位到位开关
        ,.i_axis_zero        ( ~di_regoin_msg[3][18]           )   // 零位到位开关
-       ,.i_servo_done        ( ~di_regoin_msg[3][60]           )   // 伺服定位完成
-       ,.i_servo_ready        ( ~di_regoin_msg[3][61]           )   // 伺服就绪
+       ,.i_servo_done        ( ~di_regoin_msg[3][61]           )   // 伺服定位完成
+       ,.i_servo_ready        ( ~di_regoin_msg[3][60]           )   // 伺服就绪
        ,.i_emerge_stop_signal ( 1'b1            )
     );
 
@@ -4912,8 +4912,8 @@ module emcc_mix_top
        ,.s2m_pulm_msg        ( pul_motor0_msg[3]           )   // 
        ,.i_axis_limb        ( ~di_regoin_msg[3][14]           )   // 负限位到位开关
        ,.i_axis_zero        ( ~di_regoin_msg[3][15]           )   // 零位到位开关
-       ,.i_servo_done        ( ~di_regoin_msg[3][58]           )   // 伺服定位完成
-       ,.i_servo_ready        ( ~di_regoin_msg[3][59]           )   // 伺服就绪
+       ,.i_servo_done        ( ~di_regoin_msg[3][59]           )   // 伺服定位完成
+       ,.i_servo_ready        ( ~di_regoin_msg[3][58]           )   // 伺服就绪
        ,.i_emerge_stop_signal ( 1'b1            )
     );
 
