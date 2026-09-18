@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module frame_ctrl_superisys_485#(
+module frame_ctrl_sygole_485#(
     parameter  RAM_DWIDTH  =   11
 ) (
      input   wire            i_clk
@@ -49,21 +49,23 @@ module frame_ctrl_superisys_485#(
 
      //数据收发（主从模式公用）
     ,output  reg             o_send_start_p 
+    ,output  reg  [7:0]      o_send_length
     ,input   wire [8*13-1:0] i_recv_data
     ,input   wire            i_recv_finish_p
     // 主板uart数据接口
     ,input   wire            i_send_ready    //空闲，可以发送的标志
     ,output  reg  [8*11-1:0] o_send_data
-    ,output  reg  [7:0]      o_send_length
     //从板数据接口
     ,input   wire            i_send_finish_p //发送完成（脉冲）
     ,input   wire [7:0]      i_slv_err_code
-    ,output  wire [8* 4-1:0] o_send_data_head
+    ,output  reg  [7:0]      o_exp_recv_num //预期接收的字节数
     ,output  wire [8*11-1:0] o_send_data_little
 
 );
 
     localparam  Broadcast_ADDR = 8'hFF;
+    localparam  UID_Start_ADDR = 16'h800E;
+
     localparam  WRITE_TAG = 8'd1;//1=写入行为
     localparam  READ_UID  = 8'd2;//2=读UID
     localparam  READ_TAG  = 8'd3;//3=读取行为
@@ -93,16 +95,13 @@ reg [7:0]       send_crc_high          ;
 reg [7:0]       send_crc_low           ;
 // ------------- slaver frame head ---------------
     wire [7:0]    m2s_tail_symbol;   //结束符
-    reg  [7:0]    m2s_recv_num   ;   //接收的字节数
-    reg  [7:0]    m2s_send_num   ;   //发送的字节数
+//  reg  [7:0]    m2s_send_num   ;   //发送的字节数
     wire [3:0]    m2s_start_send ;   //开始发送
     wire [3:0]    m2s_baud_rate  ;   //波特率
 
    assign m2s_baud_rate = 4'd0;         //0:115200
    assign m2s_tail_symbol = 8'h00;
    assign m2s_start_send  = 0;
-
-    assign o_send_data_head = {m2s_tail_symbol,m2s_recv_num,m2s_send_num,m2s_start_send,m2s_baud_rate};
 
 
 //covn bhv_id to func_code
@@ -129,7 +128,7 @@ always @(posedge i_clk)begin
     end
     else begin
         case(bhv_id)
-            READ_UID     :crc_check_data_send <= {24'h00,i_slave_addr,8'h03,    16'h800E,16'h4};//读UID时是定长消息，{设备地址，命令码0x03,固定地址起点0x800E,data_len固定为4}
+            READ_UID     :crc_check_data_send <= {24'h00,i_slave_addr,8'h03,UID_Start_ADDR,16'h4};//读UID时是定长消息，{设备地址，命令码0x03,固定地址起点0x800E,data_len固定为4}
             READ_TAG,
             READ_AND_COMP:crc_check_data_send <= {24'h00,i_slave_addr,8'h03,i_start_addr,16'h1};//目前支持读1个寄存器组 （2字节）
             WRITE_TAG    :crc_check_data_send <= {i_slave_addr,8'h10,i_start_addr,16'h1,8'h2,i_send_data_field_1[15:0]};//i_ctl_data_field 高16bit是数据1，低16bit是数据2
@@ -191,26 +190,26 @@ end
 //用行为ID推算出发送和接收的消息字节数，用于组成报文头 （只在从板模式下使用）  
 always @(posedge i_clk)begin
     if(i_rst)begin
-            m2s_send_num <= 8;
-            m2s_recv_num <= 13;
+        // m2s_send_num <= 8;
+            o_exp_recv_num <= 13;
        end
        else begin
             case(bhv_id)//1=读UID; 2=读取比对行为;  3=写入行为; 4=读取行为
                 READ_UID: begin //Modbus Func = 0x03 读寄存器
-                    m2s_send_num <= 8;
-                    m2s_recv_num <= 13;
+                //  m2s_send_num <= 8;
+                    o_exp_recv_num <= 13;
                 end
                 READ_TAG,READ_AND_COMP: begin //Modbus Func = 0x03 读寄存器
-                    m2s_send_num <= 8;
-                    m2s_recv_num <= 7;
+                //  m2s_send_num <= 8;
+                    o_exp_recv_num <= 7;
                 end
                 WRITE_TAG: begin //Modbus Func = 0x10 写单
-                    m2s_send_num <= 21;
-                    m2s_recv_num <= 8;
+                //  m2s_send_num <= 11;
+                    o_exp_recv_num <= 8;
                 end
                 default: begin
-                    m2s_send_num <= 8;
-                    m2s_recv_num <= 8;
+                //  m2s_send_num <= 8;
+                    o_exp_recv_num <= 8;
                 end
             endcase
        end

@@ -35,7 +35,7 @@ module frame_ctrl_dv300_485_modbus_rtu#(
     ,input       [15:0]     i_resp_tout   //响应超时时间
     ,input       [7:0]      i_retry_cnt   //重试次数
     ,input       [7:0]      i_func_code   //功能码
-    ,input       [15:0]     i_data        //控制数据帧
+    ,input       [15:0]     i_data        //数据
     ,input       [7:0]      i_data_len    //数据长度
     ,input       [15:0]     i_start_addr  //起始地址
 //
@@ -45,35 +45,54 @@ module frame_ctrl_dv300_485_modbus_rtu#(
     ,input                  i_chl_a_send_req
     ,output reg             o_chl_a_fb_data_ready_p
     ,output reg  [2:0]      o_chl_a_execu_result
-    ,output reg             o_send_start_p
-    ,input                  i_send_ready
-    ,output reg  [63:0]     o_send_data
-    ,output reg  [7:0]      o_send_length 
-    ,input       [79:0]     i_recv_data
-    ,input                  i_recv_data_ok
+
+     //数据收发（主从模式公用）
+    ,output  reg             o_send_start_p 
+    ,output  reg  [7:0]      o_send_length
+    ,input   wire [8*8-1:0]  i_recv_data
+    ,input   wire            i_recv_finish_p
+    // 主板uart数据接口
+    ,input   wire            i_send_ready    //空闲，可以发送的标志
+    ,output  reg  [0:8*8-1]  o_send_data
+    //从板数据接口
+    ,input   wire            i_send_finish_p //发送完成（脉冲）
+    ,input   wire [7:0]      i_slv_err_code
+    ,output  wire [7:0]      o_exp_recv_num //预期接收的字节数
+    ,output  wire [8*8-1:0]  o_send_data_little
 );
 
 localparam  Broadcast_ADDR = 8'h00;
 
 
 reg  [2:0]rcv_data_check_result;
-wire [0:8*10-1] rcv_data_big;
+wire [0:8*8-1] rcv_data_big;
 reg       rcv_data_check_start_p;
 reg       rcv_data_check_finish_p;
 reg  [7:0] retry_cnt_current;
-
-wire [7:0] CRC_HIGH ;
-wire [7:0] CRC_LOW ;
+wire [7:0] send_crc_high ;
+wire [7:0] send_crc_low ;
 wire [8*6-1:0] crc_check_data;
 reg  crc_cal_start;
 wire crc_cal_done;
 wire[15:0] crc_out;
 
-assign CRC_HIGH = crc_out[15:8];
-assign CRC_LOW  = crc_out[7:0];
+assign send_crc_high = crc_out[15:8];
+assign send_crc_low  = crc_out[7:0];
 assign o_fb_data_frame = 0;
-
 assign crc_check_data = {i_slave_addr,8'h06,i_start_addr,i_data[15:0]};//ctl_data_field含义是设置内容
+
+// ------------- slaver frame head ---------------
+assign o_exp_recv_num = 8; //目前接受的消息格式只有一种，长度固定8
+
+//将大端数据转为小端数据，从板接口用
+assign o_send_data_little[ 1*8-1:   0] = o_send_data[   0: 1*8-1];
+assign o_send_data_little[ 2*8-1: 1*8] = o_send_data[ 1*8: 2*8-1];
+assign o_send_data_little[ 3*8-1: 2*8] = o_send_data[ 2*8: 3*8-1];
+assign o_send_data_little[ 4*8-1: 3*8] = o_send_data[ 3*8: 4*8-1];
+assign o_send_data_little[ 5*8-1: 4*8] = o_send_data[ 4*8: 5*8-1];
+assign o_send_data_little[ 6*8-1: 5*8] = o_send_data[ 5*8: 6*8-1];
+assign o_send_data_little[ 7*8-1: 6*8] = o_send_data[ 6*8: 7*8-1];
+assign o_send_data_little[ 8*8-1: 7*8] = o_send_data[ 7*8: 8*8-1];
 
 
 // ------------------------------------------------------------------------------------------------------------------------
@@ -133,7 +152,7 @@ always @(posedge clk_i)begin
                 cal_time_cnt <= 0;
             end
             SEND_STA_SEND:begin
-                o_send_data <= {crc_check_data[8*6-1:0],CRC_LOW,CRC_HIGH};
+                o_send_data <= {crc_check_data[8*6-1:0],send_crc_low,send_crc_high};
 
                 if(i_send_ready & i_user_grant)begin
                     curr_state <= SEND_STA_ACK;
@@ -149,7 +168,7 @@ always @(posedge clk_i)begin
             SEND_STA_ACK:begin
                 o_send_start_p <= 1'b0;
                 
-                if(i_recv_data_ok)begin//收到反馈数据，要去做校验
+                if(i_recv_finish_p)begin//收到反馈数据，要去做校验
                     curr_state <= SEND_STA_CHECK;
                     rcv_data_check_start_p <= 1'b1;
                 end
@@ -262,7 +281,6 @@ reg [15:0]rcv_data_crc_field;
 
 //------------------- rcv CRC ------------------
 
-wire crc_cal_done_rcv;
 reg [7:0] rcv_slave_addr;
 reg [7:0] rcv_func_code;
 
@@ -272,7 +290,7 @@ always @(posedge clk_i)begin
         rcv_func_code <= 0;
     end
     else begin
-        if(i_recv_data_ok)begin
+        if(i_recv_finish_p)begin
             rcv_slave_addr = i_recv_data[7:0];
             rcv_func_code <= i_recv_data[15:8];
         end
@@ -318,7 +336,7 @@ always @(posedge clk_i)begin
                  end
             end
             RCV_CHK_STA_FULL_CHK:begin
-                if(rcv_data_big[0:8*8-1]==o_send_data[8*8-1:0])begin//校验结果收发一致
+                if(rcv_data_big[0:8*8-1]==o_send_data[0:8*8-1])begin//校验结果收发一致
                     rcv_data_check_result <= 3'b001;//001 = ok
                 end
                 else begin//不一样则报错退出
@@ -346,8 +364,6 @@ assign rcv_data_big[8*4 : 8*5 -1] = i_recv_data[8*5 -1 :8*4 ];
 assign rcv_data_big[8*5 : 8*6 -1] = i_recv_data[8*6 -1 :8*5 ];
 assign rcv_data_big[8*6 : 8*7 -1] = i_recv_data[8*7 -1 :8*6 ];
 assign rcv_data_big[8*7 : 8*8 -1] = i_recv_data[8*8 -1 :8*7 ];
-assign rcv_data_big[8*8 : 8*9 -1] = i_recv_data[8*9 -1 :8*8 ];
-assign rcv_data_big[8*9 : 8*10-1] = i_recv_data[8*10-1 :8*9 ];
 
 
 //-------------------------- CRC -----------------------
@@ -379,16 +395,16 @@ ila_1 ila_1_u1 (
 	.probe7({execu_result,o_chl_a_execu_result,rcv_data_check_result}), // input wire [7:0]  probe7 
 	.probe8(o_user_req), // input wire [0:0]  probe8 
 	.probe9(i_user_grant), // input wire [0:0]  probe9 
-	.probe10(0), // input wire [0:0]  probe10 
-	.probe11(i_recv_data_ok), // input wire [0:0]  probe11 
-	.probe12(0), // input wire [0:0]  probe12 
-	.probe13(crc_cal_done_rcv), // input wire [0:0]  probe13 
+	.probe10(rcv_crc_chk_ok), // input wire [0:0]  probe10 
+	.probe11(i_recv_finish_p), // input wire [0:0]  probe11 
+	.probe12(rcv_crc_work_en), // input wire [0:0]  probe12 
+	.probe13(0), // input wire [0:0]  probe13 
 	.probe14(0), // input wire [0:0]  probe14 
 	.probe15(0),// input wire [0:0]  probe15
     .probe16(i_data[15:8]), // input wire [7:0]  probe16
 	.probe17(i_data[7:0]), // input wire [7:0]  probe17
-	.probe18(0), // input wire [7:0]  probe18
-	.probe19(0), // input wire [7:0]  probe19
+	.probe18(crc_out[15:8]), // input wire [7:0]  probe18
+	.probe19(crc_out[7:0]), // input wire [7:0]  probe19
 	.probe20(rcv_data_crc_field[15:8]), // input wire [7:0]  probe20
 	.probe21(rcv_data_crc_field[7:0]), // input wire [7:0]  probe21
 	.probe22(rcv_slave_addr), // input wire [7:0]  probe22
