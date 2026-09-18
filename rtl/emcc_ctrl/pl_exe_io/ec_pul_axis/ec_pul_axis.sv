@@ -272,8 +272,10 @@ module ec_pul_axis#(
 	end
 	
 //----------------------------------------------------- user logic begin -----------------------------------------------------//
-	wire 	[31:0]	param31		;
-	wire 	[31:0]	param32		;
+	wire 	[31:0]	param31		;	// signed upper soft limit
+	wire 	[31:0]	param32		;	// signed lower soft limit
+	wire			w_soft_lim_f;
+	wire			w_soft_lim_b;
 	wire 	[31:0]	param33		;
 	wire 	[31:0]	param34		;
 	wire 	[31:0]	param35		;
@@ -407,10 +409,10 @@ module ec_pul_axis#(
 	//,.param61               (param61		)
 	//,.param62               (param62		)
 	//,.param63               (param63		)
-	,.param64               ({7'd0,i_axis_limf}	)	//fwd limit
+	,.param64               ({7'd0, i_axis_limf | w_soft_lim_f}	)	//fwd limit (hw|soft)
 	,.param65               ({7'd0,i_servo_ready}	)	//servo ready
 	,.param66               (i_servo_done		)	//servo done
-	,.param67               (i_axis_limb		)	//bwd limit
+	,.param67               (i_axis_limb | w_soft_lim_b		)	//bwd limit (hw|soft)
 	,.param68               (i_axis_zero		)	//origin
 	,.param69               (i_dv_alarm		)	//drive input alm
 	,.param70               (o_dv_son		)	//drive output son
@@ -475,8 +477,12 @@ module ec_pul_axis#(
     ,.rcfg_acc_max			(param2					)
     ,.rcfg_dec_max			(param3					)
     ,.rcfg_touch_spd		(param33				)
+    ,.rcfg_pos_max			(param31				)
+    ,.rcfg_pos_min			(param32				)
 
 	,.r_pf_abspos			(param51				)
+	,.o_soft_lim_f			(w_soft_lim_f			)
+	,.o_soft_lim_b			(w_soft_lim_b			)
 //----------------------------------------------------- user logic end -------------------------------------------------------//
     );
 

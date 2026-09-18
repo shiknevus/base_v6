@@ -82,9 +82,12 @@ module proactive_beh_pul_axis#(
 	,input		[31:0]			rcfg_acc_max      	//maximum acceleration
 	,input		[31:0]			rcfg_dec_max      	//maximum deceleration
 	,input		[31:0]			rcfg_touch_spd     	//home clamp speed
-	
+	,input signed [31:0]		rcfg_pos_max = 32'sd0	// signed upper soft limit
+	,input signed [31:0]		rcfg_pos_min = 32'sd0	// signed lower soft limit
 
 	,output reg signed [31:0]			r_pf_abspos //postion
+	,output wire				o_soft_lim_f		// 1 = abspos >= max pos
+	,output wire				o_soft_lim_b		// 1 = abspos <= min pos
 //----------------------------------------------------- user logic end -------------------------------------------------------//
     );
 
@@ -396,6 +399,8 @@ module proactive_beh_pul_axis#(
             irq_o <= irq_o;
     end
 	
+	wire w_soft_lim_f;
+	wire w_soft_lim_b;
 	always@(posedge clk_i)begin
         if(rst_i || !a_en)
             a_alm_num <= 8'd0;
@@ -411,14 +416,22 @@ module proactive_beh_pul_axis#(
 			a_alm_num <= ack_ps_alart_num;
 		else if(curr_state == S_SUCC_30_ACK && timout)									
             a_alm_num <= 8'd103;
-		else if(curr_state == S_BHA_POST_DET && action_error)
-            a_alm_num <= 8'd105;
         else if(i_stop && curr_state != S_IDLE)
             a_alm_num <= 8'd106;   // stop
         else if(~i_emerge_stop_signal && curr_state != S_IDLE)
             a_alm_num <= 8'd107;   // emergency stop, add by szzhang 20260914
         else if(~i_dv_alarm && curr_state != S_IDLE)
             a_alm_num <= 8'd108;   // alarm, add by szzhang 20260916
+		else if(curr_state == S_BHA_POST_DET && action_error && i_axis_limf)
+            a_alm_num <= 8'd109;   // HW +limit, add by szzhang 20260918
+		else if(curr_state == S_BHA_POST_DET && action_error && i_axis_limb)
+            a_alm_num <= 8'd110;   // HW -limit, add by szzhang 20260918
+		else if(curr_state == S_BHA_POST_DET && action_error && w_soft_lim_f)
+            a_alm_num <= 8'd111;   // SW +limit, add by szzhang 20260918
+		else if(curr_state == S_BHA_POST_DET && action_error && w_soft_lim_b)
+            a_alm_num <= 8'd112;   // SW -limit, add by szzhang 20260918
+		else if(curr_state == S_BHA_POST_DET && action_error)
+            a_alm_num <= 8'd105;
 		else if(curr_state == S_IDLE)
 			a_alm_num <= 8'd0;
         else
@@ -503,24 +516,19 @@ localparam DIR_NEG = 1'b0;
 
 wire r_dv_ok = i_servo_ready & i_emerge_stop_signal & i_dv_alarm;//estop and alarm active low, add by szzhang 20260914
 
-// 0 register -> default
-function [31:0] zdef(input [31:0] v, input [31:0] d);
-    zdef = (v == 32'b0) ? d : v;
-endfunction
-
-wire [31:0] home_spd_eff  = zdef(rcfg_home_spd,  32'd1000000); // 20mm/s
-wire [31:0] home_acc_eff  = zdef(rcfg_home_acc,  32'd2500000); // 50mm/s2
-wire [31:0] home_dec_eff  = zdef(rcfg_home_dec,  32'd2500000);
-wire [31:0] jog_spd_eff   = zdef(rcfg_jog_spd,   32'd1000000);
-wire [31:0] jog_acc_eff   = zdef(rcfg_jog_acc,   32'd2500000);
-wire [31:0] jog_dec_eff   = zdef(rcfg_jog_dec,   32'd2500000);
-wire [31:0] move_spd_eff  = zdef(rcfg_move_spd,  32'd1000000);
-wire [31:0] move_acc_eff  = zdef(rcfg_move_acc,  32'd2500000);
-wire [31:0] move_dec_eff  = zdef(rcfg_move_dec,  32'd2500000);
-wire [31:0] spd_max_eff   = zdef(rcfg_spd_max,   32'd4000000); // 80mm/s
-wire [31:0] acc_max_eff   = zdef(rcfg_acc_max,   32'd10000000);// 200mm/s2
-wire [31:0] dec_max_eff   = zdef(rcfg_dec_max,   32'd10000000);
-wire [31:0] touch_spd_eff = zdef(rcfg_touch_spd, 32'd5000);
+wire [31:0] home_spd_eff  = rcfg_home_spd  ? rcfg_home_spd  : 32'd1000000; // 20mm/s
+wire [31:0] home_acc_eff  = rcfg_home_acc  ? rcfg_home_acc  : 32'd2500000; // 50mm/s2
+wire [31:0] home_dec_eff  = rcfg_home_dec  ? rcfg_home_dec  : 32'd2500000;
+wire [31:0] jog_spd_eff   = rcfg_jog_spd   ? rcfg_jog_spd   : 32'd1000000;
+wire [31:0] jog_acc_eff   = rcfg_jog_acc   ? rcfg_jog_acc   : 32'd2500000;
+wire [31:0] jog_dec_eff   = rcfg_jog_dec   ? rcfg_jog_dec   : 32'd2500000;
+wire [31:0] move_spd_eff  = rcfg_move_spd  ? rcfg_move_spd  : 32'd1000000;
+wire [31:0] move_acc_eff  = rcfg_move_acc  ? rcfg_move_acc  : 32'd2500000;
+wire [31:0] move_dec_eff  = rcfg_move_dec  ? rcfg_move_dec  : 32'd2500000;
+wire [31:0] spd_max_eff   = rcfg_spd_max   ? rcfg_spd_max   : 32'd4000000; // 80mm/s
+wire [31:0] acc_max_eff   = rcfg_acc_max   ? rcfg_acc_max   : 32'd10000000;// 200mm/s2
+wire [31:0] dec_max_eff   = rcfg_dec_max   ? rcfg_dec_max   : 32'd10000000;
+wire [31:0] touch_spd_eff = rcfg_touch_spd ? rcfg_touch_spd : 32'd5000;
 
 // HOME (beh=1)
 reg          home_stop;
@@ -572,6 +580,18 @@ home_u
   .i_pf_busy      ( pos_pf_busy        ),
   .i_pf_done      ( pos_pf_done        )
 );
+wire        w_soft_lim_en = (rcfg_pos_max > rcfg_pos_min) && ~home_busy;
+assign      w_soft_lim_f  = w_soft_lim_en && (r_pf_abspos >= rcfg_pos_max);
+assign      w_soft_lim_b  = w_soft_lim_en && (r_pf_abspos <= rcfg_pos_min);
+wire signed [31:0] s_move_tgt = rserv_target_pulse;
+wire        w_move_over_f = w_soft_lim_en && (s_move_tgt > rcfg_pos_max);
+wire        w_move_over_b = w_soft_lim_en && (s_move_tgt < rcfg_pos_min);
+wire        w_jog_lim_f   = i_axis_limf | w_soft_lim_f;
+wire        w_jog_lim_b   = i_axis_limb | w_soft_lim_b;
+wire        w_move_lim_f  = i_axis_limf | w_soft_lim_f | w_move_over_f;
+wire        w_move_lim_b  = i_axis_limb | w_soft_lim_b | w_move_over_b;
+assign o_soft_lim_f = w_soft_lim_f;
+assign o_soft_lim_b = w_soft_lim_b;
 
 // JOG (beh=2;20)
 reg          jog_stop;
@@ -593,8 +613,8 @@ Jog_fa_std jog_u
   .reset          ( rst_i              ),
 
   .i_drv_son      ( r_dv_ok           ),
-  .i_lim_f        ( i_axis_limf        ),
-  .i_lim_b        ( i_axis_limb        ),
+  .i_lim_f        ( w_jog_lim_f        ),
+  .i_lim_b        ( w_jog_lim_b        ),
   .i_org          ( axis_org           ),
   .i_pf_spd       ( jog_spd_eff        ),
   .i_pf_acc       ( jog_acc_eff        ),
@@ -638,8 +658,8 @@ Move_fa_std move_u
   .reset          ( rst_i              ),
 
   .i_drv_son      ( r_dv_ok           ),
-  .i_lim_f        ( i_axis_limf        ),
-  .i_lim_b        ( i_axis_limb        ),
+  .i_lim_f        ( w_move_lim_f       ),
+  .i_lim_b        ( w_move_lim_b       ),
   .i_org          ( axis_org           ),
   .i_abspos       ( r_pf_abspos        ),
   .i_pf_spd       ( move_spd_eff       ),

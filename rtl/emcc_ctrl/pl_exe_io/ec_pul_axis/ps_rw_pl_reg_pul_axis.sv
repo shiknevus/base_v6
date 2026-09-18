@@ -101,8 +101,8 @@ module ps_rw_pl_reg_pul_axis#(
 	,output		reg 				param28			
 	,output		reg 				param29			
 	// ,output		reg 				param30		
-	,output		reg 	[31:0]		param31	
-	,output		reg 	[31:0]		param32	
+	,output		reg 	[31:0]		param31	// signed pos max
+	,output		reg 	[31:0]		param32	// signed pos min
 	,output		reg 	[31:0]		param33	
 	,output		reg 	[31:0]		param34	
 	,output		reg 	[31:0]		param35	

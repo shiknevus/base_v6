@@ -90,10 +90,13 @@ module proactive_beh_slv_pul_axis#(
 	,input		[31:0]			rcfg_acc_max      	//maximum acceleration
 	,input		[31:0]			rcfg_dec_max      	//maximum deceleration
 	,input		[31:0]			rcfg_touch_spd     	//home clamp speed
-	
+	,input signed [31:0]		rcfg_pos_max = 32'sd0	// signed upper soft limit
+	,input signed [31:0]		rcfg_pos_min = 32'sd0	// signed lower soft limit
 
 	,output wire signed [31:0]			r_pf_abspos //postion
 	,output wire						dv_alarm //remote drive alm
+	,output wire				o_soft_lim_f
+	,output wire				o_soft_lim_b
 //----------------------------------------------------- user logic end -------------------------------------------------------//
     );
 
@@ -111,6 +114,9 @@ module proactive_beh_slv_pul_axis#(
 	reg [7:0]		ack_tx_id;
 	reg [7:0]		ack_tx_result;
 	reg	[7:0]		ack_ps_alart_num;
+	reg				action_issued;
+	wire			slv_stop_ready;
+	wire	[7:0]	alert_next;
 	
 	
 	//State machine state
@@ -126,6 +132,7 @@ module proactive_beh_slv_pul_axis#(
 	localparam 	S_ALERT_40_ACK	= 8'd11;	//Alert ack
 	localparam 	S_ACT_END_1		= 8'd12;
 	localparam 	S_ACT_END_2		= 8'd13;
+	localparam 	S_SLV_STOP_WAIT	= 8'd14;	//hold m2s stop until slave idle
 	
     localparam  IRQ_OK          = 8'h51;	//ps ack:OK
     localparam  IRQ_NO_OK       = 8'h52;	//ps ack:NO OK
@@ -273,7 +280,7 @@ module proactive_beh_slv_pul_axis#(
 				if(pre_sta_allow[a_bhv_id_r - 1'b1]) begin
 					next_state = S_READY_10;
 				end else if(timout) begin
-					next_state = S_ALERT_40;			
+					next_state = alert_next;			
 				end else begin
 					next_state = S_BHA_PRE_DET;
 				end
@@ -287,7 +294,7 @@ module proactive_beh_slv_pul_axis#(
 				if(match_10) 								//Transaction 10 Acknowledged OK
                     next_state = S_EXE;
                 else if(ack_tx_result == IRQ_NO_OK || timout)
-                    next_state = S_ALERT_40;
+                    next_state = alert_next;
                 else
                     next_state = S_READY_10_ACK;
 			end
@@ -301,7 +308,7 @@ module proactive_beh_slv_pul_axis#(
 				if(post_sta_allow[a_bhv_id_r - 1'b1]) begin
                     	next_state = S_SUCC_30;
 				end else if(timout | action_error) begin
-                            next_state = S_ALERT_40;
+                            next_state = alert_next;
 				end else begin
 					next_state = S_BHA_POST_DET;
 				end
@@ -315,9 +322,17 @@ module proactive_beh_slv_pul_axis#(
 				if(match_30)    							//30 response success
                     next_state = S_ACT_END_1;
                 else if(ack_tx_result == IRQ_NO_OK || timout)
-                    next_state = S_ALERT_40;
+                    next_state = alert_next;
                 else
                     next_state = S_SUCC_30_ACK;
+			end
+
+			// Stop the slave before IRQ 40 so PS sees a settled axis.
+			S_SLV_STOP_WAIT:begin
+				if(slv_stop_ready || timout)
+					next_state = S_ALERT_40;
+				else
+					next_state = S_SLV_STOP_WAIT;
 			end
 
             S_ALERT_40: begin		//curr_state = 10					
@@ -346,7 +361,7 @@ module proactive_beh_slv_pul_axis#(
         endcase
 
 		if((i_stop | ~i_emerge_stop_signal | ~dv_alarm ) && (curr_state > S_IDLE && curr_state < S_ALERT_40))
-            next_state = S_ALERT_40;
+            next_state = alert_next;
     end
 	
 //----------------------------------------------------------- FSM end ------------------------------------------------------//
@@ -385,6 +400,8 @@ module proactive_beh_slv_pul_axis#(
             irq_o <= irq_o;
     end
 
+	wire w_soft_lim_f;
+	wire w_soft_lim_b;
 	always@(posedge clk_i)begin
         if(rst_i || !a_en)
             a_alm_num <= 8'd0;
@@ -400,14 +417,22 @@ module proactive_beh_slv_pul_axis#(
 			a_alm_num <= ack_ps_alart_num;
 		else if(curr_state == S_SUCC_30_ACK && timout)									
             a_alm_num <= 8'd103;
-		else if(curr_state == S_BHA_POST_DET && action_error)
-            a_alm_num <= 8'd105;
         else if(i_stop && curr_state != S_IDLE)
             a_alm_num <= 8'd106;   // stop 
         else if(~i_emerge_stop_signal && curr_state != S_IDLE)
             a_alm_num <= 8'd107;   // emergency stop, add by szzhang 20260914
 		else if(~dv_alarm && curr_state != S_IDLE)
             a_alm_num <= 8'd108;   // alarm, add by szzhang 20260916
+		else if(curr_state == S_BHA_POST_DET && action_error && i_axis_limf)
+            a_alm_num <= 8'd109;   // HW +limit
+		else if(curr_state == S_BHA_POST_DET && action_error && i_axis_limb)
+            a_alm_num <= 8'd110;   // HW -limit
+		else if(curr_state == S_BHA_POST_DET && action_error && w_soft_lim_f)
+            a_alm_num <= 8'd111;   // SW +limit
+		else if(curr_state == S_BHA_POST_DET && action_error && w_soft_lim_b)
+            a_alm_num <= 8'd112;   // SW -limit
+		else if(curr_state == S_BHA_POST_DET && action_error)
+            a_alm_num <= 8'd105;
 		else if(curr_state == S_IDLE)
 			a_alm_num <= 8'd0;
         else
@@ -449,6 +474,7 @@ module proactive_beh_slv_pul_axis#(
 		reg        action_alarm;
 		reg        action_ack_base;
 		reg        action_accepted;
+		reg [3:0]  stop_frame_cnt;
 
 		// m2s/s2m multi-cycle state machines
 		reg [3:0]  m2s_state;
@@ -501,7 +527,7 @@ module proactive_beh_slv_pul_axis#(
 											rserv_dir,
 		                                    1'b0, 
 											i_pause,
-		                                     i_stop|(~i_emerge_stop_signal)|(~dv_alarm),
+		                                     i_stop|(~i_emerge_stop_signal)|(~dv_alarm)|w_soft_lim_f|w_soft_lim_b,
 											action_beat,
 		                                    i_axis_zero,
 											i_axis_limb,
@@ -574,9 +600,36 @@ module proactive_beh_slv_pul_axis#(
 		assign slv_action_ack = s2m_10tmp[7];
 		assign r_pf_abspos  = s2m_11tmp;
 
+		wire w_soft_lim_en = (rcfg_pos_max > rcfg_pos_min) && (a_bhv_id_r != 8'd1);
+		assign w_soft_lim_f = w_soft_lim_en && (r_pf_abspos >= rcfg_pos_max);
+		assign w_soft_lim_b = w_soft_lim_en && (r_pf_abspos <= rcfg_pos_min);
+		assign o_soft_lim_f = w_soft_lim_f;
+		assign o_soft_lim_b = w_soft_lim_b;
+		wire w_sw_jog  = (a_bhv_id_r == 8'd2) || (a_bhv_id_r == 8'd20);
+		wire w_sw_move = (a_bhv_id_r == 8'd3) || (a_bhv_id_r == 8'd21);
+		wire w_sw_fault = (w_sw_jog | w_sw_move) & (w_soft_lim_f | w_soft_lim_b);
+
 		assign action_busy  = slv_action_busy;
 		assign action_done  = slv_action_done  & action_accepted;
-		assign action_error = slv_action_error & action_accepted;
+		assign action_error = (slv_action_error & action_accepted) | w_sw_fault;
+		assign slv_stop_ready = (stop_frame_cnt >= 4'd2) && !slv_action_busy;
+		assign alert_next     = action_issued ? S_SLV_STOP_WAIT : S_ALERT_40;
+
+		always@(posedge clk_i) begin
+		    if(rst_i || !a_en || (curr_state == S_IDLE))
+		        action_issued <= 1'b0;
+		    else if(curr_state == S_EXE)
+		        action_issued <= 1'b1;
+		end
+
+		always@(posedge clk_i) begin
+		    if(rst_i || (curr_state == S_IDLE) || (curr_state == S_EXE))
+		        stop_frame_cnt <= 4'd0;
+		    else if(curr_state == S_SLV_STOP_WAIT) begin
+		        if((m2s_state == 4'd0) && pul_motor_r_flag && (stop_frame_cnt != 4'hF))
+		            stop_frame_cnt <= stop_frame_cnt + 1'b1;
+		    end
+		end
 
 		always@(posedge clk_i) begin
 		    if(rst_i || !a_en) begin
@@ -606,7 +659,7 @@ module proactive_beh_slv_pul_axis#(
 		        action_alarm <= 1'b0;
 		    else if(curr_state == S_EXE)
 		        action_alarm <= 1'b0;
-		    else if(curr_state == S_ALERT_40)
+		    else if((curr_state == S_ALERT_40) || (curr_state == S_SLV_STOP_WAIT))
 		        action_alarm <= 1'b1;
 		    else if(curr_state == S_IDLE)
 		        action_alarm <= 1'b0;

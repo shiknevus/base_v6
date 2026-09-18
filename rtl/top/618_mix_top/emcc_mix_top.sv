@@ -2245,12 +2245,12 @@ module emcc_mix_top
 	wire   o_dri2_53;
 	
 	// --- flow_comp_53 --A0054_分拣库_打标机卡盘---
-    ec_2di_3do
+    ec_2do
     #(
          .REG_SPACE_BIAS     ( 20'd72192)
         ,.REG_SPACE_SIZE     ( `REG_SPACE_SIZE           )
     )
-    ec_2di_3do_53
+    ec_2do_53
     (
       
 	  .clk_i                 ( clk               ),
@@ -2270,11 +2270,8 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[137]    ),
 	  .o_intr_irq            ( map_irq[137]       )
 
-       ,.i_pos        ( 1'b0           )   // 位置到位开关
        ,.o_dri1        ( o_dri1_53           )   // 卡盘开驱动信号
        ,.o_dri2        ( o_dri2_53           )   // 卡盘关驱动信号
-       ,.o_dri        (            )   // 
-       ,.i_poa        ( 1'b0           )   // 
     );
 
     assign do_regoin_r_msg[0][25] = ~o_dri1_53;

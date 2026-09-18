@@ -275,8 +275,10 @@ module ec_slv_pul_axis#(
 	end
 	
 //----------------------------------------------------- user logic begin -----------------------------------------------------//
-	wire 	[31:0]	param31		;
-	wire 	[31:0]	param32		;
+	wire 	[31:0]	param31		;	// signed upper soft limit
+	wire 	[31:0]	param32		;	// signed lower soft limit
+	wire			w_soft_lim_f;
+	wire			w_soft_lim_b;
 	wire 	[31:0]	param33		;
 	wire 	[31:0]	param34		;
 	wire 	[31:0]	param35		;
@@ -373,8 +375,8 @@ module ec_slv_pul_axis#(
 	,.param29			    (param29		)
 	// ,.param30				(param30		)
 //----------------------------------------------------- user logic begin -----------------------------------------------------//
-	//,.param31				(param31		)
-	//,.param32				(param32		)
+	,.param31				(param31		)
+	,.param32				(param32		)
 	,.param33				(param33		)
 	,.param34				(param34		)
 	,.param35				(param35		)
@@ -413,10 +415,10 @@ module ec_slv_pul_axis#(
 	//,.param61               (param61		)
 	//,.param62               (param62		)
 	//,.param63               (param63		)
-	,.param64               ({7'd0,i_axis_limf}	)	//fwd limit
+	,.param64               ({7'd0, i_axis_limf | w_soft_lim_f}	)	//fwd limit (hw|soft)
 	,.param65               ({7'd0,i_servo_ready}	)	//servo ready
 	,.param66               (i_servo_done		)	//servo done
-	,.param67               (i_axis_limb		)	//bwd limit
+	,.param67               (i_axis_limb | w_soft_lim_b		)	//bwd limit (hw|soft)
 	,.param68               (i_axis_zero		)	//origin
 	,.param69               (dv_alarm		)	//remote drive alm
 	,.param70               (b_son			)	//son cmd to slv
@@ -484,8 +486,12 @@ module ec_slv_pul_axis#(
     ,.rcfg_acc_max			(param2					)
     ,.rcfg_dec_max			(param3					)
     ,.rcfg_touch_spd		(param33				)
+    ,.rcfg_pos_max			(param31				)
+    ,.rcfg_pos_min			(param32				)
 
 	,.r_pf_abspos			(param51				)
+	,.o_soft_lim_f			(w_soft_lim_f			)
+	,.o_soft_lim_b			(w_soft_lim_b			)
 	,.i_drive_on			(b_son					)
 	,.i_drive_reset			(b_reset				)
 	,.dv_alarm				(dv_alarm				)
