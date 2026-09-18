@@ -118,9 +118,14 @@ module Move_fa_std
                ST_MOVE_ERROR: begin
                    r_st_error     <= 1'b1;
                    r_pf_start     <= 1'b0;
-                   r_pf_stop      <= 1'b0;
-                   r_pf_quickstop <= 1'b0;
-                   fsm_st <= ST_MOVE_DONE;
+                   r_pf_stop      <= 1'b1;
+                   r_pf_quickstop <= 1'b1;
+                   // add by szzhang 20260917
+                   if(~i_pf_busy) begin
+                       r_pf_stop <= 1'b0;
+                       r_pf_quickstop <= 1'b0;
+                       fsm_st <= ST_MOVE_DONE;
+                   end
                end
                ST_MOVE_DONE: begin
                    r_pf_start     <= 1'b0;

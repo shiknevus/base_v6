@@ -100,6 +100,19 @@ module Home_fa_std
         end
     end
 
+   // add by szzhang 20260917
+   reg        r_done_lock;
+   reg        r_had_busy;
+   always@(posedge clk) begin
+       if(reset | ((fsm_st!=ST_HOME_FDEC) && (fsm_st!=ST_HOME_BDEC))) begin
+           r_done_lock <= 1'b0;
+           r_had_busy  <= 1'b0;
+       end else begin
+           r_done_lock <= r_done_lock | (i_pf_done & i_pf_busy);
+           r_had_busy  <= r_had_busy  | i_pf_busy; // pos really ran this segment
+       end
+   end
+
    always@(posedge clk) begin
        if(reset) begin
            fsm_st            <= ST_HOME_IDLE;
@@ -138,7 +151,7 @@ module Home_fa_std
                    end else if(i_lim_f) begin
                        fsm_st <= ST_HOME_FDEC;
                        r_pf_status_lim_f <= 1'b1;
-                       r_st_error <= r_pf_status_lim_b;
+                       r_st_error <= r_st_error | r_pf_status_lim_b; // accumulate, by szzhang 20260917
                    end
                    
                end
@@ -153,7 +166,7 @@ module Home_fa_std
                        o_pf_stop  <= 1'b1;
                        r_st_error <= 1'b0;
                        fsm_st <= ST_HOME_STOP;
-                   end else if(i_pf_done&i_pf_busy) begin
+                   end else if(r_done_lock | (~i_pf_busy & r_had_busy)) begin // r_had_busy: never trust idle pos before it ran. by szzhang 20260917
                        if(r_pf_status_org)
                            fsm_st <= (r_st_error | (r_pf_status_org & ~i_org)) ? ST_HOME_STOP : ST_HOME_FMIN; //change by szzhang 20260916
                        else 
@@ -174,22 +187,22 @@ module Home_fa_std
                    end else if(i_lim_b) begin
                        fsm_st <= ST_HOME_BDEC;
                        r_pf_status_lim_b <= 1'b1;
-                       r_st_error <= r_pf_status_lim_f;
+                       r_st_error <= r_st_error | r_pf_status_lim_f; // accumulate, by szzhang 20260917
                    end
                end
                ST_HOME_BDEC: begin
                    o_pf_start <= 1'b0;
                    o_pf_stop  <= 1'b0;
                    o_pf_quickstop <= 1'b1;
-                   if(~i_org && r_pf_status_org) begin
+                   if(r_pf_status_org & negedge_org) begin
                        r_st_error <= 1'b1;
                    end
                    if(i_stop | ~i_drv_son) begin
                        o_pf_stop  <= 1'b1;
                        r_st_error <= 1'b0;
                        fsm_st <= ST_HOME_STOP;   
-                   end else if(i_pf_done&i_pf_busy) begin
-                       if(r_pf_status_org) 
+                   end else if(r_done_lock | (~i_pf_busy & r_had_busy)) begin // r_had_busy: never trust idle pos before it ran. by szzhang 20260917
+                       if(r_pf_status_org)
                            fsm_st <= (r_st_error | (r_pf_status_org & ~i_org)) ? ST_HOME_STOP : ST_HOME_FMIN;
                        else
                            fsm_st <= r_st_error ? ST_HOME_STOP : ST_HOME_FACC;
@@ -199,11 +212,11 @@ module Home_fa_std
                    o_pf_start <= ~i_pf_busy;
                    o_pf_stop <= 1'b0;
                    o_pf_quickstop <= 1'b0;
-                   if(i_stop | ~i_drv_son) begin
+                   if(i_stop | ~i_drv_son | i_lim_f) begin // add lim guard by szzhang 20260917
                        o_pf_stop  <= 1'b1;
                        r_st_error <= 1'b0;
                        fsm_st <= ST_HOME_STOP;
-                   end else if(~i_org) begin
+                   end else if(~i_org & i_pf_busy) begin
                        fsm_st <= ST_HOME_FINISH;
                        o_pf_stop <= 1'b1;
                    end
@@ -212,11 +225,11 @@ module Home_fa_std
                    o_pf_start <= ~i_pf_busy;
                    o_pf_stop  <= 1'b0;
                    o_pf_quickstop <= 1'b0;
-                   if(i_stop | ~i_drv_son) begin
+                   if(i_stop | ~i_drv_son | i_lim_b) begin // add lim guard by szzhang 20260917
                        o_pf_stop  <= 1'b1;
                        r_st_error <= 1'b0;
                        fsm_st <= ST_HOME_STOP;
-                   end else if(negedge_org) begin
+                   end else if(~i_org & i_pf_busy) begin
                        fsm_st <= ST_HOME_FINISH;
                        o_pf_stop <= 1'b1;
                    end

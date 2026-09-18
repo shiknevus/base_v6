@@ -122,7 +122,8 @@ module man_handwheel
     assign aclk_pose = aclk_r_r & (~aclk_r_r_r);
 
 	//----------------------------------------
-
+    reg [31:0] o_pulse_cnt;
+    reg o_wheel_dir;
 
     always @(posedge clk)begin
 	    if(reset | (o_axis_number != axis_number_r))begin

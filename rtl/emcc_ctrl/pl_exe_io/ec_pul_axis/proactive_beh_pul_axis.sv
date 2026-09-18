@@ -135,7 +135,7 @@ module proactive_beh_pul_axis#(
 			curr_state_m3 <= 8'b0;
 			state_monitor_o <= 32'b0;
 			end
-        else if (curr_state != curr_state_m1) begin
+        else if ((curr_state != curr_state_m1) && (curr_state != S_ACT_END_1) && (curr_state != S_ACT_END_2)) begin
             curr_state_m1 <= curr_state;
             curr_state_m2 <= curr_state_m1;
             curr_state_m3 <= curr_state_m2;
@@ -196,7 +196,7 @@ module proactive_beh_pul_axis#(
 					end
 				end
 				1:begin
-					a_bhv_id_r <= a_bhv_id;
+					a_bhv_id_r <= a_bhv_id_r;
 					a_bhv_vld_r <= 1'b0;
 					sta1 <= 2;
 				end
@@ -206,7 +206,7 @@ module proactive_beh_pul_axis#(
 						a_bhv_vld_r <= 1'b0;
 						sta1 <= 0;
 					end else begin
-						a_bhv_id_r <= a_bhv_id;
+						a_bhv_id_r <= a_bhv_id_r;
 						a_bhv_vld_r <= 1'b0;
 						sta1 <= 2;
 					end
