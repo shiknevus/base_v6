@@ -26,17 +26,21 @@ module emcc_mst_app
      input                              clk
     ,input                              reset
     
-    ,input                              link_success
-    ,input  wire                       loop_link_success
-	,input                              downstream_lane_up
-    ,input                              downstream_link
-    ,output reg                         rcv_intf_tst_dg_done
-    ,output wire    [2:0]              stu
+    ,input                              link_success			//0 or 1 link success
+    ,input  wire                       	loop_link_success		//1
+	,input                              downstream_lane_up		//0 link_success
+    ,input                              downstream_link			//1 link_success
+    ,output reg                         rcv_intf_tst_dg_done	//unuse
+    ,output wire    [2:0]              	stu
     
     //component interface
     ,output wire                        slv_cfg_msg_rden
     ,output wire    [RAM_AWIDTH-1:0]    slv_cfg_msg_addr
     ,input  wire    [RAM_DWIDTH-1:0]    slv_cfg_msg_dat
+	
+	,output wire    [3:0]               slv_sta_msg_vld     //slave station status message
+    ,output wire    [RAM_AWIDTH-1:0]    slv_sta_msg_addr
+    ,output wire    [RAM_DWIDTH-1:0]    slv_sta_msg_dat
     //jtag interface
     ,input  wire    [RAM_AWIDTH-1:0]    jtag_slv_cfg_msg_addr
     ,input  wire    [RAM_DWIDTH-1:0]    jtag_slv_cfg_msg_dat
@@ -54,16 +58,12 @@ module emcc_mst_app
     ,output wire    [RAM_AWIDTH-1:0]    ps_tx_depot_addr
     ,input  wire    [RAM_DWIDTH-1:0]    ps_tx_depot_dout
 
-    ,output wire    [3:0]               slv_sta_msg_vld     //slave station status message
-    ,output wire    [RAM_AWIDTH-1:0]    slv_sta_msg_addr
-    ,output wire    [RAM_DWIDTH-1:0]    slv_sta_msg_dat
-
     ,output reg     [3:0]               ps_depot_we
     ,output reg     [RAM_AWIDTH-1:0]    ps_depot_addr
     ,output reg     [RAM_DWIDTH-1:0]    ps_depot_din
 
-    ,output wire            mst_prcs_hb_flag
-    ,output wire   [31:0]         debug_data
+    ,output wire            			mst_prcs_hb_flag
+    ,output wire   [31:0]         		debug_data
     
     ,input  wire    [15:0]              board_temp_82130
     
@@ -75,19 +75,19 @@ module emcc_mst_app
     ,output wire                        o_wr_cfg_data_done 
 
     //master AXI interface to aurora IP:send port
-    ,output                 m_boroa_tx_tvalid
-    ,input                  m_boroa_tx_tready
-    ,output         [3:0]   m_boroa_tx_tkeep
-    ,output                 m_boroa_tx_tlast
-    ,output         [31:0]  m_boroa_tx_tdata
+    ,output                				m_boroa_tx_tvalid
+    ,input                 				m_boroa_tx_tready
+    ,output         [3:0]  				m_boroa_tx_tkeep
+    ,output                				m_boroa_tx_tlast
+    ,output         [31:0] 				m_boroa_tx_tdata
 
     //slave AXI receive interface
-    ,input  wire            s_aurora_rx_tvalid
-    ,input  wire    [3:0]   s_aurora_rx_tkeep
-    ,input  wire            s_aurora_rx_tlast
-    ,input  wire    [31:0]  s_aurora_rx_tdata
-    
-    ,output wire    [7:0]   slv_sta_num
+    ,input  wire            			s_aurora_rx_tvalid
+    ,input  wire    [3:0]   			s_aurora_rx_tkeep
+    ,input  wire            			s_aurora_rx_tlast
+    ,input  wire    [31:0]  			s_aurora_rx_tdata
+				
+    ,output wire    [7:0]   			slv_sta_num
 
 );
     //the signals that PS config master app 

@@ -243,6 +243,7 @@ module emcc_mst_top #(
     //status LED: off=link down, solid=idle, slow=abnormal, fast=normal
     localparam [26:0] LED_ACT_HOLD = 27'd78_125_000;  //0.5s @156.25MHz
     reg  [26:0] blink_cnt, hold_dn, hold_up;
+	
     always @(posedge axi_clk_0) begin
         if (axi_clk_rst_0) begin
             blink_cnt <= 27'd0;
@@ -250,12 +251,18 @@ module emcc_mst_top #(
             hold_up   <= 27'd0;
         end else begin
             blink_cnt <= blink_cnt + 1'b1;
-            if (s_axi_tx_tvalid_0 | m_axi_rx_tvalid_0) hold_dn <= LED_ACT_HOLD;
-            else if (|hold_dn)                         hold_dn <= hold_dn - 1'b1;
-            if (s_axi_tx_tvalid_1 | m_axi_rx_tvalid_1) hold_up <= LED_ACT_HOLD;
-            else if (|hold_up)                         hold_up <= hold_up - 1'b1;
+            if (s_axi_tx_tvalid_0 | m_axi_rx_tvalid_0) 
+				hold_dn <= LED_ACT_HOLD;
+            else if (|hold_dn)                         
+				hold_dn <= hold_dn - 1'b1;
+				
+            if (s_axi_tx_tvalid_1 | m_axi_rx_tvalid_1) 
+				hold_up <= LED_ACT_HOLD;
+            else if (|hold_up)                         
+				hold_up <= hold_up - 1'b1;
         end
     end
+	
     wire led_link = LANE_UP_0 & CHANNEL_UP_0 & LANE_UP_1 & CHANNEL_UP_1;
     wire led_idle = ~(|hold_dn) & ~(|hold_up);
     wire led_act  = (|hold_dn) & (|hold_up);
@@ -367,22 +374,10 @@ module emcc_mst_top #(
 	
 	
     // ----------------------- debug logic -------------------
-    
-	wire  [RAM_DWIDTH*3-1:0] dbg_iv_di_slv_msg[RAM_DWIDTH-1:0];
-    wire  [RAM_DWIDTH*3-1:0] dbg_iv_do_slv_msg[RAM_DWIDTH-1:0];
-    wire  [RAM_DWIDTH*3-1:0] dbg_ov_di_slv_msg[RAM_DWIDTH-1:0];
-    wire  [RAM_DWIDTH*3-1:0] dbg_ov_do_slv_msg[RAM_DWIDTH-1:0];
-    wire  [RAM_DWIDTH-1:0]   dbg_ov_di_debug                  ; 
-    wire  [RAM_DWIDTH-1:0]   dbg_ov_do_debug                  ; 
-        
-	localparam DI_BIT_WIDTH = 64;
-	localparam DO_BIT_WIDTH = 32;
-	
-    wire [DI_BIT_WIDTH-1:0]     emcc_main_inio;  
-    wire [DO_BIT_WIDTH-1:0]     emcc_main_outio;
-    wire [DI_BIT_WIDTH-1:0]     emcc_main_inio_debounce;
-	
+
+	//`define IO_DEBUG
     `ifdef IO_DEBUG
+	
     wire DEBUG_UART_RX ;
     wire DEBUG_UART_TX ;
     wire DEBUG_UART_DE ;
@@ -435,7 +430,8 @@ module emcc_mst_top #(
         ,.o_debug_mode        (  debug_mode  )
         
     );
-    // ---------------------------------- I/O debug -----------------------------
+    
+	
     wire di_debug;
     wire do_debug;
     wire [DI_BIT_WIDTH-1:0] dbg_main_board_in_io;
@@ -447,6 +443,13 @@ module emcc_mst_top #(
     wire  [RAM_DWIDTH*3-1:0] dbg_ov_do_slv_msg[RAM_DWIDTH-1:0];
     wire  [RAM_DWIDTH-1:0]   dbg_ov_di_debug                  ; 
     wire  [RAM_DWIDTH-1:0]   dbg_ov_do_debug                  ;  
+	
+	localparam DI_BIT_WIDTH = 64;
+	localparam DO_BIT_WIDTH = 32;
+	
+    wire [DI_BIT_WIDTH-1:0]     emcc_main_inio;  
+    wire [DO_BIT_WIDTH-1:0]     emcc_main_outio;
+    wire [DI_BIT_WIDTH-1:0]     emcc_main_inio_debounce;
     
     debug_send_top U_debug_send_top(
          .ps_reg_clk      (ps_reg_clk              )
@@ -718,21 +721,21 @@ module emcc_mst_top #(
           .i_user_de             (rs485_2_user_de        )
     );
 
-    wire        wr_cfg_data_done;
+    
+	
+	//------------------- emcc_mix_top ---------------------------
+	
+	wire        wr_cfg_data_done;
     wire        read_dbg_data_done;
     wire        do_dbg_data_vld;
     wire [31:0] io_mode_cfg  ;
     wire [31:0] inout_io_data;
     wire [31:0] do_dbg_data  ;
-
-
-    wire                        comp_reg_rd_vld;
+	
+	wire                        comp_reg_rd_vld;
     wire    [PS_REG_DWIDTH-1:0] comp_reg_rd_dat;
     wire                        flow_reg_rd_vld;
     wire    [PS_REG_DWIDTH-1:0] flow_reg_rd_dat;
-    
-	
-	//------------------- emcc_mix_top ---------------------------
 	
     `ifdef SIM_PLATFORM_MST
     emcc_comp_top_sim
@@ -1028,7 +1031,7 @@ module emcc_mst_top #(
         );
 	
 	
-	//-------------------------- PS  MODULE ------------------------------
+	//-------------------------- PS block-design MODULE ------------------------------
 	
   wire [7:0]GPIO_tri_i;
   wire [7:0]GPIO_tri_o;

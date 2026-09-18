@@ -42,7 +42,7 @@ module mst_app_cfg
 	
 	,output reg             			init_error
 	,output reg             			run_en
-	,(* MARK_DEBUG="true" *)output	reg		[2:0]				stu	
+	,(* MARK_DEBUG="true" *)output	reg		[2:0]				stu		//unuse
 	,output reg             			init_err_clr
 	,input wire            				init_err
 	,output reg             			cnt_err_clr
@@ -514,7 +514,7 @@ module mst_app_cfg
 			case(wk_state)
 			STM_IDLE,STM_INI:begin
 				if((downstream_lane_up&downstream_link)==0)begin
-					init_error		<= 'h1;
+					init_error		<= 'h1;	//0/1 link fail
 				end else begin
 					init_error		<= init_error;
 				end
