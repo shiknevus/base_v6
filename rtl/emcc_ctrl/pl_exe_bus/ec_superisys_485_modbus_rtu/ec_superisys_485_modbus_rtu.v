@@ -45,9 +45,9 @@ module ec_superisys_485_modbus_rtu#(
 	//--- 主板Uart接口
     	input  wire             i_uart_rx        ,
     	output wire             o_uart_tx        ,
-    	output wire             o_uart_de        ,    
-		output wire   			o_user_req       ,
-    	input  wire     		i_user_grant     ,
+    	output wire             o_uart_de        ,
+		output wire             o_user_req       ,
+    	input  wire             i_user_grant     ,
 	//--- 从板接口 use clk domain 156.25MHz --
 		input  wire [4:0]       cur_slv_board_id , //
 		input  wire [4:0]       slv_board_id     , 
@@ -58,7 +58,9 @@ module ec_superisys_485_modbus_rtu#(
 
     );
 	
-	wire            slaver_en       ;
+    wire            slaver_en       ;
+    wire            user_req        ;
+    wire            user_grant      ;
 	//PS-PL    
 	wire 	[7:0]	unit_id         ;     	
 	wire 	[3:0]	unit_ectrl      ;       
@@ -136,7 +138,6 @@ module ec_superisys_485_modbus_rtu#(
 //	wire        param30         ;
 	
 	//动态参数PL-PS
-    wire    [31:0]  param50       ;
     wire    [31:0]  param51       ;
     wire    [31:0]  param52       ;
 //  wire    [31:0]  param53       ;
@@ -196,55 +197,55 @@ module ec_superisys_485_modbus_rtu#(
 
 	//a_tx_result_rpt:a_bhv_id[7:0]+a_tx_id[7:0]+OK/NO_OK
 
-	//元资源参数
-	wire		[31:0]		baud_rate ;//串口波特率
-	wire		[19:0]		stop_bit  ;//停止位
-	wire		[7:0]		parity   ; //校验位
-	wire					flow_ctl ;//流控模式
-	wire		[7:0]		com_port ;//串口号
-	wire		[7:0]		slave_addr;//从站地址
-	wire		[7:0]		frame_gap;//帧间隔时间
-	wire		[15:0]		resp_tout;//响应超时时间
-	wire		[7:0]		retry_cnt;//重试次数
-	wire		[15:0]		poll_cycle;//轮询周期
-	wire		[7:0]		max_frame_len;//最大帧长度
-	wire		[31:0]		send_data_field_1;//控制数据1
-	wire		[31:0]		send_data_field_2;//控制数据2
-//	wire		[31:0]		send_data_field_3;//控制数据3
-	wire		[7:0]		add_filt_mod;//地址过滤模式
-	wire		[7:0]		flow_ctrl;//收发控制模式
-	wire		[7:0]		func_code;//功能码
-	wire		[7:0]		data_len;//数据长度
-	wire		[15:0]		err_check;//校验码
-	wire		[7:0]		check_method;//校验方式
-	wire		[7:0]		yte_order;//字节顺序
-	wire		[7:0]		start_delim;
-	wire		[7:0]		end_delim;
-	wire		[15:0]		start_addr;//起始地址
+    //元资源参数
+    wire		[19:0]		baud_rate ;//串口波特率
+    wire		[19:0]		stop_bit  ;//停止位
+    wire		[7:0]		parity   ; //校验位
+    wire					flow_ctl ;//流控模式
+    wire		[7:0]		com_port ;//串口号
+    wire		[7:0]		slave_addr;//从站地址
+    wire		[7:0]		frame_gap;//帧间隔时间
+    wire		[15:0]		resp_tout;//响应超时时间
+    wire		[7:0]		retry_cnt;//重试次数
+    wire		[15:0]		poll_cycle;//轮询周期
+    wire		[7:0]		max_frame_len;//最大帧长度
+    wire		[31:0]		send_data_field_1;//控制数据1
+    wire		[31:0]		send_data_field_2;//控制数据2
+//  wire		[31:0]		send_data_field_3;//控制数据3
+    wire		[7:0]		add_filt_mod;//地址过滤模式
+    wire		[7:0]		flow_ctrl;//收发控制模式
+    wire		[7:0]		func_code;//功能码
+    wire		[7:0]		data_len;//数据长度
+    wire		[15:0]		err_check;//校验码
+    wire		[7:0]		check_method;//校验方式
+    wire		[7:0]		yte_order;//字节顺序
+    wire		[7:0]		start_delim;
+    wire		[7:0]		end_delim;
+    wire		[15:0]		start_addr;//起始地址
 
-	wire        [31:0]      target_value;//目标值
+    wire        [31:0]      target_value;//目标值
 
-	wire		[31:0]		fb_data_frame_1;//反馈数据区1
-	wire		[31:0]		fb_data_frame_2;//反馈数据区2
+    wire		[31:0]		fb_data_frame_1;//反馈数据区1
+    wire		[31:0]		fb_data_frame_2;//反馈数据区2
 //	wire		[31:0]		fb_data_frame_3;//反馈数据区3
 
-	wire            send_start_p        ;
+    wire            send_start_p        ;
     wire            mst_send_start_p    ;
     wire            mst_send_ready      ;
-    wire [7:0]      mst_send_length     ;
-    wire [21*8-1:0] mst_send_data       ;
-    wire [21*8-1:0] mst_recv_data       ;
+    wire [11*8-1:0] mst_send_data       ;
+    wire [13*8-1:0] mst_recv_data       ;
     wire            mst_recv_finish_p   ;
 
     wire            slv_send_req_p       ;//发送请求（电平）
     wire            slv_send_finish_p    ;//发送完成（脉冲）
-	wire [ 4*8-1:0] slv_send_data_head   ;
-	wire [21*8-1:0] slv_send_data        ;
-    wire [21*8-1:0] slv_recv_data        ;
+	wire [11*8-1:0] slv_send_data        ;
+    wire [13*8-1:0] slv_recv_data        ;
     wire            slv_recv_finish_p    ;
 	wire [7:0]      slv_err_code         ;
 
-	wire [21*8-1:0] recv_data            ;
+	wire [7:0]      send_length          ;//发送的字节数
+	wire [7:0]      exp_recv_num         ;//预期接收的字节数
+	wire [13*8-1:0] recv_data            ;
 	wire            recv_data_finish_p   ;
 
     wire            chl_a_send_req       ;
@@ -254,28 +255,30 @@ module ec_superisys_485_modbus_rtu#(
     wire            chl_a_exe_suc        ;
     wire            chl_a_mat_err        ;
 
-	assign  mst_send_start_p  = send_start_p &(~slaver_en);
+    assign  mst_send_start_p  = send_start_p &(~slaver_en);
     assign  slv_send_req_p    = send_start_p &  slaver_en;
-	assign recv_data          = (slaver_en) ? slv_recv_data     : mst_recv_data    ;
-	assign recv_data_finish_p = (slaver_en) ? slv_recv_finish_p : mst_recv_finish_p;
+    assign recv_data          = (slaver_en) ? slv_recv_data     : mst_recv_data    ;
+    assign recv_data_finish_p = (slaver_en) ? slv_recv_finish_p : mst_recv_finish_p;
+    assign o_user_req         = (slaver_en) ?              1'b0 : user_req         ;
+    assign user_grant         = (slaver_en) ?              1'b1 : i_user_grant     ;
 
-	assign ec_chb_st   =0;
-	assign b_bhv_id    =0;
-	assign b_tx_id     =0;
-	assign b_alm_num   =0;
-	assign irq_b       =0;
-	assign b_pre_sta_allow  =0 ;
-	assign b_post_sta_allow =0 ;
+    assign ec_chb_st   =0;
+    assign b_bhv_id    =0;
+    assign b_tx_id     =0;
+    assign b_alm_num   =0;
+    assign irq_b       =0;
+    assign b_pre_sta_allow  =0 ;
+    assign b_post_sta_allow =0 ;
 
-	assign task_time_cnt =0;
-	assign c_gap_crl   =0;
-	assign ec_chc_st   =0;
-	assign c_bhv_id    =0;
-	assign c_tx_id     =0;
-	assign c_alm_num   =0;
-	assign irq_c       =0;
-	assign c_pre_sta_allow  =0 ;
-	assign c_post_sta_allow =0 ;
+    assign task_time_cnt =0;
+    assign c_gap_crl   =0;
+    assign ec_chc_st   =0;
+    assign c_bhv_id    =0;
+    assign c_tx_id     =0;
+    assign c_alm_num   =0;
+    assign irq_c       =0;
+    assign c_pre_sta_allow  =0 ;
+    assign c_post_sta_allow =0 ;
 
 
 // ---- 元资源参数，在配置值为0时，要采用默认值 ------
@@ -564,8 +567,8 @@ frame_ctrl_superisys_485 frame_ctrl_i(
     .i_send_data_field_3   ( 0                    ),//发送数据3
     .i_start_addr          ( start_addr           ),//起始地址
 
-    .o_user_req            ( o_user_req           ),
-    .i_user_grant          ( i_user_grant         ),
+    .o_user_req            ( user_req             ),
+    .i_user_grant          ( user_grant           ),
     .o_fb_data_frame_1     ( fb_data_frame_1      ), //返回数据1
     .o_fb_data_frame_2     ( fb_data_frame_2      ), //返回数据2
     .o_fb_data_frame_3     (                      ), //返回数据3
@@ -577,23 +580,23 @@ frame_ctrl_superisys_485 frame_ctrl_i(
 	
     //数据收发（主从模式公用）
     .o_send_start_p        ( send_start_p         ),//发送请求（脉冲）
+	.o_send_length         ( send_length          ),//发送的字节数
 	.i_recv_data           ( recv_data            ),
     .i_recv_finish_p       ( recv_data_finish_p   ),
     // 主板uart数据接口
     .i_send_ready          ( mst_send_ready       ),//空闲，可以发送的标志
     .o_send_data           ( mst_send_data        ),
-    .o_send_length         ( mst_send_length      ),
     //从板数据接口
     .i_send_finish_p       ( slv_send_finish_p    ), //发送完成（脉冲）
 	.i_slv_err_code        ( slv_err_code         ), //报错编码
-	.o_send_data_head      ( slv_send_data_head   ),
+	.o_exp_recv_num        ( exp_recv_num         ),//预期接收的字节数
 	.o_send_data_little    ( slv_send_data        ) //little-end
 
 );
 
 // ----------主板 uart 接口 ----------
   uart_driver_modbus_rtu#(
-   .RAM_DWIDTH           ( 13                 ),
+   .RAM_DWIDTH           ( 11                 ),
    .CLK_FREQ             ( CLK_FREQ           )
 )uart_driver_modbus_rtu_u0(
     .clk                 (clk_i               ),
@@ -604,9 +607,9 @@ frame_ctrl_superisys_485 frame_ctrl_i(
     .i_uart_rx           (i_uart_rx           ),
     .o_uart_tx           (o_uart_tx           ),
     .o_uart_de           (o_uart_de           ),
-    .i_send_start        ( mst_send_start_p   ),// level or pulse all right , just detect drising edge
+    .i_send_start        (mst_send_start_p    ),// level or pulse all right , just detect drising edge
     .o_send_ready        (mst_send_ready      ),
-    .i_send_length       (mst_send_length     ),
+    .i_send_length       (send_length         ),
     .i_data_send         (mst_send_data       ),
     .o_data_pack_ok      (mst_recv_finish_p   ),
     .o_data_rcv          (mst_recv_data       )
@@ -619,6 +622,7 @@ frame_ctrl_superisys_485 frame_ctrl_i(
     .i_prot_clk          ( clk_i                ),// 156.25MHz
     .i_prot_rst          ( rst_i                ),
     .i_baud_rate         ( baud_rate            ),//串口波特率 
+	.i_parity            ( parity               ),//奇偶校验，0=无校验 1=奇校验 2=偶校验
 
 //--- 从板接口 use clk domain 156.25MHz --
     .i_cur_slv_board_id  ( cur_slv_board_id     ), //
@@ -631,7 +635,8 @@ frame_ctrl_superisys_485 frame_ctrl_i(
     //--- 对接业务模块 clk domain 100MHz --
     .i_send_req_p        ( slv_send_req_p       ),
     .i_send_data         ( slv_send_data        ),// little-end
-    .i_send_data_head    ( slv_send_data_head   ),
+    .i_exp_send_num      ( send_length          ), //发送的字节数
+    .i_exp_recv_num      ( exp_recv_num         ), //预期接收的字节数
     .o_send_finish_p     ( slv_send_finish_p    ),
     .o_recv_data         ( slv_recv_data        ),
     .o_recv_finish_p     ( slv_recv_finish_p    ),
@@ -639,5 +644,28 @@ frame_ctrl_superisys_485 frame_ctrl_i(
     .o_modbus_err_code   ( slv_err_code         ) //1 = ok ; 5 = SG_CRC_ERR ; 6 = SG_TIME_OUT
 );
 
+/*
+ila_0 ila_0_i2 (
+	.clk(clk_i), // input wire clk
+
+
+	.probe0(rs485_ch_r_flag), // input wire [0:0]  probe0  
+	.probe1(rs485_ch_flag), // input wire [0:0]  probe1 
+	.probe2(slaver_en), // input wire [0:0]  probe2 
+	.probe3(send_start_p), // input wire [0:0]  probe3 
+	.probe4({16'h0,slave_addr,slv_board_id,cur_slv_board_id}), // input wire [31:0]  probe4 
+	.probe5(), // input wire [31:0]  probe5 
+	.probe6(m2s_rs485_msg), // input wire [31:0]  probe6 
+	.probe7(s2m_rs485_msg), // input wire [31:0]  probe7 
+	.probe8(slv_recv_finish_p), // input wire [0:0]  probe8 
+	.probe9(mst_recv_finish_p), // input wire [0:0]  probe9 
+	.probe10(0), // input wire [0:0]  probe10 
+	.probe11(0), // input wire [0:0]  probe11 
+	.probe12(0), // input wire [0:0]  probe12 
+	.probe13(0), // input wire [0:0]  probe13 
+	.probe14(0), // input wire [0:0]  probe14 
+	.probe15(0) // input wire [31:0]  probe15
+);	
+*/
 	
 endmodule

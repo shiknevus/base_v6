@@ -43,14 +43,24 @@ module ec_dv300_485_modbus_rtu#(
 		output 		 [31:0]     o_st_rd_data    ,
 		output 		            o_st_rd_vld     ,
 		output 	            	o_intr_irq		,//组件中断请求
-
+	//--- 主板Uart接口
     	input  wire             i_uart_rx        ,
     	output wire             o_uart_tx        ,
     	output wire             o_uart_de        ,    
 		output wire             o_user_req       ,
-    	input  wire             i_user_grant
+    	input  wire             i_user_grant     ,
+	//--- 从板接口 use clk domain 156.25MHz --
+		input  wire [4:0]       cur_slv_board_id , //
+		input  wire [4:0]       slv_board_id     , 
+		input  wire             rs485_ch_r_flag  , //send en
+		output wire [31:0]      m2s_rs485_msg    , //send data
+		input  wire             rs485_ch_flag    , //recv en
+		input  wire [31:0]      s2m_rs485_msg      //recv data
     );
 	
+    wire            slaver_en       ;
+    wire            user_req        ;
+    wire            user_grant      ;
 	//PS-PL    
 	wire 	[7:0]	unit_id         ;     	
 	wire 	[3:0]	unit_ectrl      ;       
@@ -222,6 +232,35 @@ module ec_dv300_485_modbus_rtu#(
     wire [63:0]     uart_send_data;
     wire [63:0]     uart_rcv_data;
     wire            uart_rcv_data_ok;
+
+
+	wire            send_start_p        ;
+    wire            mst_send_start_p    ;
+    wire            mst_send_ready      ;
+    wire [8*8-1:0]  mst_send_data       ;
+    wire [8*8-1:0]  mst_recv_data       ;
+    wire            mst_recv_finish_p   ;
+
+    wire            slv_send_req_p       ;//发送请求（电平）
+    wire            slv_send_finish_p    ;//发送完成（脉冲）
+	wire [8*8-1:0]  slv_send_data        ;
+    wire [8*8-1:0]  slv_recv_data        ;
+    wire            slv_recv_finish_p    ;
+	wire [7:0]      slv_err_code         ;
+
+	wire [7:0]      send_length          ;//发送的字节数
+	wire [7:0]      exp_recv_num         ;//预期接收的字节数
+	wire [8*8-1:0]  recv_data            ;
+	wire            recv_data_finish_p   ;
+
+	assign  mst_send_start_p  = send_start_p &(~slaver_en);
+    assign  slv_send_req_p    = send_start_p &  slaver_en;
+	assign recv_data          = (slaver_en) ? slv_recv_data     : mst_recv_data    ;
+	assign recv_data_finish_p = (slaver_en) ? slv_recv_finish_p : mst_recv_finish_p;
+    assign o_user_req         = (slaver_en) ?              1'b0 : user_req         ;
+    assign user_grant         = (slaver_en) ?              1'b1 : i_user_grant     ;
+
+
     wire            chl_a_send_req;
 	wire            chl_a_fb_data_ready_p;
 	wire [2:0]      chl_a_execu_result;
@@ -275,6 +314,7 @@ module ec_dv300_485_modbus_rtu#(
 		assign	start_addr     = 0;//起始地址
 		assign  start_delim    = 0;//起始符
 		assign	flow_ctrl      = 0;//收发控制模式
+		assign  slaver_en      = param26;//0=主板模式，1=从板模式
 
 
 ps_rw_pl_reg_dv300_485#(
@@ -514,8 +554,7 @@ pre_post_sta_check_dv300_485_modbus_rtu#(
 	
 
 // --------- uart ----------
-frame_ctrl_dv300_485_modbus_rtu
- frame_ctrl_dv300_485_modbus_rtu_i(
+frame_ctrl_dv300_485_modbus_rtu frame_ctrl_i(
     .clk_i                  ( clk_i                        ),
     .rst_i                  ( rst_i                        ),
     .i_time_1s_vld          ( i_time_1s_vld                ),
@@ -529,22 +568,32 @@ frame_ctrl_dv300_485_modbus_rtu
     .i_data_len             ( data_len                     ),//数据长度
     .i_start_addr           ( chl_a_data_send_start_addr   ),//起始地址
 //
-    .o_user_req             (o_user_req                    ),
-    .i_user_grant           (i_user_grant                  ),
+    .o_user_req             (user_req                      ),
+    .i_user_grant           (user_grant                    ),
     .o_fb_data_frame        (fb_data_frame                 ),
-    .i_chl_a_send_req       (chl_a_send_req                ),
+
+    .i_chl_a_send_req       ( chl_a_send_req               ),
     .o_chl_a_fb_data_ready_p(chl_a_fb_data_ready_p         ),
     .o_chl_a_execu_result   (chl_a_execu_result            ),
-    .o_send_start_p         ( uart_send_start_p            ),
-    .i_send_ready           ( uart_send_ready              ),
-    .o_send_data            ( uart_send_data               ),
-    .o_send_length          ( uart_send_length             ),
-    .i_recv_data            ( uart_rcv_data                ),
-    .i_recv_data_ok         ( uart_rcv_data_ok             )
+
+    //数据收发（主从模式公用）
+    .o_send_start_p        ( send_start_p         ),//发送请求（脉冲）
+	.o_send_length         ( send_length          ),
+	.i_recv_data           ( recv_data            ),
+    .i_recv_finish_p       ( recv_data_finish_p   ),
+    // 主板uart数据接口
+    .i_send_ready          ( mst_send_ready       ),//空闲，可以发送的标志
+    .o_send_data           ( mst_send_data        ),
+    //从板数据接口
+    .i_send_finish_p       ( slv_send_finish_p    ), //发送完成（脉冲）
+	.i_slv_err_code        ( slv_err_code         ), //报错编码
+	.o_exp_recv_num        ( exp_recv_num         ),//预期接收的字节数
+	.o_send_data_little    ( slv_send_data        ) //little-end
+
 );
 
   uart_driver_modbus_rtu#(
-   .RAM_DWIDTH           ( 12                 ),
+   .RAM_DWIDTH           ( 9                  ),
    .CLK_FREQ             ( CLK_FREQ           )
 )uart_driver_modbus_rtu_u0(
     .clk                 (clk_i               ),
@@ -555,12 +604,41 @@ frame_ctrl_dv300_485_modbus_rtu
     .i_uart_rx           (i_uart_rx           ),
     .o_uart_tx           (o_uart_tx           ),
     .o_uart_de           (o_uart_de           ),
-    .i_send_start        (uart_send_start_p   ),
-    .o_send_ready        (uart_send_ready     ),
-    .i_send_length       (uart_send_length    ),
-    .i_data_send         (uart_send_data      ),
-    .o_data_pack_ok      (uart_rcv_data_ok    ),
-    .o_data_rcv          (uart_rcv_data       )
+    .i_send_start        (mst_send_start_p    ),
+    .o_send_ready        (mst_send_ready      ),
+    .i_send_length       (send_length         ),
+    .i_data_send         (mst_send_data       ),
+    .o_data_pack_ok      (mst_recv_finish_p   ),
+    .o_data_rcv          (mst_recv_data       )
+);
+
+// ----------- slaver 从板接口  ---------------
+  dv300_485_slaver_driver  dv300_485_slaver_driverr_i(
+    .i_clk               ( clk_i                ),// user clk （100MHz or 156.25MHz）
+    .i_rst               ( rst_i                ),
+    .i_prot_clk          ( clk_i                ),// 156.25MHz
+    .i_prot_rst          ( rst_i                ),
+    .i_baud_rate         ( baud_rate            ),//串口波特率 
+	.i_parity            ( parity               ),//奇偶校验，0=无校验 1=奇校验 2=偶校验
+
+//--- 从板接口 use clk domain 156.25MHz --
+    .i_cur_slv_board_id  ( cur_slv_board_id     ), //
+    .i_slv_board_id      ( slv_board_id         ), 
+    .i_rs485_ch_r_flag   ( rs485_ch_r_flag      ), //send en
+    .o_m2s_rs485_msg     ( m2s_rs485_msg        ), //send data
+    .i_rs485_ch_flag     ( rs485_ch_flag        ), //recv en
+    .i_s2m_rs485_msg     ( s2m_rs485_msg        ), //recv data
+
+    //--- 对接业务模块 clk domain 100MHz --
+    .i_send_req_p        ( slv_send_req_p       ),
+    .i_send_data         ( slv_send_data        ),// little-end
+    .i_exp_send_num      ( send_length          ), //发送的字节数
+    .i_exp_recv_num      ( exp_recv_num         ), //预期接收的字节数
+    .o_send_finish_p     ( slv_send_finish_p    ),
+    .o_recv_data         ( slv_recv_data        ),
+    .o_recv_finish_p     ( slv_recv_finish_p    ),
+    .i_uart_inspect      ( 0                    ),
+    .o_modbus_err_code   ( slv_err_code         ) //1 = ok ; 5 = SG_CRC_ERR ; 6 = SG_TIME_OUT
 );
 
 /*
@@ -568,22 +646,22 @@ ila_0 ila_0_i2 (
 	.clk(clk_i), // input wire clk
 
 
-	.probe0(o_uart_de), // input wire [0:0]  probe0  
-	.probe1(i_uart_rx), // input wire [0:0]  probe1 
-	.probe2(o_uart_tx), // input wire [0:0]  probe2 
-	.probe3(uart_send_start_p), // input wire [0:0]  probe3 
-	.probe4(uart_rcv_data_ok), // input wire [0:0]  probe4 
-	.probe5(irq_a), // input wire [0:0]  probe5 
-	.probe6(rst_i), // input wire [0:0]  probe6 
-	.probe7(o_intr_irq), // input wire [0:0]  probe7 
-	.probe8(i_time_1ms_vld), // input wire [0:0]  probe8 
-	.probe9(i_time_1s_vld), // input wire [0:0]  probe9 
-	.probe10(ps_reg_clk), // input wire [0:0]  probe10 
-	.probe11(ps_reg_reset), // input wire [0:0]  probe11 
-	.probe12(uart_rcv_data[31:0]), // input wire [31:0]  probe12 
-	.probe13(uart_rcv_data[63:32]), // input wire [31:0]  probe13 
-	.probe14(uart_send_data[31:0]), // input wire [31:0]  probe14 
-	.probe15(uart_send_length) // input wire [31:0]  probe15
+	.probe0(rs485_ch_r_flag), // input wire [0:0]  probe0  
+	.probe1(rs485_ch_flag), // input wire [0:0]  probe1 
+	.probe2(slaver_en), // input wire [0:0]  probe2 
+	.probe3(send_start_p), // input wire [0:0]  probe3 
+	.probe4({16'h0,slave_addr,slv_board_id,cur_slv_board_id}), // input wire [31:0]  probe4 
+	.probe5(), // input wire [31:0]  probe5 
+	.probe6(m2s_rs485_msg), // input wire [31:0]  probe6 
+	.probe7(s2m_rs485_msg), // input wire [31:0]  probe7 
+	.probe8(slv_recv_finish_p), // input wire [0:0]  probe8 
+	.probe9(mst_recv_finish_p), // input wire [0:0]  probe9 
+	.probe10(0), // input wire [0:0]  probe10 
+	.probe11(0), // input wire [0:0]  probe11 
+	.probe12(0), // input wire [0:0]  probe12 
+	.probe13(0), // input wire [0:0]  probe13 
+	.probe14(0), // input wire [0:0]  probe14 
+	.probe15(0) // input wire [31:0]  probe15
 );	
 */
 endmodule

@@ -8,7 +8,6 @@
 //`define ENB_SIM_MODULE   // Enable simulation debug
 //`define ENB_IO_DBG_SUPPORT   // Enable simulation debug
 `define SET_DEBUG_CMD 9'h90
-//`define IO_DEBUG
 //`define IO_DEBUG_USE_RS232
 //`define IO_DEBUG_USE_RS485_1
 `define IO_DEBUG_USE_RS485_2
