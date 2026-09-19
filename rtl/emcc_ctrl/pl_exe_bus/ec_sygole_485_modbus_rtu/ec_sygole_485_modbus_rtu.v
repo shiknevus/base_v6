@@ -291,7 +291,7 @@ module ec_sygole_485_modbus_rtu#(
 		assign	frame_gap      = 0;//帧间隔时间
 		assign	resp_tout      = (param7[19:0]==0)?16'd1000:param7[19:0];//响应超时时间
 		assign	start_addr[15:0]= param8[15:0];//起始地址
-		assign	parity         = (param16[7:0]==0)?2:param16[7:0];//奇偶校验位
+		assign	parity         = param16[7:0];//奇偶校验位,0=无校验，1=奇校验，2=偶校验
 		assign	retry_cnt      = (param17==0)?8'd3:param17;//重试次数
 		assign	slave_addr     =  param18[7:0];//从站地址
 		assign	func_code      = 0;//param19[7:0];//功能码

@@ -293,7 +293,7 @@ module ec_dv300_485_modbus_rtu#(
 // ---- 元资源参数，在配置值为0时，要采用默认值 ------
 		assign	baud_rate      = (param6==0)?9600:param6;//串口波特率，默认9600
 		assign	stop_bit       = 0;//停止位
-		assign	parity         = (param16==0)? 2 : param16;//奇偶校验位,默认偶校验
+		assign	parity         = param16[7:0];//奇偶校验位,0=无校验，1=奇校验，2=偶校验
 		assign	flow_ctl       = 0;//流控模式
 		assign	com_port       = 0;//串口号
 		assign	slave_addr     = param18[7:0];//从站地址
