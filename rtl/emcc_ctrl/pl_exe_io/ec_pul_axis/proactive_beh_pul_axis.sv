@@ -401,6 +401,7 @@ module proactive_beh_pul_axis#(
 	
 	wire w_soft_lim_f;
 	wire w_soft_lim_b;
+	wire w_sw_move;
 	always@(posedge clk_i)begin
         if(rst_i || !a_en)
             a_alm_num <= 8'd0;
@@ -426,10 +427,10 @@ module proactive_beh_pul_axis#(
             a_alm_num <= 8'd109;   // HW +limit, add by szzhang 20260918
 		else if(curr_state == S_BHA_POST_DET && action_error && i_axis_limb)
             a_alm_num <= 8'd110;   // HW -limit, add by szzhang 20260918
-		else if(curr_state == S_BHA_POST_DET && action_error && w_soft_lim_f)
-            a_alm_num <= 8'd111;   // SW +limit, add by szzhang 20260918
-		else if(curr_state == S_BHA_POST_DET && action_error && w_soft_lim_b)
-            a_alm_num <= 8'd112;   // SW -limit, add by szzhang 20260918
+		else if(curr_state == S_BHA_POST_DET && action_error && w_sw_move && w_soft_lim_f)
+            a_alm_num <= 8'd111;   // SW +limit (MOVE only)
+		else if(curr_state == S_BHA_POST_DET && action_error && w_sw_move && w_soft_lim_b)
+            a_alm_num <= 8'd112;   // SW -limit (MOVE only)
 		else if(curr_state == S_BHA_POST_DET && action_error)
             a_alm_num <= 8'd105;
 		else if(curr_state == S_IDLE)
@@ -586,10 +587,11 @@ assign      w_soft_lim_b  = w_soft_lim_en && (r_pf_abspos <= rcfg_pos_min);
 wire signed [31:0] s_move_tgt = rserv_target_pulse;
 wire        w_move_over_f = w_soft_lim_en && (s_move_tgt > rcfg_pos_max);
 wire        w_move_over_b = w_soft_lim_en && (s_move_tgt < rcfg_pos_min);
-wire        w_jog_lim_f   = i_axis_limf | w_soft_lim_f;
-wire        w_jog_lim_b   = i_axis_limb | w_soft_lim_b;
+wire        w_jog_lim_f   = i_axis_limf;
+wire        w_jog_lim_b   = i_axis_limb;
 wire        w_move_lim_f  = i_axis_limf | w_soft_lim_f | w_move_over_f;
 wire        w_move_lim_b  = i_axis_limb | w_soft_lim_b | w_move_over_b;
+assign      w_sw_move     = (a_bhv_id_r == 8'd3) || (a_bhv_id_r == 8'd21);
 assign o_soft_lim_f = w_soft_lim_f;
 assign o_soft_lim_b = w_soft_lim_b;
 

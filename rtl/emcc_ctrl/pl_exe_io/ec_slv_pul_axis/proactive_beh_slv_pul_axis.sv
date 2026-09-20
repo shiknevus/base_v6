@@ -402,6 +402,8 @@ module proactive_beh_slv_pul_axis#(
 
 	wire w_soft_lim_f;
 	wire w_soft_lim_b;
+	wire w_sw_move;
+	wire w_sw_fault;
 	always@(posedge clk_i)begin
         if(rst_i || !a_en)
             a_alm_num <= 8'd0;
@@ -427,9 +429,9 @@ module proactive_beh_slv_pul_axis#(
             a_alm_num <= 8'd109;   // HW +limit
 		else if(curr_state == S_BHA_POST_DET && action_error && i_axis_limb)
             a_alm_num <= 8'd110;   // HW -limit
-		else if(curr_state == S_BHA_POST_DET && action_error && w_soft_lim_f)
+		else if(curr_state == S_BHA_POST_DET && action_error && w_sw_move && w_soft_lim_f)
             a_alm_num <= 8'd111;   // SW +limit
-		else if(curr_state == S_BHA_POST_DET && action_error && w_soft_lim_b)
+		else if(curr_state == S_BHA_POST_DET && action_error && w_sw_move && w_soft_lim_b)
             a_alm_num <= 8'd112;   // SW -limit
 		else if(curr_state == S_BHA_POST_DET && action_error)
             a_alm_num <= 8'd105;
@@ -527,7 +529,7 @@ module proactive_beh_slv_pul_axis#(
 											rserv_dir,
 		                                    1'b0, 
 											i_pause,
-		                                     i_stop|(~i_emerge_stop_signal)|(~dv_alarm)|w_soft_lim_f|w_soft_lim_b,
+		                                     i_stop|(~i_emerge_stop_signal)|(~dv_alarm)|w_sw_fault,
 											action_beat,
 		                                    i_axis_zero,
 											i_axis_limb,
@@ -605,9 +607,8 @@ module proactive_beh_slv_pul_axis#(
 		assign w_soft_lim_b = w_soft_lim_en && (r_pf_abspos <= rcfg_pos_min);
 		assign o_soft_lim_f = w_soft_lim_f;
 		assign o_soft_lim_b = w_soft_lim_b;
-		wire w_sw_jog  = (a_bhv_id_r == 8'd2) || (a_bhv_id_r == 8'd20);
-		wire w_sw_move = (a_bhv_id_r == 8'd3) || (a_bhv_id_r == 8'd21);
-		wire w_sw_fault = (w_sw_jog | w_sw_move) & (w_soft_lim_f | w_soft_lim_b);
+		assign w_sw_move  = (a_bhv_id_r == 8'd3) || (a_bhv_id_r == 8'd21);
+		assign w_sw_fault = w_sw_move & (w_soft_lim_f | w_soft_lim_b);
 
 		assign action_busy  = slv_action_busy;
 		assign action_done  = slv_action_done  & action_accepted;

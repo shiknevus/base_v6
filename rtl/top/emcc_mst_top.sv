@@ -376,6 +376,21 @@ module emcc_mst_top #(
     // ----------------------- debug logic -------------------
 
 	//`define IO_DEBUG
+    
+	wire  [RAM_DWIDTH*3-1:0] dbg_iv_di_slv_msg[RAM_DWIDTH-1:0];
+    wire  [RAM_DWIDTH*3-1:0] dbg_iv_do_slv_msg[RAM_DWIDTH-1:0];
+    wire  [RAM_DWIDTH*3-1:0] dbg_ov_di_slv_msg[RAM_DWIDTH-1:0];
+    wire  [RAM_DWIDTH*3-1:0] dbg_ov_do_slv_msg[RAM_DWIDTH-1:0];
+    wire  [RAM_DWIDTH-1:0]   dbg_ov_di_debug                  ; 
+    wire  [RAM_DWIDTH-1:0]   dbg_ov_do_debug                  ; 
+        
+	localparam DI_BIT_WIDTH = 64;
+	localparam DO_BIT_WIDTH = 32;
+	
+    wire [DI_BIT_WIDTH-1:0]     emcc_main_inio;  
+    wire [DO_BIT_WIDTH-1:0]     emcc_main_outio;
+    wire [DI_BIT_WIDTH-1:0]     emcc_main_inio_debounce;
+	
     `ifdef IO_DEBUG
 	
     wire DEBUG_UART_RX ;
@@ -444,12 +459,6 @@ module emcc_mst_top #(
     wire  [RAM_DWIDTH-1:0]   dbg_ov_di_debug                  ; 
     wire  [RAM_DWIDTH-1:0]   dbg_ov_do_debug                  ;  
 	
-	localparam DI_BIT_WIDTH = 64;
-	localparam DO_BIT_WIDTH = 32;
-	
-    wire [DI_BIT_WIDTH-1:0]     emcc_main_inio;  
-    wire [DO_BIT_WIDTH-1:0]     emcc_main_outio;
-    wire [DI_BIT_WIDTH-1:0]     emcc_main_inio_debounce;
     
     debug_send_top U_debug_send_top(
          .ps_reg_clk      (ps_reg_clk              )
