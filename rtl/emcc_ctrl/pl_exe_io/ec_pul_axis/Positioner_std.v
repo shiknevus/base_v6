@@ -1,5 +1,6 @@
 /////////////////////////// MODULE //////////////////////////////
 module Positioner_std #(
+    parameter USE_ABORT = 0,
     parameter BASE_REFCLK = 156_250_000 
 )
 (
@@ -16,6 +17,7 @@ module Positioner_std #(
    ,input  wire [31:0]      i_pf_pulse
    ,input  wire             i_quickstop
    ,input  wire [31:0]      i_quickstop_dec
+   ,input  wire             i_abort
    ,input  wire             i_pause
    ,output wire             o_pf_done
    ,output wire             o_pf_error
@@ -50,13 +52,14 @@ module Positioner_std #(
    localparam  ST_POS_ACC  = 2;
    localparam  ST_POS_DEC  = 3;
    localparam  ST_POS_DRAIN = 4;
+   localparam  ST_POS_HOLD = 5;
    
    localparam  MODE_T    	 = 32'h00;
    localparam  MODE_S 		 = 32'h10;
    localparam [P_DIV_WIDTH:0] UNIT_DT = ({1'b1, {P_DIV_WIDTH{1'b0}}} + BASE_REFCLK / 2) / BASE_REFCLK;
    
    reg  [2:0]                 fsm_st;
-   wire                       div_reset = reset || (fsm_st == ST_POS_IDLE);
+   wire                       div_reset = reset || (fsm_st == ST_POS_IDLE) || (fsm_st == ST_POS_HOLD);
 
    ////////////////// Division
    reg                        spd_div_start;
@@ -74,14 +77,14 @@ module Positioner_std #(
    spd_div (
       .clk     ( clk           ),
       .rst     ( div_reset     ),
-      .clk_en  ( spd_div_start && !i_pause && !spd_div_full ),
+      .clk_en  ( spd_div_start && !spd_div_full ),
       .nom     ( spd_div_nom   ),
       .den     ( spd_div_den   ),
       .quo     ( spd_div_quo   ),
       .remo    (               ),
       .ready   ( spd_div_ready ),
       .full    ( spd_div_full  ),
-      .pause   ( i_pause       )
+      .pause   ( 1'b0       )
    );
 
    reg                        period_div_start;
@@ -99,14 +102,14 @@ module Positioner_std #(
    period_div (
       .clk     ( clk              ),
       .rst     ( div_reset        ),
-      .clk_en  ( period_div_start && !i_pause && !period_div_full ),
+      .clk_en  ( period_div_start && !period_div_full ),
       .nom     ( period_div_nom   ),
       .den     ( period_div_den   ),
       .quo     ( period_div_quo   ),
       .remo    (                  ),
       .ready   ( period_div_ready ),
       .full    ( period_div_full  ),
-      .pause   ( i_pause          )
+      .pause   ( 1'b0          )
    );
 
    ////////////////// Profile
@@ -115,6 +118,26 @@ module Positioner_std #(
    reg                                  r_pf_dir;
    reg  [31:0]                          r_pf_mode;
    reg                                  r_pf_quickstop;
+   reg                                  stop_pending;
+   reg                                  period_valid;
+   reg                                  pause_pending;
+   wire abort_now = USE_ABORT && i_abort;
+   always @(posedge clk) begin
+      if(reset || fsm_st == ST_POS_IDLE) begin
+         stop_pending <= 1'b0;
+         pause_pending <= 1'b0;
+         period_valid <= 1'b0;
+      end else begin
+         if(i_pf_stop) stop_pending <= 1'b1;
+         if(i_pause) pause_pending <= 1'b1;
+         if(fsm_st == ST_POS_HOLD) begin
+            period_valid <= 1'b0;
+            if(!i_pause || i_quickstop) pause_pending <= 1'b0;
+         end
+         if((fsm_st == ST_POS_ACC || fsm_st == ST_POS_DEC) && period_div_ready)
+            period_valid <= 1'b1;
+      end
+   end
    reg                                  r_div_ready;
    reg                                  p_div_ready;
    reg                                  r_pf_pulse_first;
@@ -186,7 +209,7 @@ module Positioner_std #(
          r_pf_dec_target  <= 0;
          r_pf_jerk_state  <= 1'b0;
          r_pf_quickstop   <= 1'b0;
-      end else if(~i_pause) begin
+      end else begin
          case(fsm_st)
             ST_POS_IDLE: begin
                if(i_pf_start) begin
@@ -202,6 +225,17 @@ module Positioner_std #(
                   r_pf_dec_act     <= 0;
                   r_pf_jerk_state  <= 1'b0;
                   r_pf_quickstop   <= 1'b0;
+               end
+            end
+            ST_POS_HOLD: begin
+               if(!i_pause) begin
+                  r_pf_spd_act <= {P_SPD_MIN,{P_DIV_WIDTH{1'b0}}};
+                  r_pf_acc <= r_pf_acc_target;
+                  r_pf_dec <= r_pf_dec_target;
+                  r_pf_acc_act <= 0;
+                  r_pf_dec_act <= 0;
+                  r_pf_jerk_state <= 0;
+                  r_pf_quickstop <= 0;
                end
             end
             ST_POS_INIT: begin
@@ -230,7 +264,10 @@ module Positioner_std #(
                   else
                      r_pf_spd_act <= {r_pf_spd_target,{P_DIV_WIDTH{1'b0}}};
 `else
-                  r_pf_spd_act <= r_pf_spd_act + r_pf_acc*UNIT_DT;
+                  if(r_pf_spd < r_pf_spd_target)
+                     r_pf_spd_act <= r_pf_spd_act + r_pf_acc*UNIT_DT;
+                  else
+                     r_pf_spd_act <= {r_pf_spd_target,{P_DIV_WIDTH{1'b0}}};
 `endif
                end else begin
 `ifdef PF_SIM
@@ -380,7 +417,7 @@ module Positioner_std #(
    // Period, 0 ~ 10^8
    reg  [P_PERIOD_WIDTH-1:0]            r_pf_pulse_period;      // 27-BIT: 0 ~ 10^8
    
-   wire                                 r_pf_pulse_done = r_pf_pulse_count>=r_pf_pulse_period-1'b1;   
+   wire                                 r_pf_pulse_done = i_pulse_done;
    
    localparam  PF_JERK_NBIT=32;
    
@@ -396,7 +433,7 @@ module Positioner_std #(
          r_pf_acc_inv      <= 0;
          r_pf_pulse_first  <= 1'b1;
       end
-      else if(~i_pause) begin
+      else begin
          case(fsm_st)
             ST_POS_IDLE: begin
                r_pf_pulse_count  <= 0;
@@ -410,6 +447,18 @@ module Positioner_std #(
                   r_pf_pulse_act   <= 0;
                   r_pf_pulse_first <= 1'b1;
                   r_pf_pulse_dif   <= ((i_pf_mode&MODE_S) == MODE_S) ? 32'd5 : 32'd5;
+               end
+            end
+            ST_POS_HOLD: begin
+               if(!i_pause) begin
+                  r_pf_pulse <= r_pf_pulse - r_pf_pulse_act;
+                  r_pf_pulse_act <= 0;
+                  r_pf_pulse_count <= 0;
+                  r_pf_pulse_period <= P_PERIOD_MIN;
+                  r_pf_pulse_first <= 1;
+                  r_pf_pulse_cal <= 0;
+                  r_pf_pulse_acc <= 0;
+                  r_pf_pulse_dec <= 0;
                end
             end
             ST_POS_INIT: begin
@@ -499,7 +548,16 @@ module Positioner_std #(
          r_div_ready <= 1'b0;
          p_div_ready <= 1'b0;
       end
-      else if(~i_pause) begin
+      else if(abort_now && fsm_st != ST_POS_IDLE) begin
+         fsm_st <= ST_POS_DRAIN;
+         r_pf_busy <= 1'b1;
+         r_pf_done <= 1'b0;
+         if(fsm_st == ST_POS_DRAIN && !i_pulse_busy) begin
+            fsm_st <= ST_POS_IDLE;
+            r_pf_done <= 1'b1;
+         end
+      end
+      else begin
          r_div_ready <= (fsm_st == ST_POS_IDLE) ? 1'b0 : spd_div_ready;
          p_div_ready <= (fsm_st == ST_POS_IDLE) ? 1'b0 : period_div_ready;
          case(fsm_st)
@@ -523,7 +581,8 @@ module Positioner_std #(
                if(spd_div_ready&r_div_ready)
                   fsm_st <= ST_POS_ACC;
 
-               if(i_pf_stop) begin
+               if(i_pause) fsm_st <= ST_POS_HOLD;
+               if(i_pf_stop || stop_pending) begin
                   fsm_st <= ST_POS_DRAIN;
                   r_pf_done <= 1'b0;
                end
@@ -533,7 +592,7 @@ module Positioner_std #(
                r_pf_done  <= 1'b0;
                r_pf_busy  <= 1'b1;
                if(r_pf_pulse_first) begin
-                  if(r_pf_pulse_count>=r_pf_pulse_period-1'b1)
+                  if(r_pf_pulse_done)
                      if(r_pf_pulse==1) begin
                         fsm_st <= ST_POS_DRAIN;
                         r_pf_done <= 1'b0;
@@ -548,8 +607,9 @@ module Positioner_std #(
                   end
                end
 
-               if(i_pf_stop) begin
-                  fsm_st <= ST_POS_DRAIN;
+               if(i_pf_stop || stop_pending || ((i_pause || pause_pending) &&
+                  !(r_pf_pulse_done && r_pf_pulse_act >= r_pf_pulse-1))) begin
+                  fsm_st <= ST_POS_DEC;
                   r_pf_done <= 1'b0; 
                end
             end
@@ -566,7 +626,7 @@ module Positioner_std #(
                         end
                      end
                      1: begin // stop when reaching target pulse, or quickstop at mini speed
-                        if((r_pf_pulse_act==r_pf_pulse-1'b1) | (r_pf_quickstop&r_pf_spd<=P_SPD_MIN)) begin
+                        if((!stop_pending && r_pf_pulse_act>=r_pf_pulse-1'b1) | ((r_pf_quickstop | stop_pending | pause_pending) && r_pf_spd<=P_SPD_MIN)) begin
                            fsm_st <= ST_POS_DRAIN;
                            r_pf_done <= 1'b0;
                         end
@@ -580,19 +640,27 @@ module Positioner_std #(
                   endcase
                end
 
-               if(i_pf_stop) begin
-                  fsm_st <= ST_POS_DRAIN;
-                  r_pf_done <= 1'b0;
-               end
             end
             ST_POS_DRAIN: begin
                // Keep busy until the pulse generator has completed its last period.add by szzhang 20260914
                r_pf_busy <= 1'b1;
                r_pf_done <= 1'b0;
                if(!i_pulse_busy) begin
-                  fsm_st <= ST_POS_IDLE;
-                  r_pf_done <= 1'b1;
+                  if(pause_pending && !stop_pending && r_pf_pulse_act < r_pf_pulse) begin
+                     fsm_st <= ST_POS_HOLD;
+                  end else begin
+                     fsm_st <= ST_POS_IDLE;
+                     r_pf_done <= 1'b1;
+                  end
                end
+            end
+            ST_POS_HOLD: begin
+               r_pf_busy <= 1;
+               r_pf_done <= 0;
+               r_div_ready <= 0;
+               p_div_ready <= 0;
+               if(i_pf_stop || stop_pending || i_quickstop) fsm_st <= ST_POS_DRAIN;
+               else if(!i_pause) fsm_st <= ST_POS_INIT;
             end
          endcase
       end
@@ -648,7 +716,7 @@ module Positioner_std #(
                period_div_den <= r_pf_spd;
             end
             ST_POS_ACC: begin
-               r_pulse_start  <= ~i_pause;
+               r_pulse_start  <= 1'b1;
                r_pulse_period <= r_pf_pulse_period;
                r_pulse_number <= 32'd1;
                r_pulse_dir    <= r_pf_dir;
@@ -664,7 +732,7 @@ module Positioner_std #(
                period_div_den <= r_pf_spd[P_SPD_WIDTH-1:0]; // Speed: 0 ~ 8M, 23-bit;
             end
             ST_POS_DEC: begin
-               r_pulse_start  <= ~i_pause;   //change by szzhang 20260813
+               r_pulse_start  <= 1'b1;   //change by szzhang 20260813
                r_pulse_period <= r_pf_pulse_period;
                r_pulse_number <= 32'd1;
                r_pulse_dir    <= r_pf_dir;
@@ -695,7 +763,7 @@ module Positioner_std #(
       end
    end
 
-   assign o_pulse_start  = r_pulse_start;
+   assign o_pulse_start  = r_pulse_start && period_valid && !i_pulse_busy && !abort_now;
    assign o_pulse_period = r_pulse_period;
    assign o_pulse_number = r_pulse_number;
    assign o_pulse_dir    = r_pulse_dir;

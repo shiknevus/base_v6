@@ -429,6 +429,7 @@ module ec_slv_pul_axis#(
 	//,.debug_reg5			(debug_reg5		)
 	);
 
+	wire home_completed;
 	proactive_beh_slv_pul_axis#(
 	.BHA_NUM 				(A_BHA_NUM  	 	)	//Number of active behaviors
 )proactive_beh_slv_pul_axis_u0(
@@ -495,6 +496,9 @@ module ec_slv_pul_axis#(
 	,.i_drive_on			(b_son					)
 	,.i_drive_reset			(b_reset				)
 	,.dv_alarm				(dv_alarm				)
+
+    ,.i_home_completed 		(home_completed			)
+    ,.i_drive_enabled 		(~b_son					)
 //----------------------------------------------------- user logic end -------------------------------------------------------//
     );
 
@@ -609,6 +613,8 @@ module ec_slv_pul_axis#(
 
 		,.i_axis_limf			(i_axis_limf        )
 		,.i_axis_limb			(i_axis_limb        )
+
+		,.o_home_completed 		(home_completed		)
 //----------------------------------------------------- user logic end -------------------------------------------------------//
     );
 

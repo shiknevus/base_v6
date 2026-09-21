@@ -88,7 +88,7 @@ module Jog_fa_std
                    if(i_start) begin
                        r_pf_dir <= i_pf_dir; // latch: limit check must not follow live PS writes
                        // only block when moving INTO an active limit; allow jog away
-                       if((i_lim_f & i_lim_b) |
+                       if(!i_drv_son | i_stop | (i_lim_f & i_lim_b) |
                            (i_lim_f & (i_pf_dir == DIR_POS)) |
                            (i_lim_b & (i_pf_dir == DIR_NEG))) begin
                            fsm_st <= ST_JOG_ERROR;
@@ -99,7 +99,7 @@ module Jog_fa_std
                end
                ST_JOG_START: begin
                    // r_st_error latched until done, change by szzhang 20260913
-                   r_pf_start <= ~i_pf_busy;
+                   r_pf_start <= ~i_pf_busy && !i_stop && !motion_fault;
                    if(i_pf_busy) begin
                        if(motion_fault) begin
                            r_pf_quickstop <= 1'b1;
@@ -111,7 +111,7 @@ module Jog_fa_std
                            fsm_st <= (r_st_error | motion_fault) ? ST_JOG_ERROR : ST_JOG_DONE;//change by szzhang 20260813
                        end
                    // add by szzhang 20260917
-                   end else if(motion_fault) begin
+                   end else if(motion_fault || i_stop) begin
                        r_st_error <= 1'b1;
                        fsm_st <= ST_JOG_ERROR;
                    end
@@ -140,7 +140,7 @@ module Jog_fa_std
        end
    end
 
-   assign o_pf_start     = r_pf_start;
+   assign o_pf_start     = r_pf_start && !i_stop && !motion_fault;
    assign o_pf_stop      = r_pf_stop ; 
    assign o_pf_spd       = i_pf_spd  ;
    assign o_pf_acc       = i_pf_acc  ;

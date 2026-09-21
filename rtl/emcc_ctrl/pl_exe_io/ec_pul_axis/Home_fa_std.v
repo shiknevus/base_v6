@@ -16,6 +16,7 @@ module Home_fa_std
    ,input  wire             i_stop
    ,output reg              o_busy
    ,output reg              o_done
+   ,output wire             o_limit_recover
    ,output reg              o_error
    
    ,output reg [31:0]       o_pf_spd
@@ -64,6 +65,12 @@ module Home_fa_std
    wire        negedge_lim_b =~i_lim_b& r_lim_b;
    wire        posedge_org   = i_org & ~r_org;
    wire        negedge_org   = ~i_org & r_org;
+
+   // First search limit.
+   assign o_limit_recover = i_drv_son && !i_stop && !(i_lim_f && i_lim_b) &&
+       !r_pf_status_org &&
+       ((((fsm_st == ST_HOME_FACC) || (fsm_st == ST_HOME_FDEC)) && !r_pf_status_lim_b) ||
+        (((fsm_st == ST_HOME_BACC) || (fsm_st == ST_HOME_BDEC)) && !r_pf_status_lim_f));
 
    assign o_pf_touchstop = o_pf_quickstop & r_pf_status_org; //add by szzhang 20260916
 
@@ -258,6 +265,12 @@ module Home_fa_std
                    fsm_st <= ST_HOME_IDLE;
                end
            endcase
+           if(i_lim_f && i_lim_b && fsm_st != ST_HOME_IDLE &&
+              fsm_st != ST_HOME_END && fsm_st != ST_HOME_STOP) begin
+               o_pf_start <= 1'b0;
+               o_pf_stop <= 1'b1;
+               fsm_st <= ST_HOME_STOP;
+           end
        end
    end
    

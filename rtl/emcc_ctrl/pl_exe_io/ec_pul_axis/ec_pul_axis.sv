@@ -292,6 +292,8 @@ module ec_pul_axis#(
 	wire 			b_clr_stop	;
 	wire 			b_pause		;
 	wire 			b_stop		;
+
+	wire 			home_completed;
 //----------------------------------------------------- user logic end -------------------------------------------------------//
 
 	ps_rw_pl_reg_pul_axis#(
@@ -483,6 +485,9 @@ module ec_pul_axis#(
 	,.r_pf_abspos			(param51				)
 	,.o_soft_lim_f			(w_soft_lim_f			)
 	,.o_soft_lim_b			(w_soft_lim_b			)
+
+    ,.i_home_completed 		(home_completed			)
+    ,.i_drive_enabled 		(~o_dv_son				)
 //----------------------------------------------------- user logic end -------------------------------------------------------//
     );
 
@@ -597,6 +602,8 @@ module ec_pul_axis#(
 
 		,.i_axis_limf			(i_axis_limf        )
 		,.i_axis_limb			(i_axis_limb        )
+
+		,.o_home_completed 		(home_completed		)
 //----------------------------------------------------- user logic end -------------------------------------------------------//
     );
 

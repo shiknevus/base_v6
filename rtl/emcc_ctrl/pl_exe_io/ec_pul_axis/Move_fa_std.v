@@ -90,7 +90,7 @@ module Move_fa_std
                     if(i_start) begin
                        r_pf_dir   <= $signed(i_pf_pulse) > $signed(i_abspos) ?  DIR_POS : DIR_NEG;
                        r_pf_pulse <= $signed(i_pf_pulse) > $signed(i_abspos) ? (i_pf_pulse-i_abspos) : (i_abspos-i_pf_pulse);
-                       if((~i_lim_f& i_lim_b& i_org)|( i_lim_f&~i_lim_b& i_org)|
+                       if(!i_drv_son | i_stop | (~i_lim_f& i_lim_b& i_org)|( i_lim_f&~i_lim_b& i_org)|
                            ( i_lim_f& i_lim_b&~i_org)|( i_lim_f& i_lim_b& i_org)|
                            ( i_lim_f& ($signed(i_pf_pulse) > $signed(i_abspos)))|
                            ( i_lim_b& ($signed(i_pf_pulse) < $signed(i_abspos))) ) begin
@@ -102,7 +102,7 @@ module Move_fa_std
                end
                ST_MOVE_START: begin
                    // r_st_error latched until done, change by szzhang 20260913
-                   r_pf_start <= ~i_pf_busy;
+                   r_pf_start <= ~i_pf_busy && !i_stop && !motion_fault;
                    if(i_pf_busy) begin
                        if(motion_fault) begin
                            r_pf_quickstop  <= 1'b1;
@@ -112,7 +112,9 @@ module Move_fa_std
                        end
                        if(i_pf_done) begin
                            fsm_st <= (r_st_error | motion_fault) ? ST_MOVE_ERROR : ST_MOVE_DONE;//change by szzhang 20260813
-                       end    
+                       end
+                   end else if(motion_fault || i_stop) begin
+                       fsm_st <= ST_MOVE_ERROR;
                    end
                end
                ST_MOVE_ERROR: begin
@@ -140,7 +142,7 @@ module Move_fa_std
        end
    end
    
-   assign o_pf_start     = r_pf_start;
+   assign o_pf_start     = r_pf_start && !i_stop && !motion_fault;
    assign o_pf_stop      = r_pf_stop ; 
    assign o_pf_spd       = i_pf_spd  ;
    assign o_pf_acc       = i_pf_acc  ;

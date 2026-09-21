@@ -88,11 +88,30 @@ module proactive_beh_pul_axis#(
 	,output reg signed [31:0]			r_pf_abspos //postion
 	,output wire				o_soft_lim_f		// 1 = abspos >= max pos
 	,output wire				o_soft_lim_b		// 1 = abspos <= min pos
+
+    ,input wire                 i_home_completed
+    ,input wire                 i_drive_enabled
 //----------------------------------------------------- user logic end -------------------------------------------------------//
     );
 
 
 
+
+    wire pos_pf_busy;
+    wire i_rc_pulse_busy;
+    reg motion_done_latched;
+    wire is_move = (a_bhv_id_r == 3) || (a_bhv_id_r == 21);
+    wire is_motion = is_move || (a_bhv_id_r == 1) || (a_bhv_id_r == 2) || (a_bhv_id_r == 20);
+    wire limits_enabled = rcfg_pos_max > rcfg_pos_min;
+    wire target_over_f = is_move && limits_enabled && ($signed(rserv_target_pulse) > rcfg_pos_max);
+    wire target_over_b = is_move && limits_enabled && ($signed(rserv_target_pulse) < rcfg_pos_min);
+    wire [7:0] launch_alarm = !i_dv_alarm ? 8'd108 :
+                              !i_servo_ready ? 8'd113 :
+                              !i_drive_enabled ? 8'd115 :
+                              target_over_f ? 8'd111 : target_over_b ? 8'd112 :
+                              (is_move && !i_home_completed) ? 8'd114 : 8'd0;
+    wire launch_fault = is_motion && (launch_alarm != 0);
+    wire launch_ok = !launch_fault && !i_stop && i_emerge_stop_signal;
 
     reg [7:0]    	curr_state;
 	reg [7:0]    	curr_state_1d;
@@ -121,7 +140,15 @@ module proactive_beh_pul_axis#(
 	localparam 	S_ALERT_40_ACK	= 8'd11;	//Alert ack
 	localparam 	S_ACT_END_1		= 8'd12;
 	localparam 	S_ACT_END_2		= 8'd13;
-	
+    localparam  S_STOP_WAIT     = 8'd14;
+
+    reg action_issued;
+
+    wire [7:0] alert_next = action_issued ? S_STOP_WAIT : S_ALERT_40;
+    always @(posedge clk_i) begin
+        if(rst_i || curr_state == S_IDLE) action_issued <= 1'b0;
+        else if(curr_state == S_EXE && launch_ok) action_issued <= 1'b1;
+    end
     localparam  IRQ_OK          = 8'h51;	//ps ack:OK
     localparam  IRQ_NO_OK       = 8'h52;	//ps ack:NO OK
 	
@@ -271,7 +298,7 @@ module proactive_beh_pul_axis#(
 				if(pre_sta_allow[a_bhv_id_r - 1'b1]) begin
 					next_state = S_READY_10;
 				end else if(timout) begin
-					next_state = S_ALERT_40;			
+					next_state = alert_next;
 				end else begin
 					next_state = S_BHA_PRE_DET;
 				end
@@ -285,7 +312,7 @@ module proactive_beh_pul_axis#(
 				if(match_10) 								//Transaction 10 Acknowledged OK
                     next_state = S_EXE_20;
                 else if(ack_tx_result == IRQ_NO_OK || timout)
-                    next_state = S_ALERT_40;
+                    next_state = alert_next;
                 else
                     next_state = S_READY_10_ACK;
 			end
@@ -308,10 +335,10 @@ module proactive_beh_pul_axis#(
 			//end
 			
             S_BHA_POST_DET: begin	//curr_state = 7
-				if(post_sta_allow[a_bhv_id_r - 1'b1]) begin
+				if(post_sta_allow[a_bhv_id_r - 1'b1] && (!is_motion || action_done) && !action_error && !timout) begin
                     	next_state = S_SUCC_30;
 				end else if(timout | action_error) begin
-                            next_state = S_ALERT_40;
+                            next_state = alert_next;
 				end else begin
 					next_state = S_BHA_POST_DET;
 				end
@@ -325,11 +352,14 @@ module proactive_beh_pul_axis#(
 				if(match_30)    							//30 response success
                     next_state = S_ACT_END_1;
                 else if(ack_tx_result == IRQ_NO_OK || timout)
-                    next_state = S_ALERT_40;
+                    next_state = alert_next;
                 else
                     next_state = S_SUCC_30_ACK;
 			end
 
+            S_STOP_WAIT: begin
+                next_state = (!action_busy && !pos_pf_busy && !i_rc_pulse_busy) ? S_ALERT_40 : S_STOP_WAIT;
+            end
             S_ALERT_40: begin		//curr_state = 10					
 				next_state = S_ALERT_40_ACK;				//Send Interrupt 40
             end
@@ -355,8 +385,8 @@ module proactive_beh_pul_axis#(
 
         endcase
         
-        if((i_stop | ~i_emerge_stop_signal | ~i_dv_alarm ) && curr_state > S_IDLE && curr_state < S_ALERT_40)
-            next_state = S_ALERT_40;
+        if((i_stop | ~i_emerge_stop_signal | launch_fault) && curr_state > S_IDLE && curr_state < S_ALERT_40)
+            next_state = alert_next;
     end
 	
 //----------------------------------------------------------- FSM end ------------------------------------------------------//
@@ -402,41 +432,25 @@ module proactive_beh_pul_axis#(
 	wire w_soft_lim_f;
 	wire w_soft_lim_b;
 	wire w_sw_move;
-	always@(posedge clk_i)begin
-        if(rst_i || !a_en)
-            a_alm_num <= 8'd0;
-        else if(curr_state == S_BHA_PRE_DET && timout)
-            a_alm_num <= 8'd100;
-        else if(curr_state == S_READY_10_ACK && ack_tx_result == IRQ_NO_OK)				
-            a_alm_num <= ack_ps_alart_num;    
-        else if(curr_state == S_READY_10_ACK && timout)									
-            a_alm_num <= 8'd101;    
-		else if(curr_state == S_BHA_POST_DET && timout)
-            a_alm_num <= 8'd102;
-		else if(curr_state == S_SUCC_30_ACK && ack_tx_result == IRQ_NO_OK)				
-			a_alm_num <= ack_ps_alart_num;
-		else if(curr_state == S_SUCC_30_ACK && timout)									
-            a_alm_num <= 8'd103;
-        else if(i_stop && curr_state != S_IDLE)
-            a_alm_num <= 8'd106;   // stop
-        else if(~i_emerge_stop_signal && curr_state != S_IDLE)
-            a_alm_num <= 8'd107;   // emergency stop, add by szzhang 20260914
-        else if(~i_dv_alarm && curr_state != S_IDLE)
-            a_alm_num <= 8'd108;   // alarm, add by szzhang 20260916
-		else if(curr_state == S_BHA_POST_DET && action_error && i_axis_limf)
-            a_alm_num <= 8'd109;   // HW +limit, add by szzhang 20260918
-		else if(curr_state == S_BHA_POST_DET && action_error && i_axis_limb)
-            a_alm_num <= 8'd110;   // HW -limit, add by szzhang 20260918
-		else if(curr_state == S_BHA_POST_DET && action_error && w_sw_move && w_soft_lim_f)
-            a_alm_num <= 8'd111;   // SW +limit (MOVE only)
-		else if(curr_state == S_BHA_POST_DET && action_error && w_sw_move && w_soft_lim_b)
-            a_alm_num <= 8'd112;   // SW -limit (MOVE only)
-		else if(curr_state == S_BHA_POST_DET && action_error)
-            a_alm_num <= 8'd105;
-		else if(curr_state == S_IDLE)
-			a_alm_num <= 8'd0;
-        else
-            a_alm_num <= a_alm_num;
+    always @(posedge clk_i) begin
+        if(rst_i || curr_state == S_IDLE) a_alm_num <= 0;
+        else if(curr_state < S_ALERT_40 && (next_state == alert_next) && next_state != curr_state) begin
+            if(is_motion && !i_dv_alarm) a_alm_num <= 108;
+            else if(is_motion && !i_servo_ready) a_alm_num <= 113;
+            else if(action_error && i_axis_limf) a_alm_num <= 109;
+            else if(action_error && i_axis_limb) a_alm_num <= 110;
+            else if(i_stop) a_alm_num <= 106;
+            else if(!i_emerge_stop_signal) a_alm_num <= 107;
+            else if(launch_fault) a_alm_num <= launch_alarm;
+            else if(curr_state == S_BHA_POST_DET && action_error)
+                a_alm_num <= (a_bhv_id_r == 1) ? 120 : is_move ? 122 : 121;
+            else if(ack_tx_result == IRQ_NO_OK) a_alm_num <= ack_ps_alart_num;
+            else if(curr_state == S_BHA_PRE_DET) a_alm_num <= 100;
+            else if(curr_state == S_READY_10_ACK) a_alm_num <= 101;
+            else if(curr_state == S_BHA_POST_DET) a_alm_num <= motion_done_latched ? 116 : 102;
+            else if(curr_state == S_SUCC_30_ACK) a_alm_num <= 103;
+            else a_alm_num <= 105;
+        end
     end
 
     //Timeout count
@@ -476,7 +490,7 @@ always@(posedge clk_i) begin
     if(rst_i || !a_en) begin
         action_start    <= 1'b0;
     end
-    else if(curr_state == S_EXE) begin
+    else if(curr_state == S_EXE && launch_ok) begin
         if     (a_bhv_id_r == 8'd1 )  action_start   <= 1'b1;   // Home serch
         else if(a_bhv_id_r == 8'd2 )  action_start   <= 1'b1;   // JOG
         else if(a_bhv_id_r == 8'd3 )  action_start   <= 1'b1;   // Move absul
@@ -498,9 +512,9 @@ end
 wire home_start;
 wire jog_start;
 wire move_start;
-assign home_start = (a_bhv_id_r == 8'd1) ? action_start : 1'b0;
-assign jog_start  = ((a_bhv_id_r == 8'd2)||(a_bhv_id_r == 8'd20)) ? action_start : 1'b0;
-assign move_start = ((a_bhv_id_r == 8'd3)||(a_bhv_id_r == 8'd21)) ? action_start : 1'b0;
+assign home_start = (a_bhv_id_r == 8'd1) ? (action_start && launch_ok) : 1'b0;
+assign jog_start  = ((a_bhv_id_r == 8'd2)||(a_bhv_id_r == 8'd20)) ? (action_start && launch_ok) : 1'b0;
+assign move_start = launch_ok && ((a_bhv_id_r == 8'd3)||(a_bhv_id_r == 8'd21)) ? (action_start && launch_ok) : 1'b0;
 
 // axis_org register
 reg axis_org;
@@ -515,7 +529,7 @@ end
 localparam DIR_POS = 1'b1;
 localparam DIR_NEG = 1'b0;
 
-wire r_dv_ok = i_servo_ready & i_emerge_stop_signal & i_dv_alarm;//estop and alarm active low, add by szzhang 20260914
+wire r_dv_ok = i_servo_ready & i_dv_alarm;//estop and alarm active low, add by szzhang 20260914
 
 wire [31:0] home_spd_eff  = (rcfg_home_spd == 32'b0 ) ? 32'd1000000 : rcfg_home_spd  ;
 wire [31:0] home_acc_eff  = (rcfg_home_acc == 32'b0 ) ? 32'd2500000 : rcfg_home_acc  ;
@@ -536,6 +550,7 @@ reg          home_stop;
 wire         home_busy;
 wire         home_done;
 wire         home_error;
+wire         home_limit_recover;
 wire [31:0]  home_pf_spd;
 wire [31:0]  home_pf_acc;
 wire [31:0]  home_pf_dec;
@@ -545,7 +560,7 @@ wire         home_pf_start;
 wire         home_pf_stop;
 wire         home_pf_quickstop;
 wire         home_pf_touchstop;
-wire         pos_pf_busy;
+
 wire         pos_pf_done;
 wire         pos_pf_error;
 
@@ -569,6 +584,7 @@ home_u
   .o_busy         ( home_busy          ),
   .o_done         ( home_done          ),
   .o_error        ( home_error         ),
+  .o_limit_recover( home_limit_recover ),
   .o_pf_spd       ( home_pf_spd        ),
   .o_pf_acc       ( home_pf_acc        ),
   .o_pf_dec       ( home_pf_dec        ),
@@ -589,8 +605,8 @@ wire        w_move_over_f = w_soft_lim_en && (s_move_tgt > rcfg_pos_max);
 wire        w_move_over_b = w_soft_lim_en && (s_move_tgt < rcfg_pos_min);
 wire        w_jog_lim_f   = i_axis_limf;
 wire        w_jog_lim_b   = i_axis_limb;
-wire        w_move_lim_f  = i_axis_limf | w_soft_lim_f | w_move_over_f;
-wire        w_move_lim_b  = i_axis_limb | w_soft_lim_b | w_move_over_b;
+wire        w_move_lim_f  = i_axis_limf;
+wire        w_move_lim_b  = i_axis_limb;
 assign      w_sw_move     = (a_bhv_id_r == 8'd3) || (a_bhv_id_r == 8'd21);
 assign o_soft_lim_f = w_soft_lim_f;
 assign o_soft_lim_b = w_soft_lim_b;
@@ -685,6 +701,8 @@ Move_fa_std move_u
   .i_pf_done      ( pos_pf_done        )
 );
 
+wire hard_abort;
+wire motion_pause;
 // Positioner
 reg  [31:0]  pos_pf_spd;
 reg  [31:0]  pos_pf_acc;
@@ -709,9 +727,9 @@ wire [31:0]  o_rc_pulse_period;
 wire [31:0]  o_rc_pulse_number;
 wire         o_rc_pulse_dir;
 wire         i_rc_pulse_done;
-wire         i_rc_pulse_busy;
 
-Positioner_std #(.BASE_REFCLK(156_250_000)) pos_u
+
+Positioner_std #(.USE_ABORT(1), .BASE_REFCLK(156_250_000)) pos_u
 (
   .clk            ( clk_i              ),
   .reset          ( rst_i              ),
@@ -725,7 +743,8 @@ Positioner_std #(.BASE_REFCLK(156_250_000)) pos_u
   .i_pf_pulse     ( pos_pf_pulse       ),
   .i_quickstop    ( pos_quickstop      ),
   .i_quickstop_dec( pos_quickstop_dec  ),
-  .i_pause        ( i_pause            ),
+  .i_abort        ( hard_abort ),
+  .i_pause        ( motion_pause            ),
   .o_pf_done      ( pos_pf_done        ),
   .o_pf_error     ( pos_pf_error       ),
   .o_pf_busy      ( pos_pf_busy        ),
@@ -738,18 +757,19 @@ Positioner_std #(.BASE_REFCLK(156_250_000)) pos_u
 );
 
 // Pulmot_fd pulse generator
-Pulmot_fd #(.USE_PAUSE(1)) Pulmot_fd00
+Pulmot_fd #(.USE_PAUSE(1), .USE_ABORT(1)) Pulmot_fd00
 (
   .clk              ( clk_i              ),
   .reset            ( rst_i              ),
 
-  .i_bv_pulse_start ( i_pause ? 1'b0 : o_rc_pulse_start ),
+  .i_bv_pulse_start ( o_rc_pulse_start ),
   .i_bv_pulse_period( o_rc_pulse_period  ),
   .i_bv_pulse_number( o_rc_pulse_number  ),
   .i_bv_pulse_dir   ( o_rc_pulse_dir     ),
   .o_bv_pulse_done  ( i_rc_pulse_done    ),
   .o_bv_pulse_busy  ( i_rc_pulse_busy    ),
-  .i_pause          ( i_pause            ),
+  .i_abort          ( hard_abort ),
+  .i_pause          ( 1'b0            ),
 
   .i_dv_ready       ( 1'b0               ),
   .i_dv_inp         ( 1'b0               ),
@@ -760,39 +780,43 @@ Pulmot_fd #(.USE_PAUSE(1)) Pulmot_fd00
   .o_dv_pulse_n     ( o_dv_dir           )
 );
 
+reg action_alarm;
+wire stop_request = action_alarm || i_stop || !i_emerge_stop_signal || !i_drive_enabled || !a_en;
+assign hard_abort = !r_dv_ok || (i_axis_limf && pos_pf_dir) || (i_axis_limb && !pos_pf_dir);
+assign motion_pause = i_pause && !stop_request && !hard_abort;
+
+wire raw_done = home_done || jog_done || move_done;
+wire raw_error = home_error || jog_error || move_error || pos_pf_error;
 // action status 
-reg  action_alarm;
-always@(posedge clk_i) begin
+
+always @(posedge clk_i) begin
     if(rst_i) begin
-        action_busy  <= 1'b0;
-        action_done  <= 1'b0;
-        action_error <= 1'b0;
+        action_busy <= 0;
+        action_done <= 0;
+        motion_done_latched <= 0;
+        action_error <= 0;
+        home_stop <= 0;
+        jog_stop <= 0;
+        move_stop <= 0;
     end else begin
-        case(a_bhv_id_r)
-            8'd1: begin
-                action_busy  <= home_busy;
-                action_done  <= home_done;
-                action_error <= home_error;
-                home_stop    <= action_alarm | i_stop | ~i_emerge_stop_signal | ~i_dv_alarm;
+        action_busy <= home_busy || jog_busy || move_busy || pos_pf_busy || i_rc_pulse_busy;
+        home_stop <= stop_request;
+        jog_stop <= stop_request;
+        move_stop <= stop_request;
+        if(a_bhv_vld_r || action_start) begin
+            action_done <= 0;
+            motion_done_latched <= 0;
+            action_error <= 0;
+        end else begin
+            if(raw_done) motion_done_latched <= 1;
+            if((motion_done_latched || raw_done) && i_servo_done && !action_error && !raw_error)
+                action_done <= 1;
+            if(raw_error || ((pos_pf_busy || i_rc_pulse_busy) && hard_abort &&
+                (!r_dv_ok || a_bhv_id_r != 1 || !home_limit_recover))) begin
+                action_error <= 1;
+                action_done <= 0;
             end
-            8'd2, 8'd20 : begin
-                action_busy  <= jog_busy;
-                action_done  <= jog_done;
-                action_error <= jog_error;
-                jog_stop     <= action_alarm | i_stop | ~i_emerge_stop_signal | ~i_dv_alarm;
-            end
-            8'd3, 8'd21 : begin
-                action_busy  <= move_busy;
-                action_done  <= move_done;
-                action_error <= move_error;
-                move_stop    <= action_alarm | i_stop | ~i_emerge_stop_signal | ~i_dv_alarm;
-            end
-            default: begin
-                action_busy  <= 1'b0;
-                action_done  <= 1'b0;
-                action_error <= 1'b0;
-            end
-        endcase
+        end
     end
 end
 
@@ -859,7 +883,7 @@ end
 
 // track physical pulse edges, not command cycles, change by szzhang 20260913
 reg  r_dv_pls_d;
-always@(posedge clk_i) r_dv_pls_d <= o_dv_pulse;
+always@(posedge clk_i) r_dv_pls_d <= rst_i ? 1'b1 : o_dv_pulse;
 wire w_dv_pls_rise = o_dv_pulse & ~r_dv_pls_d;
 
 always@(posedge clk_i) begin
@@ -869,7 +893,7 @@ always@(posedge clk_i) begin
         if(home_done & ~home_busy & ~home_error & ~home_pos_reset)
             r_pf_abspos <= 32'd0;
         else if(w_dv_pls_rise)
-            r_pf_abspos <= (o_rc_pulse_dir == DIR_POS) ? r_pf_abspos + 1'b1 : r_pf_abspos - 1'b1;
+            r_pf_abspos <= (o_dv_dir == DIR_POS) ? r_pf_abspos + 1'b1 : r_pf_abspos - 1'b1;
         else
             r_pf_abspos <= r_pf_abspos;
 
@@ -879,9 +903,9 @@ end
 always@(posedge clk_i) begin
     if(rst_i || !a_en)
         action_alarm <= 1'b0;
-    else if(curr_state == S_EXE)
+    else if(curr_state == S_EXE && launch_ok)
         action_alarm <= 1'b0;
-    else if(curr_state == S_ALERT_40)
+    else if(curr_state == S_ALERT_40 || curr_state == S_STOP_WAIT)
         action_alarm <= 1'b1;
     else if(curr_state == S_IDLE)
         action_alarm <= 1'b0;

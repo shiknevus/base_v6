@@ -85,6 +85,7 @@ module pre_post_sta_check_slv_pul_axis#(
 		,input							i_axis_limf         //axis limit forward (1=hit)
 		,input							i_axis_limb         //axis limit backward (1=hit)
 //axis limit end
+    	,output wire 					o_home_completed
 //----------------------------------------------------- user logic end -------------------------------------------------------//
     );
 
@@ -96,13 +97,17 @@ module pre_post_sta_check_slv_pul_axis#(
 	wire device_safe;
 	assign device_safe =(~unit_st && ~m_st && ~m_saf_st && ~link_m_saf_st);
 	reg home_completed;
+	assign o_home_completed = home_completed;
+	reg home_done_d;
+	always @(posedge clk_i)
+		home_done_d <= !rst_i && action_done;
 	always@(posedge clk_i) begin
-		if(rst_i || !a_en)
+		if(rst_i || !a_en || (a_bhv_id == 1 && action_busy))
 			home_completed <= 1'b0;
-		else if(a_bhv_id == 8'd1 && action_done && ~action_error)
+		else if(b_bhv_id == 8'd105 || rctrl_drive_on == 8'd2 || i_axis_limf || i_axis_limb || !dv_alarm || !i_servo_ready)
+			home_completed <= 1'b0;
+		else if(a_bhv_id == 8'd1 && action_done && !home_done_d && !action_error)
 			home_completed <= 1'b1;
-		else if(b_bhv_id == 8'd105 || i_axis_limf || i_axis_limb || ~dv_alarm || ~i_emerge_stop_signal|| action_error || ~i_servo_ready || ~device_safe)
-			home_completed <= 1'b0;
 		else begin
 			home_completed <= home_completed;
 		end
@@ -110,11 +115,11 @@ module pre_post_sta_check_slv_pul_axis#(
 
 	wire [A_BHA_NUM-1:0]	a_pre_sta	;
 
-	assign	a_pre_sta[0 ] = (a_bhv_id == 1 ) && i_servo_ready;    // HOME: always allowed
-	assign	a_pre_sta[1 ] = (a_bhv_id == 2 ) && i_servo_ready;
-	assign	a_pre_sta[2 ] = (a_bhv_id == 3 ) && home_completed && i_servo_ready;
-	assign	a_pre_sta[19] = (a_bhv_id == 20) && device_safe && i_servo_ready;//[safe]
-	assign	a_pre_sta[20] = (a_bhv_id == 21) && home_completed && device_safe && i_servo_ready;//[safe]
+	assign	a_pre_sta[0 ] = (a_bhv_id == 1 ) && i_servo_ready && dv_alarm;    // HOME: always allowed
+	assign	a_pre_sta[1 ] = (a_bhv_id == 2 ) && i_servo_ready && dv_alarm;
+	assign	a_pre_sta[2 ] = (a_bhv_id == 3 ) && home_completed && i_servo_ready && dv_alarm;
+	assign	a_pre_sta[19] = (a_bhv_id == 20) && device_safe && i_servo_ready && dv_alarm;//[safe]
+	assign	a_pre_sta[20] = (a_bhv_id == 21) && home_completed && device_safe && i_servo_ready && dv_alarm;//[safe]
 	assign	a_pre_sta[29] = (a_bhv_id == 30);   // GETPOS: always allowed
 
 	always@(posedge clk_i)
@@ -144,11 +149,11 @@ module pre_post_sta_check_slv_pul_axis#(
 	// 		action_done_r <= action_done_r;
 	// end
 
-	assign	a_post_sta[0 ] = (a_bhv_id == 1 )&&action_done&&(~action_error) && i_servo_done;
-	assign	a_post_sta[1 ] = (a_bhv_id == 2 )&&action_done&&(~action_error) && i_servo_done;
-	assign	a_post_sta[2 ] = (a_bhv_id == 3 )&&action_done&&(~action_error) && i_servo_done;
-	assign	a_post_sta[19] = (a_bhv_id == 20)&&action_done&&(~action_error) && i_servo_done;
-	assign	a_post_sta[20] = (a_bhv_id == 21)&&action_done&&(~action_error) && i_servo_done;
+	assign	a_post_sta[0 ] = (a_bhv_id == 1 )&&action_done&&(~action_error);
+	assign	a_post_sta[1 ] = (a_bhv_id == 2 )&&action_done&&(~action_error);
+	assign	a_post_sta[2 ] = (a_bhv_id == 3 )&&action_done&&(~action_error);
+	assign	a_post_sta[19] = (a_bhv_id == 20)&&action_done&&(~action_error);
+	assign	a_post_sta[20] = (a_bhv_id == 21)&&action_done&&(~action_error);
 	assign	a_post_sta[29] = (a_bhv_id == 30);
 
 	reg [7:0] a_bhv_id_d;

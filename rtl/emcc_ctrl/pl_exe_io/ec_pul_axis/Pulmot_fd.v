@@ -27,6 +27,7 @@ module Pulmot_fd
    ,input  wire [31:0]      i_bv_pulse_period  // behavior interface: pulse period, @10ns
    ,input  wire [31:0]      i_bv_pulse_number  // behavior interface: pulse number
    ,input  wire             i_bv_pulse_dir     // behavior interface: pulse direction
+   ,input  wire             i_abort
    ,input  wire             i_pause            // synchronous hold when USE_PAUSE=1
    ,output wire             o_bv_pulse_busy    // includes the complete final pulse period
    ,output wire             o_bv_pulse_done    // behavior interface: done output
@@ -44,6 +45,7 @@ module Pulmot_fd
    parameter PR_PA13 = 8'h11;
    parameter PR_PA14 = 1'b1;
    parameter P_PERIOD_MIN = 100;
+   parameter USE_ABORT = 0;
    parameter USE_PAUSE = 0; // preserve standalone callers without a pause connection
 
    ////////////////// ARCH ////////////////////
@@ -64,6 +66,11 @@ module Pulmot_fd
          r_pulse_count <= 0;
          r_pulse_idx <= 0;
          r_pulse_pn <= 1'b0;
+      end else if(USE_ABORT && i_abort) begin
+         r_pulse_number <= 0;
+         r_pulse_idx <= 0;
+         r_pulse_count <= 0;
+         r_pulse_pn <= 1'b0;
       end else if(!USE_PAUSE || !i_pause) begin
          if(r_pulse_idx < r_pulse_number) begin
             r_pulse_count <= r_pulse_count + 1'b1;
@@ -79,8 +86,9 @@ module Pulmot_fd
             r_pulse_pn <= (r_pulse_count < (r_pulse_period>>1));
          end
          
-         if(i_bv_pulse_start) begin
-            r_pulse_period <= i_bv_pulse_period;
+         if(i_bv_pulse_start && !o_bv_pulse_busy) begin
+            r_pulse_period <= (i_bv_pulse_period < 2) ? 2 : i_bv_pulse_period;
+            r_pulse_count <= 0;
             r_pulse_number <= i_bv_pulse_number;
             r_pulse_dir <= i_bv_pulse_dir;
             r_pulse_idx <= 0;
@@ -99,6 +107,6 @@ module Pulmot_fd
    endgenerate
       
    assign o_bv_pulse_busy = (r_pulse_idx < r_pulse_number);
-   assign o_bv_pulse_done = (r_pulse_count>=(r_pulse_period-1));
+   assign o_bv_pulse_done = o_bv_pulse_busy && (r_pulse_count >= r_pulse_period-1) && (!USE_PAUSE || !i_pause);
 
 endmodule
