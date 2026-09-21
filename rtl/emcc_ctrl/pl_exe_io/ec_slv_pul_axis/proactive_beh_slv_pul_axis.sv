@@ -429,8 +429,8 @@ module proactive_beh_slv_pul_axis#(
         else if(curr_state < S_ALERT_40 && (next_state == alert_next) && next_state != curr_state) begin
             if(is_motion && !dv_alarm) a_alm_num <= 108;
             else if(is_motion && !i_servo_ready) a_alm_num <= 113;
-            else if((slv_action_error && action_accepted) && i_axis_limf) a_alm_num <= 109;
-            else if((slv_action_error && action_accepted) && i_axis_limb) a_alm_num <= 110;
+            else if(action_accepted && i_axis_limf) a_alm_num <= 109;
+            else if(action_accepted && i_axis_limb) a_alm_num <= 110;
             else if(i_stop) a_alm_num <= 106;
             else if(!i_emerge_stop_signal) a_alm_num <= 107;
             else if(launch_fault) a_alm_num <= launch_alarm;
