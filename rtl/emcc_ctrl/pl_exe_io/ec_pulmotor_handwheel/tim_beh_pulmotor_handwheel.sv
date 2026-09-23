@@ -329,7 +329,7 @@ module tim_beh_pulmotor_handwheel#(
     end
 	
 	always@(posedge clk_i)begin
-        if(rst_i || !a_en)
+        if(rst_i || !c_en)
             c_alm_num <= 8'd0;
 		else if(curr_state == S_IDLE)	//clear logic
 			c_alm_num <= 8'd0;
