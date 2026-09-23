@@ -155,43 +155,34 @@ module status_beh_safety_door#(
 	always @(posedge clk_i) begin
 		if(rst_i || !b_en)begin
 			b_bhv_id <= 8'd0;
-			//b_bhv_id_vld <= 1'b0;
 		end else if(curr_state == S_ACT_END_1)begin
 			b_bhv_id <= 8'd0;
-			//b_bhv_id_vld <= 1'b0;
 		end else if(open_req_key_posedge)begin	//open door press
 			b_bhv_id <= 8'd100;
-			//b_bhv_id_vld <= 1'b1;
 		end else if(close_confirm_key_posedge)begin	//close door press
 			b_bhv_id <= 8'd101;
-			//b_bhv_id_vld <= 1'b1;
 		end else begin
 			b_bhv_id <= b_bhv_id;
-			//b_bhv_id_vld <= 1'b0;
 		end
 	end
 	
 	reg match_10;
-	//reg match_20;
 	reg match_30;
 	reg match_40;
 	
 	always @(posedge clk_i) begin
     if(rst_i) begin
         match_10 <= 1'b0;
-		//match_20 <= 1'b0;
 		match_30 <= 1'b0;
 		match_40 <= 1'b0;
     end else if(curr_state == S_READY_10_ACK)
         match_10 <= (ack_tx_result == IRQ_OK && ack_tx_id == 8'd10 && ack_beh_id == b_bhv_id);
-		//match_20 <= (ack_tx_result == IRQ_OK && ack_tx_id == 8'd20 && ack_beh_id == a_bhv_id_r);
 	else if(curr_state == S_SUCC_30_ACK)
 		match_30 <= (ack_tx_result == IRQ_OK && ack_tx_id == 8'd30 && ack_beh_id == b_bhv_id);
 	else if(curr_state == S_ALERT_40_ACK)
 		match_40 <= (ack_tx_id == 8'd40 && ack_beh_id == b_bhv_id);
 	else begin
 		match_10 <= 1'b0;
-		//match_20 <= 1'b0;
 		match_30 <= 1'b0;
 		match_40 <= 1'b0;
 	end
@@ -307,8 +298,6 @@ module status_beh_safety_door#(
 			b_tx_id <= 8'd0;
         else if(curr_state == S_READY_10)
             b_tx_id <= 8'd10;
-        //else if(curr_state == S_EXE_20)
-        //    b_tx_id <= 8'd20;
         else if(curr_state == S_SUCC_30)
             b_tx_id <= 8'd30;
         else if(curr_state == S_ALERT_40)
@@ -328,8 +317,6 @@ module status_beh_safety_door#(
 				irq_o <= 1'b0;
 			else if(curr_state == S_READY_10)
 				irq_o <= 1'b1;
-			//else if(curr_state == S_EXE_20)
-			//	irq_o <= 1'b1;
 			else if(curr_state == S_SUCC_30)
 				irq_o <= 1'b1;
 			else if(curr_state == S_ALERT_40)
@@ -338,26 +325,29 @@ module status_beh_safety_door#(
 				irq_o <= irq_o;
 		end
 	
-
 	always@(posedge clk_i)begin
-        if(rst_i || !b_en)
+        if(rst_i || !a_en)
             b_alm_num <= 8'd0;
-        else if(curr_state == S_BHA_PRE_DET && timout)						
-            b_alm_num <= 8'd100;    
-        else if(curr_state == S_READY_10_ACK && ack_tx_result == IRQ_NO_OK)	
-            b_alm_num <= ack_ps_alart_num;    
-        else if(curr_state == S_READY_10_ACK && timout)						
-            b_alm_num <= 8'd101;    
-		else if(curr_state == S_BHA_POST_DET && timout)						
-			b_alm_num <= 8'd102;
-		else if(curr_state == S_SUCC_30_ACK && ack_tx_result == IRQ_NO_OK)	
-			b_alm_num <= ack_ps_alart_num;
-		else if(curr_state == S_SUCC_30_ACK && timout)						
-            b_alm_num <= 8'd103;
-		else if(curr_state == S_ACT_END_1)
+		else if(curr_state == S_IDLE)	//clear logic
 			b_alm_num <= 8'd0;
-        else
-            b_alm_num <= b_alm_num;
+		else if(curr_state == S_READY_10_ACK && ack_tx_result == IRQ_NO_OK)//ps 10 response error num
+			b_alm_num <= ack_ps_alart_num; 	
+		else if(curr_state == S_SUCC_30_ACK && ack_tx_result == IRQ_NO_OK)//ps 30 response error num
+			b_alm_num <= ack_ps_alart_num;	
+		else if(curr_state == S_READY_10_ACK && timout)	//ps 10 response timeout
+			b_alm_num <= 8'd101; 
+		else if(curr_state == S_SUCC_30_ACK && timout)	//ps 30 response timeout
+			b_alm_num <= 8'd103; 
+		else if(curr_state == S_BHA_PRE_DET && timout)	//Not fully satisfied pre-condition
+			b_alm_num <= 8'd100; 
+		else if(curr_state == S_BHA_POST_DET && timout)	//Not fully satisfied post-condition
+			case(b_bhv_id)
+				100:	b_alm_num <= 8'd110; 
+				101:	b_alm_num <= 8'd111; 	
+				default:b_alm_num <= b_alm_num;
+			endcase		
+		else
+			b_alm_num <= b_alm_num;
     end
 	
 

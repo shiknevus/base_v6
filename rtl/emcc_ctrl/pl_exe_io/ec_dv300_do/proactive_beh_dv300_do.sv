@@ -43,7 +43,6 @@ module proactive_beh_dv300_do#(
 
 	,output	reg					o_fwd		
 	,output	reg					o_rev
-	,input						i_error
 
 	,output reg	[7:0]           a_bhv_id_r
 	,output	reg	[31:0]			state_monitor_o
@@ -335,22 +334,24 @@ module proactive_beh_dv300_do#(
     always@(posedge clk_i)begin
         if(rst_i || !a_en)
             a_alm_num <= 8'd0;
-		else if(curr_state == S_IDLE)
+		else if(curr_state == S_IDLE)	//clear logic
 			a_alm_num <= 8'd0;
-        else if(curr_state == S_BHA_PRE_DET && timout)//The pre - full inspection is not met.
-			a_alm_num <= 8'd100;
-        else if(curr_state == S_READY_10_ACK && ack_tx_result == IRQ_NO_OK)	//Transaction 10 ps response error
-            a_alm_num <= ack_ps_alart_num;    
-        else if(curr_state == S_READY_10_ACK && timout)						//For Transaction 10, waiting for the ps response timed out.
-            a_alm_num <= 8'd101;    
-		else if(curr_state_1d == S_BHA_POST_DET && curr_state == S_ALERT_40)
-			a_alm_num <= 8'd102; 
-		else if(curr_state == S_SUCC_30_ACK && ack_tx_result == IRQ_NO_OK)	
-			a_alm_num <= ack_ps_alart_num;
-		else if(curr_state == S_SUCC_30_ACK && timout)						//For Transaction 30, waiting for the ps response timed out.
-            a_alm_num <= 8'd103;
-        else
-            a_alm_num <= a_alm_num;
+		else if(curr_state == S_READY_10_ACK && ack_tx_result == IRQ_NO_OK)//ps 10 response error num
+			a_alm_num <= ack_ps_alart_num; 	
+		else if(curr_state == S_SUCC_30_ACK && ack_tx_result == IRQ_NO_OK)//ps 30 response error num
+			a_alm_num <= ack_ps_alart_num;	
+		else if(curr_state == S_READY_10_ACK && timout)	//ps 10 response timeout
+			a_alm_num <= 8'd101; 
+		else if(curr_state == S_SUCC_30_ACK && timout)	//ps 30 response timeout
+			a_alm_num <= 8'd103; 
+		else if(curr_state == S_BHA_PRE_DET && timout)	//Not fully satisfied pre-condition
+			case(a_bhv_id_r)
+				1,2:	a_alm_num <= 8'd110; 
+				4,5:	a_alm_num <= 8'd111; 	 
+				default:a_alm_num <= a_alm_num;
+			endcase		
+		else
+			a_alm_num <= a_alm_num;
     end
 
     //Timeout count

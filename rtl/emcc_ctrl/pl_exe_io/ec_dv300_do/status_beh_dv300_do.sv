@@ -123,6 +123,11 @@ module status_beh_dv300_do#(
 		end
 	end
 	
+	always@(posedge i_clk)
+	begin
+		b_bhv_id <= 100;	
+	end
+	
 	always@(posedge clk_i)begin
 	if(rst_i)
 		curr_state_1d <= 8'd0;

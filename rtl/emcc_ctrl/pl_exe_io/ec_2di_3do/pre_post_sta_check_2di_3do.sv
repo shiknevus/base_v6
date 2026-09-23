@@ -137,14 +137,14 @@ module pre_post_sta_check_2di_3do#(
 	assign	a_post_sta[2] 	= (a_bhv_id == 3 					);
 	assign	a_post_sta[3] 	= (a_bhv_id == 4 && di_i[0] == 1'b1	);
 	assign	a_post_sta[4] 	= (a_bhv_id == 5 && di_i[0] == 1'b0	);
-	assign	a_post_sta[5] 	= (a_bhv_id == 6 && di_i[0] == 1'b0	);
-	assign	a_post_sta[6] 	= (a_bhv_id == 7 && di_i[0] == 1'b0	);
+	assign	a_post_sta[5] 	= (a_bhv_id == 6);
+	assign	a_post_sta[6] 	= (a_bhv_id == 7);
 	assign	a_post_sta[7] 	= (a_bhv_id == 8 && di_i[0] == 1'b1	);
 	assign	a_post_sta[8] 	= (a_bhv_id == 9 && di_i[0] == 1'b0	);
-	assign	a_post_sta[9] 	= (a_bhv_id == 10 && di_i[0] == 1'b0);
-	assign	a_post_sta[10] 	= (a_bhv_id == 11 && di_i[0] == 1'b0);
-	assign	a_post_sta[11] 	= (a_bhv_id == 12					);
-	assign	a_post_sta[12] 	= (a_bhv_id == 13					);
+	assign	a_post_sta[9] 	= (a_bhv_id == 10);
+	assign	a_post_sta[10] 	= (a_bhv_id == 11);
+	assign	a_post_sta[11] 	= (a_bhv_id == 12);
+	assign	a_post_sta[12] 	= (a_bhv_id == 13);
 	assign	a_post_sta[13] 	= (a_bhv_id == 14 && di_i[1] == 1'b1);
 	assign	a_post_sta[14] 	= (a_bhv_id == 15 && di_i[1] == 1'b0);
 	

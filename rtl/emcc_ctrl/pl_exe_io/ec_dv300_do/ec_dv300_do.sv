@@ -400,7 +400,6 @@ module ec_dv300_do#(
     ,.a_alm_num            	(a_alm_num      	)
     ,.o_fwd					(o_fwd				)
 	,.o_rev                 (o_rev				)
-
 	,.a_bhv_id_r			(a_bhv_id_r			)
 	,.state_monitor_o		(debug_reg1			)
     ,.irq_o                	(irq_a				)

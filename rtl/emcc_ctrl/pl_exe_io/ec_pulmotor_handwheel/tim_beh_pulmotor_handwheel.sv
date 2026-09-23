@@ -82,10 +82,8 @@ module tim_beh_pulmotor_handwheel#(
 	localparam  S_IDLE          = 8'd0; 	
     localparam  S_BHA_PRE_DET	= 8'd1; 	
 	localparam	S_READY_10		= 8'd2;		
-    localparam  S_READY_10_ACK  = 8'd3; 	
-    localparam  S_EXE_20     	= 8'd4; 	
+    localparam  S_READY_10_ACK  = 8'd3; 		
 	localparam	S_EXE			= 8'd5;		
-    localparam  S_EXE_20_ACK	= 8'd6;		
     localparam  S_BHA_POST_DET  = 8'd7; 	
     localparam  S_SUCC_30       = 8'd8; 	
     localparam  S_SUCC_30_ACK	= 8'd9; 	
@@ -158,7 +156,6 @@ module tim_beh_pulmotor_handwheel#(
 	end	
 	
 	reg match_10;
-	//reg match_20;
 	reg match_30;
 	reg match_40;
 	
@@ -166,13 +163,11 @@ module tim_beh_pulmotor_handwheel#(
     if(rst_i) 
 		begin
         	match_10 <= 1'b0;
-			//match_20 <= 1'b0;
 			match_30 <= 1'b0;
 			match_40 <= 1'b0;
     	end 
 	else if(curr_state == S_READY_10_ACK)
         match_10 <= (ack_tx_result == IRQ_OK && ack_tx_id == 8'd10 && ack_beh_id == c_bhv_id);
-		//match_20 <= (ack_tx_result == IRQ_OK && ack_tx_id == 8'd20 && ack_beh_id == a_bhv_id_r);
 	else if(curr_state == S_SUCC_30_ACK)
 		match_30 <= (ack_tx_result == IRQ_OK && ack_tx_id == 8'd30 && ack_beh_id == c_bhv_id);
 	else if(curr_state == S_ALERT_40_ACK)
@@ -180,7 +175,6 @@ module tim_beh_pulmotor_handwheel#(
 	else 
 		begin
 			match_10 <= 1'b0;
-			//match_20 <= 1'b0;
 			match_30 <= 1'b0;
 			match_40 <= 1'b0;
 		end
@@ -235,14 +229,14 @@ module tim_beh_pulmotor_handwheel#(
 			
 			S_READY_10_ACK: begin	//3
 				if(match_10)  
-                    next_state = S_EXE_20;
+                    next_state = S_EXE;
                 else if(ack_tx_result == IRQ_NO_OK || timout)
                     next_state = S_ALERT_40;
                 else
                     next_state = S_READY_10_ACK;
 			end
 			
-			S_EXE_20: begin	//4
+			S_EXE: begin	//4
 				next_state = S_BHA_POST_DET;
             end
 
@@ -307,8 +301,6 @@ module tim_beh_pulmotor_handwheel#(
 			c_tx_id <= 8'd0;
         else if(curr_state == S_READY_10)
             c_tx_id <= 8'd10;
-        //else if(curr_state == S_EXE_20)
-        //    c_tx_id <= 8'd20;
         else if(curr_state == S_SUCC_30)
             c_tx_id <= 8'd30;
         else if(curr_state == S_ALERT_40)
@@ -328,8 +320,6 @@ module tim_beh_pulmotor_handwheel#(
             irq_o <= 1'b0;
         else if(curr_state == S_READY_10)
             irq_o <= 1'b1;
-		//else if(curr_state == S_EXE_20)
-		//	irq_o <= 1'b1;
 		else if(curr_state == S_SUCC_30)
 			irq_o <= 1'b1;
 		else if(curr_state == S_ALERT_40)
@@ -339,24 +329,20 @@ module tim_beh_pulmotor_handwheel#(
     end
 	
 	always@(posedge clk_i)begin
-        if(rst_i || !c_en)
+        if(rst_i || !a_en)
             c_alm_num <= 8'd0;
-        else if(curr_state == S_BHA_PRE_DET && timout)						//The pre - full inspection is not met.
-            c_alm_num <= 8'd100;    
-        else if(curr_state == S_READY_10_ACK && ack_tx_result == IRQ_NO_OK)	//Transaction 10 ps response error
-            c_alm_num <= ack_ps_alart_num;    
-        else if(curr_state == S_READY_10_ACK && timout)						//For Transaction 10, waiting for the ps response timed out.
-            c_alm_num <= 8'd101;     
-		else if(curr_state == S_BHA_POST_DET && timout)//The execution of Behavior 1 failed.
-			c_alm_num <= 8'd102; 
-		else if(curr_state == S_SUCC_30_ACK && ack_tx_result == IRQ_NO_OK)	//Transaction 30 has a ps response error.
-			c_alm_num <= ack_ps_alart_num;
-		else if(curr_state == S_SUCC_30_ACK && timout)						//For Transaction 30, waiting for the ps response timed out.
-            c_alm_num <= 8'd103;
-		else if(curr_state == S_ACT_END_1)
+		else if(curr_state == S_IDLE)	//clear logic
 			c_alm_num <= 8'd0;
-        else
-            c_alm_num <= c_alm_num;
+		else if(curr_state == S_READY_10_ACK && ack_tx_result == IRQ_NO_OK)//ps 10 response error num
+			c_alm_num <= ack_ps_alart_num; 	
+		else if(curr_state == S_SUCC_30_ACK && ack_tx_result == IRQ_NO_OK)//ps 30 response error num
+			c_alm_num <= ack_ps_alart_num;	
+		else if(curr_state == S_READY_10_ACK && timout)	//ps 10 response timeout
+			c_alm_num <= 8'd101; 
+		else if(curr_state == S_SUCC_30_ACK && timout)	//ps 30 response timeout
+			c_alm_num <= 8'd103; 
+		else
+			c_alm_num <= c_alm_num;
     end
 	
 	//Timeout count

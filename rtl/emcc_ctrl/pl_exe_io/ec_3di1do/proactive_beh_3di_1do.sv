@@ -339,24 +339,28 @@ module proactive_beh_3di_1do#(
     always@(posedge clk_i)begin
         if(rst_i || !a_en)
             a_alm_num <= 8'd0;
-		else if(curr_state == S_IDLE)
+		else if(curr_state == S_IDLE)	//clear logic
 			a_alm_num <= 8'd0;
-        else if(curr_state == S_BHA_PRE_DET && timout)			
-            a_alm_num <= 8'd100;     
-        else if(curr_state == S_READY_10_ACK && ack_tx_result == IRQ_NO_OK)				
-            a_alm_num <= ack_ps_alart_num;    
-        else if(curr_state == S_READY_10_ACK && timout)									
-            a_alm_num <= 8'd101;    
-		else if(curr_state == S_BHA_POST_DET && timout)			
-            a_alm_num <= 8'd102;     
-		else if(curr_state == S_SUCC_30_ACK && ack_tx_result == IRQ_NO_OK)				
-			a_alm_num <= ack_ps_alart_num;
-		else if(curr_state == S_SUCC_30_ACK && timout)									
-            a_alm_num <= 8'd103;
-		else if(curr_state == S_IDLE)
-			a_alm_num <= 8'd0;
-        else
-            a_alm_num <= a_alm_num;
+		else if(curr_state == S_READY_10_ACK && ack_tx_result == IRQ_NO_OK)//ps 10 response error num
+			a_alm_num <= ack_ps_alart_num; 	
+		else if(curr_state == S_SUCC_30_ACK && ack_tx_result == IRQ_NO_OK)//ps 30 response error num
+			a_alm_num <= ack_ps_alart_num;	
+		else if(curr_state == S_READY_10_ACK && timout)	//ps 10 response timeout
+			a_alm_num <= 8'd101; 
+		else if(curr_state == S_SUCC_30_ACK && timout)	//ps 30 response timeout
+			a_alm_num <= 8'd103; 
+		else if(curr_state == S_BHA_PRE_DET && timout)	//Not fully satisfied pre-condition
+			a_alm_num <= 8'd100; 
+		else if(curr_state == S_BHA_POST_DET && timout)	//Not fully satisfied post-condition
+			case(a_bhv_id_r)
+				1,4,10:	a_alm_num <= 8'd110; 
+				2,5,11:	a_alm_num <= 8'd111; 	
+				8:		a_alm_num <= 8'd112; 
+				9:		a_alm_num <= 8'd113; 
+				default:a_alm_num <= a_alm_num;
+			endcase		
+		else
+			a_alm_num <= a_alm_num;
     end
 
     //Timeout count
