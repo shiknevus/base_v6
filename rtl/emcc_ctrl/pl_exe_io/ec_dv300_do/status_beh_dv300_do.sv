@@ -123,7 +123,7 @@ module status_beh_dv300_do#(
 		end
 	end
 	
-	always@(posedge i_clk)
+	always@(posedge clk_i)
 	begin
 		b_bhv_id <= 100;	
 	end
