@@ -326,7 +326,7 @@ module status_beh_safety_door#(
 		end
 	
 	always@(posedge clk_i)begin
-        if(rst_i || !a_en)
+        if(rst_i || !b_en)
             b_alm_num <= 8'd0;
 		else if(curr_state == S_IDLE)	//clear logic
 			b_alm_num <= 8'd0;
