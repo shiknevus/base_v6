@@ -425,7 +425,7 @@ module ec_sf_door#(
 	,.i_time_1s_vld 		(i_time_1s_vld  	)
 	,.pre_sta_allow	        (b_pre_sta_allow	)
 	,.post_sta_allow	    (b_post_sta_allow	)
-	,.b_en	                (1'b0				)
+	,.b_en	                (1'b1				)
 	,.b_bhv_id              (b_bhv_id			)
 	,.b_tx_ot               (b_tx_ot			)
 	,.b_tx_result_rpt       (b_tx_result_rpt	)
@@ -486,7 +486,7 @@ module ec_sf_door#(
 			.i_close_confirm_key(i_close_confirm_key),
 			.i_lock_monitor     (i_lock_monitor  	),
 			.a_en				(1'b0			),
-			.b_en				(1'b0			),	
+			.b_en				(1'b1			),	
 			.c_en				(1'b0			),	
 			.a_bhv_id			(a_bhv_id_r		),
 			.b_bhv_id			(b_bhv_id		),

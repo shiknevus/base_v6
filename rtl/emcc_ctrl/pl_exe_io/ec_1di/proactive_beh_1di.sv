@@ -336,16 +336,10 @@ module proactive_beh_1di#(
 			a_alm_num <= 8'd101; 
 		else if(curr_state == S_SUCC_30_ACK && timout)	//ps 30 response timeout
 			a_alm_num <= 8'd103; 
-		//else if(curr_state == S_BHA_PRE_DET && timout)	//Not fully satisfied pre-condition
-		//	case(a_bhv_id_r)
-		//		8'd1:a_alm_num <= 8'd100; 
-		//		8'd2:a_alm_num <= 8'd101; 	
-		//		default:a_alm_num <= a_alm_num;
-		//	endcase
 		else if(curr_state == S_BHA_POST_DET && timout)	//Not fully satisfied post-condition
 			case(a_bhv_id_r)
-				8'd1:a_alm_num <= 8'd100; 
-				8'd2:a_alm_num <= 8'd102; 	
+				1:a_alm_num <= 8'd110; 
+				2:a_alm_num <= 8'd111; 	
 				default:a_alm_num <= a_alm_num;
 			endcase		
 		else

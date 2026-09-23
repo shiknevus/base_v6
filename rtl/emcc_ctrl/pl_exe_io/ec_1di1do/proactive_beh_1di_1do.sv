@@ -351,12 +351,8 @@ module proactive_beh_1di_1do#(
 			a_alm_num <= 8'd100; 
 		else if(curr_state == S_BHA_POST_DET && timout)	//Not fully satisfied post-condition
 			case(a_bhv_id_r)
-				8'd1:a_alm_num <= 8'd110; 
-				8'd2:a_alm_num <= 8'd111; 	
-				8'd4:a_alm_num <= 8'd112; 
-				8'd5:a_alm_num <= 8'd113; 
-				8'd6:a_alm_num <= 8'd114; 
-				8'd7:a_alm_num <= 8'd115; 
+				1,4,6:	a_alm_num <= 8'd110; 
+				2,5,7:	a_alm_num <= 8'd111; 	
 				default:a_alm_num <= a_alm_num;
 			endcase		
 		else
