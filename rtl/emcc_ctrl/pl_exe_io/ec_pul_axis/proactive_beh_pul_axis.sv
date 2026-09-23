@@ -112,6 +112,14 @@ module proactive_beh_pul_axis#(
                               (is_move && !i_home_completed) ? 8'd114 : 8'd0;
     wire launch_fault = is_motion && (launch_alarm != 0);
     wire launch_ok = !launch_fault && !i_stop && i_emerge_stop_signal;
+    //108 Drive alarm
+    //109 Forward limit
+    //110 Backward limit 
+    //111 Forward soft limit
+    //112 Backward soft limit
+    //113 Servo not ready
+    //114 Move not homed
+    //115 Drive disabled
 
     reg [7:0]    	curr_state;
 	reg [7:0]    	curr_state_1d;
@@ -435,21 +443,21 @@ module proactive_beh_pul_axis#(
     always @(posedge clk_i) begin
         if(rst_i || curr_state == S_IDLE) a_alm_num <= 0;
         else if(curr_state < S_ALERT_40 && (next_state == alert_next) && next_state != curr_state) begin
-            if(is_motion && !i_dv_alarm) a_alm_num <= 108;
-            else if(is_motion && !i_servo_ready) a_alm_num <= 113;
-            else if(action_error && i_axis_limf) a_alm_num <= 109;
-            else if(action_error && i_axis_limb) a_alm_num <= 110;
-            else if(i_stop) a_alm_num <= 106;
-            else if(!i_emerge_stop_signal) a_alm_num <= 107;
-            else if(launch_fault) a_alm_num <= launch_alarm;
+            if(is_motion && !i_dv_alarm) a_alm_num <= 8'd108;          // Drive alarm
+            else if(is_motion && !i_servo_ready) a_alm_num <= 8'd113;  // Servo not ready
+            else if(action_error && i_axis_limf) a_alm_num <= 8'd109;  // Forward limit
+            else if(action_error && i_axis_limb) a_alm_num <= 8'd110;  // Backward limit
+            else if(i_stop) a_alm_num <= 8'd106;                       // Stop warning
+            else if(!i_emerge_stop_signal) a_alm_num <= 8'd107;        // Emergency stop
+            else if(launch_fault) a_alm_num <= launch_alarm;        // Launch fault
             else if(curr_state == S_BHA_POST_DET && action_error)
-                a_alm_num <= (a_bhv_id_r == 1) ? 120 : is_move ? 122 : 121;
-            else if(ack_tx_result == IRQ_NO_OK) a_alm_num <= ack_ps_alart_num;
-            else if(curr_state == S_BHA_PRE_DET) a_alm_num <= 100;
-            else if(curr_state == S_READY_10_ACK) a_alm_num <= 101;
-            else if(curr_state == S_BHA_POST_DET) a_alm_num <= motion_done_latched ? 116 : 102;
-            else if(curr_state == S_SUCC_30_ACK) a_alm_num <= 103;
-            else a_alm_num <= 105;
+                a_alm_num <= (a_bhv_id_r == 1) ? 8'd120 : is_move ? 8'd122 : 8'd121;
+            else if(ack_tx_result == IRQ_NO_OK) a_alm_num <= ack_ps_alart_num; // PS alarm
+            else if(curr_state == S_BHA_PRE_DET) a_alm_num <= 8'd100;  // Pre-check timeout
+            else if(curr_state == S_READY_10_ACK) a_alm_num <= 8'd101; // Ready ACK timeout
+            else if(curr_state == S_BHA_POST_DET) a_alm_num <= motion_done_latched ? 8'd116 : 8'd102;
+            else if(curr_state == S_SUCC_30_ACK) a_alm_num <= 8'd103;  // Success ACK timeout
+            else a_alm_num <= 8'd105;
         end
     end
 
