@@ -427,7 +427,7 @@ always @(posedge clk_i) begin
 				else 
 					case(cur_chan)
 						4'hA:begin
-							if(a_tx_id_1d == 8'd40 && a_tx_id_1d != a_tx_id)//A channel 10/30 timeout/Alert
+							if(a_tx_id == 8'd40 && a_tx_id_1d != a_tx_id)//A channel 10/30 timeout/Alert
 								s_sta <= S_END_DELAY;
 							else if(a_tx_id == 8'd0)//A channel 40 timeout/Alert
 								s_sta <= S_END_DELAY;
@@ -436,7 +436,7 @@ always @(posedge clk_i) begin
 						end
 						
 						4'hB:begin
-							if(b_tx_id_1d == 8'd40 && b_tx_id_1d != b_tx_id)//B channel 10/30 timeout/Alert
+							if(b_tx_id == 8'd40 && b_tx_id_1d != b_tx_id)//B channel 10/30 timeout/Alert
 								s_sta <= S_END_DELAY;
 							else if(b_tx_id == 8'd0)//B channel 40 timeout/Alert
 								s_sta <= S_END_DELAY;
@@ -445,7 +445,7 @@ always @(posedge clk_i) begin
 						end
 						
 						4'hC:begin
-							if(c_tx_id_1d == 8'd40 && c_tx_id_1d != c_tx_id)//C channel 10/30 timeout/Alert
+							if(c_tx_id == 8'd40 && c_tx_id_1d != c_tx_id)//C channel 10/30 timeout/Alert
 								s_sta <= S_END_DELAY;
 							else if(c_tx_id == 8'd0)//C channel 40 timeout/Alert
 								s_sta <= S_END_DELAY;
@@ -453,7 +453,7 @@ always @(posedge clk_i) begin
 								s_sta <= S_WAIT_IRQ_ACK2;
 						end
 						
-						default:s_sta <= s_sta;
+						default:s_sta <= s_sta;			
 					endcase
 			end
 				
