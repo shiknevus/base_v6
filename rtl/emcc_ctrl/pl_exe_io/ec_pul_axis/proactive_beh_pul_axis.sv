@@ -716,12 +716,9 @@ reg  [31:0]  pos_pf_spd;
 reg  [31:0]  pos_pf_acc;
 reg  [31:0]  pos_pf_dec;
 
-wire [32:0]  home_touch_dec_2x = {home_dec_eff, 1'b0};
-wire [31:0]  home_touch_dec = (home_touch_dec_2x > {1'b0, dec_max_eff})
-                            ? dec_max_eff 
-                            : home_touch_dec_2x[31:0];
-wire [31:0]  pos_quickstop_dec = ((a_bhv_id_r == 8'd1) && home_pf_touchstop)
-                              ? home_touch_dec 
+wire [31:0]  home_qstop_dec = (home_dec_eff > dec_max_eff) ? dec_max_eff : home_dec_eff; // org/limit stop, change by szzhang 20260927
+wire [31:0]  pos_quickstop_dec = ((a_bhv_id_r == 8'd1) && home_pf_quickstop)
+                              ? home_qstop_dec
                               : dec_max_eff;
 reg          pos_quickstop;
 reg  [31:0]  pos_pf_mode;
@@ -790,7 +787,8 @@ Pulmot_fd #(.USE_PAUSE(1), .USE_ABORT(1)) Pulmot_fd00
 
 reg action_alarm;
 wire stop_request = action_alarm || i_stop || !i_emerge_stop_signal || !i_drive_enabled || !a_en;
-assign hard_abort = !r_dv_ok || (i_axis_limf && pos_pf_dir) || (i_axis_limb && !pos_pf_dir);
+assign hard_abort = !r_dv_ok || (!((a_bhv_id_r == 8'd1) && home_limit_recover) && // home 1st-search limit: decel, change by szzhang 20260927
+                    ((i_axis_limf && pos_pf_dir) || (i_axis_limb && !pos_pf_dir)));
 assign motion_pause = i_pause && !stop_request && !hard_abort;
 
 wire raw_done = home_done || jog_done || move_done;

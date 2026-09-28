@@ -1,9 +1,5 @@
 /////////////////////////// MODULE //////////////////////////////
 module Home_fa_std
-#( // add by szzhang 20260926
-    parameter ORG_CHK_CYCLES  = 200_000
-   ,parameter ORG_FALL_CYCLES = 200_000
-)
 (
     input                   clk
    ,input                   reset
@@ -54,7 +50,6 @@ module Home_fa_std
    localparam ST_HOME_STOP     = 7;
    localparam ST_HOME_END      = 8;
    localparam ST_HOME_FINISH   = 9;
-   localparam ST_HOME_CHK      = 10; // add by szzhang 20260926
    ///////////////// PARAMETER ////////////////
    reg [4:0]   fsm_st;
    reg         r_pf_status_lim_f;
@@ -64,16 +59,12 @@ module Home_fa_std
    reg         r_lim_f;
    reg         r_lim_b;
    reg         r_org;
-   localparam integer ORG_FILTER_CYCLES = 4; // require 4 consecutive samples to suppress bounce
-   localparam integer ORG_FILTER_CNT_W = 3;
-   reg         r_org_filtered;
-   reg [ORG_FILTER_CNT_W-1:0] r_org_filter_cnt;
    wire        posedge_lim_f = i_lim_f&~r_lim_f;
    wire        negedge_lim_f =~i_lim_f& r_lim_f;
    wire        posedge_lim_b = i_lim_b&~r_lim_b;
    wire        negedge_lim_b =~i_lim_b& r_lim_b;
-   wire        posedge_org   = r_org_filtered & ~r_org;
-   wire        negedge_org   = ~r_org_filtered & r_org;
+   wire        posedge_org   = i_org & ~r_org;
+   wire        negedge_org   = ~i_org & r_org;
 
    // First search limit.
    assign o_limit_recover = i_drv_son && !i_stop && !(i_lim_f && i_lim_b) &&
@@ -83,39 +74,6 @@ module Home_fa_std
 
    assign o_pf_touchstop = o_pf_quickstop & r_pf_status_org; //add by szzhang 20260916
 
-   // Debounce the origin input; limit inputs are unchanged.
-   always@(posedge clk) begin
-       if(reset) begin
-           r_org_filtered   <= 1'b0;
-           r_org_filter_cnt <= 3'd0;
-       end else if(i_org == r_org_filtered) begin
-           r_org_filter_cnt <= 3'd0;
-       end else if(r_org_filter_cnt == ORG_FILTER_CYCLES-1) begin
-           r_org_filtered   <= i_org;
-           r_org_filter_cnt <= 3'd0;
-       end else begin
-           r_org_filter_cnt <= r_org_filter_cnt + 1'b1;
-       end
-   end
-
-   // add by szzhang 20260926
-   reg  [$clog2(ORG_CHK_CYCLES+1)-1:0]  r_chk_cnt;
-   reg  [$clog2(ORG_FALL_CYCLES+1)-1:0] r_fall_cnt;
-   wire w_chk_end  = (r_chk_cnt == ORG_CHK_CYCLES);
-   wire w_org_fall = (r_fall_cnt == ORG_FALL_CYCLES);
-   always@(posedge clk) begin
-       if(reset | (fsm_st != ST_HOME_CHK))
-           r_chk_cnt <= 0;
-       else if(!w_chk_end)
-           r_chk_cnt <= r_chk_cnt + 1'b1;
-   end
-   always@(posedge clk) begin
-       if(reset | (fsm_st != ST_HOME_FMIN) | r_org_filtered)
-           r_fall_cnt <= 0;
-       else if(!w_org_fall)
-           r_fall_cnt <= r_fall_cnt + 1'b1;
-   end
-
    always@(posedge clk) begin
        if(reset) begin
            r_lim_f <= 1'b0;
@@ -124,7 +82,7 @@ module Home_fa_std
        end else begin
            r_lim_f <= i_lim_f;
            r_lim_b <= i_lim_b;
-           r_org   <= r_org_filtered;
+           r_org   <= i_org;
        end
    end
 
@@ -183,9 +141,12 @@ module Home_fa_std
                    o_pf_quickstop <= 1'b0;
                    r_st_error  <= 1'b0;
                    if(i_start) begin
-                       if(r_org_filtered) begin // add by szzhang 20260926
-                           fsm_st <= ST_HOME_FMIN;
-                           r_pf_status_org <= 1'b1;
+                       if(!i_org && i_pf_dir==DIR_NEG && i_lim_b) begin // start on search limit: reverse, add by szzhang 20260927
+                           fsm_st <= ST_HOME_FACC;
+                           r_pf_status_lim_b <= 1'b1;
+                       end else if(!i_org && i_pf_dir==DIR_POS && i_lim_f) begin
+                           fsm_st <= ST_HOME_BACC;
+                           r_pf_status_lim_f <= 1'b1;
                        end else
                            fsm_st <= i_pf_dir==DIR_POS ? ST_HOME_FACC : ST_HOME_BACC;
                    end
@@ -198,7 +159,7 @@ module Home_fa_std
                        o_pf_stop  <= 1'b1;
                        r_st_error <= 1'b0;
                        fsm_st <= ST_HOME_STOP;
-                   end else if(r_org_filtered) begin
+                   end else if(i_org) begin
                        fsm_st <= ST_HOME_FDEC;
                        r_pf_status_org <= 1'b1;
                    end else if(i_lim_f) begin
@@ -212,14 +173,17 @@ module Home_fa_std
                    o_pf_start <= 1'b0;
                    o_pf_stop  <= 1'b0;
                    o_pf_quickstop <= 1'b1;
+                   if(r_pf_status_org&negedge_org) begin
+                       r_st_error <= 1'b1;
+                   end 
                    if(i_stop | ~i_drv_son) begin
                        o_pf_stop  <= 1'b1;
                        r_st_error <= 1'b0;
                        fsm_st <= ST_HOME_STOP;
                    end else if(r_done_lock | (~i_pf_busy & r_had_busy)) begin // r_had_busy: never trust idle pos before it ran. by szzhang 20260917
-                       if(r_pf_status_org) // change by szzhang 20260926
-                           fsm_st <= r_st_error ? ST_HOME_STOP : ST_HOME_CHK;
-                       else
+                       if(r_pf_status_org)
+                           fsm_st <= (r_st_error | (r_pf_status_org & ~i_org)) ? ST_HOME_STOP : ST_HOME_FMIN; //change by szzhang 20260916
+                       else 
                            fsm_st <= r_st_error ? ST_HOME_STOP : ST_HOME_BACC;
                    end
                end
@@ -231,7 +195,7 @@ module Home_fa_std
                        o_pf_stop  <= 1'b1;
                        r_st_error <= 1'b0;
                        fsm_st <= ST_HOME_STOP;
-                   end else if(r_org_filtered)begin
+                   end else if(i_org)begin
                        fsm_st <= ST_HOME_BDEC;
                        r_pf_status_org <= 1'b1;
                    end else if(i_lim_b) begin
@@ -244,13 +208,16 @@ module Home_fa_std
                    o_pf_start <= 1'b0;
                    o_pf_stop  <= 1'b0;
                    o_pf_quickstop <= 1'b1;
+                   if(r_pf_status_org & negedge_org) begin
+                       r_st_error <= 1'b1;
+                   end
                    if(i_stop | ~i_drv_son) begin
                        o_pf_stop  <= 1'b1;
                        r_st_error <= 1'b0;
-                       fsm_st <= ST_HOME_STOP;
+                       fsm_st <= ST_HOME_STOP;   
                    end else if(r_done_lock | (~i_pf_busy & r_had_busy)) begin // r_had_busy: never trust idle pos before it ran. by szzhang 20260917
-                       if(r_pf_status_org) // change by szzhang 20260926
-                           fsm_st <= r_st_error ? ST_HOME_STOP : ST_HOME_CHK;
+                       if(r_pf_status_org)
+                           fsm_st <= (r_st_error | (r_pf_status_org & ~i_org)) ? ST_HOME_STOP : ST_HOME_FMIN;
                        else
                            fsm_st <= r_st_error ? ST_HOME_STOP : ST_HOME_FACC;
                    end
@@ -263,21 +230,9 @@ module Home_fa_std
                        o_pf_stop  <= 1'b1;
                        r_st_error <= 1'b0;
                        fsm_st <= ST_HOME_STOP;
-                   end else if(w_org_fall & i_pf_busy) begin // change by szzhang 20260926
+                   end else if(~i_org & i_pf_busy) begin
                        fsm_st <= ST_HOME_FINISH;
                        o_pf_stop <= 1'b1;
-                   end
-               end
-               ST_HOME_CHK: begin // add by szzhang 20260926
-                   o_pf_start <= 1'b0;
-                   o_pf_stop  <= 1'b0;
-                   o_pf_quickstop <= 1'b0;
-                   if(i_stop | ~i_drv_son) begin
-                       o_pf_stop  <= 1'b1;
-                       r_st_error <= 1'b0;
-                       fsm_st <= ST_HOME_STOP;
-                   end else if(w_chk_end) begin
-                       fsm_st <= r_org_filtered ? ST_HOME_FMIN : ST_HOME_STOP;
                    end
                end
                ST_HOME_BMIN: begin
@@ -288,7 +243,7 @@ module Home_fa_std
                        o_pf_stop  <= 1'b1;
                        r_st_error <= 1'b0;
                        fsm_st <= ST_HOME_STOP;
-                   end else if(~r_org_filtered & i_pf_busy) begin
+                   end else if(~i_org & i_pf_busy) begin
                        fsm_st <= ST_HOME_FINISH;
                        o_pf_stop <= 1'b1;
                    end

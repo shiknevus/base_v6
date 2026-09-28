@@ -189,9 +189,10 @@ module slv_pul_axis
    reg  [31:0]  pos_pf_acc;
    reg  [31:0]  pos_pf_dec;
    wire home_pf_touchstop;
-   wire [32:0] touch_dec_2x = {home_dec_eff, 1'b0};
-   wire [31:0] pos_quickstop_dec = home_pf_touchstop ?
-       ((touch_dec_2x > {1'b0,dec_max_eff}) ? dec_max_eff : touch_dec_2x[31:0]) : dec_max_eff;
+   wire home_pf_quickstop;
+   wire home_limit_recover;
+   wire [31:0] home_qstop_dec = (home_dec_eff > dec_max_eff) ? dec_max_eff : home_dec_eff; // org/limit stop, change by szzhang 20260927
+   wire [31:0] pos_quickstop_dec = ((cur_beha == 1) && home_pf_quickstop) ? home_qstop_dec : dec_max_eff;
    reg          pos_quickstop;
    reg  [31:0]  pos_pf_mode;
    reg          pos_pf_start;
@@ -202,7 +203,8 @@ module slv_pul_axis
    wire         pos_pf_done;
    wire         pos_pf_error;
 
-   assign hard_abort = !drive_ok || (i_axis_limf && pos_pf_dir) || (i_axis_limb && !pos_pf_dir);
+   assign hard_abort = !drive_ok || (!((cur_beha == 1) && home_limit_recover) && // home 1st-search limit: decel, change by szzhang 20260927
+                       ((i_axis_limf && pos_pf_dir) || (i_axis_limb && !pos_pf_dir)));
    Positioner_std #(.USE_ABORT(1), .BASE_REFCLK(100_000_000)) pos_u
    (
       .clk            ( clk                ),
@@ -236,7 +238,6 @@ module slv_pul_axis
    wire         home_busy;
    wire         home_done;
    wire         home_error;
-   wire         home_limit_recover;
    wire [31:0]  home_pf_spd;
    wire [31:0]  home_pf_acc;
    wire [31:0]  home_pf_dec;
@@ -244,7 +245,6 @@ module slv_pul_axis
    wire         home_pf_dir;
    wire         home_pf_start;
    wire         home_pf_stop;
-   wire         home_pf_quickstop;
 
    Home_fa_std
    home_u
