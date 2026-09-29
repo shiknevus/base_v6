@@ -210,7 +210,7 @@ module proactive_beh_2di_2do#(
     always @(*) begin			
         case (curr_state)	
             S_IDLE: begin	//0
-                if (a_en && ((a_bhv_id_r >= 8'd1) && (a_bhv_id_r <= BHA_NUM)) && a_bhv_vld_r)	//behavior start
+                if (a_en && a_bhv_vld_r)	//behavior start
                     next_state = S_BHA_PRE_DET;
                 else
                     next_state = S_IDLE;
