@@ -81,7 +81,7 @@ module proactive_beh_pul_axis#(
 	,input		[31:0]			rcfg_spd_max      	//maximum speed
 	,input		[31:0]			rcfg_acc_max      	//maximum acceleration
 	,input		[31:0]			rcfg_dec_max      	//maximum deceleration
-	,input		[31:0]			rcfg_touch_spd     	//home clamp speed
+	,input		[31:0]			rcfg_touch_dec     	//home org/1st limit touch deceleration
 	,input signed [31:0]		rcfg_pos_max = 32'sd0	// signed upper soft limit
 	,input signed [31:0]		rcfg_pos_min = 32'sd0	// signed lower soft limit
 
@@ -551,7 +551,7 @@ wire [31:0] move_dec_eff  = (rcfg_move_dec == 32'b0 ) ? 32'd2500000 : rcfg_move_
 wire [31:0] spd_max_eff   = (rcfg_spd_max  == 32'b0 ) ? 32'd4000000 : rcfg_spd_max   ;
 wire [31:0] acc_max_eff   = (rcfg_acc_max  == 32'b0 ) ? 32'd10000000: rcfg_acc_max   ;
 wire [31:0] dec_max_eff   = (rcfg_dec_max  == 32'b0 ) ? 32'd10000000: rcfg_dec_max   ;
-wire [31:0] touch_spd_eff = (rcfg_touch_spd== 32'b0 ) ? 32'd5000    : rcfg_touch_spd ;
+wire [31:0] touch_dec_eff = (rcfg_touch_dec== 32'b0 ) ? 32'd2500000 : rcfg_touch_dec ;
 
 // HOME (beh=1)
 reg          home_stop;
@@ -583,7 +583,6 @@ home_u
   .i_lim_b        ( i_axis_limb        ),
   .i_org          ( axis_org           ),
   .i_pf_spd       ( home_spd_eff       ),
-  .i_spd_min      ( touch_spd_eff      ),
   .i_pf_acc       ( home_acc_eff       ),
   .i_pf_dec       ( home_dec_eff       ),
   .i_pf_dir       ( DIR_NEG            ),
@@ -716,7 +715,7 @@ reg  [31:0]  pos_pf_spd;
 reg  [31:0]  pos_pf_acc;
 reg  [31:0]  pos_pf_dec;
 
-wire [31:0]  home_qstop_dec = (home_dec_eff > dec_max_eff) ? dec_max_eff : home_dec_eff; // org/limit stop, change by szzhang 20260927
+wire [31:0]  home_qstop_dec = (touch_dec_eff > dec_max_eff) ? dec_max_eff : touch_dec_eff; // org/1st limit touch, change by szzhang 20260929
 wire [31:0]  pos_quickstop_dec = ((a_bhv_id_r == 8'd1) && home_pf_quickstop)
                               ? home_qstop_dec
                               : dec_max_eff;
