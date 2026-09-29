@@ -172,10 +172,7 @@ module Home_fa_std
                ST_HOME_FDEC: begin
                    o_pf_start <= 1'b0;
                    o_pf_stop  <= 1'b0;
-                   o_pf_quickstop <= 1'b1;
-                   if(r_pf_status_org&negedge_org) begin
-                       r_st_error <= 1'b1;
-                   end 
+                   o_pf_quickstop <= 1'b1; // org checked only after stop, by szzhang 20260929
                    if(i_stop | ~i_drv_son) begin
                        o_pf_stop  <= 1'b1;
                        r_st_error <= 1'b0;
@@ -207,10 +204,7 @@ module Home_fa_std
                ST_HOME_BDEC: begin
                    o_pf_start <= 1'b0;
                    o_pf_stop  <= 1'b0;
-                   o_pf_quickstop <= 1'b1;
-                   if(r_pf_status_org & negedge_org) begin
-                       r_st_error <= 1'b1;
-                   end
+                   o_pf_quickstop <= 1'b1; // org checked only after stop, by szzhang 20260929
                    if(i_stop | ~i_drv_son) begin
                        o_pf_stop  <= 1'b1;
                        r_st_error <= 1'b0;
