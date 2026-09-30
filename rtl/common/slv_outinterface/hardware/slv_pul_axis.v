@@ -69,7 +69,7 @@ module slv_pul_axis
    ,input  wire [31:0]      rcfg_spd_max
    ,input  wire [31:0]      rcfg_acc_max
    ,input  wire [31:0]      rcfg_dec_max
-   ,input  wire [31:0]      rcfg_touch_spd
+   ,input  wire [31:0]      rcfg_touch_dec
 
    ,input  wire             i_axis_limf     //forward limit
    ,input  wire             i_axis_limb     //backward limit
@@ -106,7 +106,7 @@ module slv_pul_axis
     wire [31:0] spd_max_eff   = (rcfg_spd_max  == 32'b0 ) ? 32'd4000000 : rcfg_spd_max   ;
     wire [31:0] acc_max_eff   = (rcfg_acc_max  == 32'b0 ) ? 32'd10000000: rcfg_acc_max   ;
     wire [31:0] dec_max_eff   = (rcfg_dec_max  == 32'b0 ) ? 32'd10000000: rcfg_dec_max   ;
-    wire [31:0] touch_spd_eff = (rcfg_touch_spd== 32'b0 ) ? 32'd5000    : rcfg_touch_spd ;
+    wire [31:0] touch_dec_eff = (rcfg_touch_dec== 32'b0 ) ? 32'd2500000 : rcfg_touch_dec ;
 
    reg motion_done_latched;
    reg          act_busy;
@@ -191,7 +191,7 @@ module slv_pul_axis
    wire home_pf_touchstop;
    wire home_pf_quickstop;
    wire home_limit_recover;
-   wire [31:0] home_qstop_dec = (home_dec_eff > dec_max_eff) ? dec_max_eff : home_dec_eff; // org/limit stop, change by szzhang 20260927
+   wire [31:0] home_qstop_dec = (touch_dec_eff > dec_max_eff) ? dec_max_eff : touch_dec_eff; // org/1st limit touch, change by szzhang 20260929
    wire [31:0] pos_quickstop_dec = ((cur_beha == 1) && home_pf_quickstop) ? home_qstop_dec : dec_max_eff;
    reg          pos_quickstop;
    reg  [31:0]  pos_pf_mode;
@@ -276,8 +276,7 @@ module slv_pul_axis
       .o_pf_quickstop ( home_pf_quickstop  ),
       .o_pf_touchstop ( home_pf_touchstop ),
       .i_pf_busy      ( pos_pf_busy        ),
-      .i_pf_done      ( pos_pf_done        ),
-      .i_spd_min      ( touch_spd_eff      )
+      .i_pf_done      ( pos_pf_done        )
    );
    
    ////////////////// JOG

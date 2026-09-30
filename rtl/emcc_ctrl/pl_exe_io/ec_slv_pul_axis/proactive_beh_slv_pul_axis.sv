@@ -89,7 +89,7 @@ module proactive_beh_slv_pul_axis#(
 	,input		[31:0]			rcfg_spd_max      	//maximum speed
 	,input		[31:0]			rcfg_acc_max      	//maximum acceleration
 	,input		[31:0]			rcfg_dec_max      	//maximum deceleration
-	,input		[31:0]			rcfg_touch_spd     	//home clamp speed
+	,input		[31:0]			rcfg_touch_dec     	//home org/1st limit touch deceleration
 	,input signed [31:0]		rcfg_pos_max = 32'sd0	// signed upper soft limit
 	,input signed [31:0]		rcfg_pos_min = 32'sd0	// signed lower soft limit
 
@@ -573,7 +573,7 @@ module proactive_beh_slv_pul_axis#(
 		            4'd12: m2s_pulm_msg <= rcfg_spd_max;
 		            4'd13: m2s_pulm_msg <= rcfg_acc_max;
 		            4'd14: m2s_pulm_msg <= rcfg_dec_max;
-		            4'd15: m2s_pulm_msg <= rcfg_touch_spd;
+		            4'd15: m2s_pulm_msg <= rcfg_touch_dec;
 		            default: m2s_pulm_msg <= 32'd0;
 		        endcase
 		        if ((m2s_state == 4'd0) && pul_motor_r_flag)
