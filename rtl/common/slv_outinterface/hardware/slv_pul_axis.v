@@ -94,19 +94,19 @@ module slv_pul_axis
     localparam P_EN_EFF     	  = 1'b0;
     localparam P_RST_EFF    	  = 1'b0;
 
-    wire [31:0] home_spd_eff  = (rcfg_home_spd == 32'b0 ) ? 32'd1000000 : rcfg_home_spd  ;
-    wire [31:0] home_acc_eff  = (rcfg_home_acc == 32'b0 ) ? 32'd2500000 : rcfg_home_acc  ;
-    wire [31:0] home_dec_eff  = (rcfg_home_dec == 32'b0 ) ? 32'd2500000 : rcfg_home_dec  ;
-    wire [31:0] jog_spd_eff   = (rcfg_jog_spd  == 32'b0 ) ? 32'd1000000 : rcfg_jog_spd   ;
-    wire [31:0] jog_acc_eff   = (rcfg_jog_acc  == 32'b0 ) ? 32'd2500000 : rcfg_jog_acc   ;
-    wire [31:0] jog_dec_eff   = (rcfg_jog_dec  == 32'b0 ) ? 32'd2500000 : rcfg_jog_dec   ;
-    wire [31:0] move_spd_eff  = (rcfg_move_spd == 32'b0 ) ? 32'd1000000 : rcfg_move_spd  ;
-    wire [31:0] move_acc_eff  = (rcfg_move_acc == 32'b0 ) ? 32'd2500000 : rcfg_move_acc  ;
-    wire [31:0] move_dec_eff  = (rcfg_move_dec == 32'b0 ) ? 32'd2500000 : rcfg_move_dec  ;
-    wire [31:0] spd_max_eff   = (rcfg_spd_max  == 32'b0 ) ? 32'd4000000 : rcfg_spd_max   ;
-    wire [31:0] acc_max_eff   = (rcfg_acc_max  == 32'b0 ) ? 32'd10000000: rcfg_acc_max   ;
-    wire [31:0] dec_max_eff   = (rcfg_dec_max  == 32'b0 ) ? 32'd10000000: rcfg_dec_max   ;
-    wire [31:0] touch_dec_eff = (rcfg_touch_dec== 32'b0 ) ? 32'd2500000 : rcfg_touch_dec ;
+    wire [31:0] home_spd_eff  = (rcfg_home_spd == 32'b0 ) ? 32'd8750   : rcfg_home_spd  ; // 50 mm/s @ 175 pulse/mm
+    wire [31:0] home_acc_eff  = (rcfg_home_acc == 32'b0 ) ? 32'd175000 : rcfg_home_acc  ; // 1000 mm/s^2 @ 175 pulse/mm
+    wire [31:0] home_dec_eff  = (rcfg_home_dec == 32'b0 ) ? 32'd175000 : rcfg_home_dec  ;
+    wire [31:0] jog_spd_eff   = (rcfg_jog_spd  == 32'b0 ) ? 32'd8750   : rcfg_jog_spd   ;
+    wire [31:0] jog_acc_eff   = (rcfg_jog_acc  == 32'b0 ) ? 32'd175000 : rcfg_jog_acc   ;
+    wire [31:0] jog_dec_eff   = (rcfg_jog_dec  == 32'b0 ) ? 32'd175000 : rcfg_jog_dec   ;
+    wire [31:0] move_spd_eff  = (rcfg_move_spd == 32'b0 ) ? 32'd8750   : rcfg_move_spd  ;
+    wire [31:0] move_acc_eff  = (rcfg_move_acc == 32'b0 ) ? 32'd175000 : rcfg_move_acc  ;
+    wire [31:0] move_dec_eff  = (rcfg_move_dec == 32'b0 ) ? 32'd175000 : rcfg_move_dec  ;
+    wire [31:0] spd_max_eff   = (rcfg_spd_max  == 32'b0 ) ? 32'd175000 : rcfg_spd_max   ; // 1000 mm/s @ 175 pulse/mm
+    wire [31:0] acc_max_eff   = (rcfg_acc_max  == 32'b0 ) ? 32'd875000 : rcfg_acc_max   ; // 5000 mm/s^2 @ 175 pulse/mm
+    wire [31:0] dec_max_eff   = (rcfg_dec_max  == 32'b0 ) ? 32'd875000 : rcfg_dec_max   ;
+    wire [31:0] touch_dec_eff = (rcfg_touch_dec== 32'b0 ) ? 32'd87500  : rcfg_touch_dec ; // 500 mm/s^2 @ 175 pulse/mm, ~2.5 mm from 50 mm/s
 
    reg motion_done_latched;
    reg          act_busy;
