@@ -69,7 +69,7 @@ module slv_pul_axis
    ,input  wire [31:0]      rcfg_spd_max
    ,input  wire [31:0]      rcfg_acc_max
    ,input  wire [31:0]      rcfg_dec_max
-   ,input  wire [31:0]      rcfg_touch_spd
+   ,input  wire [31:0]      rcfg_touch_dec
 
    ,input  wire             i_axis_limf     //forward limit
    ,input  wire             i_axis_limb     //backward limit
@@ -94,19 +94,19 @@ module slv_pul_axis
     localparam P_EN_EFF     	  = 1'b0;
     localparam P_RST_EFF    	  = 1'b0;
 
-    wire [31:0] home_spd_eff  = (rcfg_home_spd == 32'b0 ) ? 32'd1000000 : rcfg_home_spd  ;
-    wire [31:0] home_acc_eff  = (rcfg_home_acc == 32'b0 ) ? 32'd2500000 : rcfg_home_acc  ;
-    wire [31:0] home_dec_eff  = (rcfg_home_dec == 32'b0 ) ? 32'd2500000 : rcfg_home_dec  ;
-    wire [31:0] jog_spd_eff   = (rcfg_jog_spd  == 32'b0 ) ? 32'd1000000 : rcfg_jog_spd   ;
-    wire [31:0] jog_acc_eff   = (rcfg_jog_acc  == 32'b0 ) ? 32'd2500000 : rcfg_jog_acc   ;
-    wire [31:0] jog_dec_eff   = (rcfg_jog_dec  == 32'b0 ) ? 32'd2500000 : rcfg_jog_dec   ;
-    wire [31:0] move_spd_eff  = (rcfg_move_spd == 32'b0 ) ? 32'd1000000 : rcfg_move_spd  ;
-    wire [31:0] move_acc_eff  = (rcfg_move_acc == 32'b0 ) ? 32'd2500000 : rcfg_move_acc  ;
-    wire [31:0] move_dec_eff  = (rcfg_move_dec == 32'b0 ) ? 32'd2500000 : rcfg_move_dec  ;
-    wire [31:0] spd_max_eff   = (rcfg_spd_max  == 32'b0 ) ? 32'd4000000 : rcfg_spd_max   ;
-    wire [31:0] acc_max_eff   = (rcfg_acc_max  == 32'b0 ) ? 32'd10000000: rcfg_acc_max   ;
-    wire [31:0] dec_max_eff   = (rcfg_dec_max  == 32'b0 ) ? 32'd10000000: rcfg_dec_max   ;
-    wire [31:0] touch_spd_eff = (rcfg_touch_spd== 32'b0 ) ? 32'd5000    : rcfg_touch_spd ;
+    wire [31:0] home_spd_eff  = (rcfg_home_spd == 32'b0 ) ? 32'd8750   : rcfg_home_spd  ; // 50 mm/s @ 175 pulse/mm
+    wire [31:0] home_acc_eff  = (rcfg_home_acc == 32'b0 ) ? 32'd175000 : rcfg_home_acc  ; // 1000 mm/s^2 @ 175 pulse/mm
+    wire [31:0] home_dec_eff  = (rcfg_home_dec == 32'b0 ) ? 32'd175000 : rcfg_home_dec  ;
+    wire [31:0] jog_spd_eff   = (rcfg_jog_spd  == 32'b0 ) ? 32'd8750   : rcfg_jog_spd   ;
+    wire [31:0] jog_acc_eff   = (rcfg_jog_acc  == 32'b0 ) ? 32'd175000 : rcfg_jog_acc   ;
+    wire [31:0] jog_dec_eff   = (rcfg_jog_dec  == 32'b0 ) ? 32'd175000 : rcfg_jog_dec   ;
+    wire [31:0] move_spd_eff  = (rcfg_move_spd == 32'b0 ) ? 32'd8750   : rcfg_move_spd  ;
+    wire [31:0] move_acc_eff  = (rcfg_move_acc == 32'b0 ) ? 32'd175000 : rcfg_move_acc  ;
+    wire [31:0] move_dec_eff  = (rcfg_move_dec == 32'b0 ) ? 32'd175000 : rcfg_move_dec  ;
+    wire [31:0] spd_max_eff   = (rcfg_spd_max  == 32'b0 ) ? 32'd175000 : rcfg_spd_max   ; // 1000 mm/s @ 175 pulse/mm
+    wire [31:0] acc_max_eff   = (rcfg_acc_max  == 32'b0 ) ? 32'd875000 : rcfg_acc_max   ; // 5000 mm/s^2 @ 175 pulse/mm
+    wire [31:0] dec_max_eff   = (rcfg_dec_max  == 32'b0 ) ? 32'd875000 : rcfg_dec_max   ;
+    wire [31:0] touch_dec_eff = (rcfg_touch_dec== 32'b0 ) ? 32'd87500  : rcfg_touch_dec ; // 500 mm/s^2 @ 175 pulse/mm, ~2.5 mm from 50 mm/s
 
    reg motion_done_latched;
    reg          act_busy;
@@ -189,9 +189,10 @@ module slv_pul_axis
    reg  [31:0]  pos_pf_acc;
    reg  [31:0]  pos_pf_dec;
    wire home_pf_touchstop;
-   wire [32:0] touch_dec_2x = {home_dec_eff, 1'b0};
-   wire [31:0] pos_quickstop_dec = home_pf_touchstop ?
-       ((touch_dec_2x > {1'b0,dec_max_eff}) ? dec_max_eff : touch_dec_2x[31:0]) : dec_max_eff;
+   wire home_pf_quickstop;
+   wire home_limit_recover;
+   wire [31:0] home_qstop_dec = (touch_dec_eff > dec_max_eff) ? dec_max_eff : touch_dec_eff; // org/1st limit touch, change by szzhang 20260929
+   wire [31:0] pos_quickstop_dec = ((cur_beha == 1) && home_pf_quickstop) ? home_qstop_dec : dec_max_eff;
    reg          pos_quickstop;
    reg  [31:0]  pos_pf_mode;
    reg          pos_pf_start;
@@ -202,7 +203,8 @@ module slv_pul_axis
    wire         pos_pf_done;
    wire         pos_pf_error;
 
-   assign hard_abort = !drive_ok || (i_axis_limf && pos_pf_dir) || (i_axis_limb && !pos_pf_dir);
+   assign hard_abort = !drive_ok || (!((cur_beha == 1) && home_limit_recover) && // home 1st-search limit: decel, change by szzhang 20260927
+                       ((i_axis_limf && pos_pf_dir) || (i_axis_limb && !pos_pf_dir)));
    Positioner_std #(.USE_ABORT(1), .BASE_REFCLK(100_000_000)) pos_u
    (
       .clk            ( clk                ),
@@ -236,7 +238,6 @@ module slv_pul_axis
    wire         home_busy;
    wire         home_done;
    wire         home_error;
-   wire         home_limit_recover;
    wire [31:0]  home_pf_spd;
    wire [31:0]  home_pf_acc;
    wire [31:0]  home_pf_dec;
@@ -244,7 +245,6 @@ module slv_pul_axis
    wire         home_pf_dir;
    wire         home_pf_start;
    wire         home_pf_stop;
-   wire         home_pf_quickstop;
 
    Home_fa_std
    home_u
@@ -276,8 +276,7 @@ module slv_pul_axis
       .o_pf_quickstop ( home_pf_quickstop  ),
       .o_pf_touchstop ( home_pf_touchstop ),
       .i_pf_busy      ( pos_pf_busy        ),
-      .i_pf_done      ( pos_pf_done        ),
-      .i_spd_min      ( touch_spd_eff      )
+      .i_pf_done      ( pos_pf_done        )
    );
    
    ////////////////// JOG

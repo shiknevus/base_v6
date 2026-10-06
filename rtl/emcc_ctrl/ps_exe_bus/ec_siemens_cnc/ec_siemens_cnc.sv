@@ -42,7 +42,7 @@ module ec_siemens_cnc#(
 		output 	            	o_intr_irq
     );
 
-	localparam		A_BHA_NUM	=	62;	//generic behaviors 1-128
+	localparam		A_BHA_NUM	=	64;	//generic behaviors 1-128
 	localparam		B_BHA_NUM	=	1;
 	localparam		C_BHA_NUM	=	1;
 

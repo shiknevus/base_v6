@@ -315,7 +315,7 @@ module ec_slv_pul_axis#(
 	,.param1			    (param1			)
 	,.param2			    (param2			)
 	,.param3			    (param3			)
-	//,.param4			    (param4			)
+	,.param4			    (param4			)	//[pluse/mm|°]
 	,.param5			    (param5			)
 	//,.param6			    (param6			)
 	//,.param7			    (param7			)
@@ -454,7 +454,7 @@ module ec_slv_pul_axis#(
     ,.rcfg_spd_max			(param1					)
     ,.rcfg_acc_max			(param2					)
     ,.rcfg_dec_max			(param3					)
-    ,.rcfg_touch_spd		(param33				)
+    ,.rcfg_touch_dec		(param33				)
     ,.rcfg_pos_max			(param31				)
     ,.rcfg_pos_min			(param32				)
 

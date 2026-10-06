@@ -81,7 +81,7 @@ module proactive_beh_pul_axis#(
 	,input		[31:0]			rcfg_spd_max      	//maximum speed
 	,input		[31:0]			rcfg_acc_max      	//maximum acceleration
 	,input		[31:0]			rcfg_dec_max      	//maximum deceleration
-	,input		[31:0]			rcfg_touch_spd     	//home clamp speed
+	,input		[31:0]			rcfg_touch_dec     	//home org/1st limit touch deceleration
 	,input signed [31:0]		rcfg_pos_max = 32'sd0	// signed upper soft limit
 	,input signed [31:0]		rcfg_pos_min = 32'sd0	// signed lower soft limit
 
@@ -539,19 +539,19 @@ localparam DIR_NEG = 1'b0;
 
 wire r_dv_ok = i_servo_ready & i_dv_alarm;//estop and alarm active low, add by szzhang 20260914
 
-wire [31:0] home_spd_eff  = (rcfg_home_spd == 32'b0 ) ? 32'd1000000 : rcfg_home_spd  ;
-wire [31:0] home_acc_eff  = (rcfg_home_acc == 32'b0 ) ? 32'd2500000 : rcfg_home_acc  ;
-wire [31:0] home_dec_eff  = (rcfg_home_dec == 32'b0 ) ? 32'd2500000 : rcfg_home_dec  ;
-wire [31:0] jog_spd_eff   = (rcfg_jog_spd  == 32'b0 ) ? 32'd1000000 : rcfg_jog_spd   ;
-wire [31:0] jog_acc_eff   = (rcfg_jog_acc  == 32'b0 ) ? 32'd2500000 : rcfg_jog_acc   ;
-wire [31:0] jog_dec_eff   = (rcfg_jog_dec  == 32'b0 ) ? 32'd2500000 : rcfg_jog_dec   ;
-wire [31:0] move_spd_eff  = (rcfg_move_spd == 32'b0 ) ? 32'd1000000 : rcfg_move_spd  ;
-wire [31:0] move_acc_eff  = (rcfg_move_acc == 32'b0 ) ? 32'd2500000 : rcfg_move_acc  ;
-wire [31:0] move_dec_eff  = (rcfg_move_dec == 32'b0 ) ? 32'd2500000 : rcfg_move_dec  ;
-wire [31:0] spd_max_eff   = (rcfg_spd_max  == 32'b0 ) ? 32'd4000000 : rcfg_spd_max   ;
-wire [31:0] acc_max_eff   = (rcfg_acc_max  == 32'b0 ) ? 32'd10000000: rcfg_acc_max   ;
-wire [31:0] dec_max_eff   = (rcfg_dec_max  == 32'b0 ) ? 32'd10000000: rcfg_dec_max   ;
-wire [31:0] touch_spd_eff = (rcfg_touch_spd== 32'b0 ) ? 32'd5000    : rcfg_touch_spd ;
+wire [31:0] home_spd_eff  = (rcfg_home_spd == 32'b0 ) ? 32'd8750   : rcfg_home_spd  ; // 50 mm/s @ 175 pulse/mm
+wire [31:0] home_acc_eff  = (rcfg_home_acc == 32'b0 ) ? 32'd175000 : rcfg_home_acc  ; // 1000 mm/s^2 @ 175 pulse/mm
+wire [31:0] home_dec_eff  = (rcfg_home_dec == 32'b0 ) ? 32'd175000 : rcfg_home_dec  ;
+wire [31:0] jog_spd_eff   = (rcfg_jog_spd  == 32'b0 ) ? 32'd8750   : rcfg_jog_spd   ;
+wire [31:0] jog_acc_eff   = (rcfg_jog_acc  == 32'b0 ) ? 32'd175000 : rcfg_jog_acc   ;
+wire [31:0] jog_dec_eff   = (rcfg_jog_dec  == 32'b0 ) ? 32'd175000 : rcfg_jog_dec   ;
+wire [31:0] move_spd_eff  = (rcfg_move_spd == 32'b0 ) ? 32'd8750   : rcfg_move_spd  ;
+wire [31:0] move_acc_eff  = (rcfg_move_acc == 32'b0 ) ? 32'd175000 : rcfg_move_acc  ;
+wire [31:0] move_dec_eff  = (rcfg_move_dec == 32'b0 ) ? 32'd175000 : rcfg_move_dec  ;
+wire [31:0] spd_max_eff   = (rcfg_spd_max  == 32'b0 ) ? 32'd175000 : rcfg_spd_max   ; // 1000 mm/s @ 175 pulse/mm
+wire [31:0] acc_max_eff   = (rcfg_acc_max  == 32'b0 ) ? 32'd875000 : rcfg_acc_max   ; // 5000 mm/s^2 @ 175 pulse/mm
+wire [31:0] dec_max_eff   = (rcfg_dec_max  == 32'b0 ) ? 32'd875000 : rcfg_dec_max   ;
+wire [31:0] touch_dec_eff = (rcfg_touch_dec== 32'b0 ) ? 32'd87500  : rcfg_touch_dec ; // 500 mm/s^2 @ 175 pulse/mm, ~2.5 mm from 50 mm/s
 
 // HOME (beh=1)
 reg          home_stop;
@@ -583,7 +583,6 @@ home_u
   .i_lim_b        ( i_axis_limb        ),
   .i_org          ( axis_org           ),
   .i_pf_spd       ( home_spd_eff       ),
-  .i_spd_min      ( touch_spd_eff      ),
   .i_pf_acc       ( home_acc_eff       ),
   .i_pf_dec       ( home_dec_eff       ),
   .i_pf_dir       ( DIR_NEG            ),
@@ -716,12 +715,9 @@ reg  [31:0]  pos_pf_spd;
 reg  [31:0]  pos_pf_acc;
 reg  [31:0]  pos_pf_dec;
 
-wire [32:0]  home_touch_dec_2x = {home_dec_eff, 1'b0};
-wire [31:0]  home_touch_dec = (home_touch_dec_2x > {1'b0, dec_max_eff})
-                            ? dec_max_eff 
-                            : home_touch_dec_2x[31:0];
-wire [31:0]  pos_quickstop_dec = ((a_bhv_id_r == 8'd1) && home_pf_touchstop)
-                              ? home_touch_dec 
+wire [31:0]  home_qstop_dec = (touch_dec_eff > dec_max_eff) ? dec_max_eff : touch_dec_eff; // org/1st limit touch, change by szzhang 20260929
+wire [31:0]  pos_quickstop_dec = ((a_bhv_id_r == 8'd1) && home_pf_quickstop)
+                              ? home_qstop_dec
                               : dec_max_eff;
 reg          pos_quickstop;
 reg  [31:0]  pos_pf_mode;
@@ -790,7 +786,8 @@ Pulmot_fd #(.USE_PAUSE(1), .USE_ABORT(1)) Pulmot_fd00
 
 reg action_alarm;
 wire stop_request = action_alarm || i_stop || !i_emerge_stop_signal || !i_drive_enabled || !a_en;
-assign hard_abort = !r_dv_ok || (i_axis_limf && pos_pf_dir) || (i_axis_limb && !pos_pf_dir);
+assign hard_abort = !r_dv_ok || (!((a_bhv_id_r == 8'd1) && home_limit_recover) && // home 1st-search limit: decel, change by szzhang 20260927
+                    ((i_axis_limf && pos_pf_dir) || (i_axis_limb && !pos_pf_dir)));
 assign motion_pause = i_pause && !stop_request && !hard_abort;
 
 wire raw_done = home_done || jog_done || move_done;

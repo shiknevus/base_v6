@@ -453,7 +453,7 @@ always @(posedge clk_i) begin
 								s_sta <= S_WAIT_IRQ_ACK2;
 						end
 						
-						default:s_sta <= s_sta;
+						default:s_sta <= s_sta;			
 					endcase
 			end
 				

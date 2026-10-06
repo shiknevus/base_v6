@@ -30,14 +30,13 @@ module Home_fa_std
    ,output wire             o_pf_touchstop //add by szzhang 20260916
    ,input  wire             i_pf_busy
    ,input  wire             i_pf_done
-   ,input  wire [31:0]      i_spd_min
 );
 
 
 
 
    //////////////////////// DEFINE ////////////
-   localparam P_SPD_MIN        = 32'd5000;
+   localparam P_SPD_MIN        = 32'd2000;
    localparam DIR_POS  	       = 1'b1;
    localparam DIR_NEG          = 1'b0;
    localparam ST_HOME_IDLE     = 0;
@@ -141,7 +140,14 @@ module Home_fa_std
                    o_pf_quickstop <= 1'b0;
                    r_st_error  <= 1'b0;
                    if(i_start) begin
-                       fsm_st <= i_pf_dir==DIR_POS ? ST_HOME_FACC : ST_HOME_BACC;
+                       if(!i_org && i_pf_dir==DIR_NEG && i_lim_b) begin // start on search limit: reverse, add by szzhang 20260927
+                           fsm_st <= ST_HOME_FACC;
+                           r_pf_status_lim_b <= 1'b1;
+                       end else if(!i_org && i_pf_dir==DIR_POS && i_lim_f) begin
+                           fsm_st <= ST_HOME_BACC;
+                           r_pf_status_lim_f <= 1'b1;
+                       end else
+                           fsm_st <= i_pf_dir==DIR_POS ? ST_HOME_FACC : ST_HOME_BACC;
                    end
                end
                ST_HOME_FACC: begin
@@ -165,10 +171,7 @@ module Home_fa_std
                ST_HOME_FDEC: begin
                    o_pf_start <= 1'b0;
                    o_pf_stop  <= 1'b0;
-                   o_pf_quickstop <= 1'b1;
-                   if(r_pf_status_org&negedge_org) begin
-                       r_st_error <= 1'b1;
-                   end 
+                   o_pf_quickstop <= 1'b1; // org checked only after stop, by szzhang 20260929
                    if(i_stop | ~i_drv_son) begin
                        o_pf_stop  <= 1'b1;
                        r_st_error <= 1'b0;
@@ -200,10 +203,7 @@ module Home_fa_std
                ST_HOME_BDEC: begin
                    o_pf_start <= 1'b0;
                    o_pf_stop  <= 1'b0;
-                   o_pf_quickstop <= 1'b1;
-                   if(r_pf_status_org & negedge_org) begin
-                       r_st_error <= 1'b1;
-                   end
+                   o_pf_quickstop <= 1'b1; // org checked only after stop, by szzhang 20260929
                    if(i_stop | ~i_drv_son) begin
                        o_pf_stop  <= 1'b1;
                        r_st_error <= 1'b0;
@@ -320,14 +320,14 @@ module Home_fa_std
                    o_pf_dir   <= DIR_NEG;
                end
                ST_HOME_FMIN: begin
-                   o_pf_spd   <= i_spd_min;
+                   o_pf_spd   <= P_SPD_MIN;
                    o_pf_acc   <= i_pf_acc;
                    o_pf_dec   <= i_pf_dec;
                    o_pf_pulse <= 32'h7FFFFFFF;
                    o_pf_dir   <= DIR_POS;
                end
                ST_HOME_BMIN: begin
-                   o_pf_spd   <= i_spd_min;
+                   o_pf_spd   <= P_SPD_MIN;
                    o_pf_acc   <= i_pf_acc;
                    o_pf_dec   <= i_pf_dec;
                    o_pf_pulse <= 32'h7FFFFFFF;

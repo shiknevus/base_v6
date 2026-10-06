@@ -104,7 +104,7 @@ module hardware_interface_top
     wire [31:0]      rcfg_spd_max[3:0];
     wire [31:0]      rcfg_acc_max[3:0];
     wire [31:0]      rcfg_dec_max[3:0];
-    wire [31:0]      rcfg_touch_spd[3:0];
+    wire [31:0]      rcfg_touch_dec[3:0];
     wire             i_axis_limf[3:0];
     wire             i_axis_limb[3:0];
     wire             i_axis_zero[3:0];
@@ -303,10 +303,10 @@ module hardware_interface_top
     assign rcfg_dec_max[1] = pul_motor1_buf[14];
     assign rcfg_dec_max[2] = pul_motor2_buf[14];
     assign rcfg_dec_max[3] = pul_motor3_buf[14];
-    assign rcfg_touch_spd[0] = pul_motor0_buf[15];
-    assign rcfg_touch_spd[1] = pul_motor1_buf[15];
-    assign rcfg_touch_spd[2] = pul_motor2_buf[15];
-    assign rcfg_touch_spd[3] = pul_motor3_buf[15];
+    assign rcfg_touch_dec[0] = pul_motor0_buf[15];
+    assign rcfg_touch_dec[1] = pul_motor1_buf[15];
+    assign rcfg_touch_dec[2] = pul_motor2_buf[15];
+    assign rcfg_touch_dec[3] = pul_motor3_buf[15];
 assign rs232_uart_id[0] = rs232_ch0_buf[0];
     assign rs232_uart_id[1] = rs232_ch1_buf[0];
     assign rs232_uart_id[2] = rs232_ch2_buf[0];
@@ -691,7 +691,7 @@ assign rs232_uart_id[0] = rs232_ch0_buf[0];
 		   ,.rcfg_spd_max	         ( rcfg_spd_max[i]	    )
 		   ,.rcfg_acc_max   	     ( rcfg_acc_max[i]      )
 		   ,.rcfg_dec_max   	     ( rcfg_dec_max[i]      )
-		   ,.rcfg_touch_spd         ( rcfg_touch_spd[i]     )
+		   ,.rcfg_touch_dec         ( rcfg_touch_dec[i]     )
 
 		   ,.i_axis_limf             ( i_axis_limf[i]       )
 		   ,.i_axis_limb             ( i_axis_limb[i]       )
