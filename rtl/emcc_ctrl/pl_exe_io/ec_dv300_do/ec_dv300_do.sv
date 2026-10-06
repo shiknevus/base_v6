@@ -18,7 +18,6 @@
 // Additional Comments:
 // 
 //////////////////////////////////////////////////////////////////////////////////
-`define DEBUG
 
 module ec_dv300_do#(
 		parameter  				REG_SPACE_BIAS 		= 	2000	,	//Component offset address
@@ -193,40 +192,6 @@ module ec_dv300_do#(
     assign o_spdx3 = param16[2];
     assign o_spdx4 = param16[3];
 	
-	`ifdef DEBUG
-		reg			ro_intr_irq;
-		reg	[7:0]	irq_posedge_cnt;
-		reg	[7:0]	irq_negedge_cnt;
-		
-		always@(posedge clk_i)
-		begin
-			ro_intr_irq <= o_intr_irq;
-		end
-		
-		
-		always@(posedge clk_i)
-		begin
-			if(rst_i)begin
-				irq_posedge_cnt <= 8'd0;
-				irq_negedge_cnt <= 8'd0;
-			end else if(a_bhv_vld)begin
-				irq_posedge_cnt <= 8'd0;
-				irq_negedge_cnt <= 8'd0;
-			end else begin
-				if({ro_intr_irq,o_intr_irq} == 2'b01)begin	//rising
-					irq_posedge_cnt <= irq_posedge_cnt+1;
-				end else begin
-					irq_posedge_cnt <= irq_posedge_cnt;
-				end
-				
-				if({ro_intr_irq,o_intr_irq} == 2'b10)begin	//falling
-					irq_negedge_cnt <= irq_negedge_cnt+1;
-				end else begin
-					irq_negedge_cnt <= irq_negedge_cnt;
-				end
-			end
-		end
-	`endif
 	
 	//valid signal sync
 	reg 		r_a_tx_result_vld ;

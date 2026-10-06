@@ -18,7 +18,8 @@
 // Additional Comments:
 // 
 //////////////////////////////////////////////////////////////////////////////////
-`include"reg_addr_pl.vh"
+`include "./../../../include_files/reg_addr_pl.vh"
+
 module ps_rw_pl_reg_5di#(
     parameter  						REG_SPACE_BIAS 	= 	200	,
     parameter  						REG_SPACE_SIZE 	= 	512	

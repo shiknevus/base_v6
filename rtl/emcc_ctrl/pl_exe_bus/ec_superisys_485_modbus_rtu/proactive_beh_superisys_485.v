@@ -259,12 +259,12 @@ module proactive_beh_superisys_485#(
             S_BHA_POST_DET: begin	//curr_state = 7
 				if(user_signal_start)begin
 					if(a_bhv_id_r==4)begin
-						if(o_mat_err)
+						if(o_mat_err)	//对比失败
 							next_state = S_ALERT_40;
 						else
 							next_state = S_SUCC_30;
 					end else begin
-						if(o_exe_suc)
+						if(o_exe_suc)	//==0:执行成功
 							next_state = S_SUCC_30;
 						else
 							next_state = S_ALERT_40;//执行失败（从站返回异常帧，如标签不在读取区域）→40报警

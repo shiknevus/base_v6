@@ -694,9 +694,9 @@ module emcc_mst_top #(
           .clk                   ( ps_reg_clk        ),
           .reset                 ( ps_reg_reset      ),
           
-          .o_uart_tx             (USER_UART1_TX        ),
-          .i_uart_rx             (USER_UART1_RX        ),
-          .o_uart_de             (USER_UART1_DE        ),
+          .o_uart_tx             (rs485_1_tx        ),
+          .i_uart_rx             (rs485_1_rx        ),
+          .o_uart_de             (rs485_1_de        ),
           
           .i_user_req            (rs485_1_user_req       ),
           .o_user_grant          (rs485_1_user_grant     ),
@@ -719,9 +719,9 @@ module emcc_mst_top #(
           .clk                   ( ps_reg_clk        ),
           .reset                 ( ps_reg_reset      ),
           
-          .o_uart_tx             (USER_UART2_TX        ),
-          .i_uart_rx             (USER_UART2_RX        ),
-          .o_uart_de             (USER_UART2_DE        ),
+          .o_uart_tx             (rs485_2_tx        ),
+          .i_uart_rx             (rs485_2_rx        ),
+          .o_uart_de             (rs485_2_de        ),
           
           .i_user_req            (rs485_2_user_req       ),
           .o_user_grant          (rs485_2_user_grant     ),

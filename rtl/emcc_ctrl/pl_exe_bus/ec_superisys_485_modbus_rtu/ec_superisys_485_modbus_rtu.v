@@ -305,7 +305,7 @@ ps_rw_pl_reg_superisys_485#(
 //	,.bhv_en                (bhv_en			)
 	,.a_task_id      	    (a_task_id		)
 	,.a_task_bhv_id	        (a_task_bhv_id	)
-	,.a_en				    (a_en			)
+	,.a_en				    (			)
 	,.a_bhv_ot        	    (a_bhv_ot		)
 	,.a_tsc_result_rpt	    (a_tx_result_rpt)
 	,.a_tsc_result_vld	    (a_tx_result_vld)
@@ -412,7 +412,7 @@ proactive_beh_superisys_485#(
     ,.i_time_1s_vld        	(i_time_1s_vld      )
     ,.pre_sta_allow        	(a_pre_sta_allow    )
     ,.post_sta_allow       	(a_post_sta_allow   )
-	,.a_en                  (a_en               )
+	,.a_en                  (1'b1               )
     ,.a_bhv_id             	(a_bhv_id           )
     ,.a_bhv_vld            	(a_bhv_vld          )
     ,.a_tx_ot              	(a_bhv_ot           )
@@ -453,9 +453,9 @@ pre_post_sta_check_superisys_485#(
 		.sc_id				(sc_id			),
 		.ec_id           	(ec_id          ),
 		.c_bhv_ot			(c_tx_ot		),
-		.a_en				(a_en			),	//通道A使能 ps-pl
-		.b_en				(b_en			),	//通道B使能 ps-pl
-		.c_en				(c_en			),	//通道C使能 ps-pl
+		.a_en				(1'b1			),	//通道A使能 ps-pl
+		.b_en				(1'b0			),	//通道B使能 ps-pl
+		.c_en				(1'b0			),	//通道C使能 ps-pl
 		.a_bhv_id        	(a_bhv_id_r     ),	
 		.b_bhv_id        	(b_bhv_id       ),	
 		.c_bhv_id         	(c_bhv_id       ),	
