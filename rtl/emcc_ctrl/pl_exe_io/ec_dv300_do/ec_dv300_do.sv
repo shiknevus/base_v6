@@ -151,7 +151,14 @@ module ec_dv300_do#(
 	wire 			param70 ;
 
 
-	wire	[31:0]	task_time_cnt	;
+	wire	[19:0]	task_time_cnt	;
+
+	wire	[31:0]	debug_reg1 ;
+	wire	[31:0]	debug_reg2 ;
+	wire	[31:0]	debug_reg3 ;
+	wire	[31:0]	debug_reg4 ;
+	wire	[31:0]	debug_reg5 ;
+
 	
 	wire			a_tx_result_vld;
 	wire			b_tx_result_vld;
