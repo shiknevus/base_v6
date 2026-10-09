@@ -41,11 +41,11 @@ module proactive_beh_osm41_485_laser_distance#(
     ,output reg [7:0]           a_tx_id
     ,output reg	[7:0]           a_alm_num
 	
-	,output						sample_start	
+	,output	reg					sample_start	
 	,input 		[15:0]			user_da    
 	,input 						user_da_vld
 	
-	,output		[15:0]			distance
+	,output	reg	[15:0]			distance
 	,input		[15:0]			distance_min
 	,input		[15:0]			distance_max
 
@@ -249,6 +249,8 @@ module proactive_beh_osm41_485_laser_distance#(
 					1:begin		//read distance
 						if(user_da_vld)
 							next_state = S_BHA_POST_DET;
+						else if(timout)
+							next_state = S_ALERT_40;	
 						else
 							next_state = S_EXE;
 					end
@@ -258,15 +260,19 @@ module proactive_beh_osm41_485_laser_distance#(
 								next_state = S_BHA_POST_DET;
 							else
 								next_state = S_ALERT_40;
+						else if(timout)
+							next_state = S_ALERT_40;
 						else
 							next_state = S_EXE;
 					end
 					3:begin		//detect no
 						if(user_da_vld)
-							if(user_da < distance_min && user_da > distance_max)
+							if(user_da < distance_min || user_da > distance_max)
 								next_state = S_BHA_POST_DET;
 							else
 								next_state = S_ALERT_40;
+						else if(timout)
+							next_state = S_ALERT_40;
 						else
 							next_state = S_EXE;
 					end
@@ -371,7 +377,13 @@ module proactive_beh_osm41_485_laser_distance#(
 		else if(curr_state == S_SUCC_30_ACK && timout)	//ps 30 response timeout
 			a_alm_num <= 8'd103; 
 		else if(curr_state == S_BHA_PRE_DET && timout)	//Not fully satisfied post-condition
-			a_alm_num <= 8'd110; 		
+			a_alm_num <= 8'd110; 	
+		else if(curr_state == S_EXE && timout)	//osm41 senser no back data
+			a_alm_num <= 8'd111;
+		else if(curr_state_1d == S_EXE && curr_state == S_ALERT_40 && a_bhv_id_r == 2)	//osm41 senser no back data
+			a_alm_num <= 8'd112;	//no Material
+		else if(curr_state_1d == S_EXE && curr_state == S_ALERT_40 && a_bhv_id_r == 3)	//osm41 senser no back data
+			a_alm_num <= 8'd113;	//yes Material
 		else
 			a_alm_num <= a_alm_num;
     end
@@ -401,9 +413,9 @@ module proactive_beh_osm41_485_laser_distance#(
 	//---------------------------------------------user logic begin-----------------------------------------//
 	//======================================================================================================//
 	
-	always@(posedge i_clk)
+	always@(posedge clk_i)
 	begin
-		if(i_rst)
+		if(rst_i)
 			sample_start <= 0;
 		else if(curr_state == S_EXE)	//action start
 			sample_start <= 1;
@@ -411,9 +423,9 @@ module proactive_beh_osm41_485_laser_distance#(
 			sample_start <= 0;
 	end
 	
-	always@(posedge i_clk)
+	always@(posedge clk_i)
 	begin
-		if(i_rst)
+		if(rst_i)
 			distance <= 16'd0;
 		else if(user_da_vld)
 			distance <= user_da;

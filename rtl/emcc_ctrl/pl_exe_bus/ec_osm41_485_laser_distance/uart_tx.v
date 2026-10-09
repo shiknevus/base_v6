@@ -15,8 +15,8 @@ module uart_tx(
 //==================================================================================================
 
 //baud
-parameter  CLK_FREQ = 100_000_000;            //ÏµÍ³Ê±ÖÓÆµÂÊ
-parameter  UART_BPS = 9600;                //´®¿Ú²¨ÌØÂÊ
+parameter  CLK_FREQ = 156_250_000;            //ÏµÍ³Ê±ï¿½ï¿½Æµï¿½ï¿½
+parameter  UART_BPS = 115200;                //ï¿½ï¿½ï¿½Ú²ï¿½ï¿½ï¿½ï¿½ï¿½
 
 //pority
 parameter  PARITY = "NONE" ;
@@ -57,25 +57,22 @@ end
 
 always@(posedge i_clk)
 begin
-	if(i_rst)
-		uart_tx_ready_r <= 0;
-	else
-		uart_tx_ready_r <= uart_tx_ready;
+	uart_tx_ready_r <= uart_tx_ready;
 end
 
 
 
-localparam  BPS_CNT  = CLK_FREQ/UART_BPS;   //ÎªµÃµ½Ö¸¶¨²¨ÌØÂÊ£¬¶ÔÏµÍ³Ê±ÖÓ¼ÆÊýBPS_CNT´Î
+localparam  BPS_CNT  = CLK_FREQ/UART_BPS;   //Îªï¿½Ãµï¿½Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê£ï¿½ï¿½ï¿½ÏµÍ³Ê±ï¿½Ó¼ï¿½ï¿½ï¿½BPS_CNTï¿½ï¿½
 
 //reg define
 generate
     if(PARITY=="ODD")begin:Odd
         reg        uart_en_d0; 
         reg        uart_en_d1;  
-        reg [15:0] clk_cnt;                         //ÏµÍ³Ê±ÖÓ¼ÆÊýÆ÷
-        reg [ 3:0] tx_cnt;                          //·¢ËÍÊý¾Ý¼ÆÊýÆ÷
-        reg        tx_flag;                         //·¢ËÍ¹ý³Ì±êÖ¾ÐÅºÅ
-        reg [ 7:0] tx_data;                         //¼Ä´æ·¢ËÍÊý¾Ý
+        reg [15:0] clk_cnt;                         //ÏµÍ³Ê±ï¿½Ó¼ï¿½ï¿½ï¿½ï¿½ï¿½
+        reg [ 3:0] tx_cnt;                          //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý¼ï¿½ï¿½ï¿½ï¿½ï¿½
+        reg        tx_flag;                         //ï¿½ï¿½ï¿½Í¹ï¿½ï¿½Ì±ï¿½Ö¾ï¿½Åºï¿½
+        reg [ 7:0] tx_data;                         //ï¿½Ä´æ·¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         
         //wire define
         wire       en_flag;
@@ -83,15 +80,15 @@ generate
         //*****************************************************
         //**                    main code
         //*****************************************************
-        //ÔÚ´®¿Ú·¢ËÍ¹ý³ÌÖÐ¸ø³öÃ¦×´Ì¬±êÖ¾
+        //ï¿½Ú´ï¿½ï¿½Ú·ï¿½ï¿½Í¹ï¿½ï¿½ï¿½ï¿½Ð¸ï¿½ï¿½ï¿½Ã¦×´Ì¬ï¿½ï¿½Ö¾
         reg tx_busy_pre;
         assign uart_tx_busy = tx_flag;
         assign uart_tx_ready = (~tx_flag)&(~tx_busy_pre);
         
-        //²¶»ñuart_enÉÏÉýÑØ£¬µÃµ½Ò»¸öÊ±ÖÓÖÜÆÚµÄÂö³åÐÅºÅ
+        //ï¿½ï¿½ï¿½ï¿½uart_enï¿½ï¿½ï¿½ï¿½ï¿½Ø£ï¿½ï¿½Ãµï¿½Ò»ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½Úµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Åºï¿½
         assign en_flag = (~uart_en_d1) & uart_en_d0;
         
-        //¶Ô·¢ËÍÊ¹ÄÜÐÅºÅuart_enÑÓ³ÙÁ½¸öÊ±ÖÓÖÜÆÚ
+        //ï¿½Ô·ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½ï¿½Åºï¿½uart_enï¿½Ó³ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         always @(posedge sys_clk or negedge sys_rst_n) begin         
             if (!sys_rst_n) begin
                 uart_en_d0 <= 1'b0;                                  
@@ -114,21 +111,21 @@ generate
         end
         
         reg parity;
-        //µ±Âö³åÐÅºÅen_flagµ½´ïÊ±,¼Ä´æ´ý·¢ËÍµÄÊý¾Ý£¬²¢½øÈë·¢ËÍ¹ý³Ì          
+        //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Åºï¿½en_flagï¿½ï¿½ï¿½ï¿½Ê±,ï¿½Ä´ï¿½ï¿½ï¿½ï¿½ï¿½Íµï¿½ï¿½ï¿½ï¿½Ý£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ë·¢ï¿½Í¹ï¿½ï¿½ï¿½          
         always @(posedge sys_clk or negedge sys_rst_n) begin         
             if (!sys_rst_n) begin                                  
                 tx_flag <= 1'b0;
                 tx_data <= 8'd0;
                 parity <= 1'b0;
             end 
-            else if (en_flag) begin                 //¼ì²âµ½·¢ËÍÊ¹ÄÜÉÏÉýÑØ                      
-                    tx_flag <= 1'b1;                //½øÈë·¢ËÍ¹ý³Ì£¬±êÖ¾Î»tx_flagÀ­¸ß
-                    tx_data <= uart_din;            //¼Ä´æ´ý·¢ËÍµÄÊý¾Ý
+            else if (en_flag) begin                 //ï¿½ï¿½âµ½ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½                      
+                    tx_flag <= 1'b1;                //ï¿½ï¿½ï¿½ë·¢ï¿½Í¹ï¿½ï¿½Ì£ï¿½ï¿½ï¿½Ö¾Î»tx_flagï¿½ï¿½ï¿½ï¿½
+                    tx_data <= uart_din;            //ï¿½Ä´ï¿½ï¿½ï¿½ï¿½ï¿½Íµï¿½ï¿½ï¿½ï¿½ï¿½
                     parity <= !(^uart_din);
                 end
-                                                    //¼ÆÊýµ½Í£Ö¹Î»½áÊøÊ±£¬Í£Ö¹·¢ËÍ¹ý³Ì
+                                                    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í£Ö¹Î»ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½Í£Ö¹ï¿½ï¿½ï¿½Í¹ï¿½ï¿½ï¿½
                 else if ((tx_cnt == 4'd10) && (clk_cnt == BPS_CNT -(BPS_CNT/16))) begin                                       
-                    tx_flag <= 1'b0;                //·¢ËÍ¹ý³Ì½áÊø£¬±êÖ¾Î»tx_flagÀ­µÍ
+                    tx_flag <= 1'b0;                //ï¿½ï¿½ï¿½Í¹ï¿½ï¿½Ì½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¾Î»tx_flagï¿½ï¿½ï¿½ï¿½
                     tx_data <= 8'd0;
                     parity  <= 1'b0;
                 end
@@ -139,63 +136,63 @@ generate
                 end 
         end
         
-        //½øÈë·¢ËÍ¹ý³Ìºó£¬Æô¶¯ÏµÍ³Ê±ÖÓ¼ÆÊýÆ÷
+        //ï¿½ï¿½ï¿½ë·¢ï¿½Í¹ï¿½ï¿½Ìºï¿½ï¿½ï¿½ï¿½ï¿½ÏµÍ³Ê±ï¿½Ó¼ï¿½ï¿½ï¿½ï¿½ï¿½
         always @(posedge sys_clk or negedge sys_rst_n) begin         
             if (!sys_rst_n)                             
                 clk_cnt <= 16'd0;                                  
-            else if (tx_flag) begin                 //´¦ÓÚ·¢ËÍ¹ý³Ì
+            else if (tx_flag) begin                 //ï¿½ï¿½ï¿½Ú·ï¿½ï¿½Í¹ï¿½ï¿½ï¿½
                 if (clk_cnt < BPS_CNT - 1)
                     clk_cnt <= clk_cnt + 1'b1;
                 else
-                    clk_cnt <= 16'd0;               //¶ÔÏµÍ³Ê±ÖÓ¼ÆÊý´ïÒ»¸ö²¨ÌØÂÊÖÜÆÚºóÇåÁã
+                    clk_cnt <= 16'd0;               //ï¿½ï¿½ÏµÍ³Ê±ï¿½Ó¼ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Úºï¿½ï¿½ï¿½ï¿½ï¿½
             end
             else                             
-                clk_cnt <= 16'd0; 				    //·¢ËÍ¹ý³Ì½áÊø
+                clk_cnt <= 16'd0; 				    //ï¿½ï¿½ï¿½Í¹ï¿½ï¿½Ì½ï¿½ï¿½ï¿½
         end
         
-        //½øÈë·¢ËÍ¹ý³Ìºó£¬Æô¶¯·¢ËÍÊý¾Ý¼ÆÊýÆ÷
+        //ï¿½ï¿½ï¿½ë·¢ï¿½Í¹ï¿½ï¿½Ìºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý¼ï¿½ï¿½ï¿½ï¿½ï¿½
         always @(posedge sys_clk or negedge sys_rst_n) begin         
             if (!sys_rst_n)                             
                 tx_cnt <= 4'd0;
-            else if (tx_flag) begin                 //´¦ÓÚ·¢ËÍ¹ý³Ì
-                if (clk_cnt == BPS_CNT - 1)			//¶ÔÏµÍ³Ê±ÖÓ¼ÆÊý´ïÒ»¸ö²¨ÌØÂÊÖÜÆÚ
-                    tx_cnt <= tx_cnt + 1'b1;		//´ËÊ±·¢ËÍÊý¾Ý¼ÆÊýÆ÷¼Ó1
+            else if (tx_flag) begin                 //ï¿½ï¿½ï¿½Ú·ï¿½ï¿½Í¹ï¿½ï¿½ï¿½
+                if (clk_cnt == BPS_CNT - 1)			//ï¿½ï¿½ÏµÍ³Ê±ï¿½Ó¼ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+                    tx_cnt <= tx_cnt + 1'b1;		//ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½1
                 else
                     tx_cnt <= tx_cnt;       
             end
             else                              
-                tx_cnt  <= 4'd0;				    //·¢ËÍ¹ý³Ì½áÊø
+                tx_cnt  <= 4'd0;				    //ï¿½ï¿½ï¿½Í¹ï¿½ï¿½Ì½ï¿½ï¿½ï¿½
         end
         
-        //¸ù¾Ý·¢ËÍÊý¾Ý¼ÆÊýÆ÷À´¸øuart·¢ËÍ¶Ë¿Ú¸³Öµ
+        //ï¿½ï¿½ï¿½Ý·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½uartï¿½ï¿½ï¿½Í¶Ë¿Ú¸ï¿½Öµ
         always @(posedge sys_clk or negedge sys_rst_n) begin        
             if (!sys_rst_n)  
                 uart_txd <= 1'b1;        
             else if (tx_flag)
                 case(tx_cnt)
-                    4'd0: uart_txd <= 1'b0;         //ÆðÊ¼Î» 
-                    4'd1: uart_txd <= tx_data[0];   //Êý¾ÝÎ»×îµÍÎ»
+                    4'd0: uart_txd <= 1'b0;         //ï¿½ï¿½Ê¼Î» 
+                    4'd1: uart_txd <= tx_data[0];   //ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½ï¿½Î»
                     4'd2: uart_txd <= tx_data[1];
                     4'd3: uart_txd <= tx_data[2];
                     4'd4: uart_txd <= tx_data[3];
                     4'd5: uart_txd <= tx_data[4];
                     4'd6: uart_txd <= tx_data[5];
                     4'd7: uart_txd <= tx_data[6];
-                    4'd8: uart_txd <= tx_data[7];   //Êý¾ÝÎ»×î¸ßÎ»
-                    4'd9: uart_txd <= parity;         //Ð£ÑéÎ»
+                    4'd8: uart_txd <= tx_data[7];   //ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½ï¿½Î»
+                    4'd9: uart_txd <= parity;         //Ð£ï¿½ï¿½Î»
                     4'd10: uart_txd <= 1'b1;        //Í£Ö¹Î»
                     default: ;
                 endcase
             else 
-                uart_txd <= 1'b1;                   //¿ÕÏÐÊ±·¢ËÍ¶Ë¿ÚÎª¸ßµçÆ½
+                uart_txd <= 1'b1;                   //ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½Í¶Ë¿ï¿½Îªï¿½ßµï¿½Æ½
         end
     end else if(PARITY =="EVEN")begin:Even
         reg        uart_en_d0; 
         reg        uart_en_d1;  
-        reg [15:0] clk_cnt;                         //ÏµÍ³Ê±ÖÓ¼ÆÊýÆ÷
-        reg [ 3:0] tx_cnt;                          //·¢ËÍÊý¾Ý¼ÆÊýÆ÷
-        reg        tx_flag;                         //·¢ËÍ¹ý³Ì±êÖ¾ÐÅºÅ
-        reg [ 7:0] tx_data;                         //¼Ä´æ·¢ËÍÊý¾Ý
+        reg [15:0] clk_cnt;                         //ÏµÍ³Ê±ï¿½Ó¼ï¿½ï¿½ï¿½ï¿½ï¿½
+        reg [ 3:0] tx_cnt;                          //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý¼ï¿½ï¿½ï¿½ï¿½ï¿½
+        reg        tx_flag;                         //ï¿½ï¿½ï¿½Í¹ï¿½ï¿½Ì±ï¿½Ö¾ï¿½Åºï¿½
+        reg [ 7:0] tx_data;                         //ï¿½Ä´æ·¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         
         //wire define
         wire       en_flag;
@@ -203,15 +200,15 @@ generate
         //*****************************************************
         //**                    main code
         //*****************************************************
-        //ÔÚ´®¿Ú·¢ËÍ¹ý³ÌÖÐ¸ø³öÃ¦×´Ì¬±êÖ¾
+        //ï¿½Ú´ï¿½ï¿½Ú·ï¿½ï¿½Í¹ï¿½ï¿½ï¿½ï¿½Ð¸ï¿½ï¿½ï¿½Ã¦×´Ì¬ï¿½ï¿½Ö¾
         reg tx_busy_pre;
         assign uart_tx_busy = tx_flag;
         assign uart_tx_ready = (~tx_flag)&(~tx_busy_pre);
         
-        //²¶»ñuart_enÉÏÉýÑØ£¬µÃµ½Ò»¸öÊ±ÖÓÖÜÆÚµÄÂö³åÐÅºÅ
+        //ï¿½ï¿½ï¿½ï¿½uart_enï¿½ï¿½ï¿½ï¿½ï¿½Ø£ï¿½ï¿½Ãµï¿½Ò»ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½Úµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Åºï¿½
         assign en_flag = (~uart_en_d1) & uart_en_d0;
         
-        //¶Ô·¢ËÍÊ¹ÄÜÐÅºÅuart_enÑÓ³ÙÁ½¸öÊ±ÖÓÖÜÆÚ
+        //ï¿½Ô·ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½ï¿½Åºï¿½uart_enï¿½Ó³ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         always @(posedge sys_clk or negedge sys_rst_n) begin         
             if (!sys_rst_n) begin
                 uart_en_d0 <= 1'b0;                                  
@@ -234,21 +231,21 @@ generate
         end
         
         reg parity;
-        //µ±Âö³åÐÅºÅen_flagµ½´ïÊ±,¼Ä´æ´ý·¢ËÍµÄÊý¾Ý£¬²¢½øÈë·¢ËÍ¹ý³Ì          
+        //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Åºï¿½en_flagï¿½ï¿½ï¿½ï¿½Ê±,ï¿½Ä´ï¿½ï¿½ï¿½ï¿½ï¿½Íµï¿½ï¿½ï¿½ï¿½Ý£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ë·¢ï¿½Í¹ï¿½ï¿½ï¿½          
         always @(posedge sys_clk or negedge sys_rst_n) begin         
             if (!sys_rst_n) begin                                  
                 tx_flag <= 1'b0;
                 tx_data <= 8'd0;
                 parity <= 1'b0;
             end 
-            else if (en_flag) begin                 //¼ì²âµ½·¢ËÍÊ¹ÄÜÉÏÉýÑØ                      
-                    tx_flag <= 1'b1;                //½øÈë·¢ËÍ¹ý³Ì£¬±êÖ¾Î»tx_flagÀ­¸ß
-                    tx_data <= uart_din;            //¼Ä´æ´ý·¢ËÍµÄÊý¾Ý
+            else if (en_flag) begin                 //ï¿½ï¿½âµ½ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½                      
+                    tx_flag <= 1'b1;                //ï¿½ï¿½ï¿½ë·¢ï¿½Í¹ï¿½ï¿½Ì£ï¿½ï¿½ï¿½Ö¾Î»tx_flagï¿½ï¿½ï¿½ï¿½
+                    tx_data <= uart_din;            //ï¿½Ä´ï¿½ï¿½ï¿½ï¿½ï¿½Íµï¿½ï¿½ï¿½ï¿½ï¿½
                     parity <= ^uart_din;
                 end
-                                                    //¼ÆÊýµ½Í£Ö¹Î»½áÊøÊ±£¬Í£Ö¹·¢ËÍ¹ý³Ì
+                                                    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í£Ö¹Î»ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½Í£Ö¹ï¿½ï¿½ï¿½Í¹ï¿½ï¿½ï¿½
                 else if ((tx_cnt == 4'd10) && (clk_cnt == BPS_CNT -(BPS_CNT/16))) begin                                       
-                    tx_flag <= 1'b0;                //·¢ËÍ¹ý³Ì½áÊø£¬±êÖ¾Î»tx_flagÀ­µÍ
+                    tx_flag <= 1'b0;                //ï¿½ï¿½ï¿½Í¹ï¿½ï¿½Ì½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¾Î»tx_flagï¿½ï¿½ï¿½ï¿½
                     tx_data <= 8'd0;
                     parity  <= 1'b0;
                 end
@@ -259,63 +256,63 @@ generate
                 end 
         end
         
-        //½øÈë·¢ËÍ¹ý³Ìºó£¬Æô¶¯ÏµÍ³Ê±ÖÓ¼ÆÊýÆ÷
+        //ï¿½ï¿½ï¿½ë·¢ï¿½Í¹ï¿½ï¿½Ìºï¿½ï¿½ï¿½ï¿½ï¿½ÏµÍ³Ê±ï¿½Ó¼ï¿½ï¿½ï¿½ï¿½ï¿½
         always @(posedge sys_clk or negedge sys_rst_n) begin         
             if (!sys_rst_n)                             
                 clk_cnt <= 16'd0;                                  
-            else if (tx_flag) begin                 //´¦ÓÚ·¢ËÍ¹ý³Ì
+            else if (tx_flag) begin                 //ï¿½ï¿½ï¿½Ú·ï¿½ï¿½Í¹ï¿½ï¿½ï¿½
                 if (clk_cnt < BPS_CNT - 1)
                     clk_cnt <= clk_cnt + 1'b1;
                 else
-                    clk_cnt <= 16'd0;               //¶ÔÏµÍ³Ê±ÖÓ¼ÆÊý´ïÒ»¸ö²¨ÌØÂÊÖÜÆÚºóÇåÁã
+                    clk_cnt <= 16'd0;               //ï¿½ï¿½ÏµÍ³Ê±ï¿½Ó¼ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Úºï¿½ï¿½ï¿½ï¿½ï¿½
             end
             else                             
-                clk_cnt <= 16'd0; 				    //·¢ËÍ¹ý³Ì½áÊø
+                clk_cnt <= 16'd0; 				    //ï¿½ï¿½ï¿½Í¹ï¿½ï¿½Ì½ï¿½ï¿½ï¿½
         end
         
-        //½øÈë·¢ËÍ¹ý³Ìºó£¬Æô¶¯·¢ËÍÊý¾Ý¼ÆÊýÆ÷
+        //ï¿½ï¿½ï¿½ë·¢ï¿½Í¹ï¿½ï¿½Ìºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý¼ï¿½ï¿½ï¿½ï¿½ï¿½
         always @(posedge sys_clk or negedge sys_rst_n) begin         
             if (!sys_rst_n)                             
                 tx_cnt <= 4'd0;
-            else if (tx_flag) begin                 //´¦ÓÚ·¢ËÍ¹ý³Ì
-                if (clk_cnt == BPS_CNT - 1)			//¶ÔÏµÍ³Ê±ÖÓ¼ÆÊý´ïÒ»¸ö²¨ÌØÂÊÖÜÆÚ
-                    tx_cnt <= tx_cnt + 1'b1;		//´ËÊ±·¢ËÍÊý¾Ý¼ÆÊýÆ÷¼Ó1
+            else if (tx_flag) begin                 //ï¿½ï¿½ï¿½Ú·ï¿½ï¿½Í¹ï¿½ï¿½ï¿½
+                if (clk_cnt == BPS_CNT - 1)			//ï¿½ï¿½ÏµÍ³Ê±ï¿½Ó¼ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+                    tx_cnt <= tx_cnt + 1'b1;		//ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½1
                 else
                     tx_cnt <= tx_cnt;       
             end
             else                              
-                tx_cnt  <= 4'd0;				    //·¢ËÍ¹ý³Ì½áÊø
+                tx_cnt  <= 4'd0;				    //ï¿½ï¿½ï¿½Í¹ï¿½ï¿½Ì½ï¿½ï¿½ï¿½
         end
         
-        //¸ù¾Ý·¢ËÍÊý¾Ý¼ÆÊýÆ÷À´¸øuart·¢ËÍ¶Ë¿Ú¸³Öµ
+        //ï¿½ï¿½ï¿½Ý·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½uartï¿½ï¿½ï¿½Í¶Ë¿Ú¸ï¿½Öµ
         always @(posedge sys_clk or negedge sys_rst_n) begin        
             if (!sys_rst_n)  
                 uart_txd <= 1'b1;        
             else if (tx_flag)
                 case(tx_cnt)
-                    4'd0: uart_txd <= 1'b0;         //ÆðÊ¼Î» 
-                    4'd1: uart_txd <= tx_data[0];   //Êý¾ÝÎ»×îµÍÎ»
+                    4'd0: uart_txd <= 1'b0;         //ï¿½ï¿½Ê¼Î» 
+                    4'd1: uart_txd <= tx_data[0];   //ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½ï¿½Î»
                     4'd2: uart_txd <= tx_data[1];
                     4'd3: uart_txd <= tx_data[2];
                     4'd4: uart_txd <= tx_data[3];
                     4'd5: uart_txd <= tx_data[4];
                     4'd6: uart_txd <= tx_data[5];
                     4'd7: uart_txd <= tx_data[6];
-                    4'd8: uart_txd <= tx_data[7];   //Êý¾ÝÎ»×î¸ßÎ»
-                    4'd9: uart_txd <= parity;         //Ð£ÑéÎ»
+                    4'd8: uart_txd <= tx_data[7];   //ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½ï¿½Î»
+                    4'd9: uart_txd <= parity;         //Ð£ï¿½ï¿½Î»
                     4'd10:uart_txd <= 1'b1;         //Í£Ö¹Î»
                     default: ;
                 endcase
             else 
-                uart_txd <= 1'b1;                   //¿ÕÏÐÊ±·¢ËÍ¶Ë¿ÚÎª¸ßµçÆ½
+                uart_txd <= 1'b1;                   //ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½Í¶Ë¿ï¿½Îªï¿½ßµï¿½Æ½
         end
     end else begin:None
         reg        uart_en_d0; 
         reg        uart_en_d1;  
-        reg [15:0] clk_cnt;                         //ÏµÍ³Ê±ÖÓ¼ÆÊýÆ÷
-        reg [ 3:0] tx_cnt;                          //·¢ËÍÊý¾Ý¼ÆÊýÆ÷
-        reg        tx_flag;                         //·¢ËÍ¹ý³Ì±êÖ¾ÐÅºÅ
-        reg [ 7:0] tx_data;                         //¼Ä´æ·¢ËÍÊý¾Ý
+        reg [15:0] clk_cnt;                         //ÏµÍ³Ê±ï¿½Ó¼ï¿½ï¿½ï¿½ï¿½ï¿½
+        reg [ 3:0] tx_cnt;                          //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý¼ï¿½ï¿½ï¿½ï¿½ï¿½
+        reg        tx_flag;                         //ï¿½ï¿½ï¿½Í¹ï¿½ï¿½Ì±ï¿½Ö¾ï¿½Åºï¿½
+        reg [ 7:0] tx_data;                         //ï¿½Ä´æ·¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         
         //wire define
         wire       en_flag;
@@ -323,15 +320,15 @@ generate
         //*****************************************************
         //**                    main code
         //*****************************************************
-        //ÔÚ´®¿Ú·¢ËÍ¹ý³ÌÖÐ¸ø³öÃ¦×´Ì¬±êÖ¾
+        //ï¿½Ú´ï¿½ï¿½Ú·ï¿½ï¿½Í¹ï¿½ï¿½ï¿½ï¿½Ð¸ï¿½ï¿½ï¿½Ã¦×´Ì¬ï¿½ï¿½Ö¾
         reg tx_busy_pre;
         assign uart_tx_busy = tx_flag;
         assign uart_tx_ready = (~tx_flag)&(~tx_busy_pre);
         
-        //²¶»ñuart_enÉÏÉýÑØ£¬µÃµ½Ò»¸öÊ±ÖÓÖÜÆÚµÄÂö³åÐÅºÅ
+        //ï¿½ï¿½ï¿½ï¿½uart_enï¿½ï¿½ï¿½ï¿½ï¿½Ø£ï¿½ï¿½Ãµï¿½Ò»ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½Úµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Åºï¿½
         assign en_flag = (~uart_en_d1) & uart_en_d0;
         
-        //¶Ô·¢ËÍÊ¹ÄÜÐÅºÅuart_enÑÓ³ÙÁ½¸öÊ±ÖÓÖÜÆÚ
+        //ï¿½Ô·ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½ï¿½Åºï¿½uart_enï¿½Ó³ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         always @(posedge sys_clk or negedge sys_rst_n) begin         
             if (!sys_rst_n) begin
                 uart_en_d0 <= 1'b0;                                  
@@ -353,19 +350,19 @@ generate
             end
         end
         
-        //µ±Âö³åÐÅºÅen_flagµ½´ïÊ±,¼Ä´æ´ý·¢ËÍµÄÊý¾Ý£¬²¢½øÈë·¢ËÍ¹ý³Ì          
+        //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Åºï¿½en_flagï¿½ï¿½ï¿½ï¿½Ê±,ï¿½Ä´ï¿½ï¿½ï¿½ï¿½ï¿½Íµï¿½ï¿½ï¿½ï¿½Ý£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ë·¢ï¿½Í¹ï¿½ï¿½ï¿½          
         always @(posedge sys_clk or negedge sys_rst_n) begin         
             if (!sys_rst_n) begin                                  
                 tx_flag <= 1'b0;
                 tx_data <= 8'd0;
             end 
-            else if (en_flag) begin                 //¼ì²âµ½·¢ËÍÊ¹ÄÜÉÏÉýÑØ                      
-                    tx_flag <= 1'b1;                //½øÈë·¢ËÍ¹ý³Ì£¬±êÖ¾Î»tx_flagÀ­¸ß
-                    tx_data <= uart_din;            //¼Ä´æ´ý·¢ËÍµÄÊý¾Ý
+            else if (en_flag) begin                 //ï¿½ï¿½âµ½ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½                      
+                    tx_flag <= 1'b1;                //ï¿½ï¿½ï¿½ë·¢ï¿½Í¹ï¿½ï¿½Ì£ï¿½ï¿½ï¿½Ö¾Î»tx_flagï¿½ï¿½ï¿½ï¿½
+                    tx_data <= uart_din;            //ï¿½Ä´ï¿½ï¿½ï¿½ï¿½ï¿½Íµï¿½ï¿½ï¿½ï¿½ï¿½
                 end
-                                                    //¼ÆÊýµ½Í£Ö¹Î»½áÊøÊ±£¬Í£Ö¹·¢ËÍ¹ý³Ì
+                                                    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í£Ö¹Î»ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½Í£Ö¹ï¿½ï¿½ï¿½Í¹ï¿½ï¿½ï¿½
                 else if ((tx_cnt == 4'd9) && (clk_cnt == BPS_CNT -(BPS_CNT/16))) begin                                       
-                    tx_flag <= 1'b0;                //·¢ËÍ¹ý³Ì½áÊø£¬±êÖ¾Î»tx_flagÀ­µÍ
+                    tx_flag <= 1'b0;                //ï¿½ï¿½ï¿½Í¹ï¿½ï¿½Ì½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¾Î»tx_flagï¿½ï¿½ï¿½ï¿½
                     tx_data <= 8'd0;
                 end
                 else begin
@@ -374,54 +371,54 @@ generate
                 end 
         end
         
-        //½øÈë·¢ËÍ¹ý³Ìºó£¬Æô¶¯ÏµÍ³Ê±ÖÓ¼ÆÊýÆ÷
+        //ï¿½ï¿½ï¿½ë·¢ï¿½Í¹ï¿½ï¿½Ìºï¿½ï¿½ï¿½ï¿½ï¿½ÏµÍ³Ê±ï¿½Ó¼ï¿½ï¿½ï¿½ï¿½ï¿½
         always @(posedge sys_clk or negedge sys_rst_n) begin         
             if (!sys_rst_n)                             
                 clk_cnt <= 16'd0;                                  
-            else if (tx_flag) begin                 //´¦ÓÚ·¢ËÍ¹ý³Ì
+            else if (tx_flag) begin                 //ï¿½ï¿½ï¿½Ú·ï¿½ï¿½Í¹ï¿½ï¿½ï¿½
                 if (clk_cnt < BPS_CNT - 1)
                     clk_cnt <= clk_cnt + 1'b1;
                 else
-                    clk_cnt <= 16'd0;               //¶ÔÏµÍ³Ê±ÖÓ¼ÆÊý´ïÒ»¸ö²¨ÌØÂÊÖÜÆÚºóÇåÁã
+                    clk_cnt <= 16'd0;               //ï¿½ï¿½ÏµÍ³Ê±ï¿½Ó¼ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Úºï¿½ï¿½ï¿½ï¿½ï¿½
             end
             else                             
-                clk_cnt <= 16'd0; 				    //·¢ËÍ¹ý³Ì½áÊø
+                clk_cnt <= 16'd0; 				    //ï¿½ï¿½ï¿½Í¹ï¿½ï¿½Ì½ï¿½ï¿½ï¿½
         end
         
-        //½øÈë·¢ËÍ¹ý³Ìºó£¬Æô¶¯·¢ËÍÊý¾Ý¼ÆÊýÆ÷
+        //ï¿½ï¿½ï¿½ë·¢ï¿½Í¹ï¿½ï¿½Ìºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý¼ï¿½ï¿½ï¿½ï¿½ï¿½
         always @(posedge sys_clk or negedge sys_rst_n) begin         
             if (!sys_rst_n)                             
                 tx_cnt <= 4'd0;
-            else if (tx_flag) begin                 //´¦ÓÚ·¢ËÍ¹ý³Ì
-                if (clk_cnt == BPS_CNT - 1)			//¶ÔÏµÍ³Ê±ÖÓ¼ÆÊý´ïÒ»¸ö²¨ÌØÂÊÖÜÆÚ
-                    tx_cnt <= tx_cnt + 1'b1;		//´ËÊ±·¢ËÍÊý¾Ý¼ÆÊýÆ÷¼Ó1
+            else if (tx_flag) begin                 //ï¿½ï¿½ï¿½Ú·ï¿½ï¿½Í¹ï¿½ï¿½ï¿½
+                if (clk_cnt == BPS_CNT - 1)			//ï¿½ï¿½ÏµÍ³Ê±ï¿½Ó¼ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+                    tx_cnt <= tx_cnt + 1'b1;		//ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½1
                 else
                     tx_cnt <= tx_cnt;       
             end
             else                              
-                tx_cnt  <= 4'd0;				    //·¢ËÍ¹ý³Ì½áÊø
+                tx_cnt  <= 4'd0;				    //ï¿½ï¿½ï¿½Í¹ï¿½ï¿½Ì½ï¿½ï¿½ï¿½
         end
         
-        //¸ù¾Ý·¢ËÍÊý¾Ý¼ÆÊýÆ÷À´¸øuart·¢ËÍ¶Ë¿Ú¸³Öµ
+        //ï¿½ï¿½ï¿½Ý·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½uartï¿½ï¿½ï¿½Í¶Ë¿Ú¸ï¿½Öµ
         always @(posedge sys_clk or negedge sys_rst_n) begin        
             if (!sys_rst_n)  
                 uart_txd <= 1'b1;        
             else if (tx_flag)
                 case(tx_cnt)
-                    4'd0: uart_txd <= 1'b0;         //ÆðÊ¼Î» 
-                    4'd1: uart_txd <= tx_data[0];   //Êý¾ÝÎ»×îµÍÎ»
+                    4'd0: uart_txd <= 1'b0;         //ï¿½ï¿½Ê¼Î» 
+                    4'd1: uart_txd <= tx_data[0];   //ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½ï¿½Î»
                     4'd2: uart_txd <= tx_data[1];
                     4'd3: uart_txd <= tx_data[2];
                     4'd4: uart_txd <= tx_data[3];
                     4'd5: uart_txd <= tx_data[4];
                     4'd6: uart_txd <= tx_data[5];
                     4'd7: uart_txd <= tx_data[6];
-                    4'd8: uart_txd <= tx_data[7];   //Êý¾ÝÎ»×î¸ßÎ»
+                    4'd8: uart_txd <= tx_data[7];   //ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½ï¿½Î»
                     4'd9: uart_txd <= 1'b1;         //Í£Ö¹Î»
                     default: ;
                 endcase
             else 
-                uart_txd <= 1'b1;                   //¿ÕÏÐÊ±·¢ËÍ¶Ë¿ÚÎª¸ßµçÆ½
+                uart_txd <= 1'b1;                   //ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½Í¶Ë¿ï¿½Îªï¿½ßµï¿½Æ½
         end
     end
 endgenerate

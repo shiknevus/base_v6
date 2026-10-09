@@ -39,6 +39,8 @@ module ec_osm41_485_laser_distance#(
 		output 		 [31:0]     o_st_rd_data    ,
 		output 		            o_st_rd_vld     ,
 
+		input					i_485_bus_grant	,
+		output					o_485_bus_req	,
 		input 					i_485_rx		,
 		output 					o_485_tx		,
 		output 					o_485_de		,
@@ -191,7 +193,7 @@ module ec_osm41_485_laser_distance#(
 	wire 			osm41_ready ;
 	wire    [15:0] 	user_da     ;
 	wire     		user_da_vld ;
-	wire			sample_start;
+	reg				sample_start;
 	
 	wire 			a_sample_start	 ;
 	reg 	[15:0]	a_user_da    	 ;
@@ -202,7 +204,7 @@ module ec_osm41_485_laser_distance#(
 	reg 			c_user_da_vld    ;
 	wire 	[15:0]	c_distance       ;
 	
-	wire	[15:0]	distance		;
+	reg		[15:0]	distance		;
 	
 	//---------------------------------------------------------------
 
@@ -406,9 +408,9 @@ module ec_osm41_485_laser_distance#(
 	,.ec_chb_st             (ec_chb_st			)
 	,.b_tx_id               (b_tx_id			)
 	,.b_alm_num             (b_alm_num			)
-	,.di				    (i_sign1_check		)
-	,.irq_o			        (				)
-	,.irq_ack_i	            (irq_ack_i			)	
+	,.di				    (		)
+	,.irq_o			        (irq_b				)
+	,.irq_ack_i	            (irq_b_grant			)	
     );
 	 
 	tim_beh_osm41_485_laser_distance tim_beh_osm41_485_laser_distance_u0(
@@ -433,7 +435,7 @@ module ec_osm41_485_laser_distance#(
 	,.user_da_vld               (c_user_da_vld  	)
 	,.distance                  (c_distance     	)
 	,.irq_o 					(irq_c				)
-	,.irq_ack_i                 (irq_ack_i			)
+	,.irq_ack_i                 (irq_c_grant			)
    );
 	
 		pre_post_sta_check_osm41_485_laser_distance#(
@@ -499,19 +501,22 @@ module ec_osm41_485_laser_distance#(
 		,.irq_receive_ack_i (sync_a_tx_result_vld || sync_b_tx_result_vld || sync_c_tx_result_vld)	
     );
 
-	
+	wire	[7:0]	sta;
 	osm41_driver osm41_driver_u0(
 		.i_clk           (clk_i)
 		,.i_rst          (rst_i)
+		,.i_485_bus_grant(i_485_bus_grant	)
+		,.o_485_bus_req	 (o_485_bus_req	)
 		,.i_485_rx       (i_485_rx)
 		,.o_485_tx       (o_485_tx)
 		,.o_485_de       (o_485_de)
-		,.i_sample_start (sample_start)
-		,.i_485_addr     (param16)	//param
-		,.o_ready        (osm41_ready)
-		,.o_user_da      (user_da    )
-		,.o_user_da_vld  (user_da_vld)
-		,.o_user_error   ( )
+		,.i_time_1ms_vld (i_time_1ms_vld)
+		,.i_sample_start (sample_start	)
+		,.i_485_addr     (param16		)	//param
+		,.o_ready        (osm41_ready	)
+		,.o_user_da      (user_da    	)
+		,.o_user_da_vld  (user_da_vld	)
+		,.o_sta			(sta)	//debug
     );
 	
 	//select a/c
@@ -543,6 +548,5 @@ module ec_osm41_485_laser_distance#(
 			c_user_da_vld   <= 0;
 		end
 	end
-	
 	
 endmodule

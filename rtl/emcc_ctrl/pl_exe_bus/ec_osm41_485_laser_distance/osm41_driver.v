@@ -25,19 +25,25 @@ module osm41_driver(
 	 input					i_clk
 	,input					i_rst
 	
+	,input					i_485_bus_grant
+	,output 	reg			o_485_bus_req	 
+	
 	,input					i_485_rx
 	,output					o_485_tx
 	,output 	reg			o_485_de
 	
+	,input					i_time_1ms_vld
 	,input					i_sample_start
 	,input			[7:0]	i_485_addr
 	,output					o_ready
 	,output 	reg [15:0]	o_user_da		//distance
 	,output		reg			o_user_da_vld	//distance vld
+	//debug signal
+	,output			[7:0]	o_sta
     );
 	
-	wire 			uart_tx_vld	;
-	wire 	[7:0]	uart_tx_da	;
+	reg 			uart_tx_vld	;
+	reg 	[7:0]	uart_tx_da	;
 	wire 			uart_tx_done;
 	
 	wire 			uart_rx_done;
@@ -58,11 +64,35 @@ module osm41_driver(
 	
 	reg				ri_sample_start;
 	reg				sample_start_posedge;
+
+	//------ reply timeout ------
+	//Frame send done -> no valid reply frame within REPLY_TIMEOUT_MS -> release bus request,
+	//prevent o_485_bus_req held forever and occupy the 485 bus when sensor is absent/quiet.
+	//note: 9 bytes reply frame needs about 0.8ms at 115200bps, plus sensor conversion time,
+	//      so 20ms is safe; raise it only if the sensor datasheet conversion time exceeds this.
+	//      (2000ms was a debug leftover - it parked the shared rs485_1 arbiter for 2s per query.)
+	localparam				RX_TIMEOUT_MS	= 20;	//unit: ms
+	reg		[15:0]			rx_timeout_cnt;
+	wire					rx_timeout;
 		
 	assign	tx_da_cs = slv_485_addr+8'h3;
-
+	
+	assign o_sta = sta;	//debug
 	
 	//------ 485 tx --------
+	
+	always@(posedge i_clk)
+	begin
+		if(i_rst)
+			o_485_bus_req <= 0;
+		else if(sample_start_posedge)
+			o_485_bus_req <= 1;
+		else if(o_user_da_vld || rx_timeout)	//reply ok or timeout, release bus
+			o_485_bus_req <= 0;
+		else
+			o_485_bus_req <= o_485_bus_req;
+	end
+
 	
 	always@(posedge i_clk)
 	begin
@@ -78,7 +108,6 @@ module osm41_driver(
 		else
 			sample_start_posedge <= 0;
 	end
-
 	
 	always@(posedge i_clk)
 	begin
@@ -94,13 +123,24 @@ module osm41_driver(
 					uart_tx_vld <= 0;
 					uart_tx_da <= 0;
 					o_485_de <= 0;
+					
 					if(sample_start_posedge)begin		//start	posedge
-						sta <= 1;
+						sta <= 20;
 						slv_485_addr <= i_485_addr;
 					end else begin
 						sta <= 0;
-						slv_485_addr <= 0;
+						//note: keep slv_485_addr here! state 0 is also the reply-wait state,
+						//clearing it makes the reply address match always compare with 0.
 					end
+				end
+				20:begin
+					sta <= 21;
+				end
+				21:begin
+					if(i_485_bus_grant)
+						sta <= 1;
+					else
+						sta <= 21;
 				end
 				1:begin	
 					uart_tx_vld <= 1;
@@ -179,7 +219,25 @@ module osm41_driver(
 				default:sta <= 0;
 			endcase
 	end
-	
+
+	//------ reply timeout counter ------
+	//count 1ms ticks while bus request is pending;
+	//restart at frame-send-done(sta==14 & uart_tx_done) so the reply window is independent of baud rate;
+	//timeout is masked while transmitting(!o_485_de) to avoid aborting a frame on the bus.
+	assign	rx_timeout = o_485_bus_req && !o_485_de && (rx_timeout_cnt >= RX_TIMEOUT_MS);
+
+	always@(posedge i_clk)
+	begin
+		if(i_rst || !o_485_bus_req)
+			rx_timeout_cnt <= 0;
+		else if(sta == 14 && uart_tx_done)	//frame send done, restart reply wait window
+			rx_timeout_cnt <= 0;
+		else if(sample_start_posedge)		//new query triggered, restart wait window
+			rx_timeout_cnt <= 0;
+		else if(i_time_1ms_vld)
+			rx_timeout_cnt <= rx_timeout_cnt + 1'b1;
+	end
+
 	assign	o_ready = !o_485_de;
 	
 	
@@ -225,7 +283,7 @@ module osm41_driver(
 			case(sta2)
 				0:begin
 					rx_da_cs <= 0;
-					if(rx_vld_r && da_reg[8] == 8'h68 && da_reg[7] == slv_485_addr && da_reg[0] == 8'h16)begin
+					if(rx_vld_r && da_reg[8] == 8'h68 && da_reg[7] == slv_485_addr && da_reg[0] == 8'h16)
 						sta2 <= 1;
 					else
 						sta2 <= 0;	
@@ -268,14 +326,14 @@ module osm41_driver(
 		end else 
 			if(rx_vld_r_3d && da_reg[8] == 8'h68 && da_reg[7] == slv_485_addr && da_reg[0] == 8'h16)begin
 				o_user_da_vld <= 1;
-				o_user_da     <= {da_reg[4],da_reg[3]};
+				o_user_da     <= {da_reg[3],da_reg[4]};
 			end else begin
 				o_user_da_vld <= 0;
 				o_user_da     <=o_user_da   ;
 			end
 	end
-
-	uart_tx(
+	
+	uart_tx uart_tx_u0(
     .i_clk       (i_clk)
     ,.i_rst      (i_rst)
     ,.i_tx_vld   (uart_tx_vld	)
@@ -284,7 +342,7 @@ module osm41_driver(
     ,.o_uart_tx  (o_485_tx)
     );
 	
-	uart_rx(
+	uart_rx uart_rx_u0(
     .i_clk	     (i_clk)
     ,.i_rst	     (i_rst)
     ,.i_uart_rx	 (i_485_rx)

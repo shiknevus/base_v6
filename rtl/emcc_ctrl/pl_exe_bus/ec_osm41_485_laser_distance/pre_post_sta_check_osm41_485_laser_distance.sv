@@ -81,10 +81,10 @@ module pre_post_sta_check_osm41_485_laser_distance#(
 	//post status
 	always@(posedge clk_i)
 	begin
-		if(rst_i || !b_en)
-			a_post_sta_allow <= {B_BHA_NUM{1'b0}};
+		if(rst_i || !a_en)
+			a_post_sta_allow <= {A_BHA_NUM{1'b0}};
 		else
-			a_post_sta_allow <= {B_BHA_NUM{1'b1}};
+			a_post_sta_allow <= {A_BHA_NUM{1'b1}};
 	end
 		
 	

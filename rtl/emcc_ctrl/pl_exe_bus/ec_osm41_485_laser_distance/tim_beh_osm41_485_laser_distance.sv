@@ -31,7 +31,7 @@ module tim_beh_osm41_485_laser_distance(
 	,input						post_sta_allow	
 
 	,input						c_en				
-	,output reg [7:0]			c_bhv_id   
+	,output 	[7:0]			c_bhv_id   
 	,input 		[31:0]			c_tx_ot          	
 	,input 		[31:0]			c_tx_result_rpt  	
 	,input						c_tx_result_vld
@@ -41,10 +41,10 @@ module tim_beh_osm41_485_laser_distance(
 	
 	,input 		[19:0]			c_gap_crl
 	
-	,output						sample_start
+	,output	reg					sample_start
 	,input 		[15:0]			user_da    
 	,input 						user_da_vld
-	,output		[15:0]			distance
+	,output	reg	[15:0]			distance
 
 	,output reg              	irq_o 					
 	,input                   	irq_ack_i
@@ -104,12 +104,7 @@ module tim_beh_osm41_485_laser_distance(
 	end
 	
 	//Current behavior number
-	always @(posedge clk_i) begin
-		if(rst_i)
-			c_bhv_id <= 8'd1;
-		else
-			c_bhv_id <= c_bhv_id;
-	end	
+	assign c_bhv_id = 8'd1;
 	
 	reg match_10;
 	reg match_30;
@@ -121,11 +116,11 @@ module tim_beh_osm41_485_laser_distance(
 		match_30 <= 1'b0;
 		match_40 <= 1'b0;
     end else if(curr_state == S_READY_10_ACK)
-        match_10 <= (ack_tx_result == IRQ_OK && ack_tx_id == 8'd10 && ack_beh_id == a_bhv_id_r);
+        match_10 <= (ack_tx_result == IRQ_OK && ack_tx_id == 8'd10 && ack_beh_id == c_bhv_id);
 	else if(curr_state == S_SUCC_30_ACK)
-		match_30 <= (ack_tx_result == IRQ_OK && ack_tx_id == 8'd30 && ack_beh_id == a_bhv_id_r);
+		match_30 <= (ack_tx_result == IRQ_OK && ack_tx_id == 8'd30 && ack_beh_id == c_bhv_id);
 	else if(curr_state == S_ALERT_40_ACK)
-		match_40 <= (ack_tx_id == 8'd40 && ack_beh_id == a_bhv_id_r);
+		match_40 <= (ack_tx_id == 8'd40 && ack_beh_id == c_bhv_id);
 	else begin
 		match_10 <= 1'b0;
 		match_30 <= 1'b0;
@@ -231,8 +226,6 @@ module tim_beh_osm41_485_laser_distance(
             c_tx_id <= 8'd0;
         else if(curr_state == S_READY_10)
             c_tx_id <= 8'd10;
-        else if(curr_state == S_EXE_20)
-            c_tx_id <= 8'd20;
         else if(curr_state == S_SUCC_30)
             c_tx_id <= 8'd30;
         else if(curr_state == S_ALERT_40)
@@ -381,9 +374,9 @@ end
 //================================================================================================//
 
     	
-always@(posedge i_clk)
+always@(posedge clk_i)
 begin
-	if(i_rst)
+	if(rst_i)
 		sample_start <= 0;
 	else if(curr_state == S_EXE)
 		sample_start <= 1;
@@ -391,9 +384,9 @@ begin
 		sample_start <= 0;
 end
 
-always@(posedge i_clk)
+always@(posedge clk_i)
 begin
-	if(i_rst)
+	if(rst_i)
 		distance <= 0;
 	else if(user_da_vld)
 		distance <= user_da;
