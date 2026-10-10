@@ -335,7 +335,7 @@ module emcc_mix_top
     assign  slv_board_id = slv_sta_msg_addr[RAM_AWIDTH-1:9];
 	
 	
-//	localparam                          ARB_CH_PER_BOARD = 4;   // Ã¿´Ó°å×î´ó 485 Ä£¿éÊý
+//	localparam                          ARB_CH_PER_BOARD = 4;   // Ã¿ï¿½Ó°ï¿½ï¿½ï¿½ï¿½ 485 Ä£ï¿½ï¿½ï¿½ï¿½
 //    wire                                ch_rs485_r_flag  [RAM_DWIDTH-1:0][ARB_CH_PER_BOARD-1:0];
 //    wire                                ch_rs485_flag    [RAM_DWIDTH-1:0][ARB_CH_PER_BOARD-1:0];
 //    wire    [RAM_DWIDTH-1:0]            ch_rs485_s2m_msg [RAM_DWIDTH-1:0][ARB_CH_PER_BOARD-1:0];
@@ -361,14 +361,14 @@ module emcc_mix_top
 //         .clk                   ( clk                          )
 //        ,.rst                   ( reset                        )
 
-//        // Shared side (pkg_route) - È«°åºÅÊý×é
+//        // Shared side (pkg_route) - È«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 //        ,.sh_rs485_r_flag       ( rs485_00_r_flag              )
 //        ,.sh_rs485_r_flag_board ( slv_cfg_msg_addr[RAM_AWIDTH-1:9] )
 //        ,.sh_rs485_flag         ( rs485_00_flag                )
 //        ,.sh_rs485_s2m_msg      ( rs485_00_msg                 )
 //        ,.sh_rs485_m2s_msg      ( rs485_00_send_msg            )
 
-//        // Channel side - [´Ó°åºÅ][Ä£¿éÖÙ²ÃºÅ]
+//        // Channel side - [ï¿½Ó°ï¿½ï¿½][Ä£ï¿½ï¿½ï¿½Ù²Ãºï¿½]
 //        ,.ch_rs485_r_flag       ( ch_rs485_r_flag              )
 //        ,.ch_rs485_flag         ( ch_rs485_flag                )
 //        ,.ch_rs485_s2m_msg      ( ch_rs485_s2m_msg             )
@@ -444,7 +444,7 @@ module emcc_mix_top
     
 	
 	
-	// --- flow_comp_1 --A0006_D²¿¼þµ÷×Ë»ú¹¹-1ºÅAÖáÐý×ª---
+	// --- flow_comp_1 --A0006_Dï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ë»ï¿½ï¿½ï¿½-1ï¿½ï¿½Aï¿½ï¿½ï¿½ï¿½×ª---
 //    ec_ecat_multi_turn_angle_spin_servo
     ec_ethercat_servo
     #(
@@ -472,13 +472,13 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[0]    ),
 	  .o_intr_irq            ( map_irq[0]       )
 
- //      ,.i_axis_zero        ( di_mst_msg[12]           )   // ºÚÉ«
+ //      ,.i_axis_zero        ( di_mst_msg[12]           )   // ï¿½ï¿½É«
     );
 
 	
 	
 	
-	// --- flow_comp_2 --A0856_1ºÅÆø¶¯ÀëºÏÆ÷×é¼þ---
+	// --- flow_comp_2 --A0856_1ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½---
     ec_1do
     #(
          .REG_SPACE_BIAS     ( 20'd2560)
@@ -509,7 +509,7 @@ module emcc_mix_top
 	
 	
 	
-	// --- flow_comp_3 --A0005_D²¿¼þµ÷×Ë»ú¹¹-2ºÅZÖá---
+	// --- flow_comp_3 --A0005_Dï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ë»ï¿½ï¿½ï¿½-2ï¿½ï¿½Zï¿½ï¿½---
     ec_ethercat_servo
     #(
          .REG_SPACE_BIAS     ( 20'd3072)
@@ -535,15 +535,15 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[2]    ),
 	  .o_intr_irq            ( map_irq[2]       )
 
-    //   ,.i_axis_limf        ( di_mst_msg[10]           )   // ºÚÉ«
-    //   ,.i_axis_limb        ( di_mst_msg[11]           )   // ºÚÉ«
-    //   ,.i_axis_zero        ( di_mst_msg[9]           )   // ºÚÉ«
+    //   ,.i_axis_limf        ( di_mst_msg[10]           )   // ï¿½ï¿½É«
+    //   ,.i_axis_limb        ( di_mst_msg[11]           )   // ï¿½ï¿½É«
+    //   ,.i_axis_zero        ( di_mst_msg[9]           )   // ï¿½ï¿½É«
     );
 
 	
 	
 	
-	// --- flow_comp_4 --A0857_2ºÅÆø¶¯ÀëºÏÆ÷×é¼þ---
+	// --- flow_comp_4 --A0857_2ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½---
     ec_1do
     #(
          .REG_SPACE_BIAS     ( 20'd3584)
@@ -574,7 +574,7 @@ module emcc_mix_top
 	
 	
 	
-	// --- flow_comp_5 --A0588_D²¿¼þµ÷×Ë»ú¹¹-1ºÅXÖá---
+	// --- flow_comp_5 --A0588_Dï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ë»ï¿½ï¿½ï¿½-1ï¿½ï¿½Xï¿½ï¿½---
     ec_ethercat_servo
     #(
          .REG_SPACE_BIAS     ( 20'd4096)
@@ -600,15 +600,15 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[4]    ),
 	  .o_intr_irq            ( map_irq[4]       )
 
-     //  ,.i_axis_limf        ( di_mst_msg[15]           )   // ºÚÉ«
-     //  ,.i_axis_limb        ( di_mst_msg[16]           )   // ºÚÉ«
-     //  ,.i_axis_zero        ( di_mst_msg[14]           )   // ºÚÉ«
+     //  ,.i_axis_limf        ( di_mst_msg[15]           )   // ï¿½ï¿½É«
+     //  ,.i_axis_limb        ( di_mst_msg[16]           )   // ï¿½ï¿½É«
+     //  ,.i_axis_zero        ( di_mst_msg[14]           )   // ï¿½ï¿½É«
     );
 
 	
 	
 	
-	// --- flow_comp_6 --A0822_µç×ÓÊÖÂÖ---
+	// --- flow_comp_6 --A0822_ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½---
     ec_pulmotor_handwheel
     #(
          .REG_SPACE_BIAS     ( 20'd4608)
@@ -639,7 +639,7 @@ module emcc_mix_top
 	
 	
 	
-	// --- flow_comp_7 --A0007_D²¿¼þµ÷×Ë»ú¹¹-2ºÅAÖáÐý×ª---
+	// --- flow_comp_7 --A0007_Dï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ë»ï¿½ï¿½ï¿½-2ï¿½ï¿½Aï¿½ï¿½ï¿½ï¿½×ª---
 //    ec_ecat_multi_turn_angle_spin_servo
     ec_ethercat_servo
     #(
@@ -667,13 +667,13 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[6]    ),
 	  .o_intr_irq            ( map_irq[6]       )
 
-      // ,.i_axis_zero        ( di_mst_msg[13]           )   // ºÚÉ«
+      // ,.i_axis_zero        ( di_mst_msg[13]           )   // ï¿½ï¿½É«
     );
 
 	
 	
 	
-	// --- flow_comp_8 --A0819_2ºÅÒÆÔÔ×é¼þ---
+	// --- flow_comp_8 --A0819_2ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½---
     ec_ethercat_servo
     #(
          .REG_SPACE_BIAS     ( 20'd5632)
@@ -699,15 +699,15 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[7]    ),
 	  .o_intr_irq            ( map_irq[7]       )
 
-     //  ,.i_axis_limf        ( di_mst_msg[18]           )   // ºÚÉ«
-     //  ,.i_axis_limb        ( di_mst_msg[19]           )   // ºÚÉ«
-     //  ,.i_axis_zero        ( di_mst_msg[17]           )   // ºÚÉ«
+     //  ,.i_axis_limf        ( di_mst_msg[18]           )   // ï¿½ï¿½É«
+     //  ,.i_axis_limb        ( di_mst_msg[19]           )   // ï¿½ï¿½É«
+     //  ,.i_axis_zero        ( di_mst_msg[17]           )   // ï¿½ï¿½É«
     );
 
 	
 	
 	
-	// --- flow_comp_9 --A0003_D²¿¼þµ÷×Ë»ú¹¹-2ºÅXÖá---
+	// --- flow_comp_9 --A0003_Dï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ë»ï¿½ï¿½ï¿½-2ï¿½ï¿½Xï¿½ï¿½---
     ec_ethercat_servo
     #(
          .REG_SPACE_BIAS     ( 20'd6144)
@@ -733,15 +733,15 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[8]    ),
 	  .o_intr_irq            ( map_irq[8]       )
 
-     //  ,.i_axis_limf        ( di_mst_msg[4]           )   // ºÚÉ«
-     //  ,.i_axis_limb        ( di_mst_msg[5]           )   // ºÚÉ«
-     //  ,.i_axis_zero        ( di_mst_msg[3]           )   // ºÚÉ«
+     //  ,.i_axis_limf        ( di_mst_msg[4]           )   // ï¿½ï¿½É«
+     //  ,.i_axis_limb        ( di_mst_msg[5]           )   // ï¿½ï¿½É«
+     //  ,.i_axis_zero        ( di_mst_msg[3]           )   // ï¿½ï¿½É«
     );
 
 	
 	
 	
-	// --- flow_comp_10 --A0001_1ºÅÒÆÔÔ×é¼þ---
+	// --- flow_comp_10 --A0001_1ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½---
     ec_ethercat_servo
     #(
          .REG_SPACE_BIAS     ( 20'd6656)
@@ -767,15 +767,15 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[9]    ),
 	  .o_intr_irq            ( map_irq[9]       )
 
-    //   ,.i_axis_limf        ( di_mst_msg[1]           )   // ºÚÉ«
-    //   ,.i_axis_limb        ( di_mst_msg[2]           )   // ºÚÉ«
-    //   ,.i_axis_zero        ( di_mst_msg[0]           )   // ºÚÉ«
+      ,.i_axis_limf        ( ~di_mst_msg[1]           )   // ï¿½ï¿½É«
+      ,.i_axis_limb        ( ~di_mst_msg[2]           )   // ï¿½ï¿½É«
+      ,.i_axis_zero        ( ~di_mst_msg[0]           )   // ï¿½ï¿½É«
     );
 
 	
 	
 	
-	// --- flow_comp_11 --A0193_µçÀÂ²âÊÔÒÇ---
+	// --- flow_comp_11 --A0193_ï¿½ï¿½ï¿½Â²ï¿½ï¿½ï¿½ï¿½ï¿½---
 //    ec_hd_zxcl
     ec_s7_plc
     #(
@@ -808,7 +808,7 @@ module emcc_mix_top
 	
 	
 	
-	// --- flow_comp_12 --A0004_D²¿¼þµ÷×Ë»ú¹¹-1ºÅZÖá---
+	// --- flow_comp_12 --A0004_Dï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ë»ï¿½ï¿½ï¿½-1ï¿½ï¿½Zï¿½ï¿½---
     ec_ethercat_servo
     #(
          .REG_SPACE_BIAS     ( 20'd7680)
@@ -834,15 +834,15 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[11]    ),
 	  .o_intr_irq            ( map_irq[11]       )
 
-    //   ,.i_axis_limf        ( di_mst_msg[7]           )   // ºÚÉ«
-    //   ,.i_axis_limb        ( di_mst_msg[8]           )   // ºÚÉ«
-    //   ,.i_axis_zero        ( di_mst_msg[6]           )   // ºÚÉ«
+    //   ,.i_axis_limf        ( di_mst_msg[7]           )   // ï¿½ï¿½É«
+    //   ,.i_axis_limb        ( di_mst_msg[8]           )   // ï¿½ï¿½É«
+    //   ,.i_axis_zero        ( di_mst_msg[6]           )   // ï¿½ï¿½É«
     );
 
 	
 	
 	
-//	// --- flow_comp_15 --A0890_EMCC60¿ØÖÆ°åÄ£ÐÍECAT-D²¿¶Î---
+//	// --- flow_comp_15 --A0890_EMCC60ï¿½ï¿½ï¿½Æ°ï¿½Ä£ï¿½ï¿½ECAT-Dï¿½ï¿½ï¿½ï¿½---
 //    ec_emcc60_board
 //    #(
 //         .REG_SPACE_BIAS     ( 20'd9216)
@@ -877,7 +877,7 @@ module emcc_mix_top
 	wire   o_led_r_16;
 	wire   o_led_y_16;
 	
-	// --- flow_comp_16 --A0894_ÈýÉ«µÆÄ£ÐÍ[ÐéÄâ]_¸´ÖÆ---
+	// --- flow_comp_16 --A0894_ï¿½ï¿½É«ï¿½ï¿½Ä£ï¿½ï¿½[ï¿½ï¿½ï¿½ï¿½]_ï¿½ï¿½ï¿½ï¿½---
     ec_3led_buzzer
     #(
          .REG_SPACE_BIAS     ( 20'd8192)
@@ -903,10 +903,10 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[12]    ),
 	  .o_intr_irq            ( map_irq[12]       )
 
-       ,.o_led_y        ( o_led_y_16           )   // »ÆÉ«Çý¶¯ÐÅºÅ
-       ,.o_led_g        ( o_led_g_16           )   // ÂÌÉ«Çý¶¯ÐÅºÅ
-       ,.o_bz        ( o_bz_16           )   // ·äÃùÇý¶¯ÐÅºÅ
-       ,.o_led_r        ( o_led_r_16           )   // ºìÉ«Çý¶¯ÐÅºÅ
+       ,.o_led_y        ( o_led_y_16           )   // ï¿½ï¿½É«ï¿½ï¿½ï¿½ï¿½ï¿½Åºï¿½
+       ,.o_led_g        ( o_led_g_16           )   // ï¿½ï¿½É«ï¿½ï¿½ï¿½ï¿½ï¿½Åºï¿½
+       ,.o_bz        ( o_bz_16           )   // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Åºï¿½
+       ,.o_led_r        ( o_led_r_16           )   // ï¿½ï¿½É«ï¿½ï¿½ï¿½ï¿½ï¿½Åºï¿½
     );
 
     assign do_mst_msg[1] = o_bz_16;
@@ -916,7 +916,7 @@ module emcc_mix_top
 	
 	
 	
-	// --- flow_comp_17 --A0895_ÏµÍ³°²È«Ä£ÐÍ[ÐéÄâ]_¸´ÖÆ---
+	// --- flow_comp_17 --A0895_ÏµÍ³ï¿½ï¿½È«Ä£ï¿½ï¿½[ï¿½ï¿½ï¿½ï¿½]_ï¿½ï¿½ï¿½ï¿½---
     ec_sys_sf
     #(
          .REG_SPACE_BIAS     ( 20'd8704)
@@ -942,12 +942,12 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[13]    ),
 	  .o_intr_irq            ( map_irq[13]       )
 
-       ,.i_stop        ( di_mst_msg[35]           )   // Í£Ö¹°´Å¥¿ª¹Ø
-       ,.i_start        ( di_mst_msg[34]           )   // Æô¶¯°´Å¥¿ª¹Ø
-       ,.i_rst        ( di_mst_msg[36]           )   // ¸´Î»°´Å¥¿ª¹Ø
-       ,.i_estop        ( di_mst_msg[37]           )   // ¼±Í£ÐýÅ¥¿ª¹Ø
-       ,.i_manul        ( di_mst_msg[38]           )   // ÊÖ¶¯Ñ¡ÔñµµL
-       ,.i_auto        ( di_mst_msg[39]           )   // ×Ô¶¯Ñ¡ÔñµµR
+       ,.i_stop        ( di_mst_msg[35]           )   // Í£Ö¹ï¿½ï¿½Å¥ï¿½ï¿½ï¿½ï¿½
+       ,.i_start        ( di_mst_msg[34]           )   // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Å¥ï¿½ï¿½ï¿½ï¿½
+       ,.i_rst        ( di_mst_msg[36]           )   // ï¿½ï¿½Î»ï¿½ï¿½Å¥ï¿½ï¿½ï¿½ï¿½
+       ,.i_estop        ( di_mst_msg[37]           )   // ï¿½ï¿½Í£ï¿½ï¿½Å¥ï¿½ï¿½ï¿½ï¿½
+       ,.i_manul        ( di_mst_msg[38]           )   // ï¿½Ö¶ï¿½Ñ¡ï¿½ï¿½L
+       ,.i_auto        ( di_mst_msg[39]           )   // ï¿½Ô¶ï¿½Ñ¡ï¿½ï¿½R
     );
 
 	
