@@ -350,60 +350,35 @@ module emcc_mix_top
     assign do_mst_msg[29:29] = 1'b1 ;
     assign do_mst_msg[30:30] = 1'b1 ;
     assign do_mst_msg[31:31] = 1'b1 ;
-    assign do_regoin_r_msg[3][7:7] = 1'b1 ;
-    assign do_regoin_r_msg[3][8:8] = 1'b1 ;
-    assign do_regoin_r_msg[3][9:9] = 1'b1 ;
-    assign do_regoin_r_msg[3][10:10] = 1'b1 ;
-    assign do_regoin_r_msg[3][11:11] = 1'b1 ;
-    assign do_regoin_r_msg[3][12:12] = 1'b1 ;
-    assign do_regoin_r_msg[3][13:13] = 1'b1 ;
-    assign do_regoin_r_msg[3][14:14] = 1'b1 ;
-    assign do_regoin_r_msg[3][15:15] = 1'b1 ;
-    assign do_regoin_r_msg[3][16:16] = 1'b1 ;
-    assign do_regoin_r_msg[3][17:17] = 1'b1 ;
-    assign do_regoin_r_msg[3][18:18] = 1'b1 ;
-    assign do_regoin_r_msg[3][19:19] = 1'b1 ;
-    assign do_regoin_r_msg[3][20:20] = 1'b1 ;
-    assign do_regoin_r_msg[3][21:21] = 1'b1 ;
-    assign do_regoin_r_msg[3][22:22] = 1'b1 ;
-    assign do_regoin_r_msg[3][23:23] = 1'b1 ;
-    assign do_regoin_r_msg[3][28:28] = 1'b1 ;
-    assign do_regoin_r_msg[3][29:29] = 1'b1 ;
-    assign do_regoin_r_msg[3][30:30] = 1'b1 ;
-    assign do_regoin_r_msg[3][31:31] = 1'b1 ;
-    assign do_regoin_r_msg[3][32:32] = 1'b1 ;
-    assign do_regoin_r_msg[3][33:33] = 1'b1 ;
-    assign do_regoin_r_msg[3][34:34] = 1'b1 ;
-    assign do_regoin_r_msg[3][35:35] = 1'b1 ;
-    assign do_regoin_r_msg[3][36:36] = 1'b1 ;
-    assign do_regoin_r_msg[3][37:37] = 1'b1 ;
-    assign do_regoin_r_msg[3][38:38] = 1'b1 ;
-    assign do_regoin_r_msg[3][39:39] = 1'b1 ;
-    assign do_regoin_r_msg[3][40:40] = 1'b1 ;
-    assign do_regoin_r_msg[3][41:41] = 1'b1 ;
-    assign do_regoin_r_msg[3][42:42] = 1'b1 ;
-    assign do_regoin_r_msg[3][43:43] = 1'b1 ;
-    assign do_regoin_r_msg[3][44:44] = 1'b1 ;
-    assign do_regoin_r_msg[3][45:45] = 1'b1 ;
-    assign do_regoin_r_msg[3][46:46] = 1'b1 ;
-    assign do_regoin_r_msg[3][47:47] = 1'b1 ;
-    assign do_regoin_r_msg[4][0:0] = 1'b1 ;
-    assign do_regoin_r_msg[4][4:4] = 1'b1 ;
-    assign do_regoin_r_msg[4][5:5] = 1'b1 ;
-    assign do_regoin_r_msg[4][6:6] = 1'b1 ;
+    assign do_regoin_r_msg[4][7:7] = 1'b1 ;
+    assign do_regoin_r_msg[4][8:8] = 1'b1 ;
+    assign do_regoin_r_msg[4][9:9] = 1'b1 ;
+    assign do_regoin_r_msg[4][10:10] = 1'b1 ;
+    assign do_regoin_r_msg[4][11:11] = 1'b1 ;
+    assign do_regoin_r_msg[4][12:12] = 1'b1 ;
+    assign do_regoin_r_msg[4][13:13] = 1'b1 ;
+    assign do_regoin_r_msg[4][14:14] = 1'b1 ;
+    assign do_regoin_r_msg[4][15:15] = 1'b1 ;
+    assign do_regoin_r_msg[4][16:16] = 1'b1 ;
+    assign do_regoin_r_msg[4][17:17] = 1'b1 ;
+    assign do_regoin_r_msg[4][18:18] = 1'b1 ;
     assign do_regoin_r_msg[4][19:19] = 1'b1 ;
     assign do_regoin_r_msg[4][20:20] = 1'b1 ;
     assign do_regoin_r_msg[4][21:21] = 1'b1 ;
     assign do_regoin_r_msg[4][22:22] = 1'b1 ;
     assign do_regoin_r_msg[4][23:23] = 1'b1 ;
-    assign do_regoin_r_msg[4][24:24] = 1'b1 ;
-    assign do_regoin_r_msg[4][25:25] = 1'b1 ;
-    assign do_regoin_r_msg[4][26:26] = 1'b1 ;
-    assign do_regoin_r_msg[4][27:27] = 1'b1 ;
     assign do_regoin_r_msg[4][28:28] = 1'b1 ;
     assign do_regoin_r_msg[4][29:29] = 1'b1 ;
     assign do_regoin_r_msg[4][30:30] = 1'b1 ;
     assign do_regoin_r_msg[4][31:31] = 1'b1 ;
+    assign do_regoin_r_msg[4][32:32] = 1'b1 ;
+    assign do_regoin_r_msg[4][33:33] = 1'b1 ;
+    assign do_regoin_r_msg[4][34:34] = 1'b1 ;
+    assign do_regoin_r_msg[4][35:35] = 1'b1 ;
+    assign do_regoin_r_msg[4][36:36] = 1'b1 ;
+    assign do_regoin_r_msg[4][37:37] = 1'b1 ;
+    assign do_regoin_r_msg[4][38:38] = 1'b1 ;
+    assign do_regoin_r_msg[4][39:39] = 1'b1 ;
     assign do_regoin_r_msg[4][40:40] = 1'b1 ;
     assign do_regoin_r_msg[4][41:41] = 1'b1 ;
     assign do_regoin_r_msg[4][42:42] = 1'b1 ;
@@ -412,6 +387,31 @@ module emcc_mix_top
     assign do_regoin_r_msg[4][45:45] = 1'b1 ;
     assign do_regoin_r_msg[4][46:46] = 1'b1 ;
     assign do_regoin_r_msg[4][47:47] = 1'b1 ;
+    assign do_regoin_r_msg[5][0:0] = 1'b1 ;
+    assign do_regoin_r_msg[5][4:4] = 1'b1 ;
+    assign do_regoin_r_msg[5][5:5] = 1'b1 ;
+    assign do_regoin_r_msg[5][6:6] = 1'b1 ;
+    assign do_regoin_r_msg[5][19:19] = 1'b1 ;
+    assign do_regoin_r_msg[5][20:20] = 1'b1 ;
+    assign do_regoin_r_msg[5][21:21] = 1'b1 ;
+    assign do_regoin_r_msg[5][22:22] = 1'b1 ;
+    assign do_regoin_r_msg[5][23:23] = 1'b1 ;
+    assign do_regoin_r_msg[5][24:24] = 1'b1 ;
+    assign do_regoin_r_msg[5][25:25] = 1'b1 ;
+    assign do_regoin_r_msg[5][26:26] = 1'b1 ;
+    assign do_regoin_r_msg[5][27:27] = 1'b1 ;
+    assign do_regoin_r_msg[5][28:28] = 1'b1 ;
+    assign do_regoin_r_msg[5][29:29] = 1'b1 ;
+    assign do_regoin_r_msg[5][30:30] = 1'b1 ;
+    assign do_regoin_r_msg[5][31:31] = 1'b1 ;
+    assign do_regoin_r_msg[5][40:40] = 1'b1 ;
+    assign do_regoin_r_msg[5][41:41] = 1'b1 ;
+    assign do_regoin_r_msg[5][42:42] = 1'b1 ;
+    assign do_regoin_r_msg[5][43:43] = 1'b1 ;
+    assign do_regoin_r_msg[5][44:44] = 1'b1 ;
+    assign do_regoin_r_msg[5][45:45] = 1'b1 ;
+    assign do_regoin_r_msg[5][46:46] = 1'b1 ;
+    assign do_regoin_r_msg[5][47:47] = 1'b1 ;
     assign do_regoin_r_msg[0][4:4] = 1'b1 ;
     assign do_regoin_r_msg[0][5:5] = 1'b1 ;
     assign do_regoin_r_msg[0][6:6] = 1'b1 ;
@@ -436,53 +436,29 @@ module emcc_mix_top
     assign do_regoin_r_msg[0][45:45] = 1'b1 ;
     assign do_regoin_r_msg[0][46:46] = 1'b1 ;
     assign do_regoin_r_msg[0][47:47] = 1'b1 ;
-    assign do_regoin_r_msg[1][6:6] = 1'b1 ;
-    assign do_regoin_r_msg[1][7:7] = 1'b1 ;
-    assign do_regoin_r_msg[1][8:8] = 1'b1 ;
-    assign do_regoin_r_msg[1][9:9] = 1'b1 ;
-    assign do_regoin_r_msg[1][10:10] = 1'b1 ;
-    assign do_regoin_r_msg[1][11:11] = 1'b1 ;
-    assign do_regoin_r_msg[1][12:12] = 1'b1 ;
-    assign do_regoin_r_msg[1][13:13] = 1'b1 ;
-    assign do_regoin_r_msg[1][14:14] = 1'b1 ;
-    assign do_regoin_r_msg[1][15:15] = 1'b1 ;
-    assign do_regoin_r_msg[1][16:16] = 1'b1 ;
-    assign do_regoin_r_msg[1][17:17] = 1'b1 ;
-    assign do_regoin_r_msg[1][18:18] = 1'b1 ;
-    assign do_regoin_r_msg[1][19:19] = 1'b1 ;
-    assign do_regoin_r_msg[1][20:20] = 1'b1 ;
-    assign do_regoin_r_msg[1][21:21] = 1'b1 ;
-    assign do_regoin_r_msg[1][22:22] = 1'b1 ;
-    assign do_regoin_r_msg[1][23:23] = 1'b1 ;
-    assign do_regoin_r_msg[1][24:24] = 1'b1 ;
-    assign do_regoin_r_msg[1][25:25] = 1'b1 ;
-    assign do_regoin_r_msg[1][26:26] = 1'b1 ;
-    assign do_regoin_r_msg[1][27:27] = 1'b1 ;
-    assign do_regoin_r_msg[1][33:33] = 1'b1 ;
-    assign do_regoin_r_msg[1][34:34] = 1'b1 ;
-    assign do_regoin_r_msg[1][35:35] = 1'b1 ;
-    assign do_regoin_r_msg[1][36:36] = 1'b1 ;
-    assign do_regoin_r_msg[1][37:37] = 1'b1 ;
-    assign do_regoin_r_msg[1][38:38] = 1'b1 ;
-    assign do_regoin_r_msg[1][39:39] = 1'b1 ;
-    assign do_regoin_r_msg[1][40:40] = 1'b1 ;
-    assign do_regoin_r_msg[1][41:41] = 1'b1 ;
-    assign do_regoin_r_msg[1][42:42] = 1'b1 ;
-    assign do_regoin_r_msg[1][43:43] = 1'b1 ;
-    assign do_regoin_r_msg[1][44:44] = 1'b1 ;
-    assign do_regoin_r_msg[1][45:45] = 1'b1 ;
-    assign do_regoin_r_msg[1][46:46] = 1'b1 ;
-    assign do_regoin_r_msg[1][47:47] = 1'b1 ;
-    assign do_regoin_r_msg[2][4:4] = 1'b1 ;
-    assign do_regoin_r_msg[2][5:5] = 1'b1 ;
+    assign do_regoin_r_msg[1][47:0] = {48{1'b1}} ; // 新增1号从板DO全空闲
     assign do_regoin_r_msg[2][6:6] = 1'b1 ;
+    assign do_regoin_r_msg[2][7:7] = 1'b1 ;
+    assign do_regoin_r_msg[2][8:8] = 1'b1 ;
+    assign do_regoin_r_msg[2][9:9] = 1'b1 ;
+    assign do_regoin_r_msg[2][10:10] = 1'b1 ;
+    assign do_regoin_r_msg[2][11:11] = 1'b1 ;
+    assign do_regoin_r_msg[2][12:12] = 1'b1 ;
+    assign do_regoin_r_msg[2][13:13] = 1'b1 ;
     assign do_regoin_r_msg[2][14:14] = 1'b1 ;
     assign do_regoin_r_msg[2][15:15] = 1'b1 ;
+    assign do_regoin_r_msg[2][16:16] = 1'b1 ;
+    assign do_regoin_r_msg[2][17:17] = 1'b1 ;
+    assign do_regoin_r_msg[2][18:18] = 1'b1 ;
+    assign do_regoin_r_msg[2][19:19] = 1'b1 ;
+    assign do_regoin_r_msg[2][20:20] = 1'b1 ;
+    assign do_regoin_r_msg[2][21:21] = 1'b1 ;
+    assign do_regoin_r_msg[2][22:22] = 1'b1 ;
+    assign do_regoin_r_msg[2][23:23] = 1'b1 ;
+    assign do_regoin_r_msg[2][24:24] = 1'b1 ;
+    assign do_regoin_r_msg[2][25:25] = 1'b1 ;
     assign do_regoin_r_msg[2][26:26] = 1'b1 ;
     assign do_regoin_r_msg[2][27:27] = 1'b1 ;
-    assign do_regoin_r_msg[2][28:28] = 1'b1 ;
-    assign do_regoin_r_msg[2][30:30] = 1'b1 ;
-    assign do_regoin_r_msg[2][32:32] = 1'b1 ;
     assign do_regoin_r_msg[2][33:33] = 1'b1 ;
     assign do_regoin_r_msg[2][34:34] = 1'b1 ;
     assign do_regoin_r_msg[2][35:35] = 1'b1 ;
@@ -491,9 +467,34 @@ module emcc_mix_top
     assign do_regoin_r_msg[2][38:38] = 1'b1 ;
     assign do_regoin_r_msg[2][39:39] = 1'b1 ;
     assign do_regoin_r_msg[2][40:40] = 1'b1 ;
+    assign do_regoin_r_msg[2][41:41] = 1'b1 ;
+    assign do_regoin_r_msg[2][42:42] = 1'b1 ;
+    assign do_regoin_r_msg[2][43:43] = 1'b1 ;
+    assign do_regoin_r_msg[2][44:44] = 1'b1 ;
     assign do_regoin_r_msg[2][45:45] = 1'b1 ;
     assign do_regoin_r_msg[2][46:46] = 1'b1 ;
     assign do_regoin_r_msg[2][47:47] = 1'b1 ;
+    assign do_regoin_r_msg[3][4:4] = 1'b1 ;
+    assign do_regoin_r_msg[3][5:5] = 1'b1 ;
+    assign do_regoin_r_msg[3][6:6] = 1'b1 ;
+    assign do_regoin_r_msg[3][14:14] = 1'b1 ;
+    assign do_regoin_r_msg[3][15:15] = 1'b1 ;
+    assign do_regoin_r_msg[3][26:26] = 1'b1 ;
+    assign do_regoin_r_msg[3][27:27] = 1'b1 ;
+    assign do_regoin_r_msg[3][28:28] = 1'b1 ;
+    assign do_regoin_r_msg[3][30:30] = 1'b1 ;
+    assign do_regoin_r_msg[3][32:32] = 1'b1 ;
+    assign do_regoin_r_msg[3][33:33] = 1'b1 ;
+    assign do_regoin_r_msg[3][34:34] = 1'b1 ;
+    assign do_regoin_r_msg[3][35:35] = 1'b1 ;
+    assign do_regoin_r_msg[3][36:36] = 1'b1 ;
+    assign do_regoin_r_msg[3][37:37] = 1'b1 ;
+    assign do_regoin_r_msg[3][38:38] = 1'b1 ;
+    assign do_regoin_r_msg[3][39:39] = 1'b1 ;
+    assign do_regoin_r_msg[3][40:40] = 1'b1 ;
+    assign do_regoin_r_msg[3][45:45] = 1'b1 ;
+    assign do_regoin_r_msg[3][46:46] = 1'b1 ;
+    assign do_regoin_r_msg[3][47:47] = 1'b1 ;
 	
 	
 	wire ext_emerg_stop;
@@ -1051,8 +1052,8 @@ module emcc_mix_top
        ,.i_poa        ( 1'b0           )   // 
     );
 
-    assign do_regoin_r_msg[2][17] = ~o_dri1_14;
-    assign do_regoin_r_msg[2][16] = ~o_dri2_14;
+    assign do_regoin_r_msg[3][17] = ~o_dri1_14;
+    assign do_regoin_r_msg[3][16] = ~o_dri2_14;
 	
 	
 	wire   o_dri2_15;
@@ -1091,8 +1092,8 @@ module emcc_mix_top
        ,.i_poa        ( 1'b0           )   // 
     );
 
-    assign do_regoin_r_msg[2][18] = ~o_dri2_15;
-    assign do_regoin_r_msg[2][19] = ~o_dri1_15;
+    assign do_regoin_r_msg[3][18] = ~o_dri2_15;
+    assign do_regoin_r_msg[3][19] = ~o_dri1_15;
 	
 	
 	wire   o_dri1_16;
@@ -1131,8 +1132,8 @@ module emcc_mix_top
        ,.i_poa        ( 1'b0           )   // 
     );
 
-    assign do_regoin_r_msg[2][21] = ~o_dri1_16;
-    assign do_regoin_r_msg[2][20] = ~o_dri2_16;
+    assign do_regoin_r_msg[3][21] = ~o_dri1_16;
+    assign do_regoin_r_msg[3][20] = ~o_dri2_16;
 	
 	
 	
@@ -1431,14 +1432,14 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[94]    ),
 	  .o_intr_irq            ( map_irq[94]       )
 
-       ,.i_pos1        ( ~di_regoin_msg[2][16]           )   // 位置1到位开关
-       ,.i_pos2        ( ~di_regoin_msg[2][15]           )   // 位置2到位开关
+       ,.i_pos1        ( ~di_regoin_msg[3][16]           )   // 位置1到位开关
+       ,.i_pos2        ( ~di_regoin_msg[3][15]           )   // 位置2到位开关
        ,.o_dri1        ( o_dri1_25           )   // 驱动信号1
        ,.o_dri2        ( o_dri2_25           )   // 驱动信号2
     );
 
-    assign do_regoin_r_msg[2][22] = ~o_dri1_25;
-    assign do_regoin_r_msg[2][23] = ~o_dri2_25;
+    assign do_regoin_r_msg[3][22] = ~o_dri1_25;
+    assign do_regoin_r_msg[3][23] = ~o_dri2_25;
 	
 
 	
@@ -1747,8 +1748,8 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[131]    ),
 	  .o_intr_irq            ( map_irq[131]       )
 
-       ,.i_pos1        ( ~di_regoin_msg[1][12]           )   // 位置1到位开关
-       ,.i_pos2        ( ~di_regoin_msg[1][13]           )   // 位置2到位开关
+       ,.i_pos1        ( ~di_regoin_msg[2][12]           )   // 位置1到位开关
+       ,.i_pos2        ( ~di_regoin_msg[2][13]           )   // 位置2到位开关
        ,.i_poa        ( ~di_regoin_msg[0][7]           )   // 
        ,.o_dri1        ( o_dri1_40           )   // 位置1驱动信号
        ,.o_dri2        ( o_dri2_40           )   // 位置2驱动信号
@@ -1787,8 +1788,8 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[132]    ),
 	  .o_intr_irq            ( map_irq[132]       )
 
-       ,.i_pos1        ( ~di_regoin_msg[1][14]           )   // 位置1到位开关
-       ,.i_pos2        ( ~di_regoin_msg[1][15]           )   // 位置2到位开关
+       ,.i_pos1        ( ~di_regoin_msg[2][14]           )   // 位置1到位开关
+       ,.i_pos2        ( ~di_regoin_msg[2][15]           )   // 位置2到位开关
        ,.i_poa        ( ~di_regoin_msg[0][8]           )   // 
        ,.o_dri1        ( o_dri1_41           )   // 位置1驱动信号
        ,.o_dri2        ( o_dri2_41           )   // 位置2驱动信号
@@ -1827,8 +1828,8 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[133]    ),
 	  .o_intr_irq            ( map_irq[133]       )
 
-       ,.i_pos1        ( ~di_regoin_msg[1][0]           )   // 位置1到位开关
-       ,.i_pos2        ( ~di_regoin_msg[1][1]           )   // 位置2到位开关
+       ,.i_pos1        ( ~di_regoin_msg[2][0]           )   // 位置1到位开关
+       ,.i_pos2        ( ~di_regoin_msg[2][1]           )   // 位置2到位开关
        ,.i_poa        ( ~di_regoin_msg[0][1]           )   // 
        ,.o_dri1        ( o_dri1_42           )   // 位置1驱动信号
        ,.o_dri2        ( o_dri2_42           )   // 位置2驱动信号
@@ -1867,8 +1868,8 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[128]    ),
 	  .o_intr_irq            ( map_irq[128]       )
 
-       ,.i_pos1        ( ~di_regoin_msg[1][2]           )   // 位置1到位开关
-       ,.i_pos2        ( ~di_regoin_msg[1][3]           )   // 位置2到位开关
+       ,.i_pos1        ( ~di_regoin_msg[2][2]           )   // 位置1到位开关
+       ,.i_pos2        ( ~di_regoin_msg[2][3]           )   // 位置2到位开关
        ,.i_poa        ( ~di_regoin_msg[0][2]           )   // 
        ,.o_dri1        ( o_dri1_43           )   // 位置1驱动信号
        ,.o_dri2        ( o_dri2_43           )   // 位置2驱动信号
@@ -1907,8 +1908,8 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[134]    ),
 	  .o_intr_irq            ( map_irq[134]       )
 
-       ,.i_pos1        ( ~di_regoin_msg[1][4]           )   // 位置1到位开关
-       ,.i_pos2        ( ~di_regoin_msg[1][5]           )   // 位置2到位开关
+       ,.i_pos1        ( ~di_regoin_msg[2][4]           )   // 位置1到位开关
+       ,.i_pos2        ( ~di_regoin_msg[2][5]           )   // 位置2到位开关
        ,.i_poa        ( ~di_regoin_msg[0][3]           )   // 
        ,.o_dri1        ( o_dri1_44           )   // 位置1驱动信号
        ,.o_dri2        ( o_dri2_44           )   // 位置2驱动信号
@@ -1947,8 +1948,8 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[129]    ),
 	  .o_intr_irq            ( map_irq[129]       )
 
-       ,.i_pos1        ( ~di_regoin_msg[1][6]           )   // 位置1到位开关
-       ,.i_pos2        ( ~di_regoin_msg[1][7]           )   // 位置2到位开关
+       ,.i_pos1        ( ~di_regoin_msg[2][6]           )   // 位置1到位开关
+       ,.i_pos2        ( ~di_regoin_msg[2][7]           )   // 位置2到位开关
        ,.i_poa        ( ~di_regoin_msg[0][4]           )   // 
        ,.o_dri1        ( o_dri1_45           )   // 位置1驱动信号
        ,.o_dri2        ( o_dri2_45           )   // 位置2驱动信号
@@ -1987,8 +1988,8 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[135]    ),
 	  .o_intr_irq            ( map_irq[135]       )
 
-       ,.i_pos1        ( ~di_regoin_msg[1][8]           )   // 位置1到位开关
-       ,.i_pos2        ( ~di_regoin_msg[1][9]           )   // 位置2到位开关
+       ,.i_pos1        ( ~di_regoin_msg[2][8]           )   // 位置1到位开关
+       ,.i_pos2        ( ~di_regoin_msg[2][9]           )   // 位置2到位开关
        ,.i_poa        ( ~di_regoin_msg[0][5]           )   // 
        ,.o_dri1        ( o_dri1_46           )   // 位置1驱动信号
        ,.o_dri2        ( o_dri2_46           )   // 位置2驱动信号
@@ -2027,8 +2028,8 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[130]    ),
 	  .o_intr_irq            ( map_irq[130]       )
 
-       ,.i_pos1        ( ~di_regoin_msg[1][10]           )   // 位置1到位开关
-       ,.i_pos2        ( ~di_regoin_msg[1][11]           )   // 位置2到位开关
+       ,.i_pos1        ( ~di_regoin_msg[2][10]           )   // 位置1到位开关
+       ,.i_pos2        ( ~di_regoin_msg[2][11]           )   // 位置2到位开关
        ,.i_poa        ( ~di_regoin_msg[0][6]           )   // 
        ,.o_dri1        ( o_dri1_47           )   // 位置1驱动信号
        ,.o_dri2        ( o_dri2_47           )   // 位置2驱动信号
@@ -2067,11 +2068,11 @@ module emcc_mix_top
 
        ,.i_axis_limf        ( ~di_regoin_msg[0][53]           )   // 正限位到位开关
        ,.pul_motor_r_flag        ( pul_motor0_r_flag           )   // 
-       ,.cur_slv_board_id        ( 5'd1           )   // 
+       ,.cur_slv_board_id        ( 5'd2           )   // 
        ,.slv_board_id        ( slv_board_id           )   // 
        ,.pul_motor_flag        ( pul_motor0_flag           )   // 
-       ,.m2s_pulm_msg        ( pul_motor0_r_msg[1]           )   // 
-       ,.s2m_pulm_msg        ( pul_motor0_msg[1]           )   // 
+       ,.m2s_pulm_msg        ( pul_motor0_r_msg[2]           )   // 
+       ,.s2m_pulm_msg        ( pul_motor0_msg[2]           )   // 
        ,.i_axis_limb        ( ~di_regoin_msg[0][55]           )   // 负限位到位开关
        ,.i_axis_zero        ( ~di_regoin_msg[0][54]           )   // 零位到位开关
        ,.i_servo_done        ( ~di_regoin_msg[0][28]           )   // 伺服定位完成
@@ -2110,11 +2111,11 @@ module emcc_mix_top
 
        ,.i_axis_limf        ( ~di_regoin_msg[0][44]           )   // 正限位到位开关
        ,.pul_motor_r_flag        ( pul_motor1_r_flag           )   // 
-       ,.cur_slv_board_id        ( 5'd1           )   // 
+       ,.cur_slv_board_id        ( 5'd2           )   // 
        ,.slv_board_id        ( slv_board_id           )   // 
        ,.pul_motor_flag        ( pul_motor1_flag           )   // 
-       ,.m2s_pulm_msg        ( pul_motor1_r_msg[1]           )   // 
-       ,.s2m_pulm_msg        ( pul_motor1_msg[1]           )   // 
+       ,.m2s_pulm_msg        ( pul_motor1_r_msg[2]           )   // 
+       ,.s2m_pulm_msg        ( pul_motor1_msg[2]           )   // 
        ,.i_axis_limb        ( ~di_regoin_msg[0][46]           )   // 负限位到位开关
        ,.i_axis_zero        ( ~di_regoin_msg[0][45]           )   // 零位到位开关
        ,.i_servo_done        ( ~di_regoin_msg[0][22]           )   // 伺服定位完成
@@ -2153,11 +2154,11 @@ module emcc_mix_top
 
        ,.i_axis_limf        ( ~di_regoin_msg[0][47]           )   // 正限位到位开关
        ,.pul_motor_r_flag        ( pul_motor2_r_flag           )   // 
-       ,.cur_slv_board_id        ( 5'd1           )   // 
+       ,.cur_slv_board_id        ( 5'd2           )   // 
        ,.slv_board_id        ( slv_board_id           )   // 
        ,.pul_motor_flag        ( pul_motor2_flag           )   // 
-       ,.m2s_pulm_msg        ( pul_motor2_r_msg[1]           )   // 
-       ,.s2m_pulm_msg        ( pul_motor2_msg[1]           )   // 
+       ,.m2s_pulm_msg        ( pul_motor2_r_msg[2]           )   // 
+       ,.s2m_pulm_msg        ( pul_motor2_msg[2]           )   // 
        ,.i_axis_limb        ( ~di_regoin_msg[0][49]           )   // 负限位到位开关
        ,.i_axis_zero        ( ~di_regoin_msg[0][48]           )   // 零位到位开关
        ,.i_servo_done        ( ~di_regoin_msg[0][24]           )   // 伺服定位完成
@@ -2194,17 +2195,17 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[141]    ),
 	  .o_intr_irq            ( map_irq[141]       )
 
-       ,.i_axis_limf        ( ~di_regoin_msg[0][50]           )   // 正限位到位开关
+       ,.i_axis_limf        ( ~di_regoin_msg[1][0]           )   // 正限位到位开关
        ,.pul_motor_r_flag        ( pul_motor3_r_flag           )   // 
        ,.cur_slv_board_id        ( 5'd1           )   // 
        ,.slv_board_id        ( slv_board_id           )   // 
        ,.pul_motor_flag        ( pul_motor3_flag           )   // 
        ,.m2s_pulm_msg        ( pul_motor3_r_msg[1]           )   // 
        ,.s2m_pulm_msg        ( pul_motor3_msg[1]           )   // 
-       ,.i_axis_limb        ( ~di_regoin_msg[0][52]           )   // 负限位到位开关
-       ,.i_axis_zero        ( ~di_regoin_msg[0][51]           )   // 零位到位开关
-       ,.i_servo_done        ( ~di_regoin_msg[0][26]           )   // 伺服定位完成
-       ,.i_servo_ready        ( ~di_regoin_msg[0][27]           )   // 伺服就绪
+       ,.i_axis_limb        ( ~di_regoin_msg[1][2]           )   // 负限位到位开关
+       ,.i_axis_zero        ( ~di_regoin_msg[1][1]           )   // 零位到位开关
+       ,.i_servo_done        ( ~di_regoin_msg[1][3]           )   // 伺服定位完成
+       ,.i_servo_ready        ( ~di_regoin_msg[1][4]           )   // 伺服就绪
        ,.i_emerge_stop_signal ( 1'b1            )
     );
 
@@ -2395,19 +2396,19 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[136]    ),
 	  .o_intr_irq            ( map_irq[136]       )
 
-       ,.i_axis_4        ( di_regoin_msg[1][51]           )   // 4轴
-       ,.i_axis_5        ( di_regoin_msg[1][52]           )   // 5轴
-       ,.i_axis_6        ( di_regoin_msg[1][53]           )   // 6轴
-       ,.i_axis_7        ( di_regoin_msg[1][54]           )   // 7轴
-       ,.i_stp_x10        ( di_regoin_msg[1][47]           )   // X100
-       ,.i_stp_x100        ( di_regoin_msg[1][46]           )   // X10
-       ,.i_stp_x1        ( di_regoin_msg[1][45]           )   // X1
-       ,.i_axis_x        ( di_regoin_msg[1][48]           )   // X轴
-       ,.i_axis_y        ( di_regoin_msg[1][49]           )   // Y轴
-       ,.i_axis_z        ( di_regoin_msg[1][50]           )   // Z轴
-       ,.i_estop        ( di_regoin_msg[1][42]           )   // ESTOP
-       ,.i_pulse_a        ( di_regoin_msg[1][43]           )   // A
-       ,.i_pulse_b        ( di_regoin_msg[1][44]           )   // B
+       ,.i_axis_4        ( di_regoin_msg[2][51]           )   // 4轴
+       ,.i_axis_5        ( di_regoin_msg[2][52]           )   // 5轴
+       ,.i_axis_6        ( di_regoin_msg[2][53]           )   // 6轴
+       ,.i_axis_7        ( di_regoin_msg[2][54]           )   // 7轴
+       ,.i_stp_x10        ( di_regoin_msg[2][47]           )   // X100
+       ,.i_stp_x100        ( di_regoin_msg[2][46]           )   // X10
+       ,.i_stp_x1        ( di_regoin_msg[2][45]           )   // X1
+       ,.i_axis_x        ( di_regoin_msg[2][48]           )   // X轴
+       ,.i_axis_y        ( di_regoin_msg[2][49]           )   // Y轴
+       ,.i_axis_z        ( di_regoin_msg[2][50]           )   // Z轴
+       ,.i_estop        ( di_regoin_msg[2][42]           )   // ESTOP
+       ,.i_pulse_a        ( di_regoin_msg[2][43]           )   // A
+       ,.i_pulse_b        ( di_regoin_msg[2][44]           )   // B
     );
 
 	
@@ -2733,10 +2734,10 @@ module emcc_mix_top
        ,.o_led_r        ( o_led_r_67           )   // 红色端口
     );
 
-    assign do_regoin_r_msg[2][1] = ~o_led_y_67;
-    assign do_regoin_r_msg[2][3] = ~o_bz_67;
-    assign do_regoin_r_msg[2][2] = ~o_led_g_67;
-    assign do_regoin_r_msg[2][0] = ~o_led_r_67;
+    assign do_regoin_r_msg[3][1] = ~o_led_y_67;
+    assign do_regoin_r_msg[3][3] = ~o_bz_67;
+    assign do_regoin_r_msg[3][2] = ~o_led_g_67;
+    assign do_regoin_r_msg[3][0] = ~o_led_r_67;
 	
 	
 	wire   o_dri1_68;
@@ -2768,15 +2769,15 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[147]    ),
 	  .o_intr_irq            ( map_irq[147]       )
 
-       ,.i_pos        ( ~di_regoin_msg[2][51]           )   // 位置到位开关
+       ,.i_pos        ( ~di_regoin_msg[3][51]           )   // 位置到位开关
        ,.o_dri1        ( o_dri1_68           )   // 卡盘开驱动信号
        ,.o_dri2        ( o_dri2_68           )   // 卡盘关驱动信号
        ,.o_dri        (            )   // 
        ,.i_poa        ( 1'b0           )   // 
     );
 
-    assign do_regoin_r_msg[2][9] = ~o_dri1_68;
-    assign do_regoin_r_msg[2][8] = ~o_dri2_68;
+    assign do_regoin_r_msg[3][9] = ~o_dri1_68;
+    assign do_regoin_r_msg[3][8] = ~o_dri2_68;
 	
 	
 	wire   o_dri1_69;
@@ -2808,14 +2809,14 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[146]    ),
 	  .o_intr_irq            ( map_irq[146]       )
 
-       ,.i_pos1        ( ~di_regoin_msg[2][22]           )   // 位置1到位开关
-       ,.i_pos2        ( ~di_regoin_msg[2][21]           )   // 位置2到位开关
+       ,.i_pos1        ( ~di_regoin_msg[3][22]           )   // 位置1到位开关
+       ,.i_pos2        ( ~di_regoin_msg[3][21]           )   // 位置2到位开关
        ,.o_dri1        ( o_dri1_69           )   // 驱动信号1
        ,.o_dri2        ( o_dri2_69           )   // 驱动信号2
     );
 
-    assign do_regoin_r_msg[2][13] = ~o_dri1_69;
-    assign do_regoin_r_msg[2][12] = ~o_dri2_69;
+    assign do_regoin_r_msg[3][13] = ~o_dri1_69;
+    assign do_regoin_r_msg[3][12] = ~o_dri2_69;
 	
 	
 	wire   o_dri1_70;
@@ -2847,16 +2848,16 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[150]    ),
 	  .o_intr_irq            ( map_irq[150]       )
 
-       ,.i_pos1_1        ( ~di_regoin_msg[2][9]           )   // 左侧门开到位开关
-       ,.i_pos1_2        ( ~di_regoin_msg[2][11]           )   // 右侧门开到位开关
-       ,.i_pos2_2        ( ~di_regoin_msg[2][12]           )   // 右侧门关到位开关
-       ,.i_pos2_1        ( ~di_regoin_msg[2][10]           )   // 左侧门关到位开关
+       ,.i_pos1_1        ( ~di_regoin_msg[3][9]           )   // 左侧门开到位开关
+       ,.i_pos1_2        ( ~di_regoin_msg[3][11]           )   // 右侧门开到位开关
+       ,.i_pos2_2        ( ~di_regoin_msg[3][12]           )   // 右侧门关到位开关
+       ,.i_pos2_1        ( ~di_regoin_msg[3][10]           )   // 左侧门关到位开关
        ,.o_dri1        ( o_dri1_70           )   // 门开驱动信号
        ,.o_dri2        ( o_dri2_70           )   // 门关驱动信号
     );
 
-    assign do_regoin_r_msg[2][11] = ~o_dri1_70;
-    assign do_regoin_r_msg[2][10] = ~o_dri2_70;
+    assign do_regoin_r_msg[3][11] = ~o_dri1_70;
+    assign do_regoin_r_msg[3][10] = ~o_dri2_70;
 	
 	
 	
@@ -2887,14 +2888,14 @@ module emcc_mix_top
 	  .o_intr_irq            ( map_irq[148]       )
 
        ,.pul_motor_r_flag        ( pul_motor2_r_flag           )   // 
-       ,.cur_slv_board_id        ( 5'd2           )   // 
+       ,.cur_slv_board_id        ( 5'd3           )   // 
        ,.slv_board_id        ( slv_board_id           )   // 
        ,.pul_motor_flag        ( pul_motor2_flag           )   // 
-       ,.m2s_pulm_msg        ( pul_motor2_r_msg[2]           )   // 
-       ,.s2m_pulm_msg        ( pul_motor2_msg[2]           )   // 
-       ,.i_axis_zero        ( ~di_regoin_msg[2][42]           )   // 零位到位开关
-       ,.i_servo_done        ( ~di_regoin_msg[2][44]           )   // 伺服定位完成
-       ,.i_servo_ready        ( ~di_regoin_msg[2][43]           )   // 伺服就绪
+       ,.m2s_pulm_msg        ( pul_motor2_r_msg[3]           )   // 
+       ,.s2m_pulm_msg        ( pul_motor2_msg[3]           )   // 
+       ,.i_axis_zero        ( ~di_regoin_msg[3][42]           )   // 零位到位开关
+       ,.i_servo_done        ( ~di_regoin_msg[3][44]           )   // 伺服定位完成
+       ,.i_servo_ready        ( ~di_regoin_msg[3][43]           )   // 伺服就绪
        ,.i_axis_limf        ( 1'b0           )   // 
        ,.i_axis_limb        ( 1'b0           )   // 
        ,.i_emerge_stop_signal ( 1'b1            )
@@ -2933,7 +2934,7 @@ module emcc_mix_top
        ,.o_sig_dri        ( o_sig_dri_73           )   // 单驱动信号
     );
 
-    assign do_regoin_r_msg[2][29] = ~o_sig_dri_73;
+    assign do_regoin_r_msg[3][29] = ~o_sig_dri_73;
 	
 	
 	wire   o_sig_dri_74;
@@ -2967,7 +2968,7 @@ module emcc_mix_top
        ,.o_sig_dri        ( o_sig_dri_74           )   // 单驱动信号
     );
 
-    assign do_regoin_r_msg[2][31] = ~o_sig_dri_74;
+    assign do_regoin_r_msg[3][31] = ~o_sig_dri_74;
 	
 	
 	wire   o_spdx3_75;
@@ -3004,7 +3005,7 @@ module emcc_mix_top
 	  .o_intr_irq            ( map_irq[149]       )
 
        ,.o_rev        ( o_rev_75           )   // DI-反转驱动
-       ,.i_error        ( ~di_regoin_msg[2][57]           )   // JB1-变频器故障
+       ,.i_error        ( ~di_regoin_msg[3][57]           )   // JB1-变频器故障
        ,.o_spdx1        ( o_spdx1_75           )   // X5-多段速选择1
        ,.o_spdx2        ( o_spdx2_75           )   // X6-多段速选择2
        ,.o_spdx3        ( o_spdx3_75           )   // X4-多段速选择3
@@ -3013,12 +3014,12 @@ module emcc_mix_top
        ,.o_rst        (            )   // 
     );
 
-    assign do_regoin_r_msg[2][42] = ~o_spdx3_75;
-    assign do_regoin_r_msg[2][43] = ~o_spdx1_75;
-    assign do_regoin_r_msg[2][24] = ~o_fwd_75;
-    assign do_regoin_r_msg[2][25] = ~o_rev_75;
-    assign do_regoin_r_msg[2][44] = ~o_spdx2_75;
-    assign do_regoin_r_msg[2][41] = ~o_spdx4_75;
+    assign do_regoin_r_msg[3][42] = ~o_spdx3_75;
+    assign do_regoin_r_msg[3][43] = ~o_spdx1_75;
+    assign do_regoin_r_msg[3][24] = ~o_fwd_75;
+    assign do_regoin_r_msg[3][25] = ~o_rev_75;
+    assign do_regoin_r_msg[3][44] = ~o_spdx2_75;
+    assign do_regoin_r_msg[3][41] = ~o_spdx4_75;
 	
 	
 	wire   o_dri1_76;
@@ -3090,15 +3091,15 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[119]    ),
 	  .o_intr_irq            ( map_irq[119]       )
 
-       ,.i_pos1        ( ~di_regoin_msg[3][32]           )   // 位置1到位开关
-       ,.i_pos2        ( ~di_regoin_msg[3][33]           )   // 位置2到位开关
-    //    ,.i_pos3        ( di_regoin_msg[3][56]           )   // 位置3到位开关
+       ,.i_pos1        ( ~di_regoin_msg[4][32]           )   // 位置1到位开关
+       ,.i_pos2        ( ~di_regoin_msg[4][33]           )   // 位置2到位开关
+    //    ,.i_pos3        ( di_regoin_msg[4][56]           )   // 位置3到位开关
        ,.o_dri1        ( o_dri1_77           )   // 位置1驱动信号
        ,.o_dri2        ( o_dri2_77           )   // 位置2驱动信号
     );
 
-    assign do_regoin_r_msg[3][24] = ~o_dri1_77;
-    assign do_regoin_r_msg[3][25] = ~o_dri2_77;
+    assign do_regoin_r_msg[4][24] = ~o_dri1_77;
+    assign do_regoin_r_msg[4][25] = ~o_dri2_77;
 	
 	
 	wire   o_dri1_78;
@@ -3130,15 +3131,15 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[118]    ),
 	  .o_intr_irq            ( map_irq[118]       )
 
-       ,.i_pos1        ( ~di_regoin_msg[3][35]           )   // 位置1到位开关	
-       ,.i_pos2        ( ~di_regoin_msg[3][36]           )   // 位置2到位开关
-    //    ,.i_pos3        ( di_regoin_msg[3][57]           )   // 位置3到位开关
+       ,.i_pos1        ( ~di_regoin_msg[4][35]           )   // 位置1到位开关	
+       ,.i_pos2        ( ~di_regoin_msg[4][36]           )   // 位置2到位开关
+    //    ,.i_pos3        ( di_regoin_msg[4][57]           )   // 位置3到位开关
        ,.o_dri1        ( o_dri1_78           )   // 位置1驱动信号
        ,.o_dri2        ( o_dri2_78           )   // 位置2驱动信号
     );
 
-    assign do_regoin_r_msg[3][26] = ~o_dri1_78;
-    assign do_regoin_r_msg[3][27] = ~o_dri2_78;
+    assign do_regoin_r_msg[4][26] = ~o_dri1_78;
+    assign do_regoin_r_msg[4][27] = ~o_dri2_78;
 	
 	
 	
@@ -3202,14 +3203,14 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[191]    ),
 	  .o_intr_irq            ( map_irq[191]       )
 
-       ,.i_pos1        ( ~di_regoin_msg[4][64]           )   // 位置1到位开关
-       ,.i_pos2        ( ~di_regoin_msg[4][65]           )   // 位置2到位开关
+       ,.i_pos1        ( ~di_regoin_msg[5][64]           )   // 位置1到位开关
+       ,.i_pos2        ( ~di_regoin_msg[5][65]           )   // 位置2到位开关
        ,.o_dri1        ( o_dri1_80           )   // 驱动信号1
        ,.o_dri2        ( o_dri2_80           )   // 驱动信号2
     );
 
-    assign do_regoin_r_msg[4][32] = ~o_dri1_80;
-    assign do_regoin_r_msg[4][33] = ~o_dri2_80;
+    assign do_regoin_r_msg[5][32] = ~o_dri1_80;
+    assign do_regoin_r_msg[5][33] = ~o_dri2_80;
 	
 	
 	
@@ -3268,11 +3269,11 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[156]    ),
 	  .o_intr_irq            ( map_irq[156]       )
 
-       ,.i_sign1_check        ( di_regoin_msg[2][45]           )   // 感测开关1
-       ,.i_sign2_check        ( di_regoin_msg[2][46]           )   // 感测开关2
-       ,.i_sign3_check        ( di_regoin_msg[1][17]           )   // 感测开关3
-       ,.i_sign4_check        ( di_regoin_msg[1][16]           )   // 感测开关4
-       ,.i_sign5_check        ( di_regoin_msg[1][18]           )   // 感测开关5
+       ,.i_sign1_check        ( di_regoin_msg[3][45]           )   // 感测开关1
+       ,.i_sign2_check        ( di_regoin_msg[3][46]           )   // 感测开关2
+       ,.i_sign3_check        ( di_regoin_msg[2][17]           )   // 感测开关3
+       ,.i_sign4_check        ( di_regoin_msg[2][16]           )   // 感测开关4
+       ,.i_sign5_check        ( di_regoin_msg[2][18]           )   // 感测开关5
     );
 
 	
@@ -3304,11 +3305,11 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[157]    ),
 	  .o_intr_irq            ( map_irq[157]       )
 
-       ,.i_sign1_check        ( di_regoin_msg[2][47]           )   // 感测开关1
-       ,.i_sign2_check        ( di_regoin_msg[2][48]           )   // 感测开关2
-       ,.i_sign3_check        ( di_regoin_msg[1][20]           )   // 感测开关3
-       ,.i_sign4_check        ( di_regoin_msg[1][19]           )   // 感测开关4
-       ,.i_sign5_check        ( di_regoin_msg[1][21]           )   // 感测开关5
+       ,.i_sign1_check        ( di_regoin_msg[3][47]           )   // 感测开关1
+       ,.i_sign2_check        ( di_regoin_msg[3][48]           )   // 感测开关2
+       ,.i_sign3_check        ( di_regoin_msg[2][20]           )   // 感测开关3
+       ,.i_sign4_check        ( di_regoin_msg[2][19]           )   // 感测开关4
+       ,.i_sign5_check        ( di_regoin_msg[2][21]           )   // 感测开关5
     );
 
 	
@@ -3340,11 +3341,11 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[158]    ),
 	  .o_intr_irq            ( map_irq[158]       )
 
-       ,.i_sign1_check        ( di_regoin_msg[2][49]           )   // 感测开关1
-       ,.i_sign2_check        ( di_regoin_msg[2][50]           )   // 感测开关2
-       ,.i_sign3_check        ( di_regoin_msg[1][22]           )   // 感测开关3
-       ,.i_sign4_check        ( di_regoin_msg[1][23]           )   // 感测开关4
-       ,.i_sign5_check        ( di_regoin_msg[1][24]           )   // 感测开关5
+       ,.i_sign1_check        ( di_regoin_msg[3][49]           )   // 感测开关1
+       ,.i_sign2_check        ( di_regoin_msg[3][50]           )   // 感测开关2
+       ,.i_sign3_check        ( di_regoin_msg[2][22]           )   // 感测开关3
+       ,.i_sign4_check        ( di_regoin_msg[2][23]           )   // 感测开关4
+       ,.i_sign5_check        ( di_regoin_msg[2][24]           )   // 感测开关5
     );
 
 	
@@ -3376,11 +3377,11 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[164]    ),
 	  .o_intr_irq            ( map_irq[164]       )
 
-       ,.i_sign1_check        ( di_regoin_msg[3][23]           )   // 感测开关1
-       ,.i_sign2_check        ( di_regoin_msg[3][24]           )   // 感测开关2
-       ,.i_sign3_check        ( di_regoin_msg[4][28]           )   // 感测开关3
-       ,.i_sign4_check        ( di_regoin_msg[4][30]           )   // 感测开关4
-       ,.i_sign5_check        ( di_regoin_msg[4][29]           )   // 感测开关5
+       ,.i_sign1_check        ( di_regoin_msg[4][23]           )   // 感测开关1
+       ,.i_sign2_check        ( di_regoin_msg[4][24]           )   // 感测开关2
+       ,.i_sign3_check        ( di_regoin_msg[5][28]           )   // 感测开关3
+       ,.i_sign4_check        ( di_regoin_msg[5][30]           )   // 感测开关4
+       ,.i_sign5_check        ( di_regoin_msg[5][29]           )   // 感测开关5
     );
 
 	
@@ -3412,11 +3413,11 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[166]    ),
 	  .o_intr_irq            ( map_irq[166]       )
 
-       ,.i_sign1_check        ( di_regoin_msg[3][25]           )   // 感测开关1
-       ,.i_sign2_check        ( di_regoin_msg[3][26]           )   // 感测开关2
-       ,.i_sign3_check        ( di_regoin_msg[4][31]           )   // 感测开关3
-       ,.i_sign4_check        ( di_regoin_msg[4][32]           )   // 感测开关4
-       ,.i_sign5_check        ( di_regoin_msg[4][33]           )   // 感测开关5
+       ,.i_sign1_check        ( di_regoin_msg[4][25]           )   // 感测开关1
+       ,.i_sign2_check        ( di_regoin_msg[4][26]           )   // 感测开关2
+       ,.i_sign3_check        ( di_regoin_msg[5][31]           )   // 感测开关3
+       ,.i_sign4_check        ( di_regoin_msg[5][32]           )   // 感测开关4
+       ,.i_sign5_check        ( di_regoin_msg[5][33]           )   // 感测开关5
     );
 
 	
@@ -3448,11 +3449,11 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[163]    ),
 	  .o_intr_irq            ( map_irq[163]       )
 
-       ,.i_sign1_check        ( di_regoin_msg[3][27]           )   // 感测开关1
-       ,.i_sign2_check        ( di_regoin_msg[3][28]           )   // 感测开关2
-       ,.i_sign3_check        ( di_regoin_msg[4][43]           )   // 感测开关3
-       ,.i_sign4_check        ( di_regoin_msg[4][45]           )   // 感测开关4
-       ,.i_sign5_check        ( di_regoin_msg[4][44]           )   // 感测开关5
+       ,.i_sign1_check        ( di_regoin_msg[4][27]           )   // 感测开关1
+       ,.i_sign2_check        ( di_regoin_msg[4][28]           )   // 感测开关2
+       ,.i_sign3_check        ( di_regoin_msg[5][43]           )   // 感测开关3
+       ,.i_sign4_check        ( di_regoin_msg[5][45]           )   // 感测开关4
+       ,.i_sign5_check        ( di_regoin_msg[5][44]           )   // 感测开关5
     );
 
 	
@@ -3484,11 +3485,11 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[160]    ),
 	  .o_intr_irq            ( map_irq[160]       )
 
-       ,.i_sign1_check        ( di_regoin_msg[3][29]           )   // 感测开关1
-       ,.i_sign2_check        ( di_regoin_msg[3][30]           )   // 感测开关2
-       ,.i_sign3_check        ( di_regoin_msg[4][34]           )   // 感测开关3
-       ,.i_sign4_check        ( di_regoin_msg[4][35]           )   // 感测开关4
-       ,.i_sign5_check        ( di_regoin_msg[4][36]           )   // 感测开关5
+       ,.i_sign1_check        ( di_regoin_msg[4][29]           )   // 感测开关1
+       ,.i_sign2_check        ( di_regoin_msg[4][30]           )   // 感测开关2
+       ,.i_sign3_check        ( di_regoin_msg[5][34]           )   // 感测开关3
+       ,.i_sign4_check        ( di_regoin_msg[5][35]           )   // 感测开关4
+       ,.i_sign5_check        ( di_regoin_msg[5][36]           )   // 感测开关5
     );
 
 	
@@ -3520,11 +3521,11 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[165]    ),
 	  .o_intr_irq            ( map_irq[165]       )
 
-       ,.i_sign1_check        ( di_regoin_msg[3][31]           )   // 感测开关1
-       ,.i_sign2_check        ( di_regoin_msg[3][44]           )   // 感测开关2
-       ,.i_sign3_check        ( di_regoin_msg[4][37]           )   // 感测开关3
-       ,.i_sign4_check        ( di_regoin_msg[4][38]           )   // 感测开关4
-       ,.i_sign5_check        ( di_regoin_msg[4][39]           )   // 感测开关5
+       ,.i_sign1_check        ( di_regoin_msg[4][31]           )   // 感测开关1
+       ,.i_sign2_check        ( di_regoin_msg[4][44]           )   // 感测开关2
+       ,.i_sign3_check        ( di_regoin_msg[5][37]           )   // 感测开关3
+       ,.i_sign4_check        ( di_regoin_msg[5][38]           )   // 感测开关4
+       ,.i_sign5_check        ( di_regoin_msg[5][39]           )   // 感测开关5
     );
 
 	
@@ -3556,11 +3557,11 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[162]    ),
 	  .o_intr_irq            ( map_irq[162]       )
 
-       ,.i_sign1_check        ( di_regoin_msg[3][46]           )   // 感测开关1
-       ,.i_sign2_check        ( di_regoin_msg[3][45]           )   // 感测开关2
-       ,.i_sign3_check        ( di_regoin_msg[4][40]           )   // 感测开关3
-       ,.i_sign4_check        ( di_regoin_msg[4][41]           )   // 感测开关4
-       ,.i_sign5_check        ( di_regoin_msg[4][42]           )   // 感测开关5
+       ,.i_sign1_check        ( di_regoin_msg[4][46]           )   // 感测开关1
+       ,.i_sign2_check        ( di_regoin_msg[4][45]           )   // 感测开关2
+       ,.i_sign3_check        ( di_regoin_msg[5][40]           )   // 感测开关3
+       ,.i_sign4_check        ( di_regoin_msg[5][41]           )   // 感测开关4
+       ,.i_sign5_check        ( di_regoin_msg[5][42]           )   // 感测开关5
     );
 
 	
@@ -3594,14 +3595,14 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[175]    ),
 	  .o_intr_irq            ( map_irq[175]       )
 
-       ,.i_pos1        ( ~di_regoin_msg[1][56]           )   // 位置1到位开关
-       ,.i_pos2        ( ~di_regoin_msg[1][55]           )   // 位置2到位开关
+       ,.i_pos1        ( ~di_regoin_msg[2][56]           )   // 位置1到位开关
+       ,.i_pos2        ( ~di_regoin_msg[2][55]           )   // 位置2到位开关
        ,.o_dri1        ( o_dri1_94           )   // 驱动信号1
        ,.o_dri2        ( o_dri2_94           )   // 驱动信号2
     );
 
-    assign do_regoin_r_msg[1][0] = ~o_dri1_94;
-    assign do_regoin_r_msg[1][1] = ~o_dri2_94;
+    assign do_regoin_r_msg[2][0] = ~o_dri1_94;
+    assign do_regoin_r_msg[2][1] = ~o_dri2_94;
 	
 	
 	wire   o_dri2_95;
@@ -3633,14 +3634,14 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[174]    ),
 	  .o_intr_irq            ( map_irq[174]       )
 
-       ,.i_pos1        ( ~di_regoin_msg[1][58]           )   // 位置1到位开关
-       ,.i_pos2        ( ~di_regoin_msg[1][57]           )   // 位置2到位开关
+       ,.i_pos1        ( ~di_regoin_msg[2][58]           )   // 位置1到位开关
+       ,.i_pos2        ( ~di_regoin_msg[2][57]           )   // 位置2到位开关
        ,.o_dri1        ( o_dri1_95           )   // 驱动信号1
        ,.o_dri2        ( o_dri2_95           )   // 驱动信号2
     );
 
-    assign do_regoin_r_msg[1][3] = ~o_dri2_95;
-    assign do_regoin_r_msg[1][2] = ~o_dri1_95;
+    assign do_regoin_r_msg[2][3] = ~o_dri2_95;
+    assign do_regoin_r_msg[2][2] = ~o_dri1_95;
 	
 	
 	wire   o_dri1_96;
@@ -3672,14 +3673,14 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[173]    ),
 	  .o_intr_irq            ( map_irq[173]       )
 
-       ,.i_pos1        ( ~di_regoin_msg[1][60]           )   // 位置1到位开关
-       ,.i_pos2        ( ~di_regoin_msg[1][59]           )   // 位置2到位开关
+       ,.i_pos1        ( ~di_regoin_msg[2][60]           )   // 位置1到位开关
+       ,.i_pos2        ( ~di_regoin_msg[2][59]           )   // 位置2到位开关
        ,.o_dri1        ( o_dri1_96           )   // 驱动信号1
        ,.o_dri2        ( o_dri2_96           )   // 驱动信号2
     );
 
-    assign do_regoin_r_msg[1][4] = ~o_dri1_96;
-    assign do_regoin_r_msg[1][5] = ~o_dri2_96;
+    assign do_regoin_r_msg[2][4] = ~o_dri1_96;
+    assign do_regoin_r_msg[2][5] = ~o_dri2_96;
 	
 	
 	wire   o_dri1_97;
@@ -3711,14 +3712,14 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[170]    ),
 	  .o_intr_irq            ( map_irq[170]       )
 
-       ,.i_pos1        ( ~di_regoin_msg[4][48]           )   // 位置1到位开关
-       ,.i_pos2        ( ~di_regoin_msg[4][47]           )   // 位置2到位开关
+       ,.i_pos1        ( ~di_regoin_msg[5][48]           )   // 位置1到位开关
+       ,.i_pos2        ( ~di_regoin_msg[5][47]           )   // 位置2到位开关
        ,.o_dri1        ( o_dri1_97           )   // 驱动信号1
        ,.o_dri2        ( o_dri2_97           )   // 驱动信号2
     );
 
-    assign do_regoin_r_msg[4][7] = ~o_dri1_97;
-    assign do_regoin_r_msg[4][8] = ~o_dri2_97;
+    assign do_regoin_r_msg[5][7] = ~o_dri1_97;
+    assign do_regoin_r_msg[5][8] = ~o_dri2_97;
 	
 	
 	wire   o_dri1_98;
@@ -3750,14 +3751,14 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[171]    ),
 	  .o_intr_irq            ( map_irq[171]       )
 
-       ,.i_pos1        ( ~di_regoin_msg[4][50]           )   // 位置1到位开关
-       ,.i_pos2        ( ~di_regoin_msg[4][49]           )   // 位置2到位开关
+       ,.i_pos1        ( ~di_regoin_msg[5][50]           )   // 位置1到位开关
+       ,.i_pos2        ( ~di_regoin_msg[5][49]           )   // 位置2到位开关
        ,.o_dri1        ( o_dri1_98           )   // 驱动信号1
        ,.o_dri2        ( o_dri2_98           )   // 驱动信号2
     );
 
-    assign do_regoin_r_msg[4][9] = ~o_dri1_98;
-    assign do_regoin_r_msg[4][10] = ~o_dri2_98;
+    assign do_regoin_r_msg[5][9] = ~o_dri1_98;
+    assign do_regoin_r_msg[5][10] = ~o_dri2_98;
 	
 	
 	wire   o_dri1_99;
@@ -3789,14 +3790,14 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[172]    ),
 	  .o_intr_irq            ( map_irq[172]       )
 
-       ,.i_pos1        ( ~di_regoin_msg[4][52]           )   // 位置1到位开关
-       ,.i_pos2        ( ~di_regoin_msg[4][51]           )   // 位置2到位开关
+       ,.i_pos1        ( ~di_regoin_msg[5][52]           )   // 位置1到位开关
+       ,.i_pos2        ( ~di_regoin_msg[5][51]           )   // 位置2到位开关
        ,.o_dri1        ( o_dri1_99           )   // 驱动信号1
        ,.o_dri2        ( o_dri2_99           )   // 驱动信号2
     );
 
-    assign do_regoin_r_msg[4][11] = ~o_dri1_99;
-    assign do_regoin_r_msg[4][12] = ~o_dri2_99;
+    assign do_regoin_r_msg[5][11] = ~o_dri1_99;
+    assign do_regoin_r_msg[5][12] = ~o_dri2_99;
 	
 	
 	wire   o_dri2_100;
@@ -3828,14 +3829,14 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[168]    ),
 	  .o_intr_irq            ( map_irq[168]       )
 
-       ,.i_pos1        ( ~di_regoin_msg[4][54]           )   // 位置1到位开关
-       ,.i_pos2        ( ~di_regoin_msg[4][53]           )   // 位置2到位开关
+       ,.i_pos1        ( ~di_regoin_msg[5][54]           )   // 位置1到位开关
+       ,.i_pos2        ( ~di_regoin_msg[5][53]           )   // 位置2到位开关
        ,.o_dri1        ( o_dri1_100           )   // 驱动信号1
        ,.o_dri2        ( o_dri2_100           )   // 驱动信号2
     );
 
-    assign do_regoin_r_msg[4][14] = ~o_dri2_100;
-    assign do_regoin_r_msg[4][13] = ~o_dri1_100;
+    assign do_regoin_r_msg[5][14] = ~o_dri2_100;
+    assign do_regoin_r_msg[5][13] = ~o_dri1_100;
 	
 	
 	wire   o_dri2_101;
@@ -3867,14 +3868,14 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[169]    ),
 	  .o_intr_irq            ( map_irq[169]       )
 
-       ,.i_pos1        ( ~di_regoin_msg[3][20]           )   // 位置1到位开关
-       ,.i_pos2        ( ~di_regoin_msg[4][55]           )   // 位置2到位开关
+       ,.i_pos1        ( ~di_regoin_msg[4][20]           )   // 位置1到位开关
+       ,.i_pos2        ( ~di_regoin_msg[5][55]           )   // 位置2到位开关
        ,.o_dri1        ( o_dri1_101           )   // 驱动信号1
        ,.o_dri2        ( o_dri2_101           )   // 驱动信号2
     );
 
-    assign do_regoin_r_msg[4][16] = ~o_dri2_101;
-    assign do_regoin_r_msg[4][15] = ~o_dri1_101;
+    assign do_regoin_r_msg[5][16] = ~o_dri2_101;
+    assign do_regoin_r_msg[5][15] = ~o_dri1_101;
 	
 	
 	wire   o_dri1_102;
@@ -3906,14 +3907,14 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[167]    ),
 	  .o_intr_irq            ( map_irq[167]       )
 
-       ,.i_pos1        ( ~di_regoin_msg[3][22]           )   // 位置1到位开关
-       ,.i_pos2        ( ~di_regoin_msg[3][21]           )   // 位置2到位开关
+       ,.i_pos1        ( ~di_regoin_msg[4][22]           )   // 位置1到位开关
+       ,.i_pos2        ( ~di_regoin_msg[4][21]           )   // 位置2到位开关
        ,.o_dri1        ( o_dri1_102           )   // 驱动信号1
        ,.o_dri2        ( o_dri2_102           )   // 驱动信号2
     );
 
-    assign do_regoin_r_msg[4][17] = ~o_dri1_102;
-    assign do_regoin_r_msg[4][18] = ~o_dri2_102;
+    assign do_regoin_r_msg[5][17] = ~o_dri1_102;
+    assign do_regoin_r_msg[5][18] = ~o_dri2_102;
 	
 	
 	
@@ -3976,15 +3977,15 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[180]    ),
 	  .o_intr_irq            ( map_irq[180]       )
 
-       ,.i_lock_monitor        ( ~di_regoin_msg[1][26]           )   // 锁监控常闭DO端口
-       ,.i_open_req_key        ( ~di_regoin_msg[1][27]           )   // 开门请求绿色按钮
+       ,.i_lock_monitor        ( ~di_regoin_msg[2][26]           )   // 锁监控常闭DO端口
+       ,.i_open_req_key        ( ~di_regoin_msg[2][27]           )   // 开门请求绿色按钮
        ,.o_lock_open        ( o_lock_open_105           )   // 电磁锁A1
        ,.i_close_confirm_key        ( 1'b0           )   // 
        ,.i_door_monitor        ( 1'b0           )   // 
        ,.o_key_light        (            )   // 
     );
 
-    assign do_regoin_r_msg[1][28] = ~o_lock_open_105;
+    assign do_regoin_r_msg[2][28] = ~o_lock_open_105;
 	
 	
 	wire   o_lock_open_106;
@@ -4015,15 +4016,15 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[181]    ),
 	  .o_intr_irq            ( map_irq[181]       )
 
-       ,.i_lock_monitor        ( di_regoin_msg[1][29]           )   // 锁监控常闭DO端口
-       ,.i_open_req_key        ( ~di_regoin_msg[1][30]           )   // 开门请求绿色按钮
+       ,.i_lock_monitor        ( di_regoin_msg[2][29]           )   // 锁监控常闭DO端口
+       ,.i_open_req_key        ( ~di_regoin_msg[2][30]           )   // 开门请求绿色按钮
        ,.o_lock_open        ( o_lock_open_106           )   // 电磁锁A1
        ,.i_close_confirm_key        ( 1'b0           )   // 
        ,.i_door_monitor        ( 1'b0           )   // 
        ,.o_key_light        (            )   // 
     );
 
-    assign do_regoin_r_msg[1][29] = ~o_lock_open_106;
+    assign do_regoin_r_msg[2][29] = ~o_lock_open_106;
 	
 	
 	wire   o_lock_open_107;
@@ -4054,15 +4055,15 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[179]    ),
 	  .o_intr_irq            ( map_irq[179]       )
 
-       ,.i_lock_monitor        ( ~di_regoin_msg[1][32]           )   // 锁监控常闭DO端口
-       ,.i_open_req_key        ( ~di_regoin_msg[1][33]           )   // 开门请求绿色按钮
+       ,.i_lock_monitor        ( ~di_regoin_msg[2][32]           )   // 锁监控常闭DO端口
+       ,.i_open_req_key        ( ~di_regoin_msg[2][33]           )   // 开门请求绿色按钮
        ,.o_lock_open        ( o_lock_open_107           )   // 电磁锁A1
        ,.i_close_confirm_key        ( 1'b0           )   // 
        ,.i_door_monitor        ( 1'b0           )   // 
        ,.o_key_light        (            )   // 
     );
 
-    assign do_regoin_r_msg[1][30] = ~o_lock_open_107;
+    assign do_regoin_r_msg[2][30] = ~o_lock_open_107;
 	
 	
 	wire   o_lock_open_108;
@@ -4093,15 +4094,15 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[189]    ),
 	  .o_intr_irq            ( map_irq[189]       )
 
-       ,.i_lock_monitor        ( ~di_regoin_msg[3][4]           )   // 锁监控常闭DO端口
-       ,.i_open_req_key        ( ~di_regoin_msg[3][5]           )   // 开门请求绿色按钮
+       ,.i_lock_monitor        ( ~di_regoin_msg[4][4]           )   // 锁监控常闭DO端口
+       ,.i_open_req_key        ( ~di_regoin_msg[4][5]           )   // 开门请求绿色按钮
        ,.o_lock_open        ( o_lock_open_108           )   // 电磁锁A1
        ,.i_close_confirm_key        ( 1'b0           )   // 
        ,.i_door_monitor        ( 1'b0           )   // 
        ,.o_key_light        (            )   // 
     );
 
-    assign do_regoin_r_msg[4][1] = ~o_lock_open_108;
+    assign do_regoin_r_msg[5][1] = ~o_lock_open_108;
 	
 	
 	wire   o_lock_open_109;
@@ -4132,15 +4133,15 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[186]    ),
 	  .o_intr_irq            ( map_irq[186]       )
 
-       ,.i_lock_monitor        ( ~di_regoin_msg[3][7]           )   // 锁监控常闭DO端口
-       ,.i_open_req_key        ( ~di_regoin_msg[3][8]           )   // 开门请求绿色按钮
+       ,.i_lock_monitor        ( ~di_regoin_msg[4][7]           )   // 锁监控常闭DO端口
+       ,.i_open_req_key        ( ~di_regoin_msg[4][8]           )   // 开门请求绿色按钮
        ,.o_lock_open        ( o_lock_open_109           )   // 电磁锁A1
        ,.i_close_confirm_key        ( 1'b0           )   // 
        ,.i_door_monitor        ( 1'b0           )   // 
        ,.o_key_light        (            )   // 
     );
 
-    assign do_regoin_r_msg[4][2] = ~o_lock_open_109;
+    assign do_regoin_r_msg[5][2] = ~o_lock_open_109;
 	
 	
 	wire   o_lock_open_110;
@@ -4171,15 +4172,15 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[185]    ),
 	  .o_intr_irq            ( map_irq[185]       )
 
-       ,.i_lock_monitor        ( ~di_regoin_msg[3][10]           )   // 锁监控常闭DO端口
-       ,.i_open_req_key        ( ~di_regoin_msg[3][11]           )   // 开门请求绿色按钮
+       ,.i_lock_monitor        ( ~di_regoin_msg[4][10]           )   // 锁监控常闭DO端口
+       ,.i_open_req_key        ( ~di_regoin_msg[4][11]           )   // 开门请求绿色按钮
        ,.o_lock_open        ( o_lock_open_110           )   // 电磁锁A1
        ,.i_close_confirm_key        ( 1'b0           )   // 
        ,.i_door_monitor        ( 1'b0           )   // 
        ,.o_key_light        (            )   // 
     );
 
-    assign do_regoin_r_msg[4][3] = ~o_lock_open_110;
+    assign do_regoin_r_msg[5][3] = ~o_lock_open_110;
 	
 	
 	wire   o_lock_open_111;
@@ -4210,15 +4211,15 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[188]    ),
 	  .o_intr_irq            ( map_irq[188]       )
 
-       ,.i_lock_monitor        ( ~di_regoin_msg[3][13]           )   // 锁监控常闭DO端口
-       ,.i_open_req_key        ( ~di_regoin_msg[3][47]           )   // 开门请求绿色按钮
+       ,.i_lock_monitor        ( ~di_regoin_msg[4][13]           )   // 锁监控常闭DO端口
+       ,.i_open_req_key        ( ~di_regoin_msg[4][47]           )   // 开门请求绿色按钮
        ,.o_lock_open        ( o_lock_open_111           )   // 电磁锁A1
        ,.i_close_confirm_key        ( 1'b0           )   // 
        ,.i_door_monitor        ( 1'b0           )   // 
        ,.o_key_light        (            )   // 
     );
 
-    assign do_regoin_r_msg[3][4] = ~o_lock_open_111;
+    assign do_regoin_r_msg[4][4] = ~o_lock_open_111;
 	
 	
 	wire   o_lock_open_112;
@@ -4249,15 +4250,15 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[187]    ),
 	  .o_intr_irq            ( map_irq[187]       )
 
-       ,.i_lock_monitor        ( ~di_regoin_msg[3][49]           )   // 锁监控常闭DO端口
-       ,.i_open_req_key        ( ~di_regoin_msg[3][50]           )   // 开门请求绿色按钮
+       ,.i_lock_monitor        ( ~di_regoin_msg[4][49]           )   // 锁监控常闭DO端口
+       ,.i_open_req_key        ( ~di_regoin_msg[4][50]           )   // 开门请求绿色按钮
        ,.o_lock_open        ( o_lock_open_112           )   // 电磁锁A1
        ,.i_close_confirm_key        ( 1'b0           )   // 
        ,.i_door_monitor        ( 1'b0           )   // 
        ,.o_key_light        (            )   // 
     );
 
-    assign do_regoin_r_msg[3][5] = ~o_lock_open_112;
+    assign do_regoin_r_msg[4][5] = ~o_lock_open_112;
 	
 	
 	wire   o_lock_open_113;
@@ -4288,15 +4289,15 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[184]    ),
 	  .o_intr_irq            ( map_irq[184]       )
 
-       ,.i_lock_monitor        ( ~di_regoin_msg[3][52]           )   // 锁监控常闭DO端口
-       ,.i_open_req_key        ( ~di_regoin_msg[3][53]           )   // 开门请求绿色按钮
+       ,.i_lock_monitor        ( ~di_regoin_msg[4][52]           )   // 锁监控常闭DO端口
+       ,.i_open_req_key        ( ~di_regoin_msg[4][53]           )   // 开门请求绿色按钮
        ,.o_lock_open        ( o_lock_open_113           )   // 电磁锁A1
        ,.i_close_confirm_key        ( 1'b0           )   // 
        ,.i_door_monitor        ( 1'b0           )   // 
        ,.o_key_light        (            )   // 
     );
 
-    assign do_regoin_r_msg[3][6] = ~o_lock_open_113;
+    assign do_regoin_r_msg[4][6] = ~o_lock_open_113;
 	
 	
 	wire   o_lock_open_114;
@@ -4327,15 +4328,15 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[182]    ),
 	  .o_intr_irq            ( map_irq[182]       )
 
-       ,.i_lock_monitor        ( ~di_regoin_msg[1][38]           )   // 锁监控常闭DO端口
-       ,.i_open_req_key        ( ~di_regoin_msg[1][39]           )   // 开门请求绿色按钮
+       ,.i_lock_monitor        ( ~di_regoin_msg[2][38]           )   // 锁监控常闭DO端口
+       ,.i_open_req_key        ( ~di_regoin_msg[2][39]           )   // 开门请求绿色按钮
        ,.o_lock_open        ( o_lock_open_114           )   // 电磁锁A1
        ,.i_close_confirm_key        ( 1'b0           )   // 
        ,.i_door_monitor        ( 1'b0           )   // 
        ,.o_key_light        (            )   // 
     );
 
-    assign do_regoin_r_msg[1][32] = ~o_lock_open_114;
+    assign do_regoin_r_msg[2][32] = ~o_lock_open_114;
 	
 	
 	wire   o_lock_open_115;
@@ -4366,15 +4367,15 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[183]    ),
 	  .o_intr_irq            ( map_irq[183]       )
 
-       ,.i_lock_monitor        ( ~di_regoin_msg[1][35]           )   // 锁监控常闭DO端口
-       ,.i_open_req_key        ( ~di_regoin_msg[1][36]           )   // 开门请求绿色按钮
+       ,.i_lock_monitor        ( ~di_regoin_msg[2][35]           )   // 锁监控常闭DO端口
+       ,.i_open_req_key        ( ~di_regoin_msg[2][36]           )   // 开门请求绿色按钮
        ,.o_lock_open        ( o_lock_open_115           )   // 电磁锁A1
        ,.i_close_confirm_key        ( 1'b0           )   // 
        ,.i_door_monitor        ( 1'b0           )   // 
        ,.o_key_light        (            )   // 
     );
 
-    assign do_regoin_r_msg[1][31] = ~o_lock_open_115;
+    assign do_regoin_r_msg[2][31] = ~o_lock_open_115;
 	
 	
 	wire   o_sig_dri_116;
@@ -4408,7 +4409,7 @@ module emcc_mix_top
        ,.o_sig_dri        ( o_sig_dri_116           )   // 单驱动信号
     );
 
-    assign do_regoin_r_msg[2][7] = ~o_sig_dri_116;
+    assign do_regoin_r_msg[3][7] = ~o_sig_dri_116;
 	
 	
 	wire   o_bz_118;
@@ -4448,10 +4449,10 @@ module emcc_mix_top
        ,.o_led_r        ( o_led_r_118           )   // 红色端口
     );
 
-    assign do_regoin_r_msg[3][3] = ~o_bz_118;
-    assign do_regoin_r_msg[3][2] = ~o_led_g_118;
-    assign do_regoin_r_msg[3][0] = ~o_led_r_118;
-    assign do_regoin_r_msg[3][1] = ~o_led_y_118;
+    assign do_regoin_r_msg[4][3] = ~o_bz_118;
+    assign do_regoin_r_msg[4][2] = ~o_led_g_118;
+    assign do_regoin_r_msg[4][0] = ~o_led_r_118;
+    assign do_regoin_r_msg[4][1] = ~o_led_y_118;
 	
 	
 	wire   o_dri1_122;
@@ -4483,14 +4484,14 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[161]    ),
 	  .o_intr_irq            ( map_irq[161]       )
 
-       ,.i_pos1        ( ~di_regoin_msg[4][66]           )   // 位置1到位开关
-       ,.i_pos2        ( ~di_regoin_msg[4][67]           )   // 位置2到位开关
+       ,.i_pos1        ( ~di_regoin_msg[5][66]           )   // 位置1到位开关
+       ,.i_pos2        ( ~di_regoin_msg[5][67]           )   // 位置2到位开关
        ,.o_dri1        ( o_dri1_122           )   // 驱动信号1
        ,.o_dri2        ( o_dri2_122           )   // 驱动信号2
     );
 
-    assign do_regoin_r_msg[4][34] = ~o_dri1_122;
-    assign do_regoin_r_msg[4][35] = ~o_dri2_122;
+    assign do_regoin_r_msg[5][34] = ~o_dri1_122;
+    assign do_regoin_r_msg[5][35] = ~o_dri2_122;
 	
 	
 	wire   o_dri1_123;
@@ -4522,14 +4523,14 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[190]    ),
 	  .o_intr_irq            ( map_irq[190]       )
 
-       ,.i_pos1        ( ~di_regoin_msg[4][68]           )   // 位置1到位开关
-       ,.i_pos2        ( ~di_regoin_msg[4][69]           )   // 位置2到位开关
+       ,.i_pos1        ( ~di_regoin_msg[5][68]           )   // 位置1到位开关
+       ,.i_pos2        ( ~di_regoin_msg[5][69]           )   // 位置2到位开关
        ,.o_dri1        ( o_dri1_123           )   // 驱动信号1
        ,.o_dri2        ( o_dri2_123           )   // 驱动信号2
     );
 
-    assign do_regoin_r_msg[4][36] = ~o_dri1_123;
-    assign do_regoin_r_msg[4][37] = ~o_dri2_123;
+    assign do_regoin_r_msg[5][36] = ~o_dri1_123;
+    assign do_regoin_r_msg[5][37] = ~o_dri2_123;
 	
 	
 	wire   o_dri1_124;
@@ -4561,14 +4562,14 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[192]    ),
 	  .o_intr_irq            ( map_irq[192]       )
 
-       ,.i_pos1        ( ~di_regoin_msg[4][70]           )   // 位置1到位开关
-       ,.i_pos2        ( ~di_regoin_msg[4][71]           )   // 位置2到位开关
+       ,.i_pos1        ( ~di_regoin_msg[5][70]           )   // 位置1到位开关
+       ,.i_pos2        ( ~di_regoin_msg[5][71]           )   // 位置2到位开关
        ,.o_dri1        ( o_dri1_124           )   // 驱动信号1
        ,.o_dri2        ( o_dri2_124           )   // 驱动信号2
     );
 
-    assign do_regoin_r_msg[4][38] = ~o_dri1_124;
-    assign do_regoin_r_msg[4][39] = ~o_dri2_124;
+    assign do_regoin_r_msg[5][38] = ~o_dri1_124;
+    assign do_regoin_r_msg[5][39] = ~o_dri2_124;
 	
 	
 	
@@ -4726,21 +4727,21 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[153]    ),
 	  .o_intr_irq            ( map_irq[153]       )
 
-       ,.i_sign1_check        ( di_regoin_msg[2][65]           )   // 感测开关1
-       ,.i_sign10_check        ( di_regoin_msg[2][74]           )   // 感测开关10
-       ,.i_sign11_check        ( di_regoin_msg[2][75]           )   // 感测开关11
-       ,.i_sign12_check        ( di_regoin_msg[2][76]           )   // 感测开关12
-       ,.i_sign13_check        ( di_regoin_msg[2][77]           )   // 感测开关13
-       ,.i_sign14_check        ( di_regoin_msg[2][78]           )   // 感测开关14
-       ,.i_sign15_check        ( di_regoin_msg[2][79]           )   // 感测开关15
-       ,.i_sign2_check        ( di_regoin_msg[2][66]           )   // 感测开关2
-       ,.i_sign3_check        ( di_regoin_msg[2][67]           )   // 感测开关3
-       ,.i_sign4_check        ( di_regoin_msg[2][68]           )   // 感测开关4
-       ,.i_sign5_check        ( di_regoin_msg[2][69]           )   // 感测开关5
-       ,.i_sign6_check        ( di_regoin_msg[2][70]           )   // 感测开关6
-       ,.i_sign7_check        ( di_regoin_msg[2][71]           )   // 感测开关7
-       ,.i_sign8_check        ( di_regoin_msg[2][72]           )   // 感测开关8
-       ,.i_sign9_check        ( di_regoin_msg[2][73]           )   // 感测开关9
+       ,.i_sign1_check        ( di_regoin_msg[3][65]           )   // 感测开关1
+       ,.i_sign10_check        ( di_regoin_msg[3][74]           )   // 感测开关10
+       ,.i_sign11_check        ( di_regoin_msg[3][75]           )   // 感测开关11
+       ,.i_sign12_check        ( di_regoin_msg[3][76]           )   // 感测开关12
+       ,.i_sign13_check        ( di_regoin_msg[3][77]           )   // 感测开关13
+       ,.i_sign14_check        ( di_regoin_msg[3][78]           )   // 感测开关14
+       ,.i_sign15_check        ( di_regoin_msg[3][79]           )   // 感测开关15
+       ,.i_sign2_check        ( di_regoin_msg[3][66]           )   // 感测开关2
+       ,.i_sign3_check        ( di_regoin_msg[3][67]           )   // 感测开关3
+       ,.i_sign4_check        ( di_regoin_msg[3][68]           )   // 感测开关4
+       ,.i_sign5_check        ( di_regoin_msg[3][69]           )   // 感测开关5
+       ,.i_sign6_check        ( di_regoin_msg[3][70]           )   // 感测开关6
+       ,.i_sign7_check        ( di_regoin_msg[3][71]           )   // 感测开关7
+       ,.i_sign8_check        ( di_regoin_msg[3][72]           )   // 感测开关8
+       ,.i_sign9_check        ( di_regoin_msg[3][73]           )   // 感测开关9
        ,.i_sign16_check        ( 1'b0           )   // 
     );
 
@@ -4857,17 +4858,17 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[205]    ),
 	  .o_intr_irq            ( map_irq[205]       )
 
-       ,.i_axis_limf        ( ~di_regoin_msg[3][19]           )   // 正限位到位开关
+       ,.i_axis_limf        ( ~di_regoin_msg[4][19]           )   // 正限位到位开关
        ,.pul_motor_r_flag        ( pul_motor2_r_flag           )   // 
-       ,.cur_slv_board_id        ( 5'd3           )   // 
+       ,.cur_slv_board_id        ( 5'd4           )   // 
        ,.slv_board_id        ( slv_board_id           )   // 
        ,.pul_motor_flag        ( pul_motor2_flag           )   // 
-       ,.m2s_pulm_msg        ( pul_motor2_r_msg[3]           )   // 
-       ,.s2m_pulm_msg        ( pul_motor2_msg[3]           )   // 
-       ,.i_axis_limb        ( ~di_regoin_msg[3][17]           )   // 负限位到位开关
-       ,.i_axis_zero        ( ~di_regoin_msg[3][18]           )   // 零位到位开关
-       ,.i_servo_done        ( ~di_regoin_msg[3][61]           )   // 伺服定位完成
-       ,.i_servo_ready        ( ~di_regoin_msg[3][60]           )   // 伺服就绪
+       ,.m2s_pulm_msg        ( pul_motor2_r_msg[4]           )   // 
+       ,.s2m_pulm_msg        ( pul_motor2_msg[4]           )   // 
+       ,.i_axis_limb        ( ~di_regoin_msg[4][17]           )   // 负限位到位开关
+       ,.i_axis_zero        ( ~di_regoin_msg[4][18]           )   // 零位到位开关
+       ,.i_servo_done        ( ~di_regoin_msg[4][61]           )   // 伺服定位完成
+       ,.i_servo_ready        ( ~di_regoin_msg[4][60]           )   // 伺服就绪
        ,.i_emerge_stop_signal ( 1'b1            )
     );
 
@@ -4900,17 +4901,17 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[206]    ),
 	  .o_intr_irq            ( map_irq[206]       )
 
-       ,.i_axis_limf        ( ~di_regoin_msg[3][16]           )   // 正限位到位开关
+       ,.i_axis_limf        ( ~di_regoin_msg[4][16]           )   // 正限位到位开关
        ,.pul_motor_r_flag        ( pul_motor0_r_flag           )   // 
-       ,.cur_slv_board_id        ( 5'd3           )   // 
+       ,.cur_slv_board_id        ( 5'd4           )   // 
        ,.slv_board_id        ( slv_board_id           )   // 
        ,.pul_motor_flag        ( pul_motor0_flag           )   // 
-       ,.m2s_pulm_msg        ( pul_motor0_r_msg[3]           )   // 
-       ,.s2m_pulm_msg        ( pul_motor0_msg[3]           )   // 
-       ,.i_axis_limb        ( ~di_regoin_msg[3][14]           )   // 负限位到位开关
-       ,.i_axis_zero        ( ~di_regoin_msg[3][15]           )   // 零位到位开关
-       ,.i_servo_done        ( ~di_regoin_msg[3][59]           )   // 伺服定位完成
-       ,.i_servo_ready        ( ~di_regoin_msg[3][58]           )   // 伺服就绪
+       ,.m2s_pulm_msg        ( pul_motor0_r_msg[4]           )   // 
+       ,.s2m_pulm_msg        ( pul_motor0_msg[4]           )   // 
+       ,.i_axis_limb        ( ~di_regoin_msg[4][14]           )   // 负限位到位开关
+       ,.i_axis_zero        ( ~di_regoin_msg[4][15]           )   // 零位到位开关
+       ,.i_servo_done        ( ~di_regoin_msg[4][59]           )   // 伺服定位完成
+       ,.i_servo_ready        ( ~di_regoin_msg[4][58]           )   // 伺服就绪
        ,.i_emerge_stop_signal ( 1'b1            )
     );
 
