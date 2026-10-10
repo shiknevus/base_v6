@@ -335,7 +335,7 @@ module emcc_mix_top
     assign  slv_board_id = slv_sta_msg_addr[RAM_AWIDTH-1:9];
 	
 	
-//	localparam                          ARB_CH_PER_BOARD = 4;   // ÿ�Ӱ���� 485 ģ����
+//	localparam                          ARB_CH_PER_BOARD = 4;   // 每从板最大 485 模块数
 //    wire                                ch_rs485_r_flag  [RAM_DWIDTH-1:0][ARB_CH_PER_BOARD-1:0];
 //    wire                                ch_rs485_flag    [RAM_DWIDTH-1:0][ARB_CH_PER_BOARD-1:0];
 //    wire    [RAM_DWIDTH-1:0]            ch_rs485_s2m_msg [RAM_DWIDTH-1:0][ARB_CH_PER_BOARD-1:0];
@@ -361,14 +361,14 @@ module emcc_mix_top
 //         .clk                   ( clk                          )
 //        ,.rst                   ( reset                        )
 
-//        // Shared side (pkg_route) - ȫ�������
+//        // Shared side (pkg_route) - 全板号数组
 //        ,.sh_rs485_r_flag       ( rs485_00_r_flag              )
 //        ,.sh_rs485_r_flag_board ( slv_cfg_msg_addr[RAM_AWIDTH-1:9] )
 //        ,.sh_rs485_flag         ( rs485_00_flag                )
 //        ,.sh_rs485_s2m_msg      ( rs485_00_msg                 )
 //        ,.sh_rs485_m2s_msg      ( rs485_00_send_msg            )
 
-//        // Channel side - [�Ӱ��][ģ���ٲú�]
+//        // Channel side - [从板号][模块仲裁号]
 //        ,.ch_rs485_r_flag       ( ch_rs485_r_flag              )
 //        ,.ch_rs485_flag         ( ch_rs485_flag                )
 //        ,.ch_rs485_s2m_msg      ( ch_rs485_s2m_msg             )
@@ -444,7 +444,7 @@ module emcc_mix_top
     
 	
 	
-	// --- flow_comp_1 --A0006_D�������˻���-1��A����ת---
+	// --- flow_comp_1 --A0006_D部件调姿机构-1号A轴旋转---
 //    ec_ecat_multi_turn_angle_spin_servo
     ec_ethercat_servo
     #(
@@ -472,13 +472,13 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[0]    ),
 	  .o_intr_irq            ( map_irq[0]       )
 
- //      ,.i_axis_zero        ( di_mst_msg[12]           )   // ��ɫ
+ //      ,.i_axis_zero        ( di_mst_msg[12]           )   // 黑色
     );
 
 	
 	
 	
-	// --- flow_comp_2 --A0856_1��������������---
+	// --- flow_comp_2 --A0856_1号气动离合器组件---
     ec_1do
     #(
          .REG_SPACE_BIAS     ( 20'd2560)
@@ -509,7 +509,7 @@ module emcc_mix_top
 	
 	
 	
-	// --- flow_comp_3 --A0005_D�������˻���-2��Z��---
+	// --- flow_comp_3 --A0005_D部件调姿机构-2号Z轴---
     ec_ethercat_servo
     #(
          .REG_SPACE_BIAS     ( 20'd3072)
@@ -535,15 +535,15 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[2]    ),
 	  .o_intr_irq            ( map_irq[2]       )
 
-    //   ,.i_axis_limf        ( di_mst_msg[10]           )   // ��ɫ
-    //   ,.i_axis_limb        ( di_mst_msg[11]           )   // ��ɫ
-    //   ,.i_axis_zero        ( di_mst_msg[9]           )   // ��ɫ
+    //   ,.i_axis_limf        ( di_mst_msg[10]           )   // 黑色
+    //   ,.i_axis_limb        ( di_mst_msg[11]           )   // 黑色
+    //   ,.i_axis_zero        ( di_mst_msg[9]           )   // 黑色
     );
 
 	
 	
 	
-	// --- flow_comp_4 --A0857_2��������������---
+	// --- flow_comp_4 --A0857_2号气动离合器组件---
     ec_1do
     #(
          .REG_SPACE_BIAS     ( 20'd3584)
@@ -574,7 +574,7 @@ module emcc_mix_top
 	
 	
 	
-	// --- flow_comp_5 --A0588_D�������˻���-1��X��---
+	// --- flow_comp_5 --A0588_D部件调姿机构-1号X轴---
     ec_ethercat_servo
     #(
          .REG_SPACE_BIAS     ( 20'd4096)
@@ -600,15 +600,15 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[4]    ),
 	  .o_intr_irq            ( map_irq[4]       )
 
-     //  ,.i_axis_limf        ( di_mst_msg[15]           )   // ��ɫ
-     //  ,.i_axis_limb        ( di_mst_msg[16]           )   // ��ɫ
-     //  ,.i_axis_zero        ( di_mst_msg[14]           )   // ��ɫ
+     //  ,.i_axis_limf        ( di_mst_msg[15]           )   // 黑色
+     //  ,.i_axis_limb        ( di_mst_msg[16]           )   // 黑色
+     //  ,.i_axis_zero        ( di_mst_msg[14]           )   // 黑色
     );
 
 	
 	
 	
-	// --- flow_comp_6 --A0822_��������---
+	// --- flow_comp_6 --A0822_电子手轮---
     ec_pulmotor_handwheel
     #(
          .REG_SPACE_BIAS     ( 20'd4608)
@@ -639,7 +639,7 @@ module emcc_mix_top
 	
 	
 	
-	// --- flow_comp_7 --A0007_D�������˻���-2��A����ת---
+	// --- flow_comp_7 --A0007_D部件调姿机构-2号A轴旋转---
 //    ec_ecat_multi_turn_angle_spin_servo
     ec_ethercat_servo
     #(
@@ -667,13 +667,13 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[6]    ),
 	  .o_intr_irq            ( map_irq[6]       )
 
-      // ,.i_axis_zero        ( di_mst_msg[13]           )   // ��ɫ
+      // ,.i_axis_zero        ( di_mst_msg[13]           )   // 黑色
     );
 
 	
 	
 	
-	// --- flow_comp_8 --A0819_2���������---
+	// --- flow_comp_8 --A0819_2号移栽组件---
     ec_ethercat_servo
     #(
          .REG_SPACE_BIAS     ( 20'd5632)
@@ -699,15 +699,15 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[7]    ),
 	  .o_intr_irq            ( map_irq[7]       )
 
-     //  ,.i_axis_limf        ( di_mst_msg[18]           )   // ��ɫ
-     //  ,.i_axis_limb        ( di_mst_msg[19]           )   // ��ɫ
-     //  ,.i_axis_zero        ( di_mst_msg[17]           )   // ��ɫ
+     //  ,.i_axis_limf        ( di_mst_msg[18]           )   // 黑色
+     //  ,.i_axis_limb        ( di_mst_msg[19]           )   // 黑色
+     //  ,.i_axis_zero        ( di_mst_msg[17]           )   // 黑色
     );
 
 	
 	
 	
-	// --- flow_comp_9 --A0003_D�������˻���-2��X��---
+	// --- flow_comp_9 --A0003_D部件调姿机构-2号X轴---
     ec_ethercat_servo
     #(
          .REG_SPACE_BIAS     ( 20'd6144)
@@ -733,15 +733,15 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[8]    ),
 	  .o_intr_irq            ( map_irq[8]       )
 
-     //  ,.i_axis_limf        ( di_mst_msg[4]           )   // ��ɫ
-     //  ,.i_axis_limb        ( di_mst_msg[5]           )   // ��ɫ
-     //  ,.i_axis_zero        ( di_mst_msg[3]           )   // ��ɫ
+     //  ,.i_axis_limf        ( di_mst_msg[4]           )   // 黑色
+     //  ,.i_axis_limb        ( di_mst_msg[5]           )   // 黑色
+     //  ,.i_axis_zero        ( di_mst_msg[3]           )   // 黑色
     );
 
 	
 	
 	
-	// --- flow_comp_10 --A0001_1���������---
+	// --- flow_comp_10 --A0001_1号移栽组件---
     ec_ethercat_servo
     #(
          .REG_SPACE_BIAS     ( 20'd6656)
@@ -767,15 +767,15 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[9]    ),
 	  .o_intr_irq            ( map_irq[9]       )
 
-      ,.i_axis_limf        ( ~di_mst_msg[1]           )   // ��ɫ
-      ,.i_axis_limb        ( ~di_mst_msg[2]           )   // ��ɫ
-      ,.i_axis_zero        ( ~di_mst_msg[0]           )   // ��ɫ
+      ,.i_axis_limf        ( ~di_mst_msg[1]           )   // 黑色
+      ,.i_axis_limb        ( ~di_mst_msg[2]           )   // 黑色
+      ,.i_axis_zero        ( ~di_mst_msg[0]           )   // 黑色
     );
 
 	
 	
 	
-	// --- flow_comp_11 --A0193_���²�����---
+	// --- flow_comp_11 --A0193_电缆测试仪---
 //    ec_hd_zxcl
     ec_s7_plc
     #(
@@ -808,7 +808,7 @@ module emcc_mix_top
 	
 	
 	
-	// --- flow_comp_12 --A0004_D�������˻���-1��Z��---
+	// --- flow_comp_12 --A0004_D部件调姿机构-1号Z轴---
     ec_ethercat_servo
     #(
          .REG_SPACE_BIAS     ( 20'd7680)
@@ -834,15 +834,15 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[11]    ),
 	  .o_intr_irq            ( map_irq[11]       )
 
-    //   ,.i_axis_limf        ( di_mst_msg[7]           )   // ��ɫ
-    //   ,.i_axis_limb        ( di_mst_msg[8]           )   // ��ɫ
-    //   ,.i_axis_zero        ( di_mst_msg[6]           )   // ��ɫ
+    //   ,.i_axis_limf        ( di_mst_msg[7]           )   // 黑色
+    //   ,.i_axis_limb        ( di_mst_msg[8]           )   // 黑色
+    //   ,.i_axis_zero        ( di_mst_msg[6]           )   // 黑色
     );
 
 	
 	
 	
-//	// --- flow_comp_15 --A0890_EMCC60���ư�ģ��ECAT-D����---
+//	// --- flow_comp_15 --A0890_EMCC60控制板模型ECAT-D部段---
 //    ec_emcc60_board
 //    #(
 //         .REG_SPACE_BIAS     ( 20'd9216)
@@ -877,7 +877,7 @@ module emcc_mix_top
 	wire   o_led_r_16;
 	wire   o_led_y_16;
 	
-	// --- flow_comp_16 --A0894_��ɫ��ģ��[����]_����---
+	// --- flow_comp_16 --A0894_三色灯模型[虚拟]_复制---
     ec_3led_buzzer
     #(
          .REG_SPACE_BIAS     ( 20'd8192)
@@ -903,10 +903,10 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[12]    ),
 	  .o_intr_irq            ( map_irq[12]       )
 
-       ,.o_led_y        ( o_led_y_16           )   // ��ɫ�����ź�
-       ,.o_led_g        ( o_led_g_16           )   // ��ɫ�����ź�
-       ,.o_bz        ( o_bz_16           )   // ���������ź�
-       ,.o_led_r        ( o_led_r_16           )   // ��ɫ�����ź�
+       ,.o_led_y        ( o_led_y_16           )   // 黄色驱动信号
+       ,.o_led_g        ( o_led_g_16           )   // 绿色驱动信号
+       ,.o_bz        ( o_bz_16           )   // 蜂鸣驱动信号
+       ,.o_led_r        ( o_led_r_16           )   // 红色驱动信号
     );
 
     assign do_mst_msg[1] = o_bz_16;
@@ -916,7 +916,7 @@ module emcc_mix_top
 	
 	
 	
-	// --- flow_comp_17 --A0895_ϵͳ��ȫģ��[����]_����---
+	// --- flow_comp_17 --A0895_系统安全模型[虚拟]_复制---
     ec_sys_sf
     #(
          .REG_SPACE_BIAS     ( 20'd8704)
@@ -942,12 +942,12 @@ module emcc_mix_top
       .o_st_rd_data          ( sub_comp_rd_dat[13]    ),
 	  .o_intr_irq            ( map_irq[13]       )
 
-       ,.i_stop        ( di_mst_msg[35]           )   // ֹͣ��ť����
-       ,.i_start        ( di_mst_msg[34]           )   // ������ť����
-       ,.i_rst        ( di_mst_msg[36]           )   // ��λ��ť����
-       ,.i_estop        ( di_mst_msg[37]           )   // ��ͣ��ť����
-       ,.i_manul        ( di_mst_msg[38]           )   // �ֶ�ѡ��L
-       ,.i_auto        ( di_mst_msg[39]           )   // �Զ�ѡ��R
+       ,.i_stop        ( di_mst_msg[35]           )   // 停止按钮开关
+       ,.i_start        ( di_mst_msg[34]           )   // 启动按钮开关
+       ,.i_rst        ( di_mst_msg[36]           )   // 复位按钮开关
+       ,.i_estop        ( di_mst_msg[37]           )   // 急停旋钮开关
+       ,.i_manul        ( di_mst_msg[38]           )   // 手动选择档L
+       ,.i_auto        ( di_mst_msg[39]           )   // 自动选择档R
     );
 
 	
