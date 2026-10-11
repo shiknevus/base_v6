@@ -1,449 +1,201 @@
 onerror {resume}
 quietly WaveActivateNextPane {} 0
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/clk_i
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/rst
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/i_time_1ms_vld
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/i_time_1s_vld
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_reg_clk
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_reg_reset
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/i_st_wr_en
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/i_st_wr_addr
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/i_st_wr_data
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/i_st_rd_en
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/i_st_rd_addr
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/o_st_rd_data
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/o_st_rd_vld
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/o_sig_dri
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/o_intr_irq
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/unit_id
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/unit_ectrl
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/unit_st
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/m_id
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/m_ectrl
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/m_st
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/m_wk_mod
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/m_saf_st
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/link_m_saf_st
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/sc_id
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ec_id
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/rst_en_n
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/a_bhv_id
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/a_bhv_vld
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/a_task_id
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/a_tx_ot
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/a_tx_result_rpt
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/b_tx_ot
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/b_tx_result_rpt
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/b_en
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/c_tx_ot
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/c_gap_crl
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/c_tx_result_rpt
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/c_en
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ec_cha_st
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ec_chb_st
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ec_chc_st
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/a_bhv_typ
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/a_tx_id
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/a_alm_num
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/b_bhv_id
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/b_tx_id
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/b_alm_num
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/c_bhv_id
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/c_tx_id
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/c_alm_num
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/param1
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/param2
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/param3
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/param4
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/param5
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/param6
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/param7
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/param8
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/param9
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/param10
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/param11
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/param12
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/param13
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/param14
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/param15
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/param16
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/param17
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/param18
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/param19
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/param20
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/param21
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/param22
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/param23
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/param24
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/param25
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/param26
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/param27
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/param28
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/param29
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/param30
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/param51
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/param52
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/param53
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/param54
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/param55
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/param56
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/param57
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/param58
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/param59
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/param60
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/param61
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/param62
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/param63
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/param64
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/param65
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/param66
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/param67
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/param68
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/param69
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/param70
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/debug_reg1
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/debug_reg2
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/debug_reg3
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/debug_reg4
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/debug_reg5
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/task_time_cnt
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/a_tx_result_vld
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/b_tx_result_vld
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/c_tx_result_vld
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/a_pre_sta_allow
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/a_post_sta_allow
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/b_pre_sta_allow
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/b_post_sta_allow
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/c_pre_sta_allow
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/c_post_sta_allow
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/irq_a
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/irq_b
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/irq_c
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/irq_a_grant
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/irq_b_grant
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/irq_c_grant
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/irq_busy_o
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/irq_reg1
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/irq_reg2
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/rst_i
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/chl_priority
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/a_task_bhv_id
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/a_en
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/bhv_en
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/a_bhv_id_r
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/do_o
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/irq_o
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/irq_ack_i
-add wave -noupdate -group SLV1DO /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/di
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/clk_i
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/rst_i
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/i_st_wr_en
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/i_st_wr_addr
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/i_st_wr_data
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/i_st_rd_en
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/i_st_rd_addr
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/o_st_rd_data
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/o_st_rd_vld
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/rst_en_n
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/ec_id
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/sc_id
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/chl_priority
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/unit_id
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/unit_ectrl
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/unit_st
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/m_id
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/m_ectrl
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/m_st
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/m_wk_mod
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/m_saf_st
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/link_m_saf_st
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/bhv_en
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/a_task_id
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/a_task_bhv_id
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/a_en
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/a_bhv_ot
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/a_tsc_result_rpt
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/a_tsc_result_vld
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/a_bhv_id
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/a_bhv_vld
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/b_en
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/b_bhv_ot
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/b_tsc_result_rpt
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/b_tsc_result_vld
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/c_en
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/c_bhv_ot
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/c_tsc_result_rpt
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/c_tsc_result_vld
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/c_bhv_gap_crl
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/param1
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/param2
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/param3
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/param4
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/param5
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/param6
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/param7
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/param8
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/param9
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/param10
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/param11
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/param12
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/param13
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/param14
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/param15
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/param16
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/param17
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/param18
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/param19
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/param20
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/param21
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/param22
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/param23
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/param24
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/param25
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/param26
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/param27
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/param28
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/param29
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/param30
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/param31
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/param32
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/param33
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/param34
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/param35
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/param36
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/param37
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/param38
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/param39
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/param40
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/irq_reg1
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/irq_reg2
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/a_st
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/a_alm_num
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/a_tsc_id
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/b_st
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/b_alm_num
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/b_tsc_id
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/b_bhv_id
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/c_st
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/c_alm_num
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/c_tsc_id
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/c_bhv_id
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/param51
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/param52
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/param53
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/param54
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/param55
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/param56
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/param57
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/param58
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/param59
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/param60
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/param61
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/param62
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/param63
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/param64
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/param65
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/param66
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/param67
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/param68
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/param69
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/param70
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/debug_reg1
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/debug_reg2
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/debug_reg3
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/debug_reg4
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/debug_reg5
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/rd_en_d1
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/rd_en_d2
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/rd_space_select
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/wr_space_select
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/wr_task_vld
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/rd_addr_d1
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/rd_addr_d2
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/rd_task_addr
-add wave -noupdate -group REG /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/ps_rw_pl_reg_u0/wr_task_addr
-add wave -noupdate -group A /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/proactive_beh_1do_u0/clk_i
-add wave -noupdate -group A /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/proactive_beh_1do_u0/rst_i
-add wave -noupdate -group A /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/proactive_beh_1do_u0/i_time_1ms_vld
-add wave -noupdate -group A /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/proactive_beh_1do_u0/i_time_1s_vld
-add wave -noupdate -group A /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/proactive_beh_1do_u0/pre_sta_allow
-add wave -noupdate -group A /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/proactive_beh_1do_u0/post_sta_allow
-add wave -noupdate -group A /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/proactive_beh_1do_u0/a_en
-add wave -noupdate -group A /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/proactive_beh_1do_u0/a_bhv_id
-add wave -noupdate -group A /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/proactive_beh_1do_u0/a_bhv_vld
-add wave -noupdate -group A /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/proactive_beh_1do_u0/a_tx_ot
-add wave -noupdate -group A /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/proactive_beh_1do_u0/a_tx_result_rpt
-add wave -noupdate -group A /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/proactive_beh_1do_u0/a_tx_result_vld
-add wave -noupdate -group A /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/proactive_beh_1do_u0/ec_cha_st
-add wave -noupdate -group A /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/proactive_beh_1do_u0/a_tx_id
-add wave -noupdate -group A /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/proactive_beh_1do_u0/a_alm_num
-add wave -noupdate -group A /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/proactive_beh_1do_u0/do_o
-add wave -noupdate -group A /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/proactive_beh_1do_u0/a_bhv_id_r
-add wave -noupdate -group A /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/proactive_beh_1do_u0/state_monitor_o
-add wave -noupdate -group A /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/proactive_beh_1do_u0/irq_o
-add wave -noupdate -group A /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/proactive_beh_1do_u0/irq_ack_i
-add wave -noupdate -group A /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/proactive_beh_1do_u0/curr_state
-add wave -noupdate -group A /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/proactive_beh_1do_u0/curr_state_1d
-add wave -noupdate -group A /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/proactive_beh_1do_u0/next_state
-add wave -noupdate -group A /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/proactive_beh_1do_u0/timout
-add wave -noupdate -group A /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/proactive_beh_1do_u0/timout_cnt
-add wave -noupdate -group A /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/proactive_beh_1do_u0/ack_beh_id
-add wave -noupdate -group A /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/proactive_beh_1do_u0/ack_tx_id
-add wave -noupdate -group A /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/proactive_beh_1do_u0/ack_tx_result
-add wave -noupdate -group A /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/proactive_beh_1do_u0/ack_ps_alart_num
-add wave -noupdate -group A /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/proactive_beh_1do_u0/curr_state_m1
-add wave -noupdate -group A /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/proactive_beh_1do_u0/curr_state_m2
-add wave -noupdate -group A /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/proactive_beh_1do_u0/curr_state_m3
-add wave -noupdate -group A /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/proactive_beh_1do_u0/a_bhv_vld_r
-add wave -noupdate -group A /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/proactive_beh_1do_u0/match_10
-add wave -noupdate -group A /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/proactive_beh_1do_u0/match_30
-add wave -noupdate -group A /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ec_1do_u1/proactive_beh_1do_u0/match_40
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/clk
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/reset
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/clk_10m
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/di_mst_msg
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/do_relay_mst_msg
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ai_mst_msg
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/slv_cfg_msg_rden
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/slv_cfg_msg_addr
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/slv_cfg_msg_dat
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/slv_sta_msg_vld
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/slv_sta_msg_addr
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/slv_sta_msg_dat
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ps_reg_clk
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ps_reg_reset
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ps_reg_we
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ps_reg_addr
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ps_reg_wr_dat
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ps_reg_re
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ps_reg_rd_addr
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ps_flow_rd_vld
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ps_flow_rd_dat
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ps_comp_rd_vld
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ps_comp_rd_dat
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/emcc_irq
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/flow_irq
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/rs485_1_user_req
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/rs485_1_user_grant
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/rs485_1_user_rx
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/rs485_1_user_tx
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/rs485_1_user_de
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/rs485_2_user_req
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/rs485_2_user_grant
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/rs485_2_user_rx
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/rs485_2_user_tx
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/rs485_2_user_de
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/main_232_rxd
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/main_232_txd
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/o_spi_cs_n
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/o_spi_clk
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/o_spi_mosi
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/i_spi_miso
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/o_dac_syn
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/o_dac_sclk
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/o_dac_din
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/o_dac_load
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/o_dac_clr
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/i_dac_dout
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/i_wr_cfg_data_done
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/i_do_dbg_data_vld
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/iv_io_mode_cfg
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ov_rd_io_data
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/iv_do_dbg_data
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ov_dbg_enable
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/i_time_1ms_vld
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/i_time_10ms_vld
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/i_time_100ms_vld
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/i_time_1s_vld
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/i_dv_alarm
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/o_dv_pulse
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/o_dv_dir
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/o_dv_reset
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/o_dv_son
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ov_di_slv_msg
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ov_do_slv_msg
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/iv_di_slv_msg
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/iv_do_slv_msg
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/iv_di_debug
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/iv_do_debug
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/map_irq
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/sub_comp_rd_vld
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/time_1ms_vld
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/time_10ms_vld
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/time_100ms_vld
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/time_1s_vld
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/do_regoin_msg
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/di_regoin_msg
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/di_regoin_msg_p
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ai_regoin_msg
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/rs232_00_msg
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/rs232_01_msg
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/rs232_02_msg
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/rs232_03_msg
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/rs232_04_msg
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/rs232_05_msg
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/rs232_06_msg
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/rs232_07_msg
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/rs485_00_msg
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/rs232_00_flag
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/rs232_01_flag
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/rs232_02_flag
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/rs232_03_flag
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/rs232_04_flag
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/rs232_05_flag
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/rs232_06_flag
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/rs232_07_flag
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/rs485_00_flag
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/pul_motor0_msg
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/pul_motor1_msg
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/pul_motor2_msg
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/pul_motor3_msg
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/pul_motor0_flag
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/pul_motor1_flag
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/pul_motor2_flag
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/pul_motor3_flag
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/sys_wea
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/sys_addra
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/pre_r_uuid
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/do_regoin_r_msg
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/do_regoin_r_msg_n
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/di_regoin_r_msg
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ai_regoin_r_msg
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/rs232_00_send_msg
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/rs232_01_send_msg
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/rs232_02_send_msg
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/rs232_03_send_msg
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/rs232_04_send_msg
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/rs232_05_send_msg
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/rs232_06_send_msg
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/rs232_07_send_msg
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/rs485_00_send_msg
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/rs232_00_r_flag
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/rs232_01_r_flag
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/rs232_02_r_flag
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/rs232_03_r_flag
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/rs232_04_r_flag
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/rs232_05_r_flag
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/rs232_06_r_flag
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/rs232_07_r_flag
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/rs485_00_r_flag
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/pul_motor0_r_msg
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/pul_motor1_r_msg
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/pul_motor2_r_msg
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/pul_motor3_r_msg
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/pul_motor0_r_flag
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/pul_motor1_r_flag
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/pul_motor2_r_flag
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/pul_motor3_r_flag
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/do_mst_msg
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/do_mst_msg_force
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/slv_board_id
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ext_emerg_stop
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/ext_pause_sig
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/m_1do_do
-add wave -noupdate -group MIXTOP /tb_ec_1do_slave/emcc_mst_top_u/emcc_mix_top_u/s_1do_do
+add wave -noupdate -expand -group pro /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/clk_i
+add wave -noupdate -expand -group pro /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/rst_i
+add wave -noupdate -expand -group pro /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/i_time_1ms_vld
+add wave -noupdate -expand -group pro /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/i_time_1s_vld
+add wave -noupdate -expand -group pro /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/pre_sta_allow
+add wave -noupdate -expand -group pro /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/post_sta_allow
+add wave -noupdate -expand -group pro /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/a_en
+add wave -noupdate -expand -group pro /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/a_bhv_id
+add wave -noupdate -expand -group pro /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/a_bhv_vld
+add wave -noupdate -expand -group pro /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/a_tx_ot
+add wave -noupdate -expand -group pro /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/a_tx_result_rpt
+add wave -noupdate -expand -group pro /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/a_tx_result_vld
+add wave -noupdate -expand -group pro /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/ec_cha_st
+add wave -noupdate -expand -group pro /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/a_tx_id
+add wave -noupdate -expand -group pro /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/a_alm_num
+add wave -noupdate -expand -group pro /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/a_bhv_id_r
+add wave -noupdate -expand -group pro /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/state_monitor_o
+add wave -noupdate -expand -group pro /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/irq_o
+add wave -noupdate -expand -group pro /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/irq_ack_i
+add wave -noupdate -expand -group pro /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/o_drv_busy
+add wave -noupdate -expand -group pro /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/i_comp_da
+add wave -noupdate -expand -group pro /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/i_slave_addr
+add wave -noupdate -expand -group pro /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/i_rfid_wdata
+add wave -noupdate -expand -group pro /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/o_rfid_rdata
+add wave -noupdate -expand -group pro /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/o_rfid_uid
+add wave -noupdate -expand -group pro /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/i_uart_rx
+add wave -noupdate -expand -group pro /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/o_uart_tx
+add wave -noupdate -expand -group pro /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/o_uart_de
+add wave -noupdate -expand -group pro /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/o_user_req
+add wave -noupdate -expand -group pro /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/i_user_grant
+add wave -noupdate -expand -group pro /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/curr_state
+add wave -noupdate -expand -group pro /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/curr_state_1d
+add wave -noupdate -expand -group pro /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/next_state
+add wave -noupdate -expand -group pro /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/timout
+add wave -noupdate -expand -group pro /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/timout_cnt
+add wave -noupdate -expand -group pro /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/ack_beh_id
+add wave -noupdate -expand -group pro /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/ack_tx_id
+add wave -noupdate -expand -group pro /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/ack_tx_result
+add wave -noupdate -expand -group pro /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/ack_ps_alart_num
+add wave -noupdate -expand -group pro /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/act_vld
+add wave -noupdate -expand -group pro /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/act
+add wave -noupdate -expand -group pro /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/w_o_uid
+add wave -noupdate -expand -group pro /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/w_o_rdata
+add wave -noupdate -expand -group pro /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/w_o_done
+add wave -noupdate -expand -group pro /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/w_o_busy
+add wave -noupdate -expand -group pro /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/w_o_err
+add wave -noupdate -expand -group pro /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/w_o_err_code
+add wave -noupdate -expand -group pro /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/w_o_done_1d
+add wave -noupdate -expand -group pro /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/curr_state_m1
+add wave -noupdate -expand -group pro /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/curr_state_m2
+add wave -noupdate -expand -group pro /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/curr_state_m3
+add wave -noupdate -expand -group pro /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/a_bhv_vld_r
+add wave -noupdate -expand -group pro /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/latch_sta
+add wave -noupdate -expand -group pro /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/match_10
+add wave -noupdate -expand -group pro /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/match_30
+add wave -noupdate -expand -group pro /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/match_40
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/clk_i
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/rst_i
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/i_st_wr_en
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/i_st_wr_addr
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/i_st_wr_data
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/i_st_rd_en
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/i_st_rd_addr
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/o_st_rd_data
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/o_st_rd_vld
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/rst_en_n
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/ec_id
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/sc_id
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/chl_priority
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/unit_id
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/unit_ectrl
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/unit_st
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/m_id
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/m_ectrl
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/m_st
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/m_wk_mod
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/m_saf_st
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/link_m_saf_st
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/a_task_id
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/a_task_bhv_id
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/a_en
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/a_bhv_ot
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/a_tsc_result_rpt
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/a_tsc_result_vld
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/a_bhv_id
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/a_bhv_vld
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/b_en
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/b_bhv_ot
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/b_tsc_result_rpt
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/b_tsc_result_vld
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/c_en
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/c_bhv_ot
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/c_tsc_result_rpt
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/c_tsc_result_vld
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/c_bhv_gap_crl
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/param1
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/param2
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/param16
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/irq_reg1
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/irq_reg2
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/a_st
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/a_alm_num
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/a_tsc_id
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/b_st
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/b_alm_num
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/b_tsc_id
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/b_bhv_id
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/c_st
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/c_alm_num
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/c_tsc_id
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/c_bhv_id
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/param51
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/param52
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/param53
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/debug_reg1
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/rd_en_d1
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/rd_en_d2
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/rd_space_select
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/wr_space_select
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/wr_task_vld
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/rd_addr_d1
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/rd_addr_d2
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/rd_task_addr
+add wave -noupdate -group reg /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/ps_rw_pl_reg_sp_rfid_u0/wr_task_addr
+add wave -noupdate -group drv /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/i_clk
+add wave -noupdate -group drv /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/i_rst
+add wave -noupdate -group drv /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/i_act_vld
+add wave -noupdate -group drv /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/i_act
+add wave -noupdate -group drv /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/i_slave_addr
+add wave -noupdate -group drv /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/i_wdata
+add wave -noupdate -group drv /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/o_uid
+add wave -noupdate -group drv /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/o_rdata
+add wave -noupdate -group drv /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/o_done
+add wave -noupdate -group drv /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/o_busy
+add wave -noupdate -group drv /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/o_err
+add wave -noupdate -group drv /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/o_err_code
+add wave -noupdate -group drv /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/o_485_bus_req
+add wave -noupdate -group drv /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/i_485_bus_grant
+add wave -noupdate -group drv /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/o_rs485_de
+add wave -noupdate -group drv /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/o_uart_tx
+add wave -noupdate -group drv /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/i_uart_rx
+add wave -noupdate -group drv /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/state
+add wave -noupdate -group drv /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/act_r
+add wave -noupdate -group drv /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/slave_r
+add wave -noupdate -group drv /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/tx_idx
+add wave -noupdate -group drv /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/tx_len
+add wave -noupdate -group drv /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/tx_pay
+add wave -noupdate -group drv /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/tx_crc
+add wave -noupdate -group drv /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/rx_idx
+add wave -noupdate -group drv /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/exp_len
+add wave -noupdate -group drv /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/rsp_exc
+add wave -noupdate -group drv /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/exc_r
+add wave -noupdate -group drv /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/rx_crc
+add wave -noupdate -group drv /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/rx_crcl
+add wave -noupdate -group drv /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/rx_crch
+add wave -noupdate -group drv /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/tmo_cnt
+add wave -noupdate -group drv /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/i
+add wave -noupdate -group drv /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/w_rx_da
+add wave -noupdate -group drv /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/w_rx_done
+add wave -noupdate -group drv /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/w_tx_done
+add wave -noupdate -group drv /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/w_exp_func
+add wave -noupdate -group drv /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/w_tx_da
+add wave -noupdate -group drv /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/w_tx_vld
+add wave -noupdate -expand -group uart-tx /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/u_uart_tx/i_clk
+add wave -noupdate -expand -group uart-tx /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/u_uart_tx/i_rst
+add wave -noupdate -expand -group uart-tx /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/u_uart_tx/i_tx_vld
+add wave -noupdate -expand -group uart-tx /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/u_uart_tx/i_tx_da
+add wave -noupdate -expand -group uart-tx /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/u_uart_tx/o_tx_done
+add wave -noupdate -expand -group uart-tx /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/u_uart_tx/o_uart_tx
+add wave -noupdate -expand -group uart-tx /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/u_uart_tx/uart_tx_busy
+add wave -noupdate -expand -group uart-tx /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/u_uart_tx/uart_tx_ready
+add wave -noupdate -expand -group uart-tx /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/u_uart_tx/uart_tx_ready_r
+add wave -noupdate -expand -group uart-tx /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/u_uart_tx/sys_rst_n
+add wave -noupdate -expand -group uart-tx /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/u_uart_tx/sys_clk
+add wave -noupdate -expand -group uart-tx /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/u_uart_tx/uart_en
+add wave -noupdate -expand -group uart-tx /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/u_uart_tx/uart_din
+add wave -noupdate -expand -group uart-tx /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/u_uart_tx/uart_txd
+add wave -noupdate -expand -group uart-tx /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/u_uart_tx/tx_done
+add wave -noupdate -expand -group uart_rx /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/u_uart_rx/i_clk
+add wave -noupdate -expand -group uart_rx /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/u_uart_rx/i_rst
+add wave -noupdate -expand -group uart_rx /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/u_uart_rx/i_uart_rx
+add wave -noupdate -expand -group uart_rx /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/u_uart_rx/o_rx_done
+add wave -noupdate -expand -group uart_rx /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/u_uart_rx/o_rx_da
+add wave -noupdate -expand -group uart_rx /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/u_uart_rx/sys_clk
+add wave -noupdate -expand -group uart_rx /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/u_uart_rx/sys_rst_n
+add wave -noupdate -expand -group uart_rx /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/u_uart_rx/uart_rxd
+add wave -noupdate -expand -group uart_rx /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/u_uart_rx/rx_done
+add wave -noupdate -expand -group uart_rx /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/u_uart_rx/uart_done
+add wave -noupdate -expand -group uart_rx /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/u_uart_rx/uart_done_r
+add wave -noupdate -expand -group uart_rx /tb_ec_sp_rfid/emcc_mst_top_u/emcc_mix_top_u/ec_sp_rfid_u0/proactive_beh_sp_rfid_u0/supu_rfid_drv_u0/u_uart_rx/uart_data
+add wave -noupdate /tb_ec_sp_rfid/sp_rx_line
+add wave -noupdate /tb_ec_sp_rfid/sp_state
+add wave -noupdate /tb_ec_sp_rfid/sp_baud
+add wave -noupdate /tb_ec_sp_rfid/sp_req_cnt
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {90239203350 fs} 0}
+WaveRestoreCursors {{Cursor 3} {1710822234195 fs} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 150
 configure wave -valuecolwidth 100
@@ -453,10 +205,10 @@ configure wave -snapdistance 10
 configure wave -datasetprefix 0
 configure wave -rowmargin 4
 configure wave -childrowmargin 2
-configure wave -gridoffset 0
+configure wave -gridoffset 1
 configure wave -gridperiod 1
 configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
 update
-WaveRestoreZoom {0 fs} {428470740600 fs}
+WaveRestoreZoom {0 fs} {3952925447100 fs}

@@ -302,3 +302,10 @@ set_property IOSTANDARD LVCMOS33 [get_ports rs485_2_de]
 ##########################  MAX31820 #################################
 set_property PACKAGE_PIN AD12 [get_ports MAX31820_DQ]
 set_property IOSTANDARD LVCMOS33 [get_ports MAX31820_DQ]
+
+########################## debug hub #############################################
+#dbg_hub must use a free-running clock, otherwise JTAG cannot reach it until
+#the Aurora GT finishes initialization (prot_clk is NOT free-running).
+#aurora_init_clk: 156.25MHz, MMCM output fed by the on-board INIT_CLK oscillator.
+connect_debug_port dbg_hub/clk [get_nets aurora_init_clk]
+set_property C_CLK_INPUT_FREQ_HZ 156250000 [get_debug_cores dbg_hub]

@@ -691,12 +691,12 @@ module emcc_mst_top #(
     RS485_Arbiter #(
              .USER_NUMBER     (RS485_1_USER_NUMBER      )
         )U_RS485_Arbiter_1(
-          .clk                   ( ps_reg_clk        ),
-          .reset                 ( ps_reg_reset      ),
+          .clk                   ( prot_clk          ),
+          .reset                 ( prot_clk_rst      ),
           
-          .o_uart_tx             (USER_UART1_TX        ),
-          .i_uart_rx             (USER_UART1_RX        ),
-          .o_uart_de             (USER_UART1_DE        ),
+          .o_uart_tx             (rs485_1_tx        ),
+          .i_uart_rx             (rs485_1_rx        ),
+          .o_uart_de             (rs485_1_de        ),
           
           .i_user_req            (rs485_1_user_req       ),
           .o_user_grant          (rs485_1_user_grant     ),
@@ -704,6 +704,20 @@ module emcc_mst_top #(
           .o_user_rx             (rs485_1_user_rx        ),
           .i_user_de             (rs485_1_user_de        )
     );
+	
+	//ila_top_485 ila_top_485 (
+	//.clk(prot_clk), // input wire clk
+    //
+    //
+	//.probe0(rs485_1_tx				), // input wire [0:0]  probe0  
+	//.probe1(rs485_1_rx				), // input wire [0:0]  probe1 
+	//.probe2(rs485_1_de				), // input wire [0:0]  probe2 
+	//.probe3(rs485_1_user_req[1]  	), // input wire [0:0]  probe3 
+	//.probe4(rs485_1_user_grant[1]	), // input wire [0:0]  probe4 
+	//.probe5(rs485_1_user_tx[1]   	), // input wire [0:0]  probe5 
+	//.probe6(rs485_1_user_rx[1]   	), // input wire [0:0]  probe6 
+	//.probe7(rs485_1_user_de[1]   	) // input wire [0:0]  probe7
+	//);
 
 	//-------------- rs485 Arbiter module -------------------
 
@@ -716,12 +730,12 @@ module emcc_mst_top #(
     RS485_Arbiter #(
              .USER_NUMBER     (RS485_2_USER_NUMBER      )
         )U_RS485_Arbiter_2(
-          .clk                   ( ps_reg_clk        ),
-          .reset                 ( ps_reg_reset      ),
+          .clk                   ( prot_clk          ),
+          .reset                 ( prot_clk_rst      ),
           
-          .o_uart_tx             (USER_UART2_TX        ),
-          .i_uart_rx             (USER_UART2_RX        ),
-          .o_uart_de             (USER_UART2_DE        ),
+          .o_uart_tx             (rs485_2_tx        ),
+          .i_uart_rx             (rs485_2_rx        ),
+          .o_uart_de             (rs485_2_de        ),
           
           .i_user_req            (rs485_2_user_req       ),
           .o_user_grant          (rs485_2_user_grant     ),
@@ -1049,6 +1063,7 @@ module emcc_mst_top #(
   wire [127:0]I_INTR_IRQ_1;
   wire [127:0]I_INTR_IRQ_2;
   wire [127:0]I_INTR_IRQ_3;
+  wire [127:0]I_INTR_IRQ_4;
 
   wire [31:0]PLCFG_M_AXI_araddr;
   wire [2:0]PLCFG_M_AXI_arprot;

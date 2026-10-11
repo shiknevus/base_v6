@@ -20,14 +20,14 @@
 /////////////////////////////////////////////////////////////////////////////////
 module superisys_rfid_485_slaver_driver
 (
-    input                   i_clk             ,//  user clk £¨100MHz or 156.25MHz£©
+    input                   i_clk             ,//  user clk ï¼ˆ100MHz or 156.25MHzï¼‰
     input                   i_rst             ,
     input                   i_prot_clk        ,// 156.25MHz
     input                   i_prot_rst        ,
-    input   wire [19:0]     i_baud_rate       ,//´®¿Ú²¨ÌØÂÊ
-    input   wire [7:0]      i_parity          ,//ÆæÅ¼Ğ£Ñé£¬0=ÎŞĞ£Ñé 1=ÆæĞ£Ñé 2=Å¼Ğ£Ñé
+    input   wire [19:0]     i_baud_rate       ,//ä¸²å£æ³¢ç‰¹ç‡
+    input   wire [7:0]      i_parity          ,//å¥‡å¶æ ¡éªŒï¼Œ0=æ— æ ¡éªŒ 1=å¥‡æ ¡éªŒ 2=å¶æ ¡éªŒ
 
-	//--- ´Ó°å½Ó¿Ú use clk domain 156.25MHz --
+	//--- ä»æ¿æ¥å£ use clk domain 156.25MHz --
 	input  wire [4:0]       i_cur_slv_board_id, //
 	input  wire [4:0]       i_slv_board_id    , 
 	input  wire             i_rs485_ch_r_flag , //send en
@@ -35,14 +35,14 @@ module superisys_rfid_485_slaver_driver
 	input  wire             i_rs485_ch_flag   , //recv en
 	input  wire [31:0]      i_s2m_rs485_msg   , //recv data
 
-	//--- ¶Ô½ÓÒµÎñÄ£¿é clk domain 100MHz or 156.25MHz--
+	//--- å¯¹æ¥ä¸šåŠ¡æ¨¡å— clk domain 100MHz or 156.25MHz--
     input  wire             i_send_req_p      ,
     output reg              o_send_finish_p   ,
-    input  wire [8*11-1:0]  i_send_data       ,// little-end
-    input  wire [7:0]       i_exp_send_num    , //·¢ËÍµÄ×Ö½ÚÊı
-    input  wire [7:0]       i_exp_recv_num    , //Ô¤ÆÚ½ÓÊÕµÄ×Ö½ÚÊı
+    input  wire [8*13-1:0]  i_send_data       ,// little-end (13å­—èŠ‚: byte[k]åœ¨[8*k+:8], byte[7:0]æœ€å…ˆå‘å‡º; ç”±11å­—èŠ‚æ‰©å±•, æ”¯æŒå†™æ ‡ç­¾13å­—èŠ‚å¸§)
+    input  wire [7:0]       i_exp_send_num    , //å‘é€çš„å­—èŠ‚æ•°
+    input  wire [7:0]       i_exp_recv_num    , //é¢„æœŸæ¥æ”¶çš„å­—èŠ‚æ•°
     output reg  [8*13-1:0]  o_recv_data       , //
-    output reg              o_recv_finish_p   , // o_recv_dataÎÈ¶¨×ã¹»³¤Ê±¼äºó£¬ÔÙÀ­¸ß
+    output reg              o_recv_finish_p   , // o_recv_dataç¨³å®šè¶³å¤Ÿé•¿æ—¶é—´åï¼Œå†æ‹‰é«˜
 
     input  wire             i_uart_inspect    ,
     output reg  [7:0]       o_modbus_err_code  // 5 = SG_CRC_ERR ; 6 = SG_TIME_OUT
@@ -61,7 +61,7 @@ module superisys_rfid_485_slaver_driver
     reg [7:0]    cur_state      ;
 //  reg [31:0]   time_cnt       ;
     reg [31:0]   uart_id_buf    ;
-    reg          m2s_start_send ;         //¿ªÊ¼·¢ËÍ
+    reg          m2s_start_send ;         //å¼€å§‹å‘é€
     reg [15:0]   msg_send_cnt       ; 
     reg [3:0]    uart_delay_cnt ;
     reg          uart_id_flag   ;
@@ -86,9 +86,10 @@ module superisys_rfid_485_slaver_driver
     reg [7:0]    s2m_state;
     reg           rs485_ch_flag_d1;
     reg           rs485_ch_flag_d2;
-    reg  [31:0]   m2s_send_char1;         //·¢ËÍ×Ö·û1*4
-    reg  [31:0]   m2s_send_char2;         //·¢ËÍ×Ö·û2*4
-    reg  [31:0]   m2s_send_char3;         //·¢ËÍ×Ö·û3*4
+    reg  [31:0]   m2s_send_char1;         //å‘é€å­—ç¬¦1*4
+    reg  [31:0]   m2s_send_char2;         //å‘é€å­—ç¬¦2*4
+    reg  [31:0]   m2s_send_char3;         //å‘é€å­—ç¬¦3*4
+    reg  [31:0]   m2s_send_char4;         //å‘é€å­—ç¬¦4(å¸§ç¬¬12~13å­—èŠ‚, å†™æ ‡ç­¾å¸§çš„CRC)
     reg           m2s_send_finish     ;
     reg [31:0]    s2m_uart_id         ;
     reg [7:0]     s2m_recv_byte[12:0] ;
@@ -96,11 +97,11 @@ module superisys_rfid_485_slaver_driver
 
 
 // ------------- slaver frame head ---------------
-    wire [7:0]    m2s_tail_symbol;   //½áÊø·û
-    reg [7:0]     m2s_recv_num   ;   //Ô¤ÆÚ½ÓÊÕµÄ×Ö½ÚÊı
-    reg [7:0]     m2s_send_num   ;   //·¢ËÍµÄ×Ö½ÚÊı
-    reg  [3:0]    m2s_baud_rate  ;   //²¨ÌØÂÊ
-    reg  [1:0]    m2s_odd_even   ;   //ÆæÅ¼Ğ£Ñé
+    wire [7:0]    m2s_tail_symbol;   //ç»“æŸç¬¦
+    reg [7:0]     m2s_recv_num   ;   //é¢„æœŸæ¥æ”¶çš„å­—èŠ‚æ•°
+    reg [7:0]     m2s_send_num   ;   //å‘é€çš„å­—èŠ‚æ•°
+    reg  [3:0]    m2s_baud_rate  ;   //æ³¢ç‰¹ç‡
+    reg  [1:0]    m2s_odd_even   ;   //å¥‡å¶æ ¡éªŒ
 
 // ------------------------------------------------------
 
@@ -188,7 +189,7 @@ module superisys_rfid_485_slaver_driver
         if(i_rst) begin
             uart_id_buf <= 0;
             uart_delay_cnt <= 12;
-        end else if(uart_id_buf != s2m_uart_id) begin // it could stay mismatched for 2-3 clock cycles ;¶àbit¿çÊ±ÖÓÓòĞÅºÅ£¬±È½Ï½á¹û²»Ò»ÖÂ¿ÉÄÜ»á³ÖĞøÁ½Èı¸öÊ±ÖÓ
+        end else if(uart_id_buf != s2m_uart_id) begin // it could stay mismatched for 2-3 clock cycles ;å¤šbitè·¨æ—¶é’ŸåŸŸä¿¡å·ï¼Œæ¯”è¾ƒç»“æœä¸ä¸€è‡´å¯èƒ½ä¼šæŒç»­ä¸¤ä¸‰ä¸ªæ—¶é’Ÿ
             uart_id_buf <= s2m_uart_id;
             uart_delay_cnt <= 0;
         end else if(uart_delay_cnt < 12) begin
@@ -251,9 +252,11 @@ module superisys_rfid_485_slaver_driver
                 o_recv_data <= 0;
             end else if(uart_delay_cnt == 10) begin // wait 10 clks for siginal corssing clock domain
                 uart_id_flag  <= 1'b1;
-                if(uart_id_buf[31])begin            //rx_err_flag
-                    o_modbus_err_code <= 6;     	    //SG_TIME_OUT
-                    o_recv_data <= 0;
+                if(uart_id_buf[31])begin            //rx_err_flag(å¸§ä¸è¶³recv_num, ä»æ¿æŒ‰10msç©ºé—²è¶…æ—¶æˆªå¸§)
+                    o_modbus_err_code <= 6;     	    //SG_TIME_OUT(çŸ­å¸§, å¦‚5å­—èŠ‚MODBUSå¼‚å¸¸åº”ç­”)
+                    //ä¿®æ”¹: è¶…æ—¶æˆªå¸§ä¸å†æ¸…é›¶o_recv_dataã€‚çŸ­å¸§å†…å®¹è¦ä¾›ä¸Šå±‚è§£æå¼‚å¸¸ç±»å‹; err_code=6ä»æç¤º"å¸§é•¿ä¸è¶³é¢„æœŸ"
+                    o_recv_data[8*8-1:    0] <= {s2m_recv_byte[7] ,s2m_recv_byte[6] ,s2m_recv_byte[5] ,s2m_recv_byte[4] ,s2m_recv_byte[3] ,s2m_recv_byte[2] ,s2m_recv_byte[1] ,s2m_recv_byte[0] };
+                    o_recv_data[8*13-1:8* 8] <= {                                                      s2m_recv_byte[12],s2m_recv_byte[11],s2m_recv_byte[10],s2m_recv_byte[9] ,s2m_recv_byte[8] };
                 end else begin
                     o_modbus_err_code <= 1;  // 1 =ok
                     o_recv_data[8*8-1:    0] <= {s2m_recv_byte[7] ,s2m_recv_byte[6] ,s2m_recv_byte[5] ,s2m_recv_byte[4] ,s2m_recv_byte[3] ,s2m_recv_byte[2] ,s2m_recv_byte[1] ,s2m_recv_byte[0] };
@@ -281,7 +284,7 @@ module superisys_rfid_485_slaver_driver
         endcase
     end
     always @(posedge i_prot_clk)begin
-        case(i_parity)//ÆæÅ¼Ğ£Ñé£¬0=ÎŞĞ£Ñé 1=ÆæĞ£Ñé 2=Å¼Ğ£Ñé
+        case(i_parity)//å¥‡å¶æ ¡éªŒï¼Œ0=æ— æ ¡éªŒ 1=å¥‡æ ¡éªŒ 2=å¶æ ¡éªŒ
             0:m2s_odd_even <= 2'd00;//2'b0x:no check;2'b11:odd check;2'b10:even check;
             1:m2s_odd_even <= 2'b11;
             2:m2s_odd_even <= 2'b10;
@@ -293,7 +296,8 @@ module superisys_rfid_485_slaver_driver
         m2s_send_num <= i_exp_send_num ;
         m2s_send_char1 <= i_send_data[8* 4-1:   0];
         m2s_send_char2 <= i_send_data[8* 8-1:8* 4];
-        m2s_send_char3 <= {8'h0,i_send_data[8*11-1:8* 8]};
+        m2s_send_char3 <= i_send_data[8*12-1:8* 8];            //å¸§å­—èŠ‚8~11: char3æŒ‰4å­—èŠ‚æ»¡è£…, æ˜ å°„tx_dev_data[8]~[11]
+        m2s_send_char4 <= {24'h0,i_send_data[8*13-1:8*12]};    //å¸§å­—èŠ‚12:   æ˜ å°„tx_dev_data[12](char4ä½å­—èŠ‚)
     end
 
    // ---------- send clk : 156.25MHz --------
@@ -329,8 +333,8 @@ module superisys_rfid_485_slaver_driver
                   o_m2s_rs485_msg <= m2s_send_char3;
                   m2s_state <= 5;
               end
-              5: begin
-                  o_m2s_rs485_msg <= 0;
+              5: begin//å‘é€å­—ç¬¦4, å¯¹åº”ä»æ¿å¯„å­˜å™¨0x8F(send_char4), ä½¿å‘é€æ”¯æŒ13å­—èŠ‚å¸§(å†™æ ‡ç­¾)
+                  o_m2s_rs485_msg <= m2s_send_char4;
                   m2s_state <= 6;
               end
               6: begin
@@ -445,7 +449,7 @@ module superisys_rfid_485_slaver_driver
             m2s_send_finish <= 0;
             s2m_recv_finish <= 0;
        end else begin
-            m2s_send_finish <= (m2s_state==10)|(m2s_state==11)|(m2s_state==12);//Íê³É±êÖ¾³ÖĞøÈı¸öÊ±ÖÓ£¨Òª³¬¹ıÂıÊ±ÖÓÓòÒ»¸öÊ±ÖÓÖÜÆÚ£©
+            m2s_send_finish <= (m2s_state==10)|(m2s_state==11)|(m2s_state==12);//å®Œæˆæ ‡å¿—æŒç»­ä¸‰ä¸ªæ—¶é’Ÿï¼ˆè¦è¶…è¿‡æ…¢æ—¶é’ŸåŸŸä¸€ä¸ªæ—¶é’Ÿå‘¨æœŸï¼‰
             s2m_recv_finish <= (uart_delay_cnt==10)|(uart_delay_cnt==11);
        end
     end
@@ -456,35 +460,12 @@ module superisys_rfid_485_slaver_driver
        end else begin
             if(i_send_req_p)begin
                 if(msg_send_cnt==16'hFFFF)
-                    msg_send_cnt <= 16'd1;//1~FFFF£¬ none zero
+                    msg_send_cnt <= 16'd1;//1~FFFFï¼Œ none zero
                 else
                     msg_send_cnt <= msg_send_cnt + 1'b1; // cycle cnt
             end
        end
     end
-    
-/*
-ila_0 ila_0_i2 (
-	.clk(i_clk), // input wire clk
-
-	.probe0(i_rs485_ch_r_flag), // input wire [0:0]  probe0  
-	.probe1(i_rs485_ch_flag), // input wire [0:0]  probe1 
-	.probe2(i_send_req_p), // input wire [0:0]  probe2 
-	.probe3(o_send_finish_p), // input wire [0:0]  probe3 
-	.probe4({cur_state,s2m_uart_id[7:0],uart_delay_cnt,uart_id_buf[31:28],i_send_data[7:0]}), // input wire [31:0]  probe4 
-	.probe5({i_slv_board_id,s2m_state,m2s_state,msg_send_cnt[7:0]}), // input wire [31:0]  probe5 
-	.probe6(o_m2s_rs485_msg), // input wire [31:0]  probe6 
-	.probe7(i_s2m_rs485_msg), // input wire [31:0]  probe7 
-	.probe8(m2s_start_send), // input wire [0:0]  probe8 
-	.probe9(rs485_ch_flag_d2), // input wire [0:0]  probe9 
-	.probe10(0), // input wire [0:0]  probe10 
-	.probe11(0), // input wire [0:0]  probe11 
-	.probe12(o_intr_irq), // input wire [0:0]  probe12 
-	.probe13(0), // input wire [0:0]  probe13 
-	.probe14(0), // input wire [0:0]  probe14 
-	.probe15(o_recv_finish_p) // input wire [0:0]  probe15
-);
-*/
 
 endmodule
 

@@ -18,7 +18,6 @@
 // Additional Comments:
 // 
 //////////////////////////////////////////////////////////////////////////////////
-`define DEBUG
 
 module ec_8do#(
 		parameter  				REG_SPACE_BIAS 		= 	2000	,	//Component offset address
@@ -213,40 +212,6 @@ module ec_8do#(
 	assign 	o_dri7 = do_o[6];
 	assign 	o_dri8 = do_o[7];
 	
-	`ifdef DEBUG
-		reg			ro_intr_irq;
-		reg	[7:0]	irq_posedge_cnt;
-		reg	[7:0]	irq_negedge_cnt;
-		
-		always@(posedge clk_i)
-		begin
-			ro_intr_irq <= o_intr_irq;
-		end
-		
-		
-		always@(posedge clk_i)
-		begin
-			if(rst_i)begin
-				irq_posedge_cnt <= 8'd0;
-				irq_negedge_cnt <= 8'd0;
-			end else if(a_bhv_vld)begin
-				irq_posedge_cnt <= 8'd0;
-				irq_negedge_cnt <= 8'd0;
-			end else begin
-				if({ro_intr_irq,o_intr_irq} == 2'b01)begin	//rising
-					irq_posedge_cnt <= irq_posedge_cnt+1;
-				end else begin
-					irq_posedge_cnt <= irq_posedge_cnt;
-				end
-				
-				if({ro_intr_irq,o_intr_irq} == 2'b10)begin	//falling
-					irq_negedge_cnt <= irq_negedge_cnt+1;
-				end else begin
-					irq_negedge_cnt <= irq_negedge_cnt;
-				end
-			end
-		end
-	`endif
 	
 	
 	//valid signal sync
@@ -403,7 +368,7 @@ module ec_8do#(
 	// ,.param69               (param69		)
 	// ,.param70               (param70		)
 	,.debug_reg1			(debug_reg1		)
-	,.debug_reg2			({16'd0,irq_posedge_cnt,irq_negedge_cnt}		)
+	,.debug_reg2			()
 	// ,.debug_reg3			(debug_reg3		)
 	// ,.debug_reg4			(debug_reg4		)
 	// ,.debug_reg5			(debug_reg5		)

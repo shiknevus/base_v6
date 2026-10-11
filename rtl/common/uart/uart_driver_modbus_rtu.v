@@ -26,9 +26,9 @@ module uart_driver_modbus_rtu#(
 ) (
      input                  clk           ,
     input                   reset         ,
-    input  wire  [19:0]     i_uart_bps    ,
-    input  wire  [7:0]      i_frame_gap   ,
-    input        [1:0]      i_parity      , //奇偶校验，0=None 无校验 1=Odd 奇校验 2=EVE偶校验
+   //input  wire  [19:0]     i_uart_bps    ,
+   //input  wire  [7:0]      i_frame_gap   ,
+   //input        [1:0]      i_parity      , //奇偶校验，0=None 无校验 1=Odd 奇校验 2=EVE偶校验
     input  wire             i_uart_rx     ,
     output wire             o_uart_tx     ,
     output reg              o_uart_de     ,
@@ -40,6 +40,10 @@ module uart_driver_modbus_rtu#(
     output reg                              o_data_pack_ok ,
     output reg [RAM_DWIDTH*RAM_DWIDTH-1:0]  o_data_rcv     
 );
+
+assign i_uart_bps = 115200;
+assign i_frame_gap = 0;
+assign i_parity = 0;
 
 always @(posedge clk)begin
     if(reset)begin

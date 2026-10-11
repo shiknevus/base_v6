@@ -19,7 +19,6 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
-
 module proactive_beh_2di_2do#(
     parameter                 	BHA_NUM 		= 11   //Number of active behaviors
 )(
@@ -77,8 +76,7 @@ module proactive_beh_2di_2do#(
 	
     localparam  IRQ_OK          = 8'h51;	//ps ack:OK
     localparam  IRQ_NO_OK       = 8'h52;	//ps ack:NO OK
-	
-	
+
 	//state monitor
 	reg [7:0]	curr_state_m1;
 	reg [7:0]	curr_state_m2;
@@ -210,7 +208,7 @@ module proactive_beh_2di_2do#(
     always @(*) begin			
         case (curr_state)	
             S_IDLE: begin	//0
-                if (a_en && ((a_bhv_id_r >= 8'd1) && (a_bhv_id_r <= BHA_NUM)) && a_bhv_vld_r)	//behavior start
+                if (a_en && a_bhv_vld_r)	//behavior start
                     next_state = S_BHA_PRE_DET;
                 else
                     next_state = S_IDLE;
@@ -242,8 +240,6 @@ module proactive_beh_2di_2do#(
 			S_EXE:begin			//5						//active Execution
 				next_state = S_BHA_POST_DET;
 			end
-			
-
 			
             S_BHA_POST_DET: begin	//curr_state = 7
 				if(post_sta_allow[a_bhv_id_r - 1'b1]) begin

@@ -18,16 +18,16 @@
 // Additional Comments:
 // 
 /////////////////////////////////////////////////////////////////////////////////
-module sygole_rfid_485_slaver_driver
+module sg_rfid_485_slaver_driver
 (
-    input                   i_clk             ,//  user clk ��100MHz or 156.25MHz��
+    input                   i_clk             ,//  user clk （100MHz or 156.25MHz）
     input                   i_rst             ,
     input                   i_prot_clk        ,// 156.25MHz
     input                   i_prot_rst        ,
-    input   wire [19:0]     i_baud_rate       ,//���ڲ�����
-    input   wire [7:0]      i_parity          ,//��żУ�飬0=��У�� 1=��У�� 2=żУ��
+    input   wire [19:0]     i_baud_rate       ,//串口波特率
+    input   wire [7:0]      i_parity          ,//奇偶校验，0=无校验 1=奇校验 2=偶校验
 
-	//--- �Ӱ�ӿ� use clk domain 156.25MHz --
+	//--- 从板接口 use clk domain 156.25MHz --
 	input  wire [4:0]       i_cur_slv_board_id, //
 	input  wire [4:0]       i_slv_board_id    , 
 	input  wire             i_rs485_ch_r_flag , //send en
@@ -35,14 +35,14 @@ module sygole_rfid_485_slaver_driver
 	input  wire             i_rs485_ch_flag   , //recv en
 	input  wire [31:0]      i_s2m_rs485_msg   , //recv data
 
-	//--- �Խ�ҵ��ģ�� clk domain 100MHz or 156.25MHz--
+	//--- 对接业务模块 clk domain 100MHz or 156.25MHz--
     input  wire             i_send_req_p      ,
     output reg              o_send_finish_p   ,
-    input  wire [8*11-1:0]  i_send_data       ,// little-end
-    input  wire [7:0]       i_exp_send_num    , //���͵��ֽ���
-    input  wire [7:0]       i_exp_recv_num    , //Ԥ�ڽ��յ��ֽ���
+    input  wire [8*13-1:0]  i_send_data       ,// little-end (13字节: byte[k]在[8*k+:8], byte[7:0]最先发出; 由11字节扩展, 支持写标签13字节帧)
+    input  wire [7:0]       i_exp_send_num    , //发送的字节数
+    input  wire [7:0]       i_exp_recv_num    , //预期接收的字节数
     output reg  [8*13-1:0]  o_recv_data       , //
-    output reg              o_recv_finish_p   , // o_recv_data�ȶ��㹻��ʱ���������
+    output reg              o_recv_finish_p   , // o_recv_data稳定足够长时间后，再拉高
 
     input  wire             i_uart_inspect    ,
     output reg  [7:0]       o_modbus_err_code  // 5 = SG_CRC_ERR ; 6 = SG_TIME_OUT
@@ -61,7 +61,7 @@ module sygole_rfid_485_slaver_driver
     reg [7:0]    cur_state      ;
 //  reg [31:0]   time_cnt       ;
     reg [31:0]   uart_id_buf    ;
-    reg          m2s_start_send ;         //��ʼ����
+    reg          m2s_start_send ;         //开始发送
     reg [15:0]   msg_send_cnt       ; 
     reg [3:0]    uart_delay_cnt ;
     reg          uart_id_flag   ;
@@ -86,9 +86,10 @@ module sygole_rfid_485_slaver_driver
     reg [7:0]    s2m_state;
     reg           rs485_ch_flag_d1;
     reg           rs485_ch_flag_d2;
-    reg  [31:0]   m2s_send_char1;         //�����ַ�1*4
-    reg  [31:0]   m2s_send_char2;         //�����ַ�2*4
-    reg  [31:0]   m2s_send_char3;         //�����ַ�3*4
+    reg  [31:0]   m2s_send_char1;         //发送字符1*4
+    reg  [31:0]   m2s_send_char2;         //发送字符2*4
+    reg  [31:0]   m2s_send_char3;         //发送字符3*4
+    reg  [31:0]   m2s_send_char4;         //发送字符4(帧第12~13字节, 写标签帧的CRC)
     reg           m2s_send_finish     ;
     reg [31:0]    s2m_uart_id         ;
     reg [7:0]     s2m_recv_byte[12:0] ;
@@ -96,11 +97,11 @@ module sygole_rfid_485_slaver_driver
 
 
 // ------------- slaver frame head ---------------
-    wire [7:0]    m2s_tail_symbol;   //������
-    reg [7:0]     m2s_recv_num   ;   //Ԥ�ڽ��յ��ֽ���
-    reg [7:0]     m2s_send_num   ;   //���͵��ֽ���
-    reg  [3:0]    m2s_baud_rate  ;   //������
-    reg  [1:0]    m2s_odd_even   ;   //��żУ��
+    wire [7:0]    m2s_tail_symbol;   //结束符
+    reg [7:0]     m2s_recv_num   ;   //预期接收的字节数
+    reg [7:0]     m2s_send_num   ;   //发送的字节数
+    reg  [3:0]    m2s_baud_rate  ;   //波特率
+    reg  [1:0]    m2s_odd_even   ;   //奇偶校验
 
 // ------------------------------------------------------
 
@@ -188,7 +189,7 @@ module sygole_rfid_485_slaver_driver
         if(i_rst) begin
             uart_id_buf <= 0;
             uart_delay_cnt <= 12;
-        end else if(uart_id_buf != s2m_uart_id) begin // it could stay mismatched for 2-3 clock cycles ;��bit��ʱ�����źţ��ȽϽ����һ�¿��ܻ����������ʱ��
+        end else if(uart_id_buf != s2m_uart_id) begin // it could stay mismatched for 2-3 clock cycles ;多bit跨时钟域信号，比较结果不一致可能会持续两三个时钟
             uart_id_buf <= s2m_uart_id;
             uart_delay_cnt <= 0;
         end else if(uart_delay_cnt < 12) begin
@@ -251,9 +252,11 @@ module sygole_rfid_485_slaver_driver
                 o_recv_data <= 0;
             end else if(uart_delay_cnt == 10) begin // wait 10 clks for siginal corssing clock domain
                 uart_id_flag  <= 1'b1;
-                if(uart_id_buf[31])begin            //rx_err_flag
-                    o_modbus_err_code <= 6;     	    //SG_TIME_OUT
-                    o_recv_data <= 0;
+                if(uart_id_buf[31])begin            //rx_err_flag(帧不足recv_num, 从板按10ms空闲超时截帧)
+                    o_modbus_err_code <= 6;     	    //SG_TIME_OUT(短帧, 如5字节MODBUS异常应答)
+                    //修改: 超时截帧不再清零o_recv_data。短帧内容要供上层解析异常类型; err_code=6仍提示"帧长不足预期"
+                    o_recv_data[8*8-1:    0] <= {s2m_recv_byte[7] ,s2m_recv_byte[6] ,s2m_recv_byte[5] ,s2m_recv_byte[4] ,s2m_recv_byte[3] ,s2m_recv_byte[2] ,s2m_recv_byte[1] ,s2m_recv_byte[0] };
+                    o_recv_data[8*13-1:8* 8] <= {                                                      s2m_recv_byte[12],s2m_recv_byte[11],s2m_recv_byte[10],s2m_recv_byte[9] ,s2m_recv_byte[8] };
                 end else begin
                     o_modbus_err_code <= 1;  // 1 =ok
                     o_recv_data[8*8-1:    0] <= {s2m_recv_byte[7] ,s2m_recv_byte[6] ,s2m_recv_byte[5] ,s2m_recv_byte[4] ,s2m_recv_byte[3] ,s2m_recv_byte[2] ,s2m_recv_byte[1] ,s2m_recv_byte[0] };
@@ -281,7 +284,7 @@ module sygole_rfid_485_slaver_driver
         endcase
     end
     always @(posedge i_prot_clk)begin
-        case(i_parity)//��żУ�飬0=��У�� 1=��У�� 2=żУ��
+        case(i_parity)//奇偶校验，0=无校验 1=奇校验 2=偶校验
             0:m2s_odd_even <= 2'd00;//2'b0x:no check;2'b11:odd check;2'b10:even check;
             1:m2s_odd_even <= 2'b11;
             2:m2s_odd_even <= 2'b10;
@@ -293,7 +296,8 @@ module sygole_rfid_485_slaver_driver
         m2s_send_num <= i_exp_send_num ;
         m2s_send_char1 <= i_send_data[8* 4-1:   0];
         m2s_send_char2 <= i_send_data[8* 8-1:8* 4];
-        m2s_send_char3 <= {8'h0,i_send_data[8*11-1:8* 8]};
+        m2s_send_char3 <= i_send_data[8*12-1:8* 8];            //帧字节8~11: char3按4字节满装, 映射tx_dev_data[8]~[11]
+        m2s_send_char4 <= {24'h0,i_send_data[8*13-1:8*12]};    //帧字节12:   映射tx_dev_data[12](char4低字节)
     end
 
    // ---------- send clk : 156.25MHz --------
@@ -329,8 +333,8 @@ module sygole_rfid_485_slaver_driver
                   o_m2s_rs485_msg <= m2s_send_char3;
                   m2s_state <= 5;
               end
-              5: begin
-                  o_m2s_rs485_msg <= 0;
+              5: begin//发送字符4, 对应从板寄存器0x8F(send_char4), 使发送支持13字节帧(写标签)
+                  o_m2s_rs485_msg <= m2s_send_char4;
                   m2s_state <= 6;
               end
               6: begin
@@ -445,7 +449,7 @@ module sygole_rfid_485_slaver_driver
             m2s_send_finish <= 0;
             s2m_recv_finish <= 0;
        end else begin
-            m2s_send_finish <= (m2s_state==10)|(m2s_state==11)|(m2s_state==12);//��ɱ�־��������ʱ�ӣ�Ҫ������ʱ����һ��ʱ�����ڣ�
+            m2s_send_finish <= (m2s_state==10)|(m2s_state==11)|(m2s_state==12);//完成标志持续三个时钟（要超过慢时钟域一个时钟周期）
             s2m_recv_finish <= (uart_delay_cnt==10)|(uart_delay_cnt==11);
        end
     end
@@ -456,35 +460,12 @@ module sygole_rfid_485_slaver_driver
        end else begin
             if(i_send_req_p)begin
                 if(msg_send_cnt==16'hFFFF)
-                    msg_send_cnt <= 16'd1;//1~FFFF�� none zero
+                    msg_send_cnt <= 16'd1;//1~FFFF， none zero
                 else
                     msg_send_cnt <= msg_send_cnt + 1'b1; // cycle cnt
             end
        end
     end
-    
-/*
-ila_0 ila_0_i2 (
-	.clk(i_clk), // input wire clk
-
-	.probe0(i_rs485_ch_r_flag), // input wire [0:0]  probe0  
-	.probe1(i_rs485_ch_flag), // input wire [0:0]  probe1 
-	.probe2(i_send_req_p), // input wire [0:0]  probe2 
-	.probe3(o_send_finish_p), // input wire [0:0]  probe3 
-	.probe4({cur_state,s2m_uart_id[7:0],uart_delay_cnt,uart_id_buf[31:28],i_send_data[7:0]}), // input wire [31:0]  probe4 
-	.probe5({i_slv_board_id,s2m_state,m2s_state,msg_send_cnt[7:0]}), // input wire [31:0]  probe5 
-	.probe6(o_m2s_rs485_msg), // input wire [31:0]  probe6 
-	.probe7(i_s2m_rs485_msg), // input wire [31:0]  probe7 
-	.probe8(m2s_start_send), // input wire [0:0]  probe8 
-	.probe9(rs485_ch_flag_d2), // input wire [0:0]  probe9 
-	.probe10(0), // input wire [0:0]  probe10 
-	.probe11(0), // input wire [0:0]  probe11 
-	.probe12(o_intr_irq), // input wire [0:0]  probe12 
-	.probe13(0), // input wire [0:0]  probe13 
-	.probe14(0), // input wire [0:0]  probe14 
-	.probe15(o_recv_finish_p) // input wire [0:0]  probe15
-);
-*/
 
 endmodule
 
