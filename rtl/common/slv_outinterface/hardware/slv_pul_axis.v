@@ -70,6 +70,7 @@ module slv_pul_axis
    ,input  wire [31:0]      rcfg_acc_max
    ,input  wire [31:0]      rcfg_dec_max
    ,input  wire [31:0]      rcfg_touch_dec
+   ,input  wire [31:0]      rcfg_touch_spd
 
    ,input  wire             i_axis_limf     //forward limit
    ,input  wire             i_axis_limb     //backward limit
@@ -107,6 +108,7 @@ module slv_pul_axis
     wire [31:0] acc_max_eff   = (rcfg_acc_max  == 32'b0 ) ? 32'd875000 : rcfg_acc_max   ; // 5000 mm/s^2 @ 175 pulse/mm
     wire [31:0] dec_max_eff   = (rcfg_dec_max  == 32'b0 ) ? 32'd875000 : rcfg_dec_max   ;
     wire [31:0] touch_dec_eff = (rcfg_touch_dec== 32'b0 ) ? 32'd87500  : rcfg_touch_dec ; // 500 mm/s^2 @ 175 pulse/mm, ~2.5 mm from 50 mm/s
+    wire [31:0] touch_spd_eff = (rcfg_touch_spd== 32'b0 ) ? 32'd2000   : rcfg_touch_spd ; // param4, add by szzhang 20261010
 
    reg motion_done_latched;
    reg          act_busy;
@@ -259,6 +261,7 @@ module slv_pul_axis
       .i_pf_spd       ( home_spd_eff       ),
       .i_pf_acc       ( home_acc_eff       ),
       .i_pf_dec       ( home_dec_eff       ),
+      .i_spd_min      ( touch_spd_eff      ),
       .i_pf_dir       ( DIR_NEG            ),
       .i_start        ( home_start    	   ),
       .i_stop         ( home_stop          ),

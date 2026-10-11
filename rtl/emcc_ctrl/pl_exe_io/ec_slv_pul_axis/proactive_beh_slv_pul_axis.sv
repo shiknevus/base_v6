@@ -90,6 +90,7 @@ module proactive_beh_slv_pul_axis#(
 	,input		[31:0]			rcfg_acc_max      	//maximum acceleration
 	,input		[31:0]			rcfg_dec_max      	//maximum deceleration
 	,input		[31:0]			rcfg_touch_dec     	//home org/1st limit touch deceleration
+	,input		[31:0]			rcfg_touch_spd     	//home creep speed after org touch
 	,input signed [31:0]		rcfg_pos_max = 32'sd0	// signed upper soft limit
 	,input signed [31:0]		rcfg_pos_min = 32'sd0	// signed lower soft limit
 
@@ -564,7 +565,7 @@ module proactive_beh_slv_pul_axis#(
 		            4'd3:  m2s_pulm_msg <= rcfg_home_spd;
 		            4'd4:  m2s_pulm_msg <= rcfg_home_acc;
 		            4'd5:  m2s_pulm_msg <= rcfg_home_dec;
-		            4'd6:  m2s_pulm_msg <= rcfg_jog_spd;
+		            4'd6:  m2s_pulm_msg <= rcfg_touch_spd; // was jog_spd(=word3), change by szzhang 20261010
 		            4'd7:  m2s_pulm_msg <= rcfg_jog_acc;
 		            4'd8:  m2s_pulm_msg <= rcfg_jog_dec;
 		            4'd9:  m2s_pulm_msg <= rcfg_move_spd;
