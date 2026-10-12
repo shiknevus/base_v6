@@ -354,6 +354,9 @@ module status_beh_ethercat_servo#(
 				else if(pre_sta_allow[8'd103-1])  b_bhv_id <= 8'd103;//stop
 				else if(pre_sta_allow[8'd104-1])  b_bhv_id <= 8'd104;//son
 				else if(pre_sta_allow[8'd105-1])  b_bhv_id <= 8'd105;//soff
+				else if(pre_sta_allow[8'd106-1])  b_bhv_id <= 8'd106;//limf rise
+				else if(pre_sta_allow[8'd107-1])  b_bhv_id <= 8'd107;//zero rise
+				else if(pre_sta_allow[8'd108-1])  b_bhv_id <= 8'd108;//limb rise
 				else                              b_bhv_id <= 8'd0;
 			end
 	end

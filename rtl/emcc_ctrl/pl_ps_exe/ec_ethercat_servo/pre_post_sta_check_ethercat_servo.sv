@@ -88,10 +88,10 @@ module pre_post_sta_check_ethercat_servo#(
 	wire [A_BHA_NUM-1:0]	a_pre_sta	;
 
 	assign	a_pre_sta[0 ] = (a_bhv_id == 1 );    // HOME: always allowed
-	assign	a_pre_sta[1 ] = (a_bhv_id == 2 ) && axis_safe;
-	assign	a_pre_sta[2 ] = (a_bhv_id == 3 ) && axis_safe;
-	assign	a_pre_sta[19] = (a_bhv_id == 20) && axis_safe && device_safe;//[safe]
-	assign	a_pre_sta[20] = (a_bhv_id == 21) && axis_safe && device_safe;//[safe]
+	assign	a_pre_sta[1 ] = (a_bhv_id == 2 );
+	assign	a_pre_sta[2 ] = (a_bhv_id == 3 );
+	assign	a_pre_sta[19] = (a_bhv_id == 20) && device_safe;//[safe]
+	assign	a_pre_sta[20] = (a_bhv_id == 21) && device_safe;//[safe]
 	assign	a_pre_sta[29] = (a_bhv_id == 30);   // GETPOS: always allowed
 
 	always@(posedge clk_i)
@@ -142,14 +142,43 @@ module pre_post_sta_check_ethercat_servo#(
 	//beh 100~105 pre-cond (B ch, same as ec_slv_pul_axis, PARAM26~30)
 	wire [B_BHA_NUM-1:0]	b_pre_sta	;
 
+	// DI rising edge -> pending until beh starts
+	reg [2:0] di_s1, di_s2, di_s3;	// {limb,zero,limf}
+	always@(posedge clk_i) begin
+		di_s1 <= {i_axis_limb, i_axis_zero, i_axis_limf};
+		di_s2 <= di_s1;
+		di_s3 <= di_s2;
+	end
+	wire [2:0] di_rise = di_s2 & ~di_s3;
+
+	reg ec_chb_st_d1;
+	reg pend_limf, pend_zero, pend_limb;
+	wire b_start = ec_chb_st && ~ec_chb_st_d1;
+	always@(posedge clk_i) begin
+		if(rst_i || !b_en) begin
+			pend_limf <= 1'b0;
+			pend_zero <= 1'b0;
+			pend_limb <= 1'b0;
+		end else begin
+			if(di_rise[0])                            pend_limf <= 1'b1;
+			else if(b_start && b_bhv_id == 8'd106)    pend_limf <= 1'b0;
+			if(di_rise[1])                            pend_zero <= 1'b1;
+			else if(b_start && b_bhv_id == 8'd107)    pend_zero <= 1'b0;
+			if(di_rise[2])                            pend_limb <= 1'b1;
+			else if(b_start && b_bhv_id == 8'd108)    pend_limb <= 1'b0;
+		end
+	end
+
 	assign	b_pre_sta[99 ] = rctrl_pause && ~rctrl_resume && ~rctrl_stop && ec_cha_st; // beh100 pause
 	assign	b_pre_sta[100] = rctrl_pause && rctrl_resume && ec_cha_st; // beh101 resume
 	assign	b_pre_sta[101] = rctrl_drive_reset;    // beh102 reset
 	assign	b_pre_sta[102] = rctrl_pause && rctrl_stop && ec_cha_st;  // beh103 stop
 	assign	b_pre_sta[103] = rctrl_drive_on==8'd1;       // beh104 son
 	assign	b_pre_sta[104] = rctrl_drive_on==8'd2;      // beh105 soff
+	assign	b_pre_sta[105] = pend_limf;                 // beh106 limf 0->1
+	assign	b_pre_sta[106] = pend_zero;                 // beh107 zero 0->1
+	assign	b_pre_sta[107] = pend_limb;                 // beh108 limb 0->1
 
-	reg ec_chb_st_d1;
 	always@(posedge clk_i) begin
 		if(rst_i || !b_en) begin
 			ec_chb_st_d1 <= 1'b0;
@@ -182,7 +211,7 @@ module pre_post_sta_check_ethercat_servo#(
 			b_executed <= {B_BHA_NUM{1'b0}};
 		end else begin
 			if(ec_chb_st && ~ec_chb_st_d1) begin
-				if(b_bhv_id >= 8'd100 && b_bhv_id <= 8'd105)
+				if(b_bhv_id >= 8'd100 && b_bhv_id <= 8'd108)
 					b_executed[b_bhv_id - 8'd1] <= 1'b1;
 			end
 			for(integer i = 0; i < B_BHA_NUM; i = i + 1) begin
@@ -216,6 +245,9 @@ module pre_post_sta_check_ethercat_servo#(
 	assign	b_post_sta[102] = (b_bhv_id == 103);
 	assign	b_post_sta[103] = (b_bhv_id == 104);
 	assign	b_post_sta[104] = (b_bhv_id == 105);
+	assign	b_post_sta[105] = (b_bhv_id == 106);
+	assign	b_post_sta[106] = (b_bhv_id == 107);
+	assign	b_post_sta[107] = (b_bhv_id == 108);
 
 	always@(posedge clk_i)
 	begin

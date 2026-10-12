@@ -131,11 +131,13 @@ if "!choice!" equ "0" goto :launch_all
 set "sel_xpr=!xpr_%choice%!"
 set "sel_dir=!xpr_dir_%choice%!"
 
+call :resolve_vivado "!sel_xpr!" || (pause & exit /b 1)
 echo.
 echo Opening: !sel_xpr!
+echo Vivado : !VIV_VER!  ^(!VIV_BAT!^)
 echo Working dir: !sel_dir!
 pushd "!sel_dir!"
-start "" "!sel_xpr!"
+call :start_vivado "!sel_xpr!"
 echo   Started at %date% %time%
 echo.
 
@@ -155,13 +157,57 @@ exit
 
 :launch_all
 echo Opening ALL !xpr_count! project(s)...
+set "viv_fail="
 for /L %%i in (1,1,!xpr_count!) do (
     echo   [%%i/!xpr_count!] !xpr_%%i!
-    pushd "!xpr_dir_%%i!"
-    start "" "!xpr_%%i!"
-    popd
+    call :resolve_vivado "!xpr_%%i!" || set "viv_fail=1"
+    if defined VIV_BAT (
+        echo         Vivado !VIV_VER!
+        pushd "!xpr_dir_%%i!"
+        call :start_vivado "!xpr_%%i!"
+        popd
+    )
 )
 echo.
 echo All projects started at %date% %time%
 echo Skipping vivado.log tail (multiple projects)
+if defined viv_fail pause
 exit
+
+:: %1=xpr -> VIV_VER/VIV_BAT; override: VIVADO_VER=2018.3 or VIVADO_BAT=path\vivado.bat
+:resolve_vivado
+set "VIV_VER="
+set "VIV_BAT="
+for /f "tokens=5" %%v in ('findstr /c:"Product Version: Vivado v" "%~1" 2^>nul') do if not defined VIV_VER set "VIV_VER=%%v"
+if defined VIV_VER set "VIV_VER=!VIV_VER:v=!"
+if defined VIVADO_VER set "VIV_VER=%VIVADO_VER%"
+if defined VIVADO_BAT (
+    set "VIV_BAT=%VIVADO_BAT%"
+    exit /b 0
+)
+if not defined VIV_VER (
+    echo ERROR: Cannot read Vivado version from %~1
+    echo        set VIVADO_VER=xxxx.x or VIVADO_BAT=...\vivado.bat
+    exit /b 1
+)
+for %%d in (C D E F G H) do (
+    if not defined VIV_BAT if exist "%%d:\Xilinx\Vivado\!VIV_VER!\bin\vivado.bat" set "VIV_BAT=%%d:\Xilinx\Vivado\!VIV_VER!\bin\vivado.bat"
+    if not defined VIV_BAT if exist "%%d:\AMDDesignTools\!VIV_VER!\Vivado\bin\vivado.bat" set "VIV_BAT=%%d:\AMDDesignTools\!VIV_VER!\Vivado\bin\vivado.bat"
+)
+if defined VIV_BAT exit /b 0
+echo ERROR: Vivado !VIV_VER! not installed. Found:
+for %%d in (C D E F G H) do for /d %%p in ("%%d:\Xilinx\Vivado\*" "%%d:\AMDDesignTools\*") do echo          %%p
+echo        set VIVADO_BAT=...\vivado.bat to force one
+exit /b 1
+
+:: %1=xpr; vvgl.exe hides the console like the Start menu shortcut
+:: vvgl.exe drops quoted args, so use it only when paths have no spaces
+:start_vivado
+for %%b in ("!VIV_BAT!") do set "VIV_VVGL=%%~dpbunwrapped\win64.o\vvgl.exe"
+set "VIV_ARGS=!VIV_BAT!%~1"
+if exist "!VIV_VVGL!" if "!VIV_ARGS: =!"=="!VIV_ARGS!" (
+    start "" "!VIV_VVGL!" !VIV_BAT! %~1
+    exit /b 0
+)
+start "Vivado !VIV_VER!" cmd /c ""!VIV_BAT!" "%~1""
+exit /b 0
