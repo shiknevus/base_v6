@@ -8,7 +8,7 @@
 //
 // 使用说明(在emcc_mix_top中直接接pkg_route, 单实例占用一条从板485通道):
 //   .i_clk          ( clk                          )  // 业务时钟(组件域)
-//   .i_prot_clk     ( clk                          )  // emcc通道时钟(aurora ll_clk域, pkg_route所在域)
+//   (单一时钟156.25MHz, 原i_prot_clk/i_prot_rst端口已删除, 业务与emcc通道同域)
 //   .i_cur_slv_board_id ( 5'd0                     )  // 本实例服务的从板号
 //   .i_slv_board_id ( slv_board_id                 )  // = slv_sta_msg_addr[RAM_AWIDTH-1:9] (读侧当前板号)
 //   .i_cfg_slv_board_id( cfg_slv_board_id          )  // = slv_cfg_msg_addr[RAM_AWIDTH-1:9] (写侧当前板号, 需在顶层引出)
@@ -27,8 +27,6 @@ module sg_rfid_drv_slv
 )(
 	input							i_clk
 	,input							i_rst			// 高有效(业务域)
-	,input							i_prot_clk		// emcc通道时钟(aurora域)
-	,input							i_prot_rst		// emcc通道复位
 	//---------- 命令接口(与sg_rfid_drv一致) ----------
 	,input							i_act_vld		// 命令启动, 拉高1拍(o_busy=1期间被忽略)
 	,input	[1:0]					i_act			// 1=写标签 2=读UID 3=读标签
@@ -279,8 +277,6 @@ wire	[7:0]		w_drv_err;							// 1=收满预期长度 6=短帧(10ms截帧)
 sg_rfid_485_slaver_driver sg_rfid_485_slaver_driver_u0 (
 	.i_clk				(i_clk				),
 	.i_rst				(i_rst				),
-	.i_prot_clk			(i_prot_clk			),
-	.i_prot_rst			(i_prot_rst			),
 	.i_baud_rate		(BAUD_RATE			),
 	.i_parity			(PARITY				),
 
@@ -300,7 +296,6 @@ sg_rfid_485_slaver_driver sg_rfid_485_slaver_driver_u0 (
 	.i_exp_recv_num		(exp_len			),
 	.o_recv_data		(w_rx_data			),
 	.o_recv_finish_p	(w_rx_vld			),
-	.i_uart_inspect		(1'b0				),	// 超时由本模块自己的ms计数器判定
 	.o_modbus_err_code	(w_drv_err			)
 );
 

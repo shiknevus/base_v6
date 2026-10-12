@@ -528,8 +528,6 @@ module proactive_beh_sg_rfid#(
 	)sg_rfid_drv_slv_u0(
 		 .i_clk				(clk_i			)
 		,.i_rst				(rst_i			)
-		,.i_prot_clk		(clk_i			)// 组件内单时钟; 例化于emcc_mix_top时clk即pkg_route所在ll_clk域
-		,.i_prot_rst		(rst_i			)
 		,.i_act_vld			(slv_act_vld	)// i_slaver_en=1时才接收命令
 		,.i_act				(act			)// 相同行为号发与主板版完全相同的帧
 		,.i_slave_addr		(i_slave_addr	)

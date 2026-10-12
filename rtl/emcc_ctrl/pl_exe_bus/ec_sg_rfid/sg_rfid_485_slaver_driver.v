@@ -20,10 +20,8 @@
 /////////////////////////////////////////////////////////////////////////////////
 module sg_rfid_485_slaver_driver
 (
-    input                   i_clk             ,//  user clk （100MHz or 156.25MHz）
+    input                   i_clk             ,//  单一时钟 156.25MHz(业务侧与emcc通道同域; 原i_clk/i_rst双时钟结构已删除)
     input                   i_rst             ,
-    input                   i_prot_clk        ,// 156.25MHz
-    input                   i_prot_rst        ,
     input   wire [19:0]     i_baud_rate       ,//串口波特率
     input   wire [7:0]      i_parity          ,//奇偶校验，0=无校验 1=奇校验 2=偶校验
 
@@ -44,42 +42,20 @@ module sg_rfid_485_slaver_driver
     output reg  [8*13-1:0]  o_recv_data       , //
     output reg              o_recv_finish_p   , // o_recv_data稳定足够长时间后，再拉高
 
-    input  wire             i_uart_inspect    ,
-    output reg  [7:0]       o_modbus_err_code  // 5 = SG_CRC_ERR ; 6 = SG_TIME_OUT
+    output reg  [7:0]       o_modbus_err_code  // 1=收满预期长度 6=短帧(从板10ms截帧); 无应答的超时判定在上层模块
 );
 
-   localparam  INTERVAL_10ms  = 32'd1000000;      //10ms
-   localparam  TXD_DATA_NUM   = 8'd24;
-   localparam  RFID_READ_CMD  = 8'h03;
-   localparam  RFID_WRITE_CMD = 8'h10;
-   localparam  ST_IDLE      = 0;
-   localparam  ST_TXD_E     = 1;
-   localparam  ST_TXD_CRC   = 2;
-   localparam  ST_TXD       = 3;
-   localparam  ST_END       = 4;
-     
-    reg [7:0]    cur_state      ;
-//  reg [31:0]   time_cnt       ;
     reg [31:0]   uart_id_buf    ;
     reg          m2s_start_send ;         //开始发送
     reg [15:0]   msg_send_cnt       ; 
     reg [3:0]    uart_delay_cnt ;
-    reg          uart_id_flag   ;
 
-    reg         m2s_send_finish_dy1;
-    reg         m2s_send_finish_dy2;
-    reg         m2s_send_finish_dy3;
-    reg         m2s_send_finish_dy4;
-    reg         m2s_send_finish_dy4_temp;
-    reg         m2s_send_finish_dy5;
+    reg         m2s_send_finish_d1;
+    reg         m2s_send_finish_d2;
     reg         m2s_send_finish_p  ;
 
-    reg         s2m_recv_finish_dy1;
-    reg         s2m_recv_finish_dy2;
-    reg         s2m_recv_finish_dy3;
-    reg         s2m_recv_finish_dy4;
-    reg         s2m_recv_finish_dy4_temp;
-    reg         s2m_recv_finish_dy5;
+    reg         s2m_recv_finish_d1;
+    reg         s2m_recv_finish_d2;
 
 // --------------- 156.25MHZ clock domain ---------------
     reg [7:0]    m2s_state;
@@ -104,48 +80,6 @@ module sg_rfid_485_slaver_driver
     reg  [1:0]    m2s_odd_even   ;   //奇偶校验
 
 // ------------------------------------------------------
-
- // cross clock domain
-
-   always @(posedge i_clk)begin
-        if(i_rst)begin
-        //  time_cnt <= 0;
-            cur_state <= ST_IDLE;
-        end else begin
-            case(cur_state)
-                ST_IDLE: begin
-                //  time_cnt <= 0;
-                //  if(i_send_req) begin
-                    if(i_send_req_p) begin
-                    //  cur_state <= ST_TXD_E;
-                        cur_state <= ST_TXD; //crc already finish
-                    end
-                end
-         /*     ST_TXD_E: begin
-                    time_cnt <= 0;
-                   cur_state <= ST_TXD_CRC;
-                end
-               ST_TXD_CRC: begin
-                    if(time_cnt == INTERVAL_10ms) begin
-                        time_cnt <= time_cnt;
-                        cur_state <= ST_TXD;
-                    end else begin
-                        time_cnt <= time_cnt + 1'b1; 
-                        cur_state <= ST_TXD_CRC;                        
-                    end
-                end */
-                ST_TXD: begin
-                //  time_cnt <= 0;
-                //  cur_state <= ~i_send_req ? ST_IDLE : ST_TXD;
-                    if(o_recv_finish_p) cur_state <= ST_IDLE;
-                end
-                default: begin
-                    cur_state <= ST_IDLE;
-                end
-            endcase
-        end
-    end
-    
 
     reg [1:0] send_sig_state;
    always@(posedge i_clk) begin
@@ -184,12 +118,12 @@ module sg_rfid_485_slaver_driver
        end
    end
     
-    // ---------- corss clock domain without fifo -------
+    // ---------- 帧计数变化检测(单时钟化后无跨域问题; ~10拍等待保留, 用于等s2m状态机把13字节数据拍全部捕获后再锁存) -------
     always @(posedge i_clk)begin
         if(i_rst) begin
             uart_id_buf <= 0;
             uart_delay_cnt <= 12;
-        end else if(uart_id_buf != s2m_uart_id) begin // it could stay mismatched for 2-3 clock cycles ;多bit跨时钟域信号，比较结果不一致可能会持续两三个时钟
+        end else if(uart_id_buf != s2m_uart_id) begin // 帧计数变化: id在s2m_state=0拍更新, 数据在1~4拍更新, 需等几拍再取数
             uart_id_buf <= s2m_uart_id;
             uart_delay_cnt <= 0;
         end else if(uart_delay_cnt < 12) begin
@@ -197,61 +131,42 @@ module sg_rfid_485_slaver_driver
         end
     end
 
-    //send
+    //send: 打2拍取上升沿, 出1拍完成脉冲(原双时钟时代的4级同步+展宽链, 单时钟化后精简)
     always @(posedge i_clk)begin
         if(i_rst) begin
-            m2s_send_finish_dy1 <= 0;
-            m2s_send_finish_dy2 <= 0;
-            m2s_send_finish_dy3 <= 0;
-            m2s_send_finish_dy4 <= 0;
-            m2s_send_finish_dy4_temp <= 0;
-            m2s_send_finish_dy5 <= 0;
-            m2s_send_finish_p <= 0;
-        end  begin 
-            m2s_send_finish_dy1 <= m2s_send_finish;
-            m2s_send_finish_dy2 <= m2s_send_finish_dy1;
-            m2s_send_finish_dy3 <= m2s_send_finish_dy2;
-            m2s_send_finish_dy4 <= m2s_send_finish_dy3;
-            m2s_send_finish_dy4_temp <= m2s_send_finish_dy4 | m2s_send_finish_dy3 ;
-            m2s_send_finish_dy5 <= m2s_send_finish_dy4_temp;
-            m2s_send_finish_p <= m2s_send_finish_dy4_temp & (~m2s_send_finish_dy5);
+            m2s_send_finish_d1 <= 1'b0;
+            m2s_send_finish_d2 <= 1'b0;
+            m2s_send_finish_p  <= 1'b0;
+        end else begin
+            m2s_send_finish_d1 <= m2s_send_finish;
+            m2s_send_finish_d2 <= m2s_send_finish_d1;
+            m2s_send_finish_p  <= m2s_send_finish_d1 & (~m2s_send_finish_d2);
         end
     end
-    //receive
+    //receive: 同上, 帧数据在o_recv_finish_p脉冲前已稳定
     always @(posedge i_clk)begin
         if(i_rst) begin
-            s2m_recv_finish_dy1 <= 0;
-            s2m_recv_finish_dy2 <= 0;
-            s2m_recv_finish_dy3 <= 0;
-            s2m_recv_finish_dy4 <= 0;
-            s2m_recv_finish_dy4_temp <= 0;
-            s2m_recv_finish_dy5 <= 0;
-            o_recv_finish_p <= 0;
-        end  begin 
-            s2m_recv_finish_dy1 <= s2m_recv_finish;
-            s2m_recv_finish_dy2 <= s2m_recv_finish_dy1;
-            s2m_recv_finish_dy3 <= s2m_recv_finish_dy2;
-            s2m_recv_finish_dy4 <= s2m_recv_finish_dy3;
-            s2m_recv_finish_dy4_temp <= s2m_recv_finish_dy4 | s2m_recv_finish_dy3 ;
-            s2m_recv_finish_dy5 <= s2m_recv_finish_dy4_temp;
-            o_recv_finish_p <= s2m_recv_finish_dy4_temp & (~s2m_recv_finish_dy5);
+            s2m_recv_finish_d1 <= 1'b0;
+            s2m_recv_finish_d2 <= 1'b0;
+            o_recv_finish_p    <= 1'b0;
+        end else begin
+            s2m_recv_finish_d1 <= s2m_recv_finish;
+            s2m_recv_finish_d2 <= s2m_recv_finish_d1;
+            o_recv_finish_p    <= s2m_recv_finish_d1 & (~s2m_recv_finish_d2);
         end
     end
     
     // ------------ recv clk : 100MHz ----------
     always @(posedge i_clk)begin
         if(i_rst) begin
-            uart_id_flag   <= 1'b0;
             o_modbus_err_code <= 0;
             o_recv_data <= 0;
         end
         else begin
-            if(i_send_req_p) begin    
+            if(i_send_req_p) begin
                 o_modbus_err_code <= 0;
-                uart_id_flag  <= 1'b0;
                 o_recv_data <= 0;
-            end else if(uart_delay_cnt == 10) begin // wait 10 clks for siginal corssing clock domain
-                uart_id_flag  <= 1'b1;
+            end else if(uart_delay_cnt == 10) begin // 等10拍: s2m状态机13字节数据已捕获完毕, 此刻锁存o_recv_data
                 if(uart_id_buf[31])begin            //rx_err_flag(帧不足recv_num, 从板按10ms空闲超时截帧)
                     o_modbus_err_code <= 6;     	    //SG_TIME_OUT(短帧, 如5字节MODBUS异常应答)
                     //修改: 超时截帧不再清零o_recv_data。短帧内容要供上层解析异常类型; err_code=6仍提示"帧长不足预期"
@@ -262,8 +177,6 @@ module sg_rfid_485_slaver_driver
                     o_recv_data[8*8-1:    0] <= {s2m_recv_byte[7] ,s2m_recv_byte[6] ,s2m_recv_byte[5] ,s2m_recv_byte[4] ,s2m_recv_byte[3] ,s2m_recv_byte[2] ,s2m_recv_byte[1] ,s2m_recv_byte[0] };
                     o_recv_data[8*13-1:8* 8] <= {                                                      s2m_recv_byte[12],s2m_recv_byte[11],s2m_recv_byte[10],s2m_recv_byte[9] ,s2m_recv_byte[8] };
                 end
-            end else if(i_uart_inspect & ~uart_id_flag) begin    
-                o_modbus_err_code <= 6;       //SG_TIME_OUT
             end
         end
     end
@@ -275,7 +188,7 @@ module sg_rfid_485_slaver_driver
  // ---------- send clk : 156.25MHz --------
    assign m2s_tail_symbol = 8'h00;
 
-    always @(posedge i_prot_clk)begin
+    always @(posedge i_clk)begin
         case(i_baud_rate)
             115200:m2s_baud_rate <= 4'd0;//0=115200,1=9600,2:19200
              9600 :m2s_baud_rate <= 4'd1;
@@ -283,7 +196,7 @@ module sg_rfid_485_slaver_driver
             default:m2s_baud_rate <= 4'd0;//default:115200
         endcase
     end
-    always @(posedge i_prot_clk)begin
+    always @(posedge i_clk)begin
         case(i_parity)//奇偶校验，0=无校验 1=奇校验 2=偶校验
             0:m2s_odd_even <= 2'd00;//2'b0x:no check;2'b11:odd check;2'b10:even check;
             1:m2s_odd_even <= 2'b11;
@@ -291,7 +204,7 @@ module sg_rfid_485_slaver_driver
             default:m2s_odd_even <= 2'b10;//default:even
         endcase
     end
-    always @(posedge i_prot_clk)begin
+    always @(posedge i_clk)begin
         m2s_recv_num <= i_exp_recv_num ;
         m2s_send_num <= i_exp_send_num ;
         m2s_send_char1 <= i_send_data[8* 4-1:   0];
@@ -301,8 +214,8 @@ module sg_rfid_485_slaver_driver
     end
 
    // ---------- send clk : 156.25MHz --------
-   always@(posedge i_prot_clk) begin
-       if(i_prot_rst) begin
+   always@(posedge i_clk) begin
+       if(i_rst) begin
            o_m2s_rs485_msg <= 0;
            m2s_state <= 0;
        end else begin   
@@ -374,10 +287,10 @@ module sg_rfid_485_slaver_driver
    end
    
    // ---------- receive clk : 156.25MHz ------
-   always@(posedge i_prot_clk) begin
+   always@(posedge i_clk) begin
        rs485_ch_flag_d1 <= i_rs485_ch_flag & (i_cur_slv_board_id == i_slv_board_id);
        rs485_ch_flag_d2 <= rs485_ch_flag_d1;
-       if(i_prot_rst) begin
+       if(i_rst) begin
             s2m_uart_id <= 0;
             s2m_state <= 0;
             {s2m_recv_byte[3] ,s2m_recv_byte[2] ,s2m_recv_byte[1] ,s2m_recv_byte[0] } <= 0;
@@ -444,18 +357,18 @@ module sg_rfid_485_slaver_driver
        end
    end
    
-    always@(posedge i_prot_clk) begin
-       if(i_prot_rst) begin
+    always@(posedge i_clk) begin
+       if(i_rst) begin
             m2s_send_finish <= 0;
             s2m_recv_finish <= 0;
        end else begin
-            m2s_send_finish <= (m2s_state==10)|(m2s_state==11)|(m2s_state==12);//完成标志持续三个时钟（要超过慢时钟域一个时钟周期）
-            s2m_recv_finish <= (uart_delay_cnt==10)|(uart_delay_cnt==11);
+            m2s_send_finish <= (m2s_state==10);        //13拍流发完, 1拍即可(下级打2拍取边沿)
+            s2m_recv_finish <= (uart_delay_cnt==10);   //帧计数变化且13字节捕获完, 1拍即可(下级打2拍取边沿)
        end
     end
 
-    always@(posedge i_prot_clk) begin
-       if(i_prot_rst) begin
+    always@(posedge i_clk) begin
+       if(i_rst) begin
             msg_send_cnt <= 16'd1;//initial none zero
        end else begin
             if(i_send_req_p)begin
