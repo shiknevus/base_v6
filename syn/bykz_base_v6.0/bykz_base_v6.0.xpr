@@ -180,6 +180,13 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
+      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_pul_axis/Wheel_vel_std.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
       <File Path="$PPRDIR/../src/rtl/peri/RS485_Arbiter/RS485_Arbiter.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>

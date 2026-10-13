@@ -92,6 +92,8 @@ module proactive_beh_pul_axis#(
 
     ,input wire                 i_home_completed
     ,input wire                 i_drive_enabled
+    ,input wire [31:0]          i_wheel_spd         //signed pulse/s (PARAM38)
+    ,input wire                 i_wheel_vld         //PARAM38 write strobe
 //----------------------------------------------------- user logic end -------------------------------------------------------//
     );
 
@@ -103,12 +105,14 @@ module proactive_beh_pul_axis#(
     reg motion_done_latched;
     wire is_move = (a_bhv_id_r == 3) || (a_bhv_id_r == 21);
     wire is_motion = is_move || (a_bhv_id_r == 1) || (a_bhv_id_r == 2) || (a_bhv_id_r == 20);
+    wire wheel_active;
     wire limits_enabled = rcfg_pos_max > rcfg_pos_min;
     wire target_over_f = is_move && limits_enabled && ($signed(rserv_target_pulse) > rcfg_pos_max);
     wire target_over_b = is_move && limits_enabled && ($signed(rserv_target_pulse) < rcfg_pos_min);
     wire [7:0] launch_alarm = !i_dv_alarm ? 8'd108 :
                               !i_servo_ready ? 8'd113 :
                               !i_drive_enabled ? 8'd115 :
+                              wheel_active ? 8'd118 :
                               target_over_f ? 8'd111 : target_over_b ? 8'd112 :
                               (is_move && !i_home_completed) ? 8'd114 : 8'd0;
     wire launch_fault = is_motion && (launch_alarm != 0);
@@ -121,6 +125,7 @@ module proactive_beh_pul_axis#(
     //113 Servo not ready
     //114 Move not homed
     //115 Drive disabled
+    //118 Handwheel active
 
     reg [7:0]    	curr_state;
 	reg [7:0]    	curr_state_1d;
@@ -734,6 +739,8 @@ wire [31:0]  o_rc_pulse_period;
 wire [31:0]  o_rc_pulse_number;
 wire         o_rc_pulse_dir;
 wire         i_rc_pulse_done;
+wire         pm_pulse;
+wire         pm_dir;
 
 
 Positioner_std #(.USE_ABORT(1), .BASE_REFCLK(156_250_000)) pos_u
@@ -783,9 +790,43 @@ Pulmot_fd #(.USE_PAUSE(1), .USE_ABORT(1)) Pulmot_fd00
   .i_dv_phase_a     ( 1'b0               ),
   .i_dv_phase_b     ( 1'b0               ),
   .i_dv_phase_z     ( 1'b0               ),
-  .o_dv_pulse_p     ( o_dv_pulse         ),
-  .o_dv_pulse_n     ( o_dv_dir           )
+  .o_dv_pulse_p     ( pm_pulse           ),
+  .o_dv_pulse_n     ( pm_dir             )
 );
+
+// WHEEL (PARAM38), add by szzhang 20261013
+wire [31:0] wheel_acc = (jog_acc_eff > acc_max_eff) ? acc_max_eff : jog_acc_eff;
+wire [31:0] wheel_dec = (jog_dec_eff > dec_max_eff) ? dec_max_eff : jog_dec_eff;
+wire        wheel_pulse;
+wire        wheel_dir;
+
+Wheel_vel_std #(.BASE_REFCLK(156_250_000)) wheel_u
+(
+  .clk            ( clk_i              ),
+  .reset          ( rst_i              ),
+  .i_tick_1ms     ( i_time_1ms_vld     ),
+  .i_vld          ( i_wheel_vld        ),
+  .i_spd          ( i_wheel_spd        ),
+  .i_allow        ( !is_motion && !action_busy ),
+  .i_hold         ( i_pause            ),
+  .i_stop         ( i_stop || !i_emerge_stop_signal || !a_en ),
+  .i_abort        ( !r_dv_ok || !i_drive_enabled ),
+  .i_acc          ( wheel_acc          ),
+  .i_dec          ( wheel_dec          ),
+  .i_qdec         ( dec_max_eff        ),
+  .i_spd_max      ( spd_max_eff        ),
+  .i_dir_init     ( o_dv_dir           ),
+  .i_lim_f        ( i_axis_limf        ),
+  .i_lim_b        ( i_axis_limb        ),
+  .i_blk_f        ( w_soft_lim_f && i_home_completed ),
+  .i_blk_b        ( w_soft_lim_b && i_home_completed ),
+  .o_active       ( wheel_active       ),
+  .o_pulse        ( wheel_pulse        ),
+  .o_dir          ( wheel_dir          )
+);
+
+assign o_dv_pulse = wheel_active ? wheel_pulse : pm_pulse;
+assign o_dv_dir   = wheel_active ? wheel_dir   : pm_dir;
 
 reg action_alarm;
 wire stop_request = action_alarm || i_stop || !i_emerge_stop_signal || !i_drive_enabled || !a_en;
