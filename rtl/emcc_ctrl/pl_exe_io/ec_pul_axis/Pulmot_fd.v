@@ -39,6 +39,7 @@ module Pulmot_fd
    ,input  wire             i_dv_phase_z       // drive interface: encoder feedback phase z
    ,output wire             o_dv_pulse_p       // drive interface: pulse output positice
    ,output wire             o_dv_pulse_n       // drive interface: pulse output negative
+   ,output wire [31:0]      o_dbg_period       // latched pulse period, add by szzhang 20261012
 );
 
    ///////////////// PARAMETER ////////////////
@@ -107,6 +108,7 @@ module Pulmot_fd
    endgenerate
       
    assign o_bv_pulse_busy = (r_pulse_idx < r_pulse_number);
+   assign o_dbg_period = r_pulse_period;
    assign o_bv_pulse_done = o_bv_pulse_busy && (r_pulse_count >= r_pulse_period-1) && (!USE_PAUSE || !i_pause);
 
 endmodule

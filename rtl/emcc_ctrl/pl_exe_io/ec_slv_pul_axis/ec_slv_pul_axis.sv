@@ -144,10 +144,10 @@ module ec_slv_pul_axis#(
 	wire 	[31:0]	param53 ;
 	wire 	[31:0]	param54 ;
 	wire 	[31:0]	param55 ;
-	wire 	[19:0]	param56 ;
-	wire 	[19:0]	param57 ;
-	wire 	[19:0]	param58 ;
-	wire 	[19:0]	param59 ;
+	wire 	[31:0]	param56 ;
+	wire 	[31:0]	param57 ;
+	wire 	[31:0]	param58 ;
+	wire 	[31:0]	param59 ;
 	wire 	[19:0]	param60 ;
 	wire 	[7:0]	param61 ;
 	wire 	[7:0]	param62 ;
@@ -373,12 +373,12 @@ module ec_slv_pul_axis#(
 	,.param51               (param51		)
 	,.param52               ({30'd0,b_reset,param16[0]}	)	//out cmd [2]rst [1]son [0]dir
 	//,.param53               (param53		)
-	//,.param54               (param54		)
-	//,.param55               (param55		)
-	//,.param56               (param56		)
-	//,.param57               (param57		)
-	//,.param58               (param58		)
-	//,.param59               (param59		)
+	,.param54               (param54		)	//m2s word0 sent
+	,.param55               (param55		)	//slave echo of word0
+	,.param56               (param56		)	//slave debug word 12
+	,.param57               (param57		)	//slave debug word 13
+	,.param58               (param58		)	//slave debug word 14
+	,.param59               (param59		)	//slave debug word 15
 	//,.param60               (param60		)
 	//,.param61               (param61		)
 	//,.param62               (param62		)
@@ -393,8 +393,8 @@ module ec_slv_pul_axis#(
 	,.debug_reg1			(debug_reg1		)
 	,.debug_reg2			(debug_reg2		)
 	,.debug_reg3			(debug_reg3		)
-	//,.debug_reg4			(debug_reg4		)
-	//,.debug_reg5			(debug_reg5		)
+	,.debug_reg4			(debug_reg4		)	//{s2m frame cnt, s2m word10}
+	,.debug_reg5			(debug_reg5		)	//{m2s frame cnt, stop_frame_cnt, flags}
 	);
 
 	wire home_completed;
@@ -468,6 +468,14 @@ module ec_slv_pul_axis#(
 
     ,.i_home_completed 		(home_completed			)
     ,.i_drive_enabled 		(~b_son					)
+    ,.dbg_s2m_o				(debug_reg4				)
+    ,.dbg_ctl_o				(debug_reg5				)
+    ,.dbg_m2s_w0_o			(param54				)
+    ,.dbg_s2m_w0_o			(param55				)
+    ,.dbg_s2m_w12_o			(param56				)
+    ,.dbg_s2m_w13_o			(param57				)
+    ,.dbg_s2m_w14_o			(param58				)
+    ,.dbg_s2m_w15_o			(param59				)
 //----------------------------------------------------- user logic end -------------------------------------------------------//
     );
 

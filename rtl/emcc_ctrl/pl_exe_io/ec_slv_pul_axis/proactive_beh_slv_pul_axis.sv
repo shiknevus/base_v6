@@ -101,6 +101,14 @@ module proactive_beh_slv_pul_axis#(
 
     ,input wire i_home_completed
     ,input wire i_drive_enabled
+    ,output wire [31:0]         dbg_s2m_o       // {s2m frame cnt, s2m word10}
+    ,output wire [31:0]         dbg_ctl_o       // {m2s frame cnt, stop_frame_cnt, ctrl flags}
+    ,output wire [31:0]         dbg_m2s_w0_o    // m2s word0 being sent
+    ,output wire [31:0]         dbg_s2m_w0_o    // slave echo of received word0
+    ,output wire [31:0]         dbg_s2m_w12_o   // slave debug words 12..15
+    ,output wire [31:0]         dbg_s2m_w13_o
+    ,output wire [31:0]         dbg_s2m_w14_o
+    ,output wire [31:0]         dbg_s2m_w15_o
 //----------------------------------------------------- user logic end -------------------------------------------------------//
     );
 
@@ -358,7 +366,7 @@ module proactive_beh_slv_pul_axis#(
 
 			// Stop the slave before IRQ 40 so PS sees a settled axis.
 			S_SLV_STOP_WAIT:begin
-				if(slv_stop_ready)
+				if(slv_stop_ready || timout)	// timeout exit, add by szzhang 20261012
 					next_state = S_ALERT_40;
 				else
 					next_state = S_SLV_STOP_WAIT;
@@ -469,8 +477,8 @@ module proactive_beh_slv_pul_axis#(
             timout_cnt <= 20'd0;
 		else if(curr_state != curr_state_1d)
 			timout_cnt <= 20'd0;
-		else if(i_pause)
-			timout_cnt <= timout_cnt;   
+		else if(i_pause && curr_state < S_ALERT_40)	// pause must not block alarm-path timeouts
+			timout_cnt <= timout_cnt;
         else if(timout_cnt > a_tx_ot)
             timout_cnt <= 20'd0;
         else if(i_time_1s_vld)
@@ -510,6 +518,7 @@ module proactive_beh_slv_pul_axis#(
 		reg [31:0] s2m_0tmp;
 
 		reg [31:0] s2m_11tmp;
+		reg [31:0] s2m_12tmp, s2m_13tmp, s2m_14tmp, s2m_15tmp;
 
 		wire       slv_action_busy;
 		wire       slv_action_done;
@@ -534,32 +543,34 @@ module proactive_beh_slv_pul_axis#(
 		    end
 		end
 
+		wire [31:0] m2s_word0 = {
+									8'd0,
+									a_bhv_id_r,
+		                            i_servo_ready,
+		                            i_servo_done,
+		                            i_home_completed,
+									i_drive_on,
+		                            i_drive_reset,
+									rserv_dir,
+		                            1'b0,
+									i_pause,
+		                            i_stop|(~i_emerge_stop_signal)|(!a_en),
+									action_beat,
+		                            i_axis_zero,
+									i_axis_limb,
+		                            i_axis_limf,
+									1'b0,
+		                            action_start,
+									action_alarm
+									};
+
 		always @(posedge clk_i) begin
 		    if (rst_i) begin
 		        m2s_state    <= 4'd0;
 		        m2s_pulm_msg <= 32'd0;
 		    end else begin
 		        case (m2s_state)
-		            4'd0:  m2s_pulm_msg <= {
-											8'd0, 
-											a_bhv_id_r,
-		                                    i_servo_ready,
-                                            i_servo_done,
-                                            i_home_completed,
-											i_drive_on,
-		                                    i_drive_reset, 
-											rserv_dir,
-		                                    1'b0, 
-											i_pause,
-		                                     i_stop|(~i_emerge_stop_signal)|(!a_en),
-											action_beat,
-		                                    i_axis_zero,
-											i_axis_limb,
-		                                    i_axis_limf, 
-											1'b0,
-		                                    action_start,
-											action_alarm
-											};
+		            4'd0:  m2s_pulm_msg <= m2s_word0;
 		            4'd1:  m2s_pulm_msg <= rserv_step_pulse;
 		            4'd2:  m2s_pulm_msg <= rserv_target_pulse;
 		            4'd3:  m2s_pulm_msg <= rcfg_home_spd;
@@ -592,6 +603,10 @@ module proactive_beh_slv_pul_axis#(
 		        s2m_0tmp  <= 32'd0;
 		        s2m_10tmp <= 32'd0;
 		        s2m_11tmp <= 32'd0;
+		        s2m_12tmp <= 32'd0;
+		        s2m_13tmp <= 32'd0;
+		        s2m_14tmp <= 32'd0;
+		        s2m_15tmp <= 32'd0;
 		    end else begin
 		        pul_motor_flag_d1 <= pul_motor_flag & (cur_slv_board_id == slv_board_id);
 		        pul_motor_flag_d2 <= pul_motor_flag_d1;
@@ -614,7 +629,10 @@ module proactive_beh_slv_pul_axis#(
 		            	    s2m_11tmp <= s2m_pulm_msg;
 		            	    s2m_state <= 4'd12;
 		            	end
-		            	12,13,14: s2m_state <= s2m_state + 1'b1;            
+		            	12: begin s2m_12tmp <= s2m_pulm_msg; s2m_state <= 4'd13; end	// slave debug words
+		            	13: begin s2m_13tmp <= s2m_pulm_msg; s2m_state <= 4'd14; end
+		            	14: begin s2m_14tmp <= s2m_pulm_msg; s2m_state <= 4'd15; end
+		            	15: begin s2m_15tmp <= s2m_pulm_msg; s2m_state <= 4'd0;  end
 		            	default: s2m_state <= 4'd0;
 		        	endcase
 		        end
@@ -708,6 +726,39 @@ module proactive_beh_slv_pul_axis#(
 		    else
 		        action_alarm <= action_alarm;
 		end
+
+		// debug: frame liveness + stop-wait status, add by szzhang 20261012
+		reg [15:0] s2m_frm_cnt;
+		reg [11:0] m2s_frm_cnt;
+		reg        stop_wait_to;
+		always@(posedge clk_i) begin
+		    if(rst_i) begin
+		        s2m_frm_cnt  <= 16'd0;
+		        m2s_frm_cnt  <= 12'd0;
+		        stop_wait_to <= 1'b0;
+		    end else begin
+		        if(pul_motor_flag_d2)
+		            s2m_frm_cnt <= s2m_frm_cnt + 1'b1;	// this board only
+		        if((m2s_state == 4'd0) && pul_motor_r_flag)
+		            m2s_frm_cnt <= m2s_frm_cnt + 1'b1;	// any board
+		        if(a_bhv_vld_r)
+		            stop_wait_to <= 1'b0;
+		        else if(curr_state == S_SLV_STOP_WAIT && timout && !slv_stop_ready)
+		            stop_wait_to <= 1'b1;
+		    end
+		end
+		assign dbg_s2m_o = {s2m_frm_cnt, s2m_10tmp[15:0]};
+		assign dbg_m2s_w0_o = m2s_word0;
+		assign dbg_s2m_w0_o = s2m_0tmp;
+		assign dbg_s2m_w12_o = s2m_12tmp;
+		assign dbg_s2m_w13_o = s2m_13tmp;
+		assign dbg_s2m_w14_o = s2m_14tmp;
+		assign dbg_s2m_w15_o = s2m_15tmp;
+		assign dbg_ctl_o = {m2s_frm_cnt, stop_frame_cnt,
+		                    i_pause, i_stop, i_emerge_stop_signal, a_en,
+		                    stop_wait_to, timout, action_ack_base, action_issued,
+		                    action_start, action_alarm, action_accepted, done_latched,
+		                    pulse_done_latched, stop_status_idle, latch_sta};
 //==============================================================================================================================//
 //----------------------------------------------------- user logic end -------------------------------------------------------//
 //==============================================================================================================================//

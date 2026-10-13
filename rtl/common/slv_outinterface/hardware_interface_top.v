@@ -109,7 +109,11 @@ module hardware_interface_top
     wire             i_axis_limf[3:0];
     wire             i_axis_limb[3:0];
     wire             i_axis_zero[3:0];
-    wire             i_axis_abspos0[3:0]; 
+    wire             i_axis_abspos0[3:0];
+    wire [31:0]      axis_dbg12[3:0];   //debug s2m words 12..15, add by szzhang 20261012
+    wire [31:0]      axis_dbg13[3:0];
+    wire [31:0]      axis_dbg14[3:0];
+    wire [31:0]      axis_dbg15[3:0];
     wire [31:0]      rs232_uart_id[7:0];            //uart_id
     wire [3:0]       rs232_baud_rate[7:0];          
     wire             rs232_start_send[7:0];         
@@ -522,6 +526,14 @@ assign rs232_uart_id[0] = rs232_ch0_buf[0];
                         pul_motor0_msg <= {16'd0,axis_alarm_code[0],action_ack[0],pulse_done[0],device_beat[0],o_dv_dir[0],device_alarm[0],action_error[0],action_done[0],action_busy[0]};
                     end else if(rd_msg_addr_d == (bias_pul_motor0+11)) begin
                         pul_motor0_msg <= r_pf_abspos[0];
+                    end else if(rd_msg_addr_d == (bias_pul_motor0+12)) begin
+                        pul_motor0_msg <= axis_dbg12[0];
+                    end else if(rd_msg_addr_d == (bias_pul_motor0+13)) begin
+                        pul_motor0_msg <= axis_dbg13[0];
+                    end else if(rd_msg_addr_d == (bias_pul_motor0+14)) begin
+                        pul_motor0_msg <= axis_dbg14[0];
+                    end else if(rd_msg_addr_d == (bias_pul_motor0+15)) begin
+                        pul_motor0_msg <= axis_dbg15[0];
                     end else begin
                         pul_motor0_msg <= pul_motor0_buf[rd_msg_addr_d - bias_pul_motor0];
                     end
@@ -531,6 +543,14 @@ assign rs232_uart_id[0] = rs232_ch0_buf[0];
                         pul_motor1_msg <= {16'd0,axis_alarm_code[1],action_ack[1],pulse_done[1],device_beat[1],o_dv_dir[1],device_alarm[1],action_error[1],action_done[1],action_busy[1]};
                     end else if(rd_msg_addr_d == (bias_pul_motor1+11)) begin
                         pul_motor1_msg <= r_pf_abspos[1];
+                    end else if(rd_msg_addr_d == (bias_pul_motor1+12)) begin
+                        pul_motor1_msg <= axis_dbg12[1];
+                    end else if(rd_msg_addr_d == (bias_pul_motor1+13)) begin
+                        pul_motor1_msg <= axis_dbg13[1];
+                    end else if(rd_msg_addr_d == (bias_pul_motor1+14)) begin
+                        pul_motor1_msg <= axis_dbg14[1];
+                    end else if(rd_msg_addr_d == (bias_pul_motor1+15)) begin
+                        pul_motor1_msg <= axis_dbg15[1];
                     end else begin
                         pul_motor1_msg <= pul_motor1_buf[rd_msg_addr_d - bias_pul_motor1];
                     end
@@ -540,6 +560,14 @@ assign rs232_uart_id[0] = rs232_ch0_buf[0];
                         pul_motor2_msg <= {16'd0,axis_alarm_code[2],action_ack[2],pulse_done[2],device_beat[2],o_dv_dir[2],device_alarm[2],action_error[2],action_done[2],action_busy[2]};
                     end else if(rd_msg_addr_d == (bias_pul_motor2+11)) begin
                         pul_motor2_msg <= r_pf_abspos[2];
+                    end else if(rd_msg_addr_d == (bias_pul_motor2+12)) begin
+                        pul_motor2_msg <= axis_dbg12[2];
+                    end else if(rd_msg_addr_d == (bias_pul_motor2+13)) begin
+                        pul_motor2_msg <= axis_dbg13[2];
+                    end else if(rd_msg_addr_d == (bias_pul_motor2+14)) begin
+                        pul_motor2_msg <= axis_dbg14[2];
+                    end else if(rd_msg_addr_d == (bias_pul_motor2+15)) begin
+                        pul_motor2_msg <= axis_dbg15[2];
                     end else begin
                         pul_motor2_msg <= pul_motor2_buf[rd_msg_addr_d - bias_pul_motor2];
                     end
@@ -549,6 +577,14 @@ assign rs232_uart_id[0] = rs232_ch0_buf[0];
                         pul_motor3_msg <= {16'd0,axis_alarm_code[3],action_ack[3],pulse_done[3],device_beat[3],o_dv_dir[3],device_alarm[3],action_error[3],action_done[3],action_busy[3]};
                     end else if(rd_msg_addr_d == (bias_pul_motor3+11)) begin
                         pul_motor3_msg <= r_pf_abspos[3];
+                    end else if(rd_msg_addr_d == (bias_pul_motor3+12)) begin
+                        pul_motor3_msg <= axis_dbg12[3];
+                    end else if(rd_msg_addr_d == (bias_pul_motor3+13)) begin
+                        pul_motor3_msg <= axis_dbg13[3];
+                    end else if(rd_msg_addr_d == (bias_pul_motor3+14)) begin
+                        pul_motor3_msg <= axis_dbg14[3];
+                    end else if(rd_msg_addr_d == (bias_pul_motor3+15)) begin
+                        pul_motor3_msg <= axis_dbg15[3];
                     end else begin
                         pul_motor3_msg <= pul_motor3_buf[rd_msg_addr_d - bias_pul_motor3];
                     end 
@@ -713,6 +749,10 @@ assign rs232_uart_id[0] = rs232_ch0_buf[0];
            ,.o_device_dir            ( o_dv_dir[i]          )
            ,.o_device_reset          ( o_dv_reset[i]        )
            ,.o_device_son            ( o_dv_son[i]          )
+           ,.o_dbg_w12               ( axis_dbg12[i]        )
+           ,.o_dbg_w13               ( axis_dbg13[i]        )
+           ,.o_dbg_w14               ( axis_dbg14[i]        )
+           ,.o_dbg_w15               ( axis_dbg15[i]        )
 	   );
 	   end
    endgenerate

@@ -135,12 +135,12 @@ module ps_rw_pl_reg_slv_pul_axis#(
 	,input 				[31:0]		param51
 	,input 				[31:0]		param52
 	//,input 				[31:0]		param53   
-	//,input 				[31:0]		param54   
-	//,input 				[31:0]		param55   
-	//,input 				[19:0]		param56   
-	//,input 				[19:0]		param57   
-	//,input 				[19:0]		param58   
-	//,input 				[19:0]		param59   
+	,input 				[31:0]		param54
+	,input 				[31:0]		param55
+	,input 				[31:0]		param56   	//slave debug word 12..15
+	,input 				[31:0]		param57
+	,input 				[31:0]		param58
+	,input 				[31:0]		param59
 	//,input 				[19:0]		param60   
 	//,input 				[7:0]		param61   
 	//,input 				[7:0]		param62   
@@ -155,8 +155,8 @@ module ps_rw_pl_reg_slv_pul_axis#(
 	,input 				[31:0]		debug_reg1
 	,input 				[31:0]		debug_reg2
 	,input 				[31:0]		debug_reg3
-	//,input 				[31:0]		debug_reg4
-	//,input 				[31:0]		debug_reg5
+	,input 				[31:0]		debug_reg4
+	,input 				[31:0]		debug_reg5
 	);
 
 	reg  		rd_en_d1;
@@ -398,12 +398,12 @@ module ps_rw_pl_reg_slv_pul_axis#(
 		`PARAM51		:	o_st_rd_data <= param51     		;
 		`PARAM52		:	o_st_rd_data <= param52     		;
 		//`PARAM53		:	o_st_rd_data <= param53     		;
-		//`PARAM54		:	o_st_rd_data <= param54     		;
-		//`PARAM55		:	o_st_rd_data <= param55     		;
-		//`PARAM56		:	o_st_rd_data <= {12'd0,param56		};
-		//`PARAM57		:	o_st_rd_data <= {12'd0,param57		};
-		//`PARAM58		:	o_st_rd_data <= {12'd0,param58		};
-		//`PARAM59		:	o_st_rd_data <= {12'd0,param59		};
+		`PARAM54		:	o_st_rd_data <= param54     		;
+		`PARAM55		:	o_st_rd_data <= param55     		;
+		`PARAM56		:	o_st_rd_data <= param56     		;
+		`PARAM57		:	o_st_rd_data <= param57     		;
+		`PARAM58		:	o_st_rd_data <= param58     		;
+		`PARAM59		:	o_st_rd_data <= param59     		;
 		//`PARAM60		:	o_st_rd_data <= {12'd0,param60		};
 		//`PARAM61		:	o_st_rd_data <= {24'd0,param61  	};
 		//`PARAM62		:	o_st_rd_data <= {24'd0,param62  	};
@@ -419,8 +419,8 @@ module ps_rw_pl_reg_slv_pul_axis#(
 		`DEBUG_REG1		:	o_st_rd_data <= debug_reg1			;
 		`DEBUG_REG2		:	o_st_rd_data <= debug_reg2			;
 		`DEBUG_REG3		:	o_st_rd_data <= debug_reg3			;
-		//`DEBUG_REG4		:	o_st_rd_data <= debug_reg4			;
-        //`DEBUG_REG5		:	o_st_rd_data <= debug_reg5			;
+		`DEBUG_REG4		:	o_st_rd_data <= debug_reg4			;
+		`DEBUG_REG5		:	o_st_rd_data <= debug_reg5			;
 
 		`RST_EN        	:	o_st_rd_data <= {31'd0,rst_en_n		};
 		`EC_ID         	:	o_st_rd_data <= {18'd0,ec_id		};   

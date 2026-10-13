@@ -85,7 +85,11 @@ module slv_pul_axis
    ,output wire             o_device_pulse
    ,output wire             o_device_dir
    ,output wire             o_device_reset
-   ,output wire             o_device_son 
+   ,output wire             o_device_son
+   ,output wire [31:0]      o_dbg_w12       //debug words to s2m 12..15, add by szzhang 20261012
+   ,output wire [31:0]      o_dbg_w13
+   ,output wire [31:0]      o_dbg_w14
+   ,output wire [31:0]      o_dbg_w15
 );
    
    ///////////////// PARAMETER ////////////////
@@ -162,7 +166,12 @@ module slv_pul_axis
    wire         i_rc_pulse_done;
    wire         i_rc_dbestop;
    wire         i_rc_pulse_busy;
-  
+   wire [31:0]  pg_period;
+   wire [31:0]  pos_dbg;
+   wire [4:0]   home_st;
+   wire [4:0]   jog_st;
+   wire [4:0]   move_st;
+
    Pulmot_fd #(.USE_PAUSE(1), .USE_ABORT(1)) Pulmot_fd00
    (
       .clk              ( clk                    ),
@@ -183,7 +192,8 @@ module slv_pul_axis
       .i_dv_phase_b     ( 1'b0                   ),
       .i_dv_phase_z     ( 1'b0                   ),
       .o_dv_pulse_p     ( o_device_pulse         ),
-      .o_dv_pulse_n     ( o_device_dir           )
+      .o_dv_pulse_n     ( o_device_dir           ),
+      .o_dbg_period     ( pg_period              )
    );
   
   ////////////////// Positioner
@@ -231,7 +241,8 @@ module slv_pul_axis
       .o_pulse_number ( o_rc_pulse_number  ),
       .o_pulse_dir    ( o_rc_pulse_dir     ),
       .i_pulse_busy   ( i_rc_pulse_busy ),
-      .i_pulse_done   ( i_rc_pulse_done    )
+      .i_pulse_done   ( i_rc_pulse_done    ),
+      .o_dbg          ( pos_dbg            )
    );
    
    ////////////////// HOME
@@ -279,7 +290,8 @@ module slv_pul_axis
       .o_pf_quickstop ( home_pf_quickstop  ),
       .o_pf_touchstop ( home_pf_touchstop ),
       .i_pf_busy      ( pos_pf_busy        ),
-      .i_pf_done      ( pos_pf_done        )
+      .i_pf_done      ( pos_pf_done        ),
+      .o_dbg_st       ( home_st            )
    );
    
    ////////////////// JOG
@@ -325,7 +337,8 @@ module slv_pul_axis
       .o_pf_stop      ( jog_pf_stop        ),
       .o_pf_quickstop ( jog_pf_quickstop   ),
       .i_pf_busy      ( pos_pf_busy        ),
-      .i_pf_done      ( pos_pf_done        )
+      .i_pf_done      ( pos_pf_done        ),
+      .o_dbg_st       ( jog_st             )
    );
    
    ////////////////// MOVE
@@ -371,7 +384,8 @@ module slv_pul_axis
       .o_pf_stop      ( move_pf_stop       ),
       .o_pf_quickstop ( move_pf_quickstop  ),
       .i_pf_busy      ( pos_pf_busy        ),
-      .i_pf_done      ( pos_pf_done        )
+      .i_pf_done      ( pos_pf_done        ),
+      .o_dbg_st       ( move_st            )
    );
 
   //behavior mapping (aligned with master ec_pul_axis):
@@ -511,6 +525,34 @@ module slv_pul_axis
           endcase
   end
    
+// debug words, add by szzhang 20261012
+reg [7:0] dbg_start_cnt;   // action_start edges
+reg [7:0] dbg_accept_cnt;  // home/jog/move start issued
+reg [7:0] dbg_pos_cnt;     // positioner busy rises
+reg       dbg_pos_busy_d;
+always @(posedge clk) begin
+    if(reset) begin
+        dbg_start_cnt  <= 8'd0;
+        dbg_accept_cnt <= 8'd0;
+        dbg_pos_cnt    <= 8'd0;
+        dbg_pos_busy_d <= 1'b0;
+    end else begin
+        dbg_pos_busy_d <= pos_pf_busy;
+        if(action_start_pulse)                  dbg_start_cnt  <= dbg_start_cnt + 1'b1;
+        if(home_start | jog_start | move_start) dbg_accept_cnt <= dbg_accept_cnt + 1'b1;
+        if(pos_pf_busy & ~dbg_pos_busy_d)       dbg_pos_cnt    <= dbg_pos_cnt + 1'b1;
+    end
+end
+assign o_dbg_w12 = {home_st[3:0], jog_st[2:0], move_st[2:0], pos_dbg[8:6],
+                    home_busy, jog_busy, move_busy, pos_pf_busy, i_rc_pulse_busy,
+                    pos_dbg[5:1],
+                    stop_request, beat_timeout, action_flag, action_alarm, action_son,
+                    drive_ok, hard_abort, motion_pause, start_ok};
+assign o_dbg_w13 = {dbg_start_cnt, dbg_accept_cnt, dbg_pos_cnt, cur_beha};
+assign o_dbg_w14 = pg_period;
+assign o_dbg_w15 = {pos_dbg[31:9], o_device_pulse, o_device_dir, pos_pf_start, pos_pf_stop,
+                    pos_quickstop, i_axis_limf, i_axis_limb, i_pause, action_start};
+
 // absolute position tracking
 reg home_pos_reset;
 always@(posedge clk) begin

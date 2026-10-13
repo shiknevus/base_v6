@@ -28,7 +28,7 @@ module Positioner_std #(
    ,output wire             o_pulse_dir
    ,input  wire             i_pulse_busy // wait for the physical output to finish add by szzhang 20260914
    ,input  wire             i_pulse_done
-   
+   ,output wire [31:0]      o_dbg          //{spd,st,pvalid,first,stop_pend,pause_pend,qstop,err}, add by szzhang 20261012
 );
 
    //////////////////////// DEFINE ////////////
@@ -669,6 +669,8 @@ module Positioner_std #(
    assign o_pf_done  = r_pf_done;
    assign o_pf_error = r_pf_error;
    assign o_pf_busy  = r_pf_busy;
+   assign o_dbg      = {r_pf_spd, fsm_st, period_valid, r_pf_pulse_first, stop_pending,
+                        pause_pending, r_pf_quickstop, r_pf_error};
    
    ////////////////// Pulse generator
    reg         r_pulse_start;

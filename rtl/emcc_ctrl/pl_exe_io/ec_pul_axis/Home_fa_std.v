@@ -31,6 +31,7 @@ module Home_fa_std
    ,output wire             o_pf_touchstop //add by szzhang 20260916
    ,input  wire             i_pf_busy
    ,input  wire             i_pf_done
+   ,output wire [4:0]       o_dbg_st       //debug, add by szzhang 20261012
 );
 
 
@@ -51,6 +52,7 @@ module Home_fa_std
    localparam ST_HOME_FINISH   = 9;
    ///////////////// PARAMETER ////////////////
    reg [4:0]   fsm_st;
+   assign o_dbg_st = fsm_st;
    reg         r_pf_status_lim_f;
    reg         r_pf_status_lim_b;
    reg         r_pf_status_org;

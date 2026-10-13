@@ -29,6 +29,7 @@ module Jog_fa_std
    ,output wire             o_pf_quickstop
    ,input  wire             i_pf_busy
    ,input  wire             i_pf_done
+   ,output wire [4:0]       o_dbg_st       //debug, add by szzhang 20261012
 );
 
    //////////////////////// DEFINE ////////////
@@ -41,6 +42,7 @@ module Jog_fa_std
    localparam ST_JOG_END        = 4;
    ///////////////// PARAMETER //////////////// 
    reg [4:0]   fsm_st;
+   assign o_dbg_st = fsm_st;
    reg         r_pf_start;
    reg         r_pf_stop;
    reg         r_pf_quickstop;
