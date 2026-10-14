@@ -519,61 +519,121 @@ end
         ,.ch_rs485_m2s_msg      ( ch_rs485_m2s_msg             )
     );
 	
-	
-	
-	
-	
-	reg 		i_right_far_cage_mat_check ;
-	reg 		i_right_hori_overrange     ;
-	reg 		i_left_near_cage_mat_check ;
-	reg 		i_left_far_cage_mat_check  ;
-	reg 		i_left_hori_overrange      ;
-	reg 		i_right_near_cage_mat_cher ;
-	reg 		i_mat_arr                  ;
-	reg 		i_left_verti_overrange     ;
-	reg 		i_height_overrange         ;
-	reg 		i_right_verti_overrange    ;
-	
-	ec_stacker_cage_check#(
-		.REG_SPACE_BIAS 		(20'h3000 		)
-		,.REG_SPACE_SIZE 		(`REG_SPACE_SIZE)
-	)ec_stacker_cage_check_u0(
-		.clk_i							(clk                )		
-		,.rst							(reset              )		
-		,.i_time_1ms_vld				(time_1ms_vld       )		
-		,.i_time_1s_vld 				(time_1s_vld        )		
-		,.ps_reg_clk					(ps_reg_clk         )		
-		,.ps_reg_reset					(ps_reg_reset       )		
-		,.i_st_wr_en					(ps_reg_we          )		
-		,.i_st_wr_addr  				(ps_reg_addr        )		
-		,.i_st_wr_data  				(ps_reg_wr_dat      )		
-		,.i_st_rd_en    				(ps_reg_re          )		
-		,.i_st_rd_addr  				(ps_reg_rd_addr     )		
-		,.o_st_rd_data  				(sub_comp_rd_dat[20])		
-		,.o_st_rd_vld   				(sub_comp_rd_vld[20])		
-		//,.i_right_far_cage_mat_check	(di_mst_msg[0])		// »õÁıÓÒ±ßÔ¶Àë»õÁı¶ËÎïÁÏ¼ì²â
-		//,.i_right_hori_overrange    	(di_mst_msg[1])		// ÓÒ²àºáÏò³¬¿í¼ì²â
-		//,.i_left_near_cage_mat_check	(di_mst_msg[2])		// »õÁı×ó±ß¿¿½ü»õÁı¶ËÎïÁÏ¼ì²â
-		//,.i_left_far_cage_mat_check 	(di_mst_msg[3])		// »õÁı×ó±ßÔ¶Àë»õÁı¶ËÎïÁÏ¼ì²â
-		//,.i_left_hori_overrange     	(di_mst_msg[4])		// ×ó²àºáÏò³¬¿í¼ì²â
-		//,.i_right_near_cage_mat_cher	(di_mst_msg[5])		// »õÁıÓÒ±ß¿¿½ü»õÁı¶ËÎïÁÏ¼ì²â
-		//,.i_mat_arr                 	(di_mst_msg[6])		// »õÁıÄÚ²¿ÎïÁÏ¼ì²â
-		//,.i_left_verti_overrange    	(di_mst_msg[7])		// ×ó²àÊúÏò³¬¿í¼ì²â
-		//,.i_height_overrange        	(di_mst_msg[8])		// ³¬¸ß¼ì²â
-		//,.i_right_verti_overrange   	(di_mst_msg[9])		// ÓÒ²àÊúÏò³¬¿í¼ì²â
-		
-		,.i_right_far_cage_mat_check	(i_right_far_cage_mat_check)		// »õÁıÓÒ±ßÔ¶Àë»õÁı¶ËÎïÁÏ¼ì²â
-		,.i_right_hori_overrange    	(i_right_hori_overrange    )		// ÓÒ²àºáÏò³¬¿í¼ì²â
-		,.i_left_near_cage_mat_check	(i_left_near_cage_mat_check)		// »õÁı×ó±ß¿¿½ü»õÁı¶ËÎïÁÏ¼ì²â
-		,.i_left_far_cage_mat_check 	(i_left_far_cage_mat_check )		// »õÁı×ó±ßÔ¶Àë»õÁı¶ËÎïÁÏ¼ì²â
-		,.i_left_hori_overrange     	(i_left_hori_overrange     )		// ×ó²àºáÏò³¬¿í¼ì²â
-		,.i_right_near_cage_mat_cher	(i_right_near_cage_mat_cher)		// »õÁıÓÒ±ß¿¿½ü»õÁı¶ËÎïÁÏ¼ì²â
-		,.i_mat_arr                 	(i_mat_arr                 )		// »õÁıÄÚ²¿ÎïÁÏ¼ì²â
-		,.i_left_verti_overrange    	(i_left_verti_overrange    )		// ×ó²àÊúÏò³¬¿í¼ì²â
-		,.i_height_overrange        	(i_height_overrange        )		// ³¬¸ß¼ì²â
-		,.i_right_verti_overrange   	(i_right_verti_overrange   )		// ÓÒ²àÊúÏò³¬¿í¼ì²â
-		,.o_intr_irq	                (map_irq[20])		
+	ec_wind_press_sensor#(
+        .REG_SPACE_BIAS      (20'h3000 			)
+        ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE	)
+	)ec_wind_press_sensor_u0(
+        .clk_i           	 (clk                )
+        ,.rst            	 (reset              )
+        ,.i_time_1ms_vld 	 (time_1ms_vld       )
+        ,.i_time_1s_vld  	 (time_1s_vld        )
+        ,.ps_reg_clk     	 (ps_reg_clk         )
+        ,.ps_reg_reset   	 (ps_reg_reset       )
+        ,.i_st_wr_en     	 (ps_reg_we          )
+        ,.i_st_wr_addr   	 (ps_reg_addr        )
+        ,.i_st_wr_data   	 (ps_reg_wr_dat      )
+        ,.i_st_rd_en     	 (ps_reg_re          )
+        ,.i_st_rd_addr   	 (ps_reg_rd_addr     )
+        ,.o_st_rd_data   	 (sub_comp_rd_dat[20])
+        ,.o_st_rd_vld    	 (sub_comp_rd_vld[20])
+        ,.o_intr_irq     	 (map_irq[20])
+        ,.i_uart_rx      	 (rs485_1_user_rx[6]   )
+        ,.o_uart_tx      	 (rs485_1_user_tx[6]   )
+        ,.o_uart_de      	 (rs485_1_user_de[6]   )
+        ,.o_user_req     	 (rs485_1_user_req[6]  )
+        ,.i_user_grant   	 (rs485_1_user_grant[6])
+        ,.cur_slv_board_id	 (ch_board_id[0])
+        ,.slv_board_id    	 (slv_board_id)
+        ,.rs485_ch_r_flag 	 (ch_rs485_r_flag[0][0] )
+        ,.m2s_rs485_msg   	 (ch_rs485_m2s_msg[0][0])
+        ,.rs485_ch_flag   	 (ch_rs485_flag[0][0]   )
+        ,.s2m_rs485_msg	     (ch_rs485_s2m_msg[0][0])
     );
+	
+	//ec_lanyu_temper_humidity_sensor#(
+    //    .REG_SPACE_BIAS      (20'h3000 			)
+    //    ,.REG_SPACE_SIZE     (`REG_SPACE_SIZE	)
+	//)ec_lanyu_temper_humidity_sensor_u0(
+    //    .clk_i            	(clk                )
+    //    ,.rst             	(reset              )
+    //    ,.i_time_1ms_vld  	(time_1ms_vld       )
+    //    ,.i_time_1s_vld   	(time_1s_vld        )
+    //    ,.ps_reg_clk      	(ps_reg_clk         )
+    //    ,.ps_reg_reset    	(ps_reg_reset       )
+    //    ,.i_st_wr_en      	(ps_reg_we          )
+    //    ,.i_st_wr_addr    	(ps_reg_addr        )
+    //    ,.i_st_wr_data    	(ps_reg_wr_dat      )
+    //    ,.i_st_rd_en      	(ps_reg_re          )
+    //    ,.i_st_rd_addr    	(ps_reg_rd_addr     )
+    //    ,.o_st_rd_data    	(sub_comp_rd_dat[20])
+    //    ,.o_st_rd_vld     	(sub_comp_rd_vld[20])
+    //    ,.o_intr_irq      	(map_irq[20])
+    //    ,.i_uart_rx       	(rs485_1_user_rx[6]   )
+    //    ,.o_uart_tx       	(rs485_1_user_tx[6]   )
+    //    ,.o_uart_de       	(rs485_1_user_de[6]   )
+    //    ,.o_user_req      	(rs485_1_user_req[6]  )
+    //    ,.i_user_grant    	(rs485_1_user_grant[6])
+    //    ,.cur_slv_board_id	(ch_board_id[0]	)
+    //    ,.slv_board_id    	(slv_board_id)
+    //    ,.rs485_ch_r_flag 	(ch_rs485_r_flag[0][0]  )
+    //    ,.m2s_rs485_msg   	(ch_rs485_m2s_msg[0][0] )
+    //    ,.rs485_ch_flag   	(ch_rs485_flag[0][0]    )
+    //    ,.s2m_rs485_msg		(ch_rs485_s2m_msg[0][0]     )
+    //);
+	
+	
+	
+	//reg 		i_right_far_cage_mat_check ;
+	//reg 		i_right_hori_overrange     ;
+	//reg 		i_left_near_cage_mat_check ;
+	//reg 		i_left_far_cage_mat_check  ;
+	//reg 		i_left_hori_overrange      ;
+	//reg 		i_right_near_cage_mat_cher ;
+	//reg 		i_mat_arr                  ;
+	//reg 		i_left_verti_overrange     ;
+	//reg 		i_height_overrange         ;
+	//reg 		i_right_verti_overrange    ;
+	
+	//ec_stacker_cage_check#(
+	//	.REG_SPACE_BIAS 		(20'h3000 		)
+	//	,.REG_SPACE_SIZE 		(`REG_SPACE_SIZE)
+	//)ec_stacker_cage_check_u0(
+	//	.clk_i							(clk                )		
+	//	,.rst							(reset              )		
+	//	,.i_time_1ms_vld				(time_1ms_vld       )		
+	//	,.i_time_1s_vld 				(time_1s_vld        )		
+	//	,.ps_reg_clk					(ps_reg_clk         )		
+	//	,.ps_reg_reset					(ps_reg_reset       )		
+	//	,.i_st_wr_en					(ps_reg_we          )		
+	//	,.i_st_wr_addr  				(ps_reg_addr        )		
+	//	,.i_st_wr_data  				(ps_reg_wr_dat      )		
+	//	,.i_st_rd_en    				(ps_reg_re          )		
+	//	,.i_st_rd_addr  				(ps_reg_rd_addr     )		
+	//	,.o_st_rd_data  				(sub_comp_rd_dat[20])		
+	//	,.o_st_rd_vld   				(sub_comp_rd_vld[20])		
+	//	//,.i_right_far_cage_mat_check	(di_mst_msg[0])		// »õÁıÓÒ±ßÔ¶Àë»õÁı¶ËÎïÁÏ¼ì²â
+	//	//,.i_right_hori_overrange    	(di_mst_msg[1])		// ÓÒ²àºáÏò³¬¿í¼ì²â
+	//	//,.i_left_near_cage_mat_check	(di_mst_msg[2])		// »õÁı×ó±ß¿¿½ü»õÁı¶ËÎïÁÏ¼ì²â
+	//	//,.i_left_far_cage_mat_check 	(di_mst_msg[3])		// »õÁı×ó±ßÔ¶Àë»õÁı¶ËÎïÁÏ¼ì²â
+	//	//,.i_left_hori_overrange     	(di_mst_msg[4])		// ×ó²àºáÏò³¬¿í¼ì²â
+	//	//,.i_right_near_cage_mat_cher	(di_mst_msg[5])		// »õÁıÓÒ±ß¿¿½ü»õÁı¶ËÎïÁÏ¼ì²â
+	//	//,.i_mat_arr                 	(di_mst_msg[6])		// »õÁıÄÚ²¿ÎïÁÏ¼ì²â
+	//	//,.i_left_verti_overrange    	(di_mst_msg[7])		// ×ó²àÊúÏò³¬¿í¼ì²â
+	//	//,.i_height_overrange        	(di_mst_msg[8])		// ³¬¸ß¼ì²â
+	//	//,.i_right_verti_overrange   	(di_mst_msg[9])		// ÓÒ²àÊúÏò³¬¿í¼ì²â
+	//	
+	//	,.i_right_far_cage_mat_check	(i_right_far_cage_mat_check)		// »õÁıÓÒ±ßÔ¶Àë»õÁı¶ËÎïÁÏ¼ì²â
+	//	,.i_right_hori_overrange    	(i_right_hori_overrange    )		// ÓÒ²àºáÏò³¬¿í¼ì²â
+	//	,.i_left_near_cage_mat_check	(i_left_near_cage_mat_check)		// »õÁı×ó±ß¿¿½ü»õÁı¶ËÎïÁÏ¼ì²â
+	//	,.i_left_far_cage_mat_check 	(i_left_far_cage_mat_check )		// »õÁı×ó±ßÔ¶Àë»õÁı¶ËÎïÁÏ¼ì²â
+	//	,.i_left_hori_overrange     	(i_left_hori_overrange     )		// ×ó²àºáÏò³¬¿í¼ì²â
+	//	,.i_right_near_cage_mat_cher	(i_right_near_cage_mat_cher)		// »õÁıÓÒ±ß¿¿½ü»õÁı¶ËÎïÁÏ¼ì²â
+	//	,.i_mat_arr                 	(i_mat_arr                 )		// »õÁıÄÚ²¿ÎïÁÏ¼ì²â
+	//	,.i_left_verti_overrange    	(i_left_verti_overrange    )		// ×ó²àÊúÏò³¬¿í¼ì²â
+	//	,.i_height_overrange        	(i_height_overrange        )		// ³¬¸ß¼ì²â
+	//	,.i_right_verti_overrange   	(i_right_verti_overrange   )		// ÓÒ²àÊúÏò³¬¿í¼ì²â
+	//	,.o_intr_irq	                (map_irq[20])		
+    //);
 	
 	
 	

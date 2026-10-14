@@ -1,7 +1,12 @@
 //2026/9/20
 //cgliu
+//起始位滤波开关(条件编译):定义本宏后,接收端在检测到下降沿后的第5/8个比特时间处复核电平,
+//仍为低才承认是起始位,用于滤除rs485收发换向(de拉低)时rx上约40个时钟的窄低脉冲被误判为
+//起始位的问题;判定点由CLK_FREQ/UART_BPS参数换算,随波特率设置自动变化。
+//接上真传感器后如需恢复原始行为(仅凭下降沿即认为起始位),注释掉下面这行define重新编译即可。
+`define UART_START_CHK_EN
 
-module uart_rx(
+module uart_1byte_rx(
     input				i_clk	                 //ϵͳʱ��
     ,input           	i_rst	               //ϵͳ��λ���͵�ƽ��Ч
     ,input           	i_uart_rx	                //UART���ն˿�
@@ -67,6 +72,12 @@ end
 localparam BPS_CNT  = CLK_FREQ/UART_BPS;        //Ϊ�õ�ָ�������ʣ�
                                                 //��Ҫ��ϵͳʱ�Ӽ���BPS_CNT��                                          
 //reg define
+`ifdef UART_START_CHK_EN
+//起始位确认点=1bit时间的5/8,随CLK_FREQ/UART_BPS(波特率)自动换算;
+//换向毛刺约40clk,在任何支持的波特率下都远短于5/8比特,会被该判据滤除。
+localparam START_CHK_CNT = (CLK_FREQ/UART_BPS)*5/8;
+`endif
+
 generate
     if(PARITY=="ODD")begin:Odd
         reg        uart_rxd_d0;
@@ -104,6 +115,10 @@ generate
             else begin
                 if(start_flag)                          //��⵽��ʼλ
                     rx_flag <= 1'b1;                    //������չ��̣���־λrx_flag����
+`ifdef UART_START_CHK_EN
+                else if((rx_cnt == 4'd0)&&(clk_cnt == START_CHK_CNT)&&(uart_rxd_d1))
+                    rx_flag <= 1'b0;                    //起始位校验失败:5/8比特处已回高=毛刺,丢弃本次接收
+`endif
                 else if((rx_cnt == 4'd10)&&(clk_cnt == BPS_CNT/2))
                     rx_flag <= 1'b0;                    //������ֹͣλ�м�ʱ��ֹͣ���չ���
                 else
@@ -215,6 +230,10 @@ generate
             else begin
                 if(start_flag)                          //��⵽��ʼλ
                     rx_flag <= 1'b1;                    //������չ��̣���־λrx_flag����
+`ifdef UART_START_CHK_EN
+                else if((rx_cnt == 4'd0)&&(clk_cnt == START_CHK_CNT)&&(uart_rxd_d1))
+                    rx_flag <= 1'b0;                    //起始位校验失败:5/8比特处已回高=毛刺,丢弃本次接收
+`endif
                 else if((rx_cnt == 4'd10)&&(clk_cnt == BPS_CNT/2))
                     rx_flag <= 1'b0;                    //������ֹͣλ�м�ʱ��ֹͣ���չ���
                 else
@@ -326,6 +345,10 @@ generate
             else begin
                 if(start_flag)                          //��⵽��ʼλ
                     rx_flag <= 1'b1;                    //������չ��̣���־λrx_flag����
+`ifdef UART_START_CHK_EN
+                else if((rx_cnt == 4'd0)&&(clk_cnt == START_CHK_CNT)&&(uart_rxd_d1))
+                    rx_flag <= 1'b0;                    //起始位校验失败:5/8比特处已回高=毛刺,丢弃本次接收
+`endif
                 else if((rx_cnt == 4'd9)&&(clk_cnt == BPS_CNT/2))
                     rx_flag <= 1'b0;                    //������ֹͣλ�м�ʱ��ֹͣ���չ���
                 else

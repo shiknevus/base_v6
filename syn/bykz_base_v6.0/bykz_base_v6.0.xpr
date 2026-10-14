@@ -3,7 +3,7 @@
 <!--                                                         -->
 <!-- Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.   -->
 
-<Project Version="7" Minor="39" Path="E:/base_prj/bykz_v6.0/syn/bykz_base_v6.0/bykz_base_v6.0.xpr">
+<Project Version="7" Minor="39" Path="C:/Users/keyang/Desktop/bykz_v6.0/syn/bykz_base_v6.0/bykz_base_v6.0.xpr">
   <DefaultLaunch Dir="$PRUNDIR"/>
   <Configuration>
     <Option Name="Id" Val="f50145e241df45a782da3972e666a56e"/>
@@ -34,19 +34,19 @@
     <Option Name="DSAVendor" Val="xilinx"/>
     <Option Name="DSANumComputeUnits" Val="60"/>
     <Option Name="WTXSimLaunchSim" Val="1"/>
-    <Option Name="WTModelSimLaunchSim" Val="217"/>
+    <Option Name="WTModelSimLaunchSim" Val="221"/>
     <Option Name="WTQuestaLaunchSim" Val="0"/>
     <Option Name="WTIesLaunchSim" Val="0"/>
     <Option Name="WTVcsLaunchSim" Val="0"/>
     <Option Name="WTRivieraLaunchSim" Val="0"/>
     <Option Name="WTActivehdlLaunchSim" Val="0"/>
-    <Option Name="WTXSimExportSim" Val="127"/>
-    <Option Name="WTModelSimExportSim" Val="127"/>
-    <Option Name="WTQuestaExportSim" Val="127"/>
-    <Option Name="WTIesExportSim" Val="127"/>
-    <Option Name="WTVcsExportSim" Val="127"/>
-    <Option Name="WTRivieraExportSim" Val="126"/>
-    <Option Name="WTActivehdlExportSim" Val="126"/>
+    <Option Name="WTXSimExportSim" Val="144"/>
+    <Option Name="WTModelSimExportSim" Val="143"/>
+    <Option Name="WTQuestaExportSim" Val="143"/>
+    <Option Name="WTIesExportSim" Val="141"/>
+    <Option Name="WTVcsExportSim" Val="140"/>
+    <Option Name="WTRivieraExportSim" Val="139"/>
+    <Option Name="WTActivehdlExportSim" Val="139"/>
     <Option Name="GenerateIPUpgradeLog" Val="TRUE"/>
     <Option Name="XSimRadix" Val="hex"/>
     <Option Name="XSimTimeUnit" Val="ns"/>
@@ -61,35 +61,35 @@
   <FileSets Version="1" Minor="31">
     <FileSet Name="sources_1" Type="DesignSrcs" RelSrcDir="$PSRCDIR/sources_1">
       <Filter Type="Srcs"/>
-      <File Path="$PPRDIR/../src/rtl/include_files/reg_addr_pl.vh">
+      <File Path="$PPRDIR/../../rtl/include_files/reg_addr_pl.vh">
         <FileInfo>
           <Attr Name="IsGlobalInclude" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/rtl/include_files/para_reg_addr.vh">
+      <File Path="$PPRDIR/../../rtl/include_files/para_reg_addr.vh">
         <FileInfo>
           <Attr Name="IsGlobalInclude" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/rtl/include_files/globe_includes.vh">
+      <File Path="$PPRDIR/../../rtl/include_files/globe_includes.vh">
         <FileInfo>
           <Attr Name="IsGlobalInclude" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/rtl/include_files/depot_addr_map.vh">
+      <File Path="$PPRDIR/../../rtl/include_files/depot_addr_map.vh">
         <FileInfo>
           <Attr Name="IsGlobalInclude" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/rtl/include_files/components_param.vh">
+      <File Path="$PPRDIR/../../rtl/include_files/components_param.vh">
         <FileInfo>
           <Attr Name="IsGlobalInclude" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -117,6 +117,13 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
+      <File Path="$PSRCDIR/sources_1/ip/ila_top_485/ila_top_485.xci">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
       <File Path="$PPRDIR/../src/ip/mst_ip/aurora_8b10b_1/ip/aurora_8b10b_1/aurora_8b10b_1.xci">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -132,41 +139,6 @@
         </FileInfo>
       </File>
       <File Path="$PPRDIR/../src/ip/mst_ip/aurora_mmcm/ip/aurora_mmcm/aurora_mmcm.xci">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_pul_axis/Home_fa_std.v">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_pul_axis/Jog_fa_std.v">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_pul_axis/Move_fa_std.v">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_pul_axis/Positioner_std.v">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_pul_axis/Pulmot_fd.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
@@ -411,28 +383,35 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_pulmotor_handwheel/man_handwheel.v">
+      <File Path="$PPRDIR/../src/rtl/fiber_stack/emcc_mst_app/mst_app_cfg.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_pul_axis/math_div.v">
+      <File Path="$PPRDIR/../src/rtl/fiber_stack/emcc_mst_app/mst_app_rcv.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_pul_axis/math_reduce.v">
+      <File Path="$PPRDIR/../src/rtl/fiber_stack/emcc_mst_app/mst_app_send.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../rtl/emcc_ctrl/pl_exe_io/ec_stacker_cage_check/pre_post_sta_check_stacker_cage_check.v">
+      <File Path="$PPRDIR/../../rtl/emcc_ctrl/pl_exe_bus/ec_sp_rfid/mst_slv_485_driver.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../../rtl/emcc_ctrl/pl_exe_bus/ec_wind_press_sensor/pre_post_sta_check_wind_press_sensor.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
@@ -446,14 +425,14 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/rtl/fiber_stack/emcc_mst_app/mst_app_cfg.v">
+      <File Path="$PPRDIR/../src/rtl/common/sys_signal_gen/reset_sync.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/rtl/fiber_stack/emcc_mst_app/mst_app_rcv.v">
+      <File Path="$PPRDIR/../src/rtl/fiber_stack/protocal_top/ethcat_top/rx_crc_top/rx_crc.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
@@ -474,6 +453,34 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
+      <File Path="$PPRDIR/../../rtl/emcc_ctrl/pl_exe_bus/ec_osm41_485_laser_distance/uart_1byte_rx.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../../rtl/emcc_ctrl/pl_exe_bus/ec_osm41_485_laser_distance/uart_1byte_tx.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../../rtl/emcc_ctrl/pl_exe_bus/ec_wind_press_sensor/wind_press_drv.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../../rtl/emcc_ctrl/pl_exe_bus/ec_wind_press_sensor/wind_press_drv_slv.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
       <File Path="$PPRDIR/../src/rtl/fiber_stack/emcc_mst_app/common_module/xilinx_simple_dual_port_2_clock_ram.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -488,7 +495,7 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../rtl/emcc_ctrl/pl_exe_io/ec_stacker_cage_check/ec_stacker_cage_check.sv">
+      <File Path="$PPRDIR/../../rtl/emcc_ctrl/pl_exe_bus/ec_wind_press_sensor/ec_wind_press_sensor.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
@@ -530,7 +537,7 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../rtl/emcc_ctrl/pl_exe_io/ec_stacker_cage_check/proactive_beh_stacker_cage_check.sv">
+      <File Path="$PPRDIR/../../rtl/emcc_ctrl/pl_exe_bus/ec_wind_press_sensor/proactive_beh_wind_press_sensor.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
@@ -544,7 +551,7 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../rtl/emcc_ctrl/pl_exe_io/ec_stacker_cage_check/ps_rw_pl_reg_stacker_cage_check.sv">
+      <File Path="$PPRDIR/../../rtl/emcc_ctrl/pl_exe_bus/ec_wind_press_sensor/ps_rw_pl_reg_wind_press_sensor.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
@@ -572,14 +579,14 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../rtl/emcc_ctrl/pl_exe_io/ec_stacker_cage_check/status_beh_stacker_cage_check.sv">
+      <File Path="$PPRDIR/../../rtl/emcc_ctrl/pl_exe_bus/ec_wind_press_sensor/status_beh_wind_press_sensor.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../rtl/emcc_ctrl/pl_exe_io/ec_stacker_cage_check/tim_beh_stacker_cage_check.sv">
+      <File Path="$PPRDIR/../../rtl/emcc_ctrl/pl_exe_bus/ec_wind_press_sensor/tim_beh_wind_press_sensor.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
@@ -600,7 +607,111 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../rtl/emcc_ctrl/pl_exe_bus/ec_sp_rfid/superisys_rfid_485_slaver_driver.v">
+      <File Path="$PPRDIR/../../rtl/emcc_ctrl/pl_exe_bus/ec_lanyu_temper_humidity_sensor/lanyu_temper_humidity_drv.v">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../../rtl/emcc_ctrl/pl_exe_bus/ec_lanyu_temper_humidity_sensor/lanyu_temper_humidity_drv_slv.v">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../../rtl/emcc_ctrl/pl_exe_bus/ec_lanyu_temper_humidity_sensor/pre_post_sta_check_lanyu_temper_humidity_sensor.v">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../../rtl/emcc_ctrl/pl_exe_bus/ec_lanyu_temper_humidity_sensor/ec_lanyu_temper_humidity_sensor.sv">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../../rtl/emcc_ctrl/pl_exe_bus/ec_lanyu_temper_humidity_sensor/proactive_beh_lanyu_temper_humidity_sensor.sv">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../../rtl/emcc_ctrl/pl_exe_bus/ec_lanyu_temper_humidity_sensor/ps_rw_pl_reg_lanyu_temper_humidity_sensor.sv">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../../rtl/emcc_ctrl/pl_exe_bus/ec_lanyu_temper_humidity_sensor/status_beh_lanyu_temper_humidity_sensor.sv">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../../rtl/emcc_ctrl/pl_exe_bus/ec_lanyu_temper_humidity_sensor/tim_beh_lanyu_temper_humidity_sensor.sv">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../../rtl/emcc_ctrl/pl_exe_io/ec_stacker_cage_check/pre_post_sta_check_stacker_cage_check.v">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../../rtl/emcc_ctrl/pl_exe_io/ec_stacker_cage_check/ec_stacker_cage_check.sv">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../../rtl/emcc_ctrl/pl_exe_io/ec_stacker_cage_check/proactive_beh_stacker_cage_check.sv">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../../rtl/emcc_ctrl/pl_exe_io/ec_stacker_cage_check/ps_rw_pl_reg_stacker_cage_check.sv">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../../rtl/emcc_ctrl/pl_exe_io/ec_stacker_cage_check/status_beh_stacker_cage_check.sv">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../../rtl/emcc_ctrl/pl_exe_io/ec_stacker_cage_check/tim_beh_stacker_cage_check.sv">
         <FileInfo>
           <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -617,22 +728,6 @@
         </FileInfo>
       </File>
       <File Path="$PPRDIR/../../rtl/emcc_ctrl/pl_exe_bus/ec_sp_rfid/supu_rfid_drv_slv.v">
-        <FileInfo>
-          <Attr Name="AutoDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../../rtl/emcc_ctrl/pl_exe_bus/ec_osm41_485_laser_distance/uart_rx.v">
-        <FileInfo>
-          <Attr Name="AutoDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../../rtl/emcc_ctrl/pl_exe_bus/ec_osm41_485_laser_distance/uart_tx.v">
         <FileInfo>
           <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -688,8 +783,406 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
+      <File Path="$PPRDIR/../../rtl/emcc_ctrl/pl_exe_bus/ec_osm41_485_laser_distance/osm41_driver.v">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../../rtl/emcc_ctrl/pl_exe_bus/ec_osm41_485_laser_distance/ec_osm41_485_laser_distance.sv">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../../rtl/emcc_ctrl/pl_exe_bus/ec_osm41_485_laser_distance/pre_post_sta_check_osm41_485_laser_distance.sv">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../../rtl/emcc_ctrl/pl_exe_bus/ec_osm41_485_laser_distance/proactive_beh_osm41_485_laser_distance.sv">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../../rtl/emcc_ctrl/pl_exe_bus/ec_osm41_485_laser_distance/ps_rw_pl_reg_osm41_485_laser_distance.sv">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../../rtl/emcc_ctrl/pl_exe_bus/ec_osm41_485_laser_distance/status_beh_osm41_485_laser_distance.sv">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../../rtl/emcc_ctrl/pl_exe_bus/ec_osm41_485_laser_distance/tim_beh_osm41_485_laser_distance.sv">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_pul_axis/Home_fa_std.v">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_pul_axis/Jog_fa_std.v">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_pul_axis/Move_fa_std.v">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_pul_axis/Positioner_std.v">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_pul_axis/Pulmot_fd.v">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/rtl/common/slv_outinterface/hardware/common_rs232_top.v">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/rtl/common/slv_outinterface/hardware/common_rs485_top.v">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/rtl/fiber_stack/emcc_slv_app/emcc_slv_app.v">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/rtl/fiber_stack/ethcat_axi_rout/ethcat_axi_rout.v">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/rtl/common/slv_outinterface/hardware_interface_top.v">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/rtl/peri/id_top/id.v">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/rtl/peri/iic_32_4top/iic_32_4.v">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_pul_axis/math_div.v">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_pul_axis/math_reduce.v">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_pul_axis/math_sat.v">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/rtl/fiber_stack/emcc_slv_app/slv_app_rcv.v">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/rtl/fiber_stack/emcc_slv_app/slv_app_send.v">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/rtl/common/slv_outinterface/hardware/slv_pul_axis.v">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/rtl/common/slv_outinterface/hardware/uart_top.v">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/rtl/common/slv_outinterface/zz_io_debounce.v">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/rtl/peri/adc_dac/adc_dac.vhd">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/rtl/peri/i2c_top/iic_rom.vhd">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/rtl/common/my_freq_top/my_freq.vhd">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/rtl/top/emcc_slv_top.v">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_pulmotor_handwheel/man_handwheel.v">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_1do/pre_post_sta_check_1do.v">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_2do/pre_post_sta_check_2do.v">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_dv300_do/pre_post_sta_check_dv300_do.v">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_16di/ec_16di.sv">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_1di/ec_1di.sv">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_1do/ec_1do.sv">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_2di/ec_2di.sv">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_2di2do/ec_2di_2do.sv">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_2di_3do/ec_2di_3do.sv">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_2do/ec_2do.sv">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_3di2do/ec_3di_2do.sv">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_3led_buzzer/ec_3led_buzzer.sv">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_4di2do/ec_4di_2do.sv">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_5di/ec_5di.sv">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_ps_exe/ec_can_servo/ec_can_servo.sv">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_dv300_do/ec_dv300_do.sv">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/ps_exe_bus/ec_fanuc_robot/ec_fanuc_robot.sv">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/ps_exe_bus/ec_feijie_marker/ec_feijie_marker.sv">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/ps_exe_bus/ec_hex_coordinate/ec_hex_coordinate.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -697,6 +1190,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/ps_exe_bus/ec_lanj_washer/ec_lanj_washer.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -704,6 +1198,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/ps_exe_bus/ec_ocr_camera/ec_ocr_camera.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -711,6 +1206,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_pul_axis/ec_pul_axis.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -718,6 +1214,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_pulmotor_handwheel/ec_pulmotor_handwheel.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -725,6 +1222,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/ps_exe_bus/ec_s7_plc/ec_s7_plc.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -732,6 +1230,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_safety_door_lock/ec_sf_door.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -739,6 +1238,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/ps_exe_bus/ec_siemens_cnc/ec_siemens_cnc.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -746,6 +1246,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_slv_pul_axis/ec_slv_pul_axis.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -753,6 +1254,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_trayclaw/ec_trayclaw.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -760,27 +1262,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/top/618_mix_top/emcc_mix_top.sv">
         <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/ps/pkg_route/fen_top/fen_1.sv">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/ps/pkg_route/fen_top/fen_top.sv">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_1di/irq_3i1o_arbitrator.sv">
-        <FileInfo>
+          <Attr Name="UserDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -788,13 +1270,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_pul_axis/irq_3i1o_arbitrator_pul_axis.sv">
         <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/ps/pkg_route/pkg_route.sv">
-        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -802,6 +1278,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_16di/pre_post_sta_check_16di.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -809,6 +1286,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_1di/pre_post_sta_check_1di.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -816,6 +1294,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_2di/pre_post_sta_check_2di.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -823,6 +1302,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_2di2do/pre_post_sta_check_2di_2do.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -830,6 +1310,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_2di_3do/pre_post_sta_check_2di_3do.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -837,6 +1318,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_3di2do/pre_post_sta_check_3di_2do.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -844,6 +1326,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_4di2do/pre_post_sta_check_4di_2do.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -851,6 +1334,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_5di/pre_post_sta_check_5di.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -858,6 +1342,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_ps_exe/ec_can_servo/pre_post_sta_check_can_servo.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -865,6 +1350,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/ps_exe_bus/ec_fanuc_robot/pre_post_sta_check_fanuc_robot.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -872,6 +1358,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/ps_exe_bus/ec_feijie_marker/pre_post_sta_check_feijie_marker.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -879,6 +1366,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/ps_exe_bus/ec_hex_coordinate/pre_post_sta_check_hex_coordinate.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -886,6 +1374,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/ps_exe_bus/ec_lanj_washer/pre_post_sta_check_lanj_washer.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -893,6 +1382,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/ps_exe_bus/ec_ocr_camera/pre_post_sta_check_ocr_camera.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -900,6 +1390,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_pul_axis/pre_post_sta_check_pul_axis.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -907,6 +1398,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_pulmotor_handwheel/pre_post_sta_check_pulmotor_handwheel.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -914,6 +1406,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/ps_exe_bus/ec_s7_plc/pre_post_sta_check_s7_plc.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -921,6 +1414,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_safety_door_lock/pre_post_sta_check_safety_door.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -928,6 +1422,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/ps_exe_bus/ec_siemens_cnc/pre_post_sta_check_siemens_cnc.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -935,6 +1430,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_slv_pul_axis/pre_post_sta_check_slv_pul_axis.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -942,6 +1438,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_trayclaw/pre_post_sta_check_trayclaw.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -949,6 +1446,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_16di/proactive_beh_16di.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -956,6 +1454,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_1di/proactive_beh_1di.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -963,6 +1462,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_1do/proactive_beh_1do.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -970,6 +1470,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_2di/proactive_beh_2di.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -977,6 +1478,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_2di2do/proactive_beh_2di_2do.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -984,6 +1486,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_2di_3do/proactive_beh_2di_3do.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -991,6 +1494,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_2do/proactive_beh_2do.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -998,6 +1502,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_3di2do/proactive_beh_3di_2do.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1005,6 +1510,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_4di2do/proactive_beh_4di_2do.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1012,6 +1518,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_5di/proactive_beh_5di.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1019,6 +1526,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_ps_exe/ec_can_servo/proactive_beh_can_servo.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1026,6 +1534,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_dv300_do/proactive_beh_dv300_do.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1033,6 +1542,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/ps_exe_bus/ec_fanuc_robot/proactive_beh_fanuc_robot.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1040,6 +1550,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/ps_exe_bus/ec_feijie_marker/proactive_beh_feijie_marker.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1047,6 +1558,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/ps_exe_bus/ec_hex_coordinate/proactive_beh_hex_coordinate.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1054,6 +1566,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/ps_exe_bus/ec_lanj_washer/proactive_beh_lanj_washer.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1061,6 +1574,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/ps_exe_bus/ec_ocr_camera/proactive_beh_ocr_camera.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1068,6 +1582,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_pul_axis/proactive_beh_pul_axis.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1075,6 +1590,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_pulmotor_handwheel/proactive_beh_pulmotor_handwheel.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1082,6 +1598,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/ps_exe_bus/ec_s7_plc/proactive_beh_s7_plc.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1089,6 +1606,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_safety_door_lock/proactive_beh_safety_door.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1096,6 +1614,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/ps_exe_bus/ec_siemens_cnc/proactive_beh_siemens_cnc.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1103,6 +1622,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_slv_pul_axis/proactive_beh_slv_pul_axis.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1110,13 +1630,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_trayclaw/proactive_beh_trayclaw.sv">
         <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/ps/ps_rd_dat_route/ps_rd_dat_route.sv">
-        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1124,6 +1638,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_16di/ps_rw_pl_reg_16di.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1131,6 +1646,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_1di/ps_rw_pl_reg_1di.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1138,6 +1654,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_1do/ps_rw_pl_reg_1do.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1145,6 +1662,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_2di/ps_rw_pl_reg_2di.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1152,6 +1670,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_2di2do/ps_rw_pl_reg_2di_2do.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1159,6 +1678,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_2di_3do/ps_rw_pl_reg_2di_3do.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1166,6 +1686,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_2do/ps_rw_pl_reg_2do.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1173,6 +1694,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_3di2do/ps_rw_pl_reg_3di_2do.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1180,6 +1702,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_3led_buzzer/ps_rw_pl_reg_3led_buzzer.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1187,6 +1710,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_4di2do/ps_rw_pl_reg_4di_2do.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1194,6 +1718,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_5di/ps_rw_pl_reg_5di.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1201,6 +1726,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_ps_exe/ec_can_servo/ps_rw_pl_reg_can_servo.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1208,6 +1734,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_dv300_do/ps_rw_pl_reg_dv300_do.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1215,6 +1742,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/ps_exe_bus/ec_fanuc_robot/ps_rw_pl_reg_fanuc_robot.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1222,6 +1750,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/ps_exe_bus/ec_feijie_marker/ps_rw_pl_reg_feijie_marker.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1229,6 +1758,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/ps_exe_bus/ec_hex_coordinate/ps_rw_pl_reg_hex_coordinate.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1236,6 +1766,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/ps_exe_bus/ec_lanj_washer/ps_rw_pl_reg_lanj_washer.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1243,6 +1774,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/ps_exe_bus/ec_ocr_camera/ps_rw_pl_reg_ocr_camera.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1250,6 +1782,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_pul_axis/ps_rw_pl_reg_pul_axis.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1257,6 +1790,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_pulmotor_handwheel/ps_rw_pl_reg_pulmotor_handwheel.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1264,6 +1798,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/ps_exe_bus/ec_s7_plc/ps_rw_pl_reg_s7_plc.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1271,6 +1806,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_safety_door_lock/ps_rw_pl_reg_sf_doo.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1278,6 +1814,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/ps_exe_bus/ec_siemens_cnc/ps_rw_pl_reg_siemens_cnc.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1285,6 +1822,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_slv_pul_axis/ps_rw_pl_reg_slv_pul_axis.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1292,20 +1830,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_trayclaw/ps_rw_pl_reg_trayclaw.sv">
         <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/ps/pkg_route/shou_top/shou_1.sv">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/ps/pkg_route/shou_top/shou_top.sv">
-        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1313,6 +1838,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_16di/status_beh_16di.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1320,6 +1846,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_1di/status_beh_1di.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1327,6 +1854,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_1do/status_beh_1do.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1334,6 +1862,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_2di/status_beh_2di.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1341,6 +1870,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_2di2do/status_beh_2di_2do.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1348,6 +1878,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_2di_3do/status_beh_2di_3do.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1355,6 +1886,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_2do/status_beh_2do.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1362,6 +1894,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_3di2do/status_beh_3di_2do.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1369,6 +1902,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_4di2do/status_beh_4di_2do.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1376,6 +1910,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_5di/status_beh_5di.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1383,6 +1918,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_ps_exe/ec_can_servo/status_beh_can_servo.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1390,6 +1926,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_dv300_do/status_beh_dv300_do.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1397,6 +1934,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/ps_exe_bus/ec_fanuc_robot/status_beh_fanuc_robot.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1404,6 +1942,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/ps_exe_bus/ec_feijie_marker/status_beh_feijie_marker.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1411,6 +1950,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/ps_exe_bus/ec_hex_coordinate/status_beh_hex_coordinate.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1418,6 +1958,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/ps_exe_bus/ec_lanj_washer/status_beh_lanj_washer.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1425,6 +1966,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/ps_exe_bus/ec_ocr_camera/status_beh_ocr_camera.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1432,6 +1974,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_pul_axis/status_beh_pul_axis.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1439,6 +1982,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_pulmotor_handwheel/status_beh_pulmotor_handwheel.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1446,6 +1990,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/ps_exe_bus/ec_s7_plc/status_beh_s7_plc.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1453,6 +1998,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_safety_door_lock/status_beh_safety_door.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1460,6 +2006,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/ps_exe_bus/ec_siemens_cnc/status_beh_siemens_cnc.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1467,6 +2014,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_slv_pul_axis/status_beh_slv_pul_axis.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1474,6 +2022,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_trayclaw/status_beh_trayclaw.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1481,6 +2030,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_16di/tim_beh_16di.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1488,6 +2038,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_1di/tim_beh_1di.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1495,6 +2046,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_1do/tim_beh_1do.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1502,6 +2054,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_2di/tim_beh_2di.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1509,6 +2062,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_2di2do/tim_beh_2di_2do.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1516,6 +2070,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_2di_3do/tim_beh_2di_3do.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1523,6 +2078,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_2do/tim_beh_2do.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1530,6 +2086,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_3di2do/tim_beh_3di_2do.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1537,6 +2094,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_4di2do/tim_beh_4di_2do.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1544,6 +2102,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_5di/tim_beh_5di.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1551,6 +2110,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_ps_exe/ec_can_servo/tim_beh_can_servo.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1558,6 +2118,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_dv300_do/tim_beh_dv300_do.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1565,6 +2126,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/ps_exe_bus/ec_fanuc_robot/tim_beh_fanuc_robot.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1572,6 +2134,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/ps_exe_bus/ec_feijie_marker/tim_beh_feijie_marker.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1579,6 +2142,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/ps_exe_bus/ec_hex_coordinate/tim_beh_hex_coordinate.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1586,6 +2150,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/ps_exe_bus/ec_lanj_washer/tim_beh_lanj_washer.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1593,6 +2158,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/ps_exe_bus/ec_ocr_camera/tim_beh_ocr_camera.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1600,6 +2166,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_pul_axis/tim_beh_pul_axis.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1607,6 +2174,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_pulmotor_handwheel/tim_beh_pulmotor_handwheel.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1614,6 +2182,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/ps_exe_bus/ec_s7_plc/tim_beh_s7_plc.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1621,6 +2190,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_safety_door_lock/tim_beh_safety_door.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1628,6 +2198,7 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/ps_exe_bus/ec_siemens_cnc/tim_beh_siemens_cnc.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1635,249 +2206,13 @@
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_slv_pul_axis/tim_beh_slv_pul_axis.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_trayclaw/tim_beh_trayclaw.sv">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/fiber_stack/emcc_mst_app/common_module/xilinx_ultraram_true_dual_port.sv">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/top/emcc_mst_top.sv">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_ps_exe/ec_ethercat_servo/ec_ethercat_servo.sv">
-        <FileInfo>
-          <Attr Name="AutoDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_sys_sf/ec_sys_sf.sv">
-        <FileInfo>
-          <Attr Name="AutoDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/top/683_mix_top/emcc_mix_top.sv">
-        <FileInfo>
-          <Attr Name="UserDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_ps_exe/ec_ethercat_servo/pre_post_sta_check_ethercat_servo.sv">
-        <FileInfo>
-          <Attr Name="AutoDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_sys_sf/pre_post_sta_check_sys_sf.sv">
-        <FileInfo>
-          <Attr Name="AutoDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_ps_exe/ec_ethercat_servo/proactive_beh_ethercat_servo.sv">
-        <FileInfo>
-          <Attr Name="AutoDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_sys_sf/proactive_beh_sys_sf.sv">
-        <FileInfo>
-          <Attr Name="AutoDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_ps_exe/ec_ethercat_servo/ps_rw_pl_reg_ethercat_servo.sv">
-        <FileInfo>
-          <Attr Name="AutoDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_sys_sf/ps_rw_pl_reg_sys_sf.sv">
-        <FileInfo>
-          <Attr Name="AutoDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_ps_exe/ec_ethercat_servo/status_beh_ethercat_servo.sv">
-        <FileInfo>
-          <Attr Name="AutoDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_sys_sf/status_beh_sys_sf.sv">
-        <FileInfo>
-          <Attr Name="AutoDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_ps_exe/ec_ethercat_servo/tim_beh_ethercat_servo.sv">
-        <FileInfo>
-          <Attr Name="AutoDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_sys_sf/tim_beh_sys_sf.sv">
-        <FileInfo>
-          <Attr Name="AutoDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/common/uart/CRC16_modbus.v">
-        <FileInfo>
-          <Attr Name="AutoDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_bus/ec_superisys_485_modbus_rtu/ec_superisys_485_modbus_rtu.v">
-        <FileInfo>
-          <Attr Name="AutoDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_bus/ec_superisys_485_modbus_rtu/frame_ctrl_superisys_485.v">
-        <FileInfo>
-          <Attr Name="AutoDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_bus/ec_superisys_485_modbus_rtu/pre_post_sta_check_superisys_485.v">
-        <FileInfo>
-          <Attr Name="AutoDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_bus/ec_superisys_485_modbus_rtu/proactive_beh_superisys_485.v">
-        <FileInfo>
-          <Attr Name="AutoDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_bus/ec_superisys_485_modbus_rtu/ps_rw_pl_reg_superisys_485.v">
-        <FileInfo>
-          <Attr Name="AutoDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_bus/ec_superisys_485_modbus_rtu/superisys_rfid_485_slaver_driver.v">
-        <FileInfo>
-          <Attr Name="AutoDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/common/uart/uart_driver_modbus_rtu.v">
-        <FileInfo>
-          <Attr Name="AutoDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/common/uart/uart_recv_modbus_rtu.v">
-        <FileInfo>
-          <Attr Name="AutoDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/common/uart/uart_send_modbus_rtu.v">
-        <FileInfo>
-          <Attr Name="AutoDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/peri/RS485_Arbiter/slave_rs485_arbiter.sv">
-        <FileInfo>
-          <Attr Name="AutoDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_3led_buzzer/pre_post_sta_check_3led_buzzer.sv">
-        <FileInfo>
-          <Attr Name="AutoDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_3led_buzzer/proactive_beh_3led_buzzer.sv">
-        <FileInfo>
-          <Attr Name="AutoDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_3led_buzzer/status_beh_3led_buzzer.sv">
-        <FileInfo>
-          <Attr Name="AutoDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_3led_buzzer/tim_beh_3led_buzzer.sv">
         <FileInfo>
           <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -2005,6 +2340,14 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
+      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_ps_exe/ec_ethercat_servo/ec_ethercat_servo.sv">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/ps_exe_bus/ec_fanuc_cnc/ec_fanuc_cnc.sv">
         <FileInfo>
           <Attr Name="AutoDisabled" Val="1"/>
@@ -2061,6 +2404,14 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
+      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_sys_sf/ec_sys_sf.sv">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
       <File Path="$PPRDIR/../src/rtl/top/1363_mix_top/emcc_mix_top.sv">
         <FileInfo>
           <Attr Name="UserDisabled" Val="1"/>
@@ -2102,6 +2453,14 @@
         </FileInfo>
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_3di1do/pre_post_sta_check_3di_1do.sv">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_ps_exe/ec_ethercat_servo/pre_post_sta_check_ethercat_servo.sv">
         <FileInfo>
           <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -2165,6 +2524,14 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
+      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_sys_sf/pre_post_sta_check_sys_sf.sv">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_1avi/proactive_beh_1avi.sv">
         <FileInfo>
           <Attr Name="AutoDisabled" Val="1"/>
@@ -2206,6 +2573,14 @@
         </FileInfo>
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_8do/proactive_beh_8do.sv">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_ps_exe/ec_ethercat_servo/proactive_beh_ethercat_servo.sv">
         <FileInfo>
           <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -2269,6 +2644,14 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
+      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_sys_sf/proactive_beh_sys_sf.sv">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_1avi/ps_rw_pl_reg_1avi.sv">
         <FileInfo>
           <Attr Name="AutoDisabled" Val="1"/>
@@ -2310,6 +2693,14 @@
         </FileInfo>
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_8do/ps_rw_pl_reg_8do.sv">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_ps_exe/ec_ethercat_servo/ps_rw_pl_reg_ethercat_servo.sv">
         <FileInfo>
           <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -2373,6 +2764,14 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
+      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_sys_sf/ps_rw_pl_reg_sys_sf.sv">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_1avi/status_beh_1avi.sv">
         <FileInfo>
           <Attr Name="AutoDisabled" Val="1"/>
@@ -2414,6 +2813,14 @@
         </FileInfo>
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_8do/status_beh_8do.sv">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_ps_exe/ec_ethercat_servo/status_beh_ethercat_servo.sv">
         <FileInfo>
           <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -2477,6 +2884,14 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
+      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_sys_sf/status_beh_sys_sf.sv">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_1avi/tim_beh_1avi.sv">
         <FileInfo>
           <Attr Name="AutoDisabled" Val="1"/>
@@ -2518,6 +2933,14 @@
         </FileInfo>
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_8do/tim_beh_8do.sv">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_ps_exe/ec_ethercat_servo/tim_beh_ethercat_servo.sv">
         <FileInfo>
           <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -2581,55 +3004,7 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/rtl/common/debug/debug_uart_arbitor.v">
-        <FileInfo>
-          <Attr Name="AutoDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/common/debug/uart_debug_req.v">
-        <FileInfo>
-          <Attr Name="AutoDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/common/debug/uart_recv.v">
-        <FileInfo>
-          <Attr Name="AutoDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/common/debug/uart_send.v">
-        <FileInfo>
-          <Attr Name="AutoDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/common/debug/debug_send_top.sv">
-        <FileInfo>
-          <Attr Name="AutoDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/common/slv_outinterface/hardware/common_rs232_top.v">
-        <FileInfo>
-          <Attr Name="AutoDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/common/slv_outinterface/hardware/common_rs485_top.v">
+      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_sys_sf/tim_beh_sys_sf.sv">
         <FileInfo>
           <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -2638,102 +3013,6 @@
         </FileInfo>
       </File>
       <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_1avo/dac_top.v">
-        <FileInfo>
-          <Attr Name="AutoDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/fiber_stack/emcc_slv_app/emcc_slv_app.v">
-        <FileInfo>
-          <Attr Name="AutoDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/fiber_stack/ethcat_axi_rout/ethcat_axi_rout.v">
-        <FileInfo>
-          <Attr Name="AutoDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/common/slv_outinterface/hardware_interface_top.v">
-        <FileInfo>
-          <Attr Name="AutoDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/peri/id_top/id.v">
-        <FileInfo>
-          <Attr Name="AutoDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/peri/iic_32_4top/iic_32_4.v">
-        <FileInfo>
-          <Attr Name="AutoDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/fiber_stack/emcc_slv_app/slv_app_rcv.v">
-        <FileInfo>
-          <Attr Name="AutoDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/fiber_stack/emcc_slv_app/slv_app_send.v">
-        <FileInfo>
-          <Attr Name="AutoDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/common/slv_outinterface/hardware/slv_pul_axis.v">
-        <FileInfo>
-          <Attr Name="AutoDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/common/slv_outinterface/hardware/uart_rx.v">
-        <FileInfo>
-          <Attr Name="AutoDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/common/slv_outinterface/hardware/uart_top.v">
-        <FileInfo>
-          <Attr Name="AutoDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/common/slv_outinterface/hardware/uart_tx.v">
-        <FileInfo>
-          <Attr Name="AutoDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/common/slv_outinterface/zz_io_debounce.v">
         <FileInfo>
           <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -2789,20 +3068,15 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <Config>
-        <Option Name="ConstrsType" Val="XDC"/>
-      </Config>
-    </FileSet>
-    <FileSet Name="sim_1" Type="SimulationSrcs" RelSrcDir="$PSRCDIR/sim_1">
-      <Filter Type="Srcs"/>
-      <File Path="$PPRDIR/../../sim/emcc_mst_top/tb/tb_ec_stacker_cage_check.sv">
+      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_1avi_1avo/ps_rw_pl_reg_1avi_1avo.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../rtl/include_files/slv_global_cfg/global_includes.vh">
+      <File Path="$PPRDIR/../src/rtl/emcc_ctrl/pl_exe_io/ec_1avo/ps_rw_pl_reg_1avo.sv">
         <FileInfo>
           <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -2842,28 +3116,13 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/rtl/peri/adc_dac/adc_dac.vhd">
+      <File Path="$PPRDIR/../src/sim/emcc_slv_top/tb/ram_init/slv_depot_init.coe">
         <FileInfo>
-          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/rtl/peri/i2c_top/iic_rom.vhd">
-        <FileInfo>
-          <Attr Name="AutoDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/common/my_freq_top/my_freq.vhd">
-        <FileInfo>
-          <Attr Name="AutoDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/rtl/top/emcc_slv_top.v">
+      <File Path="$PPRDIR/../../rtl/emcc_ctrl/pl_exe_bus/ec_sg_rfid/sg_rfid_485_slaver_driver.v">
         <FileInfo>
           <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -2871,16 +3130,89 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/sim/emcc_slv_top/tb/ram_init/slv_depot_init.coe">
+      <File Path="$PPRDIR/../../rtl/emcc_ctrl/pl_exe_bus/ec_sg_rfid/sg_rfid_drv.v">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../../rtl/emcc_ctrl/pl_exe_bus/ec_sg_rfid/sg_rfid_drv_slv.v">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../../rtl/emcc_ctrl/pl_exe_bus/ec_sg_rfid/status_beh_sg_rfid.sv">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../../rtl/emcc_ctrl/pl_exe_bus/ec_sg_rfid/ps_rw_pl_reg_sg_rfid.sv">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../../rtl/emcc_ctrl/pl_exe_bus/ec_sg_rfid/tim_beh_sg_rfid.sv">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../../rtl/emcc_ctrl/pl_exe_bus/ec_sg_rfid/proactive_beh_sg_rfid.sv">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../../rtl/emcc_ctrl/pl_exe_bus/ec_sg_rfid/ec_sg_rfid.sv">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../../rtl/emcc_ctrl/pl_exe_bus/ec_sg_rfid/pre_post_sta_check_sg_rfid.sv">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../../rtl/common/slv_outinterface/hardware/uart_rx.v">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../../rtl/common/slv_outinterface/hardware/uart_tx.v">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
       <Config>
         <Option Name="DesignMode" Val="RTL"/>
         <Option Name="TopModule" Val="emcc_mst_top"/>
-        <Option Name="TopAutoSet" Val="TRUE"/>
       </Config>
     </FileSet>
     <FileSet Name="mst_constrs" Type="Constrs" RelSrcDir="$PSRCDIR/mst_constrs">
@@ -2903,8 +3235,63 @@
     </FileSet>
     <FileSet Name="sim_1" Type="SimulationSrcs" RelSrcDir="$PSRCDIR/sim_1">
       <Filter Type="Srcs"/>
+      <File Path="$PPRDIR/../../sim/emcc_mst_top/tb/tb_common_rs485_top.sv">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../../rtl/include_files/slv_global_cfg/global_includes.vh">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../../sim/emcc_mst_top/tb/aurora_8b10b_0_tb.sv">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
       <File Path="$PPRDIR/../src/sim/emcc_mst_top/tb/tb_ec_1do_slave.sv">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../../sim/emcc_mst_top/tb/tb_ec_osm41.sv">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../../sim/emcc_mst_top/tb/tb_ec_sp_485.sv">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../../sim/emcc_mst_top/tb/tb_ec_sp_rfid.sv">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../../sim/emcc_mst_top/tb/tb_ec_stacker_cage_check.sv">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -2912,26 +3299,34 @@
       </File>
       <Config>
         <Option Name="DesignMode" Val="RTL"/>
-        <Option Name="TopModule" Val="tb_ec_stacker_cage_check"/>
+        <Option Name="TopModule" Val="tb_common_rs485_top"/>
         <Option Name="TopLib" Val="xil_defaultlib"/>
+        <Option Name="VerilogDir" Val="$PPRDIR/../../rtl/include_files"/>
         <Option Name="TransportPathDelay" Val="0"/>
         <Option Name="TransportIntDelay" Val="0"/>
         <Option Name="SrcSet" Val="sources_1"/>
         <Option Name="xsim.compile.xvlog.more_options" Val="--define SIM_PLATFORM_MST --define PF_SIM --define ENB_SIM_MODE"/>
-        <Option Name="modelsim.compile.vlog.more_options" Val="+define+SIM_PLATFORM_MST+PF_SIM+ENB_SIM_MODE"/>
         <Option Name="modelsim.simulate.runtime" Val="10000ms"/>
-        <Option Name="modelsim.simulate.custom_wave_do" Val="wave.do"/>
-        <Option Name="NLNetlistMode" Val="funcsim"/>
       </Config>
     </FileSet>
     <FileSet Name="utils_1" Type="Utils" RelSrcDir="$PSRCDIR/utils_1">
       <Filter Type="Utils"/>
-      <File Path="$PSRCDIR/utils_1/imports/impl_683/emcc_mst_top_routed.dcp">
+      <File Path="$PSRCDIR/utils_1/imports/mst_impl_618/emcc_mst_top_routed.dcp">
         <FileInfo>
-          <Attr Name="ImportPath" Val="$PRUNDIR/impl_2/emcc_mst_top_routed.dcp"/>
-          <Attr Name="ImportTime" Val="1791535262"/>
+          <Attr Name="ImportPath" Val="$PRUNDIR/mst_impl_618/emcc_mst_top_routed.dcp"/>
+          <Attr Name="ImportTime" Val="1790675410"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="AutoDcp" Val="1"/>
+        </FileInfo>
+      </File>
+      <File Path="$PSRCDIR/utils_1/imports/impl_2/emcc_mst_top_routed.dcp">
+        <FileInfo>
+          <Attr Name="ImportPath" Val="$PRUNDIR/impl_2/emcc_mst_top_routed.dcp"/>
+          <Attr Name="ImportTime" Val="1791974448"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedInSteps" Val="impl_2"/>
           <Attr Name="AutoDcp" Val="1"/>
         </FileInfo>
       </File>
@@ -2965,6 +3360,20 @@
         <Option Name="UseBlackboxStub" Val="1"/>
       </Config>
     </FileSet>
+    <FileSet Name="ila_0" Type="BlockSrcs" RelSrcDir="$PSRCDIR/ila_0">
+      <File Path="$PSRCDIR/sources_1/ip/ila_0/ila_0.xci">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <Config>
+        <Option Name="TopModule" Val="ila_0"/>
+        <Option Name="UseBlackboxStub" Val="1"/>
+      </Config>
+    </FileSet>
   </FileSets>
   <Simulators>
     <Simulator Name="XSim">
@@ -2985,31 +3394,9 @@
     </Simulator>
   </Simulators>
   <Runs Version="1" Minor="10">
-    <Run Id="mst_synth_1363" Type="Ft3:Synth" SrcSet="sources_1" Part="xczu5eg-sfvc784-2-i" ConstrsSet="mst_constrs" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" Dir="$PRUNDIR/mst_synth_1363" IncludeInArchive="true">
-      <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2018">
-          <Desc>Vivado Synthesis Defaults</Desc>
-        </StratHandle>
-        <Step Id="synth_design"/>
-      </Strategy>
-      <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
-      <ReportStrategy Name="Vivado Synthesis Default Reports" Flow="Vivado Synthesis 2018"/>
-      <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
-    </Run>
     <Run Id="TDPBRAM_4096x32b_synth_1" Type="Ft3:Synth" SrcSet="TDPBRAM_4096x32b" Part="xczu5eg-sfvc784-2-i" ConstrsSet="TDPBRAM_4096x32b" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" Dir="$PRUNDIR/TDPBRAM_4096x32b_synth_1" IncludeInArchive="true">
       <Strategy Version="1" Minor="2">
         <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2018"/>
-        <Step Id="synth_design"/>
-      </Strategy>
-      <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
-      <ReportStrategy Name="Vivado Synthesis Default Reports" Flow="Vivado Synthesis 2018"/>
-      <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
-    </Run>
-    <Run Id="mst_synth_618" Type="Ft3:Synth" SrcSet="sources_1" Part="xczu5eg-sfvc784-2-i" ConstrsSet="mst_constrs" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" State="current" Dir="$PRUNDIR/mst_synth_618" IncludeInArchive="true">
-      <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2018">
-          <Desc>Vivado Synthesis Defaults</Desc>
-        </StratHandle>
         <Step Id="synth_design"/>
       </Strategy>
       <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
@@ -3025,33 +3412,24 @@
       <ReportStrategy Name="Vivado Synthesis Default Reports" Flow="Vivado Synthesis 2018"/>
       <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
     </Run>
-    <Run Id="synth_2" Type="Ft3:Synth" SrcSet="sources_1" Part="xczu5eg-sfvc784-2-i" ConstrsSet="mst_constrs" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" State="current" IncludeInArchive="true">
+    <Run Id="synth_2" Type="Ft3:Synth" SrcSet="sources_1" Part="xczu5eg-sfvc784-2-i" ConstrsSet="mst_constrs" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" State="current" Dir="$PRUNDIR/synth_2" IncludeInArchive="true">
+      <Strategy Version="1" Minor="2">
+        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2018"/>
+        <Step Id="synth_design"/>
+      </Strategy>
+      <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
+      <ReportStrategy Name="Vivado Synthesis Default Reports" Flow="Vivado Synthesis 2018"/>
+      <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
+    </Run>
+    <Run Id="ila_0_synth_1" Type="Ft3:Synth" SrcSet="ila_0" Part="xczu5eg-sfvc784-2-i" ConstrsSet="ila_0" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" Dir="$PRUNDIR/ila_0_synth_1" IncludeInArchive="true">
       <Strategy Version="1" Minor="2">
         <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2018">
           <Desc>Vivado Synthesis Defaults</Desc>
         </StratHandle>
         <Step Id="synth_design"/>
       </Strategy>
-      <ReportStrategy Name="Vivado Synthesis Default Reports" Flow="Vivado Synthesis 2018"/>
-      <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
-    </Run>
-    <Run Id="mst_impl_1363" Type="Ft2:EntireDesign" Part="xczu5eg-sfvc784-2-i" ConstrsSet="mst_constrs" Description="Default settings for Implementation." AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" Dir="$PRUNDIR/mst_impl_1363" SynthRun="mst_synth_1363" IncludeInArchive="true" GenFullBitstream="true">
-      <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2018">
-          <Desc>Default settings for Implementation.</Desc>
-        </StratHandle>
-        <Step Id="init_design"/>
-        <Step Id="opt_design"/>
-        <Step Id="power_opt_design"/>
-        <Step Id="place_design"/>
-        <Step Id="post_place_power_opt_design"/>
-        <Step Id="phys_opt_design"/>
-        <Step Id="route_design"/>
-        <Step Id="post_route_phys_opt_design"/>
-        <Step Id="write_bitstream"/>
-      </Strategy>
       <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
-      <ReportStrategy Name="Vivado Implementation Default Reports" Flow="Vivado Implementation 2018"/>
+      <ReportStrategy Name="Vivado Synthesis Default Reports" Flow="Vivado Synthesis 2018"/>
       <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
     </Run>
     <Run Id="TDPBRAM_4096x32b_impl_1" Type="Ft2:EntireDesign" Part="xczu5eg-sfvc784-2-i" ConstrsSet="TDPBRAM_4096x32b" Description="Default settings for Implementation." AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" SynthRun="TDPBRAM_4096x32b_synth_1" IncludeInArchive="false" GenFullBitstream="true">
@@ -3067,25 +3445,6 @@
         <Step Id="post_route_phys_opt_design"/>
         <Step Id="write_bitstream"/>
       </Strategy>
-      <ReportStrategy Name="Vivado Implementation Default Reports" Flow="Vivado Implementation 2018"/>
-      <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
-    </Run>
-    <Run Id="mst_impl_618" Type="Ft2:EntireDesign" Part="xczu5eg-sfvc784-2-i" ConstrsSet="mst_constrs" Description="Default settings for Implementation." AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" State="current" Dir="$PRUNDIR/mst_impl_618" SynthRun="mst_synth_618" IncludeInArchive="true" GenFullBitstream="true">
-      <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2018">
-          <Desc>Default settings for Implementation.</Desc>
-        </StratHandle>
-        <Step Id="init_design"/>
-        <Step Id="opt_design"/>
-        <Step Id="power_opt_design"/>
-        <Step Id="place_design"/>
-        <Step Id="post_place_power_opt_design"/>
-        <Step Id="phys_opt_design"/>
-        <Step Id="route_design"/>
-        <Step Id="post_route_phys_opt_design"/>
-        <Step Id="write_bitstream"/>
-      </Strategy>
-      <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
       <ReportStrategy Name="Vivado Implementation Default Reports" Flow="Vivado Implementation 2018"/>
       <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
     </Run>
@@ -3105,7 +3464,24 @@
       <ReportStrategy Name="Vivado Implementation Default Reports" Flow="Vivado Implementation 2018"/>
       <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
     </Run>
-    <Run Id="impl_2" Type="Ft2:EntireDesign" Part="xczu5eg-sfvc784-2-i" ConstrsSet="mst_constrs" Description="Default settings for Implementation." AutoIncrementalCheckpoint="true" IncrementalCheckpoint="$PSRCDIR/utils_1/imports/impl_2/emcc_mst_top_routed.dcp" WriteIncrSynthDcp="false" State="current" SynthRun="synth_2" IncludeInArchive="true" GenFullBitstream="true">
+    <Run Id="impl_2" Type="Ft2:EntireDesign" Part="xczu5eg-sfvc784-2-i" ConstrsSet="mst_constrs" Description="Default settings for Implementation." AutoIncrementalCheckpoint="true" IncrementalCheckpoint="$PSRCDIR/utils_1/imports/impl_2/emcc_mst_top_routed.dcp" WriteIncrSynthDcp="false" State="current" Dir="$PRUNDIR/impl_2" SynthRun="synth_2" IncludeInArchive="true" GenFullBitstream="true">
+      <Strategy Version="1" Minor="2">
+        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2018"/>
+        <Step Id="init_design"/>
+        <Step Id="opt_design"/>
+        <Step Id="power_opt_design"/>
+        <Step Id="place_design"/>
+        <Step Id="post_place_power_opt_design"/>
+        <Step Id="phys_opt_design"/>
+        <Step Id="route_design"/>
+        <Step Id="post_route_phys_opt_design"/>
+        <Step Id="write_bitstream"/>
+      </Strategy>
+      <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
+      <ReportStrategy Name="Vivado Implementation Default Reports" Flow="Vivado Implementation 2018"/>
+      <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
+    </Run>
+    <Run Id="ila_0_impl_1" Type="Ft2:EntireDesign" Part="xczu5eg-sfvc784-2-i" ConstrsSet="ila_0" Description="Default settings for Implementation." AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" SynthRun="ila_0_synth_1" IncludeInArchive="false" GenFullBitstream="true">
       <Strategy Version="1" Minor="2">
         <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2018">
           <Desc>Default settings for Implementation.</Desc>

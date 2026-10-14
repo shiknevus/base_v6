@@ -1,3 +1,5 @@
+//2026/10/13
+//cgliu
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
 // Company: 
@@ -5,20 +7,20 @@
 // 
 // Create Date: 2023/08/15 15:20:14
 // Design Name: 
-// Module Name: osm61_laser_distance_ctrl
-// Project Name: 
-// Target Devices: 
-// Tool Versions: 
-// Description: 
-// 
-// Dependencies: 
-// 
+// Module Name: mst_slv_485_driver (原superisys_rfid_485_slaver_driver, 2026/10/13更名)
+// Project Name:
+// Target Devices:
+// Tool Versions:
+// Description:
+//
+// Dependencies:
+//
 // Revision:
 // Revision 0.01 - File Created
 // Additional Comments:
-// 
+//
 /////////////////////////////////////////////////////////////////////////////////
-module superisys_rfid_485_slaver_driver
+module mst_slv_485_driver
 (
     input                   i_clk             ,//  单一时钟 156.25MHz(业务侧与emcc通道同域; 原i_clk/i_rst双时钟结构已删除)
     input                   i_rst             ,

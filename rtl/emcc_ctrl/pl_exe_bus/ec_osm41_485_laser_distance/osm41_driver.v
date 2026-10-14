@@ -333,7 +333,7 @@ module osm41_driver(
 			end
 	end
 	
-	uart_tx uart_tx_u0(
+	uart_1byte_tx uart_tx_u0(
     .i_clk       (i_clk)
     ,.i_rst      (i_rst)
     ,.i_tx_vld   (uart_tx_vld	)
@@ -342,7 +342,7 @@ module osm41_driver(
     ,.o_uart_tx  (o_485_tx)
     );
 	
-	uart_rx uart_rx_u0(
+	uart_1byte_rx uart_rx_u0(
     .i_clk	     (i_clk)
     ,.i_rst	     (i_rst)
     ,.i_uart_rx	 (i_485_rx)

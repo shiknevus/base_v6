@@ -3,7 +3,7 @@
 //supu_rfid_drv 的"从板485"版本:
 //  命令接口(i_act_vld/i_act/i_slave_addr/i_wdata/o_uid/o_rdata/o_done/o_err...)、3个行为的定义、
 //  每个行为发往485传感器的字节帧、错误码定义, 全部与 supu_rfid_drv 保持一致 —— 相同行为号发出的字节流完全相同.
-//  区别: 本模块不驱动主板本地uart/485仲裁, 而是例化 superisys_rfid_485_slaver_driver, 把相同的帧
+//  区别: 本模块不驱动主板本地uart/485仲裁, 而是例化 mst_slv_485_driver, 把相同的帧
 //  经emcc总线写入目标从板的485寄存器区(0x8A~0x99), 由从板 common_rs485_top 在从板侧485总线上实际收发.
 //
 // 使用说明(在emcc_mix_top中直接接pkg_route, 单实例占用一条从板485通道):
@@ -121,6 +121,32 @@ wire	[15:0]	w_crc	= (i_act == 2'd1)	// 行为1: 站号+10+地址2+数量2+字节
 				// 行为2/3: 站号+03+地址2+数量2 = 6字节参与CRC (行为2: 地址E000/数量04; 行为3: 地址0000/数量02)
 				// 修复: 数量低字节此前写死8'h04, 行为3实发0x02, CRC不符被传感器静默丢弃→超时115
 				: crc16_n({(i_act == 2'd2) ? 8'h04 : 8'h02,8'h00,8'h00,(i_act == 2'd2) ? 8'hE0 : 8'h00,8'h03,i_slave_addr}, 4'd6);
+
+//==================================================================================================
+// 从板485通道驱动输出(业务域)与应答帧字节切分(小端)/校验用CRC
+// (声明置于状态机之前: 本工程仿真用ModelSim, .v文件先声明后使用才可编译)
+//==================================================================================================
+wire	[8*13-1:0]	w_rx_data;							// 收到的应答帧(小端, byte[k]在[8*k+:8])
+wire			w_rx_vld;							// 1拍: 收到新帧
+wire	[7:0]		w_drv_err;							// 1=收满预期长度 6=短帧(10ms截帧)
+
+wire	[7:0]	rx_b0	= w_rx_data[8* 0 +: 8];	// 站号
+wire	[7:0]	rx_b1	= w_rx_data[8* 1 +: 8];	// 功能码
+wire	[7:0]	rx_b2	= w_rx_data[8* 2 +: 8];	// 字节数 / 异常码
+wire	[7:0]	rx_b3	= w_rx_data[8* 3 +: 8];
+wire	[7:0]	rx_b4	= w_rx_data[8* 4 +: 8];
+wire	[7:0]	rx_b5	= w_rx_data[8* 5 +: 8];
+wire	[7:0]	rx_b6	= w_rx_data[8* 6 +: 8];
+wire	[7:0]	rx_b7	= w_rx_data[8* 7 +: 8];
+wire	[7:0]	rx_b8	= w_rx_data[8* 8 +: 8];
+wire	[7:0]	rx_b9	= w_rx_data[8* 9 +: 8];
+wire	[7:0]	rx_b10	= w_rx_data[8*10 +: 8];
+wire	[7:0]	rx_crcl	= w_rx_data[8*(exp_len-8'd2) +: 8];	// 应答帧倒数第2字节=CRC低
+wire	[7:0]	rx_crch	= w_rx_data[8*(exp_len-8'd1) +: 8];	// 应答帧最后1字节=CRC高
+
+wire	[7:0]	w_exp_func	= (act_r == 2'd1) ? 8'h10 : 8'h03;	// 期望的应答功能码
+wire	[15:0]	w_rsp_crc	= crc16_n(w_rx_data[8*11-1:0], exp_len[3:0] - 4'd2);	// 正常应答CRC(前exp_len-2字节)
+wire	[15:0]	w_exc_crc	= crc16_n({64'd0, rx_b2, rx_b1, rx_b0}, 4'd3);		// 异常应答CRC(前3字节)
 
 //==================================================================================================
 // 主状态机
@@ -270,12 +296,7 @@ assign	o_busy	= (state != ST_IDLE);
 // i_cfg_slv_board_id与i_cur_slv_board_id接同一个常量即可). 组合逻辑, 不改变拍节时序.
 wire	w_r_flag_gate = i_rs485_ch_r_flag & (i_cfg_slv_board_id == i_cur_slv_board_id);
 
-// 驱动输出(业务域)
-wire	[8*13-1:0]	w_rx_data;							// 收到的应答帧(小端, byte[k]在[8*k+:8])
-wire			w_rx_vld;							// 1拍: 收到新帧
-wire	[7:0]		w_drv_err;							// 1=收满预期长度 6=短帧(10ms截帧)
-
-superisys_rfid_485_slaver_driver u_slv485_drv (
+mst_slv_485_driver u_slv485_drv (
 	.i_clk				(i_clk				),
 	.i_rst				(i_rst				),
 	.i_baud_rate		(BAUD_RATE			),
@@ -299,26 +320,5 @@ superisys_rfid_485_slaver_driver u_slv485_drv (
 	.o_recv_finish_p	(w_rx_vld			),
 	.o_modbus_err_code	(w_drv_err			)
 );
-
-//==================================================================================================
-// 应答帧字节切分(小端)与校验用CRC
-//==================================================================================================
-wire	[7:0]	rx_b0	= w_rx_data[8* 0 +: 8];	// 站号
-wire	[7:0]	rx_b1	= w_rx_data[8* 1 +: 8];	// 功能码
-wire	[7:0]	rx_b2	= w_rx_data[8* 2 +: 8];	// 字节数 / 异常码
-wire	[7:0]	rx_b3	= w_rx_data[8* 3 +: 8];
-wire	[7:0]	rx_b4	= w_rx_data[8* 4 +: 8];
-wire	[7:0]	rx_b5	= w_rx_data[8* 5 +: 8];
-wire	[7:0]	rx_b6	= w_rx_data[8* 6 +: 8];
-wire	[7:0]	rx_b7	= w_rx_data[8* 7 +: 8];
-wire	[7:0]	rx_b8	= w_rx_data[8* 8 +: 8];
-wire	[7:0]	rx_b9	= w_rx_data[8* 9 +: 8];
-wire	[7:0]	rx_b10	= w_rx_data[8*10 +: 8];
-wire	[7:0]	rx_crcl	= w_rx_data[8*(exp_len-8'd2) +: 8];	// 应答帧倒数第2字节=CRC低
-wire	[7:0]	rx_crch	= w_rx_data[8*(exp_len-8'd1) +: 8];	// 应答帧最后1字节=CRC高
-
-wire	[7:0]	w_exp_func	= (act_r == 2'd1) ? 8'h10 : 8'h03;	// 期望的应答功能码
-wire	[15:0]	w_rsp_crc	= crc16_n(w_rx_data[8*11-1:0], exp_len[3:0] - 4'd2);	// 正常应答CRC(前exp_len-2字节)
-wire	[15:0]	w_exc_crc	= crc16_n({64'd0, rx_b2, rx_b1, rx_b0}, 4'd3);		// 异常应答CRC(前3字节)
 
 endmodule

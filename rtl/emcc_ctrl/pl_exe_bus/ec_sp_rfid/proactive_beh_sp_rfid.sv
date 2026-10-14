@@ -477,7 +477,7 @@ module proactive_beh_sp_rfid#(
 	
 	
 	//=============== 主板/从板485驱动选择 (i_slaver_en) ===============
-	// i_slaver_en=1: 命令走 supu_rfid_drv_slv -> superisys_rfid_485_slaver_driver -> emcc总线 -> 目标从板485口
+	// i_slaver_en=1: 命令走 supu_rfid_drv_slv -> mst_slv_485_driver -> emcc总线 -> 目标从板485口
 	// i_slaver_en=0: 命令走 supu_rfid_drv -> 主板本地uart(经RS485_Arbiter仲裁)
 	// 只让被选中的驱动收到i_act_vld(未选中的一直空闲), 输出按i_slaver_en选择;
 	// 两边行为号->发送帧完全一致(1=写标签 2=读UID 3=读标签; 行为4=读+比对只下发act=3)
