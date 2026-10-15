@@ -211,11 +211,14 @@ module ec_slv_pul_axis#(
 	reg 		r_b_tx_result_vld ;
 	reg 		r_c_tx_result_vld ;
 	reg 		r_a_bhv_vld       ;
+	reg 		r_param38_vld     ;
 	
 	reg 		sync_a_tx_result_vld ;
 	reg 		sync_b_tx_result_vld ;
 	reg 		sync_c_tx_result_vld ;
 	reg 		sync_a_bhv_vld       ;
+	reg 		sync_param38_vld     ;
+	wire		param38_vld          ;
 	
 	always@(posedge clk_i)
 	begin
@@ -224,21 +227,25 @@ module ec_slv_pul_axis#(
 			r_b_tx_result_vld 		<= 1'b0;
 			r_c_tx_result_vld 		<= 1'b0;
 			r_a_bhv_vld       		<= 1'b0;
-			
+			r_param38_vld     		<= 1'b0;
+
 			sync_a_tx_result_vld 	<= 1'b0;
 			sync_b_tx_result_vld 	<= 1'b0;
 			sync_c_tx_result_vld 	<= 1'b0;
 			sync_a_bhv_vld       	<= 1'b0;
+			sync_param38_vld     	<= 1'b0;
 		end else begin
 			r_a_tx_result_vld		<= a_tx_result_vld;
 			r_b_tx_result_vld		<= b_tx_result_vld;
 			r_c_tx_result_vld		<= c_tx_result_vld;
 			r_a_bhv_vld      		<= a_bhv_vld      ;
-			
+			r_param38_vld    		<= param38_vld    ;
+
 			sync_a_tx_result_vld 	<= r_a_tx_result_vld;
 			sync_b_tx_result_vld 	<= r_b_tx_result_vld;
 			sync_c_tx_result_vld 	<= r_c_tx_result_vld;
 			sync_a_bhv_vld       	<= r_a_bhv_vld      ;
+			sync_param38_vld     	<= r_param38_vld    ;
 		end
 	end
 	
@@ -350,7 +357,8 @@ module ec_slv_pul_axis#(
 	,.param35				(param35		)
 	,.param36				(param36		)
 	,.param37				(param37		)
-	//,.param38				(param38		)
+	,.param38				(param38		)	//signed wheel spd
+	,.param38_vld			(param38_vld	)
 	//,.param39				(param39		)
 	//,.param40				(param40		)
 	,.clr_pause				(b_clr_pause	)
@@ -468,6 +476,8 @@ module ec_slv_pul_axis#(
 
     ,.i_home_completed 		(home_completed			)
     ,.i_drive_enabled 		(~b_son					)
+    ,.i_wheel_spd			(param38				)
+    ,.i_wheel_vld			(sync_param38_vld		)
     ,.dbg_s2m_o				(debug_reg4				)
     ,.dbg_ctl_o				(debug_reg5				)
     ,.dbg_m2s_w0_o			(param54				)

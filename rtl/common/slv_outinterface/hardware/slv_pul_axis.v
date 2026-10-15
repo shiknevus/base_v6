@@ -90,6 +90,10 @@ module slv_pul_axis
    ,output wire [31:0]      o_dbg_w13
    ,output wire [31:0]      o_dbg_w14
    ,output wire [31:0]      o_dbg_w15
+   ,input  wire             i_frame_end     //wheel: m2s frame done, add by szzhang 20261013
+   ,input  wire [31:0]      i_frame_w0      // m2s word0
+   ,input  wire [31:0]      i_wheel_spd     // m2s word9, signed pulse/s
+   ,output wire             o_wheel_active
 );
    
    ///////////////// PARAMETER ////////////////
@@ -136,7 +140,8 @@ module slv_pul_axis
    wire action_start_pulse = action_start & ~action_start_d;
    wire drive_ok = i_device_alarm && i_servo_ready;
    wire is_move = cur_beha == 3 || cur_beha == 21;
-   wire start_ok = drive_ok && action_son && (!is_move || i_home_valid);
+   wire is_motion = is_move || cur_beha == 1 || cur_beha == 2 || cur_beha == 20;
+   wire start_ok = drive_ok && action_son && (!is_move || i_home_valid) && !(is_motion && o_wheel_active);
    wire stop_request = action_alarm || beat_timeout || action_flag || !action_son;
    wire hard_abort;
    wire motion_pause = i_pause && !stop_request && !hard_abort;
@@ -167,6 +172,8 @@ module slv_pul_axis
    wire         i_rc_dbestop;
    wire         i_rc_pulse_busy;
    wire [31:0]  pg_period;
+   wire         pm_pulse;
+   wire         pm_dir;
    wire [31:0]  pos_dbg;
    wire [4:0]   home_st;
    wire [4:0]   jog_st;
@@ -191,10 +198,69 @@ module slv_pul_axis
       .i_dv_phase_a     ( 1'b0                   ),
       .i_dv_phase_b     ( 1'b0                   ),
       .i_dv_phase_z     ( 1'b0                   ),
-      .o_dv_pulse_p     ( o_device_pulse         ),
-      .o_dv_pulse_n     ( o_device_dir           ),
+      .o_dv_pulse_p     ( pm_pulse               ),
+      .o_dv_pulse_n     ( pm_dir                 ),
       .o_dbg_period     ( pg_period              )
    );
+
+   ////////////////// WHEEL (m2s word9), add by szzhang 20261013
+   reg  [16:0]  tick_cnt;
+   reg          tick_1ms;
+   always @(posedge clk) begin
+      if(reset || tick_cnt == 17'd99_999) tick_cnt <= 17'd0;
+      else                                tick_cnt <= tick_cnt + 1'b1;
+      tick_1ms <= (tick_cnt == 17'd99_999);
+   end
+
+   // write strobe = word0[31:24] count changed; first frame after reset/link loss only syncs
+   reg  [7:0]   wheel_seq;
+   reg          wheel_seq_ok;
+   reg          wheel_vld;
+   always @(posedge clk) begin
+      if(reset || action_flag) begin
+         wheel_seq_ok <= 1'b0;
+         wheel_vld    <= 1'b0;
+      end else begin
+         wheel_vld <= i_frame_end && wheel_seq_ok && (i_frame_w0[31:24] != wheel_seq);
+         if(i_frame_end) begin
+            wheel_seq    <= i_frame_w0[31:24];
+            wheel_seq_ok <= 1'b1;
+         end
+      end
+   end
+
+   wire [31:0]  wheel_acc = (jog_acc_eff > acc_max_eff) ? acc_max_eff : jog_acc_eff;
+   wire [31:0]  wheel_dec = (jog_dec_eff > dec_max_eff) ? dec_max_eff : jog_dec_eff;
+   wire         wheel_pulse;
+   wire         wheel_dir;
+
+   Wheel_vel_std #(.BASE_REFCLK(100_000_000)) wheel_u
+   (
+      .clk            ( clk                ),
+      .reset          ( reset              ),
+      .i_tick_1ms     ( tick_1ms           ),
+      .i_vld          ( wheel_vld          ),
+      .i_spd          ( i_wheel_spd        ),
+      .i_allow        ( !is_motion && !act_busy ),
+      .i_hold         ( i_pause            ),
+      .i_stop         ( i_frame_w0[7] || beat_timeout || action_flag ), // stop/estop/a_en off
+      .i_abort        ( !drive_ok || !action_son ),
+      .i_acc          ( wheel_acc          ),
+      .i_dec          ( wheel_dec          ),
+      .i_qdec         ( dec_max_eff        ),
+      .i_spd_max      ( spd_max_eff        ),
+      .i_dir_init     ( pm_dir             ),
+      .i_lim_f        ( i_axis_limf        ),
+      .i_lim_b        ( i_axis_limb        ),
+      .i_blk_f        ( i_frame_w0[2]      ),   // master soft limit
+      .i_blk_b        ( i_frame_w0[9]      ),
+      .o_active       ( o_wheel_active     ),
+      .o_pulse        ( wheel_pulse        ),
+      .o_dir          ( wheel_dir          )
+   );
+
+   assign o_device_pulse = o_wheel_active ? wheel_pulse : pm_pulse;
+   assign o_device_dir   = o_wheel_active ? wheel_dir   : pm_dir;
   
   ////////////////// Positioner
    reg  [31:0]  pos_pf_spd;
@@ -417,7 +483,8 @@ module slv_pul_axis
               if(!start_ok || stop_request) begin
                   act_error <= 1;
                   alarm_code <= !i_device_alarm ? 108 : !i_servo_ready ? 113 :
-                                !action_son ? 115 : !i_home_valid && is_move ? 114 : 106;
+                                !action_son ? 115 : is_motion && o_wheel_active ? 118 :
+                                !i_home_valid && is_move ? 114 : 106;
               end
           end
           case(cur_beha)

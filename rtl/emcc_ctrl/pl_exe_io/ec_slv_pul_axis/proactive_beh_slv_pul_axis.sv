@@ -101,6 +101,8 @@ module proactive_beh_slv_pul_axis#(
 
     ,input wire i_home_completed
     ,input wire i_drive_enabled
+    ,input wire [31:0]          i_wheel_spd         //signed pulse/s (PARAM38) -> m2s word9
+    ,input wire                 i_wheel_vld         //PARAM38 write strobe
     ,output wire [31:0]         dbg_s2m_o       // {s2m frame cnt, s2m word10}
     ,output wire [31:0]         dbg_ctl_o       // {m2s frame cnt, stop_frame_cnt, ctrl flags}
     ,output wire [31:0]         dbg_m2s_w0_o    // m2s word0 being sent
@@ -121,12 +123,14 @@ module proactive_beh_slv_pul_axis#(
     reg pulse_done_latched;
     wire is_move = (a_bhv_id_r == 3) || (a_bhv_id_r == 21);
     wire is_motion = is_move || (a_bhv_id_r == 1) || (a_bhv_id_r == 2) || (a_bhv_id_r == 20);
+    wire wheel_active = s2m_10tmp[16];   // slave wheel owns pulse
     wire limits_enabled = rcfg_pos_max > rcfg_pos_min;
     wire target_over_f = is_move && limits_enabled && ($signed(rserv_target_pulse) > rcfg_pos_max);
     wire target_over_b = is_move && limits_enabled && ($signed(rserv_target_pulse) < rcfg_pos_min);
     wire [7:0] launch_alarm = !dv_alarm ? 8'd108 :
                               !i_servo_ready ? 8'd113 :
                               !i_drive_enabled ? 8'd115 :
+                              wheel_active ? 8'd118 :
                               target_over_f ? 8'd111 : target_over_b ? 8'd112 :
                               (is_move && !i_home_completed) ? 8'd114 : 8'd0;
     wire launch_fault = is_motion && (launch_alarm != 0);
@@ -139,6 +143,7 @@ module proactive_beh_slv_pul_axis#(
     //113 Servo not ready
     //114 Move not homed
     //115 Drive disabled
+    //118 Handwheel active
 
     reg [7:0]    	curr_state;
 	reg [7:0]    	curr_state_1d;
@@ -543,8 +548,17 @@ module proactive_beh_slv_pul_axis#(
 		    end
 		end
 
+		// wheel: write count -> word0[31:24], soft-limit block -> bit9/bit2, add by szzhang 20261013
+		reg  [7:0]  wheel_seq;
+		always@(posedge clk_i) begin
+		    if(rst_i)            wheel_seq <= 8'd0;
+		    else if(i_wheel_vld) wheel_seq <= wheel_seq + 1'b1;
+		end
+		wire wheel_blk_f = w_soft_lim_f && i_home_completed;
+		wire wheel_blk_b = w_soft_lim_b && i_home_completed;
+
 		wire [31:0] m2s_word0 = {
-									8'd0,
+									wheel_seq,
 									a_bhv_id_r,
 		                            i_servo_ready,
 		                            i_servo_done,
@@ -552,14 +566,14 @@ module proactive_beh_slv_pul_axis#(
 									i_drive_on,
 		                            i_drive_reset,
 									rserv_dir,
-		                            1'b0,
+		                            wheel_blk_b,
 									i_pause,
 		                            i_stop|(~i_emerge_stop_signal)|(!a_en),
 									action_beat,
 		                            i_axis_zero,
 									i_axis_limb,
 		                            i_axis_limf,
-									1'b0,
+									wheel_blk_f,
 		                            action_start,
 									action_alarm
 									};
@@ -579,7 +593,7 @@ module proactive_beh_slv_pul_axis#(
 		            4'd6:  m2s_pulm_msg <= rcfg_touch_spd; // was jog_spd(=word3), change by szzhang 20261010
 		            4'd7:  m2s_pulm_msg <= rcfg_jog_acc;
 		            4'd8:  m2s_pulm_msg <= rcfg_jog_dec;
-		            4'd9:  m2s_pulm_msg <= rcfg_move_spd;
+		            4'd9:  m2s_pulm_msg <= i_wheel_spd;    // was move_spd(=word3), change by szzhang 20261013
 		            4'd10: m2s_pulm_msg <= rcfg_move_acc;
 		            4'd11: m2s_pulm_msg <= rcfg_move_dec;
 		            4'd12: m2s_pulm_msg <= rcfg_spd_max;

@@ -2,7 +2,7 @@
 // handwheel velocity follower, PARAM38 write = signed pulse/s, add by szzhang 20261013
 module Wheel_vel_std #(
     parameter BASE_REFCLK = 156_250_000,
-    parameter WDT_MS      = 200,                   // no write -> target 0
+    parameter WDT_MS      = 1000,                   // no write -> target 0
     parameter PW_CLK      = BASE_REFCLK/500_000,   // pulse low cap 2us
     parameter DIR_SETUP   = BASE_REFCLK/200_000    // dir setup/hold 5us
 )
