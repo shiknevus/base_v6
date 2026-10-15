@@ -1,0 +1,265 @@
+`timescale 1ns / 1ps
+//==============================================================================
+// tb_common_rs485_top
+//   波形仿真, 无 $display。覆盖场景:
+//     S1  按字节计数收帧 : recv_num=8, TB 模拟主站发 8 字节
+//                          观察 ST_RX_IDLE->WORK->SAVE->OK->END,
+//                          写 buf1 -> buf_flag 翻转为 1, uart_id=1
+//     S2  读缓冲扫描      : i_rx_sel 0..3, 观察 o_rx_32data
+//                          word0=0000_0001, word1=0201_5AA5, word2=4030_2010
+//     S3  尾符号断帧      : tail=0xAA, 发 4 字节(尾符也入缓冲),
+//                          写 buf0, uart_id=2, word1=AA33_3231
+//     S4  帧间超时        : 只发 2 字节后静默 >10ms,
+//                          rx_err_flag=1, 写 buf1, uart_id=3, word0=8000_0003
+//     S5  TX 发送         : send_num=8, start_send 脉冲,
+//                          观察 uart_dir 拉高 / uart_txd 波形(字节序 11 22 33
+//                          44 55 66 77 88) / tx_num 0->7 / 发完自动撤方向
+//     S6  回环自收        : uart_txd 接回 uart_rxd, 自发 8 字节自收,
+//                          写 buf0, uart_id=4, word1=4433_2211
+//
+//   RX FSM 状态值: 0=IDLE 1=WORK 2=SAVE 3=OK 4=ERR 5=END
+//
+//   波特率/位周期对照 (i_bps_sel -> bps_para, 100MHz):
+//     000:115200->868  001:9600->10416  010:19200->5208
+//     011:38400->2604  100:57600->1736  101:4800->20832
+//   (换波特率时同步改 rs232_baud_rate 与 BIT_CYC)
+//
+//   仿真命令 (ModelSim, 路径按实际环境调整):
+//     vlib work
+//     vlog -sv -work work ^
+//       ../../rtl/common/slv_outinterface/hardware/common_rs485_top.v ^
+//       ../../rtl/common/slv_outinterface/hardware/uart_top.v ^
+//       ../../rtl/common/slv_outinterface/hardware/uart_rx.v ^
+//       ../../rtl/common/slv_outinterface/hardware/uart_tx.v ^
+//       tb_common_rs485_top.sv
+//     vsim -voptargs=+acc work.tb_common_rs485_top
+//   (TB 引用了 DUT 内部信号做波形观察, vsim 必须加 -voptargs=+acc)
+//==============================================================================
+module tb_common_rs485_top;
+
+    localparam CLK_PERIOD = 10;      // 100 MHz
+    localparam BIT_CYC    = 868;     // 115200 bps @ 100MHz, 与 bps_para 一致
+
+    // ---------------- 时钟 / 复位 ----------------
+    reg clk;
+    reg rst;
+
+    initial clk = 1'b0;
+    always #(CLK_PERIOD/2) clk = ~clk;
+
+    // ---------------- DUT 输入 ----------------
+    reg         i_clear;
+    reg  [4:0]  i_rx_sel;
+    reg         loop_en;             // 1: uart_txd 回环到 uart_rxd
+    reg         uart_rxd_drv;        // TB 驱动的 RX 线 (非回环时)
+    reg  [2:0]  rs232_baud_rate;
+    reg  [1:0]  rs232_odd_even;
+    reg         rs232_start_send;
+    reg  [7:0]  rs232_send_num;
+    reg  [7:0]  rs232_recv_num;
+    reg  [7:0]  rs232_tail_symbol;
+    reg  [31:0] rs232_send_char1;
+    reg  [31:0] rs232_send_char2;
+    reg  [31:0] rs232_send_char3;
+    reg  [31:0] rs232_send_char4;
+    reg  [31:0] rs232_send_char5;
+    reg  [31:0] rs232_send_char6;
+
+    // ---------------- DUT 输出 (先声明后使用) ----------------
+    wire [31:0] o_rx_32data;
+    wire        uart_txd;
+    wire        uart_dir;
+
+    // 回环开关: 1 时 DUT 收到自己发的帧 (模拟 485 总线回显)
+    wire uart_rxd = loop_en ? uart_txd : uart_rxd_drv;
+
+    // ---------------- DUT ----------------
+    common_rs485_top u_dut (
+         .i_clk              ( clk               )
+        ,.i_rst              ( rst               )
+        ,.i_clear            ( i_clear           )
+        ,.i_rx_sel           ( i_rx_sel          )
+        ,.o_rx_32data        ( o_rx_32data       )
+        ,.uart_rxd           ( uart_rxd          )
+        ,.uart_txd           ( uart_txd          )
+        ,.uart_dir           ( uart_dir          )
+        ,.rs232_baud_rate    ( rs232_baud_rate   )
+        ,.rs232_odd_even     ( rs232_odd_even    )
+        ,.rs232_start_send   ( rs232_start_send  )
+        ,.rs232_send_num     ( rs232_send_num    )
+        ,.rs232_recv_num     ( rs232_recv_num    )
+        ,.rs232_tail_symbol  ( rs232_tail_symbol )
+        ,.rs232_send_char1   ( rs232_send_char1  )
+        ,.rs232_send_char2   ( rs232_send_char2  )
+        ,.rs232_send_char3   ( rs232_send_char3  )
+        ,.rs232_send_char4   ( rs232_send_char4  )
+        ,.rs232_send_char5   ( rs232_send_char5  )
+        ,.rs232_send_char6   ( rs232_send_char6  )
+    );
+
+    // ---------------- 波形观察辅助: DUT 内部关键状态 ----------------
+    wire [7:0]  dbg_rx_state  = u_dut.uart_rx_state;   // 0~5 见文件头注释
+    wire [7:0]  dbg_rx_num    = u_dut.rx_num;
+    wire [31:0] dbg_rx_time   = u_dut.rx_time;
+    wire [27:0] dbg_uart_id   = u_dut.uart_id;
+    wire        dbg_buf_flag  = u_dut.buf_flag;        // 1: o_rx_32data 选 buf1
+    wire        dbg_rx_err    = u_dut.rx_err_flag;
+    wire [7:0]  dbg_rx_byte   = u_dut.rx_data;
+    wire [7:0]  dbg_rxdev0    = u_dut.rx_dev_data[0];
+    wire [7:0]  dbg_rxdev1    = u_dut.rx_dev_data[1];
+    wire [7:0]  dbg_tx_num    = u_dut.tx_num;
+    wire [7:0]  dbg_tx_data   = u_dut.tx_data;
+    wire        dbg_tx_work   = u_dut.latch_txd_work;
+    wire [31:0] dbg_wdg_cnt   = u_dut.send_cnt_add;    // TX 看门狗计数
+    wire [3:0]  dbg_rx_phy    = u_dut.uart_top_u0.uart_rx_u.cur_state; // 0=IDLE..11=STOP
+    wire [3:0]  dbg_tx_phy    = u_dut.uart_top_u0.uart_tx_u.cur_state; // 0=IDLE..13=BEAT
+
+    // ---------------- 激励 task ----------------
+    // 模拟主站发 1 字节: 起始+8数据+(奇偶校验)+停止, 每位 BIT_CYC 拍, LSB first
+    task automatic uart_send_byte(input [7:0] b);
+        integer i;
+        reg p;
+        begin
+            // 2'b11 奇校验 / 2'b10 偶校验 / 2'b0x 无校验
+            p = rs232_odd_even[1] ? (^b ^ rs232_odd_even[0]) : 1'b0;
+            @(negedge clk);
+            uart_rxd_drv = 1'b0;                       // start bit
+            repeat (BIT_CYC) @(posedge clk);
+            for (i = 0; i < 8; i = i + 1) begin
+                uart_rxd_drv = b[i];
+                repeat (BIT_CYC) @(posedge clk);
+            end
+            if (rs232_odd_even[1]) begin
+                uart_rxd_drv = p;
+                repeat (BIT_CYC) @(posedge clk);
+            end
+            uart_rxd_drv = 1'b1;                       // stop bit
+            repeat (BIT_CYC) @(posedge clk);
+            repeat (BIT_CYC/2) @(posedge clk);         // 帧间半位空闲
+        end
+    endtask
+
+    // start_send 单拍脉冲
+    task automatic tx_start;
+        begin
+            @(negedge clk); rs232_start_send = 1'b1;
+            @(negedge clk); rs232_start_send = 1'b0;
+        end
+    endtask
+
+    // 扫描 i_rx_sel 观察缓冲读出
+    task automatic rx_sel_scan(input integer n);
+        integer s;
+        begin
+            for (s = 0; s < n; s = s + 1) begin
+                @(negedge clk);
+                i_rx_sel = s[4:0];
+                repeat (10) @(negedge clk);
+            end
+        end
+    endtask
+
+    // ---------------- 波形 dump (ModelSim 下也可改用 log -r /*) ----------------
+    initial begin
+        $dumpfile("tb_common_rs485_top.vcd");
+        $dumpvars(0, tb_common_rs485_top);
+    end
+
+    // ---------------- 主序列 ----------------
+    initial begin
+        rst               = 1'b1;
+        i_clear           = 1'b0;          // DUT 中未使用
+        i_rx_sel          = 5'd0;
+        loop_en           = 1'b0;
+        uart_rxd_drv      = 1'b1;
+        rs232_baud_rate   = 3'b000;        // 115200
+        rs232_odd_even    = 2'b00;         // 无校验
+        rs232_start_send  = 1'b0;
+        rs232_send_num    = 8'd0;
+        rs232_recv_num    = 8'd0;
+        rs232_tail_symbol = 8'd0;
+        rs232_send_char1  = 32'h0;
+        rs232_send_char2  = 32'h0;
+        rs232_send_char3  = 32'h0;
+        rs232_send_char4  = 32'h0;
+        rs232_send_char5  = 32'h0;
+        rs232_send_char6  = 32'h0;
+
+        repeat (10) @(negedge clk);
+        rst = 1'b0;
+        repeat (10) @(negedge clk);
+
+        // ============ S1: 按字节计数收帧 (recv_num=8) ============
+        rs232_recv_num = 8'd8;
+        uart_send_byte(8'hA5);
+        uart_send_byte(8'h5A);
+        uart_send_byte(8'h01);
+        uart_send_byte(8'h02);
+        uart_send_byte(8'h10);
+        uart_send_byte(8'h20);
+        uart_send_byte(8'h30);
+        uart_send_byte(8'h40);             // 第 8 字节 -> SAVE (写 buf1)
+        repeat (200) @(negedge clk);       // 观察 SAVE/OK/END, buf_flag 翻转
+
+        // ============ S2: 读缓冲扫描 (buf1, uart_id=1) ============
+        rx_sel_scan(4);                    // word0=1, word1=0201_5AA5, word2=4030_2010
+		
+		// ============ S1: 按字节计数收帧 (recv_num=8) ============
+        rs232_recv_num = 8'd8;
+        uart_send_byte(8'h16);
+        uart_send_byte(8'h16);
+        uart_send_byte(8'h16);
+        uart_send_byte(8'h16);
+        uart_send_byte(8'h16);
+        uart_send_byte(8'h16);
+        uart_send_byte(8'h16);
+        uart_send_byte(8'h16);             // 第 8 字节 -> SAVE (写 buf1)
+        repeat (200) @(negedge clk);       // 观察 SAVE/OK/END, buf_flag 翻转
+
+        // ============ S2: 读缓冲扫描 (buf1, uart_id=1) ============
+        rx_sel_scan(4);                    // word0=1, word1=0201_5AA5, word2=4030_2010
+		
+		
+		
+
+        // ============ S3: 尾符号断帧 (tail=0xAA, 写 buf0) ============
+        rs232_recv_num    = 8'd0;
+        rs232_tail_symbol = 8'hAA;
+        repeat (10) @(negedge clk);
+        uart_send_byte(8'h31);
+        uart_send_byte(8'h32);
+        uart_send_byte(8'h33);
+        uart_send_byte(8'hAA);             // 尾符号 -> SAVE, 尾符也存入 rx_dev_data[3]
+        repeat (200) @(negedge clk);
+        rx_sel_scan(2);                    // word0=2, word1=AA33_3231
+
+        // ============ S4: 帧间超时 (写 buf1, err=1) ============
+        rs232_tail_symbol = 8'd0;
+        rs232_recv_num    = 8'd8;
+        uart_send_byte(8'hB1);
+        uart_send_byte(8'hB2);
+        // 静默 >10ms: WORK 中 rx_time 计到 1_000_000 -> rx_err_flag=1 -> SAVE
+        repeat (1_010_000) @(posedge clk);
+        rx_sel_scan(2);                    // word0=8000_0003, word1=0000_B2B1
+
+        // ============ S5: TX 发送 (uart_dir / uart_txd 波形) ============
+        rs232_recv_num    = 8'd0;
+        rs232_send_num    = 8'd8;
+        rs232_send_char1  = 32'h4433_2211; // 线上顺序: 11 22 33 44
+        rs232_send_char2  = 32'h8877_6655; //             55 66 77 88
+        tx_start;
+        // 8 字节 x ~105us ~= 0.85ms, 留裕量观察发完自动撤方向
+        repeat (120_000) @(posedge clk);
+
+        // ============ S6: 回环自收 (uart_txd -> uart_rxd, 写 buf0) ============
+        loop_en          = 1'b1;
+        rs232_recv_num   = 8'd8;
+        tx_start;                          // 自发 8 字节, RX 同时收帧
+        repeat (130_000) @(posedge clk);
+        rx_sel_scan(2);                    // word0=4, word1=4433_2211
+
+        repeat (100) @(negedge clk);
+        #2000;
+    end
+
+endmodule

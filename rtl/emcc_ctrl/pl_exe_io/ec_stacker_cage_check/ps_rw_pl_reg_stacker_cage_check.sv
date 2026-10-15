@@ -18,6 +18,8 @@
 // Additional Comments:
 // 
 //////////////////////////////////////////////////////////////////////////////////
+`include "reg_addr_pl.vh"
+
 module ps_rw_pl_reg_stacker_cage_check#(
     parameter  						REG_SPACE_BIAS 	= 	200	,
     parameter  						REG_SPACE_SIZE 	= 	512	
@@ -83,7 +85,7 @@ module ps_rw_pl_reg_stacker_cage_check#(
 	//,output		reg 	[19:0]		param13			
 	//,output		reg 	[19:0]		param14			
 	//,output		reg 	[19:0]		param15			
-	//,output		reg 	[7:0]		param16			
+	,output		reg 	[7:0]		param16			
 	//,output		reg 	[7:0]		param17			
 	//,output		reg 	[7:0]		param18			
 	//,output		reg 	[7:0]		param19			
@@ -135,18 +137,18 @@ module ps_rw_pl_reg_stacker_cage_check#(
 	//,input 				[19:0]		param58   
 	//,input 				[19:0]		param59   
 	//,input 				[19:0]		param60   
-	//,input 				[7:0]		param61   
-	//,input 				[7:0]		param62   
-	//,input 				[7:0]		param63   
-	//,input 				[7:0]		param64   
-	//,input 				[7:0]		param65   
+	,input 				[7:0]		param61   
+	,input 				[7:0]		param62   
+	,input 				[7:0]		param63   
+	,input 				[7:0]		param64   
+	,input 				[7:0]		param65   
 	,input 							param66   
-	//,input 							param67   
-	//,input 							param68   
-	//,input 							param69   
-	//,input 							param70   
+	,input 							param67   
+	,input 							param68   
+	,input 							param69   
+	,input 							param70   
 	,input 				[31:0]		debug_reg1
-	,input 				[31:0]		debug_reg2
+	//,input 				[31:0]		debug_reg2
 	//,input 				[31:0]		debug_reg3
 	//,input 				[31:0]		debug_reg4
 	//,input 				[31:0]		debug_reg5
@@ -250,7 +252,7 @@ module ps_rw_pl_reg_stacker_cage_check#(
 			//param13				<=	20'd0   	;
 			//param14				<=	20'd0   	;
 			//param15				<=	20'd0   	;
-			//param16				<=	8'd0	   	;
+			param16				<=	8'd0	   	;
 			//param17				<=	8'd0	   	;
 			//param18				<=	8'd0	   	;
 			//param19				<=	8'd0	   	;
@@ -326,7 +328,7 @@ module ps_rw_pl_reg_stacker_cage_check#(
 			//param13			<=	(wr_task_vld && wr_task_addr == `PARAM13		) ? i_st_wr_data[19:0]	: param13	;
 			//param14			<=	(wr_task_vld && wr_task_addr == `PARAM14		) ? i_st_wr_data[19:0]	: param14	;
 			//param15			<=	(wr_task_vld && wr_task_addr == `PARAM15		) ? i_st_wr_data[19:0]	: param15	;
-			//param16			<=	(wr_task_vld && wr_task_addr == `PARAM16		) ? i_st_wr_data[7:0] 	: param16	;
+			param16			<=	(wr_task_vld && wr_task_addr == `PARAM16		) ? i_st_wr_data[7:0] 	: param16	;
 			//param17			<=	(wr_task_vld && wr_task_addr == `PARAM17		) ? i_st_wr_data[7:0] 	: param17	;
 			//param18			<=	(wr_task_vld && wr_task_addr == `PARAM18		) ? i_st_wr_data[7:0] 	: param18	;
 			//param19			<=	(wr_task_vld && wr_task_addr == `PARAM19		) ? i_st_wr_data[7:0] 	: param19	;
@@ -389,19 +391,19 @@ module ps_rw_pl_reg_stacker_cage_check#(
 		//`PARAM58		:	o_st_rd_data <= {12'd0,param58		};
 		//`PARAM59		:	o_st_rd_data <= {12'd0,param59		};
 		//`PARAM60		:	o_st_rd_data <= {12'd0,param60		};
-		//`PARAM61		:	o_st_rd_data <= {24'd0,param61  	};
-		//`PARAM62		:	o_st_rd_data <= {24'd0,param62  	};
-		//`PARAM63		:	o_st_rd_data <= {24'd0,param63  	};
-		//`PARAM64		:	o_st_rd_data <= {24'd0,param64  	};
-		//`PARAM65		:	o_st_rd_data <= {24'd0,param65  	};
+		`PARAM61		:	o_st_rd_data <= {24'd0,param61  	};
+		`PARAM62		:	o_st_rd_data <= {24'd0,param62  	};
+		`PARAM63		:	o_st_rd_data <= {24'd0,param63  	};
+		`PARAM64		:	o_st_rd_data <= {24'd0,param64  	};
+		`PARAM65		:	o_st_rd_data <= {24'd0,param65  	};
 		`PARAM66		:	o_st_rd_data <= {31'd0,param66  	};
-		//`PARAM67		:	o_st_rd_data <= {31'd0,param67  	};
-		//`PARAM68		:	o_st_rd_data <= {31'd0,param68  	};
-		//`PARAM69		:	o_st_rd_data <= {31'd0,param69  	};
-		//`PARAM70		:	o_st_rd_data <= {31'd0,param70  	};
+		`PARAM67		:	o_st_rd_data <= {31'd0,param67  	};
+		`PARAM68		:	o_st_rd_data <= {31'd0,param68  	};
+		`PARAM69		:	o_st_rd_data <= {31'd0,param69  	};
+		`PARAM70		:	o_st_rd_data <= {31'd0,param70  	};
 		
 		`DEBUG_REG1		:	o_st_rd_data <= debug_reg1			;
-		`DEBUG_REG2		:	o_st_rd_data <= debug_reg2			;
+		//`DEBUG_REG2		:	o_st_rd_data <= debug_reg2			;
 		//`DEBUG_REG3		:	o_st_rd_data <= debug_reg3			;
 		//`DEBUG_REG4		:	o_st_rd_data <= debug_reg4			;
         //`DEBUG_REG5		:	o_st_rd_data <= debug_reg5			;
@@ -448,7 +450,7 @@ module ps_rw_pl_reg_stacker_cage_check#(
 		//`PARAM13		:	o_st_rd_data <= {12'd0,param13		};
 		//`PARAM14		:	o_st_rd_data <= {12'd0,param14		};
 		//`PARAM15		:	o_st_rd_data <= {12'd0,param15		};
-		//`PARAM16		:	o_st_rd_data <= {24'd0,param16		};
+		`PARAM16		:	o_st_rd_data <= {24'd0,param16		};
 		//`PARAM17		:	o_st_rd_data <= {24'd0,param17		};
 		//`PARAM18		:	o_st_rd_data <= {24'd0,param18		};
 		//`PARAM19		:	o_st_rd_data <= {24'd0,param19		};

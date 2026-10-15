@@ -356,11 +356,11 @@ end
 //==================================================================================================
 // UART 发送 / 接收 (复用本目录 uart_tx.v / uart_rx.v)
 //==================================================================================================
-uart_tx #(
+uart_1byte_tx #(
 	.CLK_FREQ	(CLK_FREQ)
 	,.UART_BPS	(UART_BPS)
 	,.PARITY	(PARITY)
-) u_uart_tx (
+) u_uart_1byte_tx (
 	.i_clk		(i_clk)
 	,.i_rst		(i_rst)
 	,.i_tx_vld	(w_tx_vld)
@@ -369,11 +369,11 @@ uart_tx #(
 	,.o_uart_tx	(o_uart_tx)
 );
 
-uart_rx #(
+uart_1byte_rx #(
 	.CLK_FREQ	(CLK_FREQ)
 	,.UART_BPS	(UART_BPS)
 	,.PARITY	(PARITY)
-) u_uart_rx (
+) u_uart_1byte_tx (
 	.i_clk		(i_clk)
 	,.i_rst		(i_rst)
 	,.i_uart_rx	(i_uart_rx)

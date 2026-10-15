@@ -38,12 +38,21 @@ module ec_stacker_cage_check#(
 		output 		 [31:0]     o_st_rd_data    ,
 		output 		            o_st_rd_vld     ,
 
-		output					o_sig_dri		,
-		
+		input					i_right_far_cage_mat_check 	,	// 货笼右边远离货笼端物料检测
+		input 					i_right_hori_overrange     ,	// 右侧横向超宽检测
+		input 					i_left_near_cage_mat_check ,	// 货笼左边靠近货笼端物料检测
+		input 					i_left_far_cage_mat_check  ,	// 货笼左边远离货笼端物料检测
+		input 					i_left_hori_overrange      ,	// 左侧横向超宽检测
+		input 					i_right_near_cage_mat_cher ,	// 货笼右边靠近货笼端物料检测
+		input 					i_mat_arr                  ,	// 货笼内部物料检测
+		input 					i_left_verti_overrange     ,	// 左侧竖向超宽检测
+		input 					i_height_overrange         ,	// 超高检测
+		input 					i_right_verti_overrange    ,	// 右侧竖向超宽检测
+
 		output 	            	o_intr_irq	
     );
 	
-	localparam		A_BHA_NUM	=	2;	
+	localparam		A_BHA_NUM	=	5;	
 	localparam		B_BHA_NUM	=	1;	
 	
 	//PS-PL    
@@ -286,7 +295,7 @@ module ec_stacker_cage_check#(
 	// ,.param13			    (param13		)
 	// ,.param14			    (param14		)
 	// ,.param15			    (param15		)
-	// ,.param16			    (param16		)
+	,.param16			    (param16		)	//selchan	1：右近	2：右远	3：左近	3：左远
 	// ,.param17			    (param17		)
 	// ,.param18			    (param18		)
 	// ,.param19			    (param19		)
@@ -324,24 +333,23 @@ module ec_stacker_cage_check#(
 	// ,.param58               (param58		)
 	// ,.param59               (param59		)
 	// ,.param60               (param60		)
-	// ,.param61               (param61		)
-	// ,.param62               (param62		)
-	// ,.param63               (param63		)
-	// ,.param64               (param64		)
-	// ,.param65               (param65		)
-	,.param66               (do_o			)
-	// ,.param67               (param67		)
-	// ,.param68               (param68		)
-	// ,.param69               (param69		)
-	// ,.param70               (param70		)
+	,.param61               (i_right_far_cage_mat_check		)
+	,.param62               (i_right_hori_overrange    		)
+	,.param63               (i_left_near_cage_mat_check		)
+	,.param64               (i_left_far_cage_mat_check 		)
+	,.param65               (i_left_hori_overrange     		)
+	,.param66               (i_right_near_cage_mat_cher		)
+	,.param67               (i_mat_arr                 		)
+	,.param68               (i_left_verti_overrange    		)
+	,.param69               (i_height_overrange        		)
+	,.param70               (i_right_verti_overrange   		)
 	,.debug_reg1			(debug_reg1		)
-	,.debug_reg2			()
+	//,.debug_reg2			()
 	// ,.debug_reg3			(debug_reg3		)
 	// ,.debug_reg4			(debug_reg4		)
 	// ,.debug_reg5			(debug_reg5		)
 	);
 
-	wire	[7:0]	curr_state;
 	wire			a_bhv_vld_r;
 	
 	proactive_beh_stacker_cage_check#(	
@@ -367,8 +375,6 @@ module ec_stacker_cage_check#(
 	,.state_monitor_o		(debug_reg1			)
     ,.irq_o                	(irq_a				)
     ,.irq_ack_i       		(irq_a_grant		)
-	//,.curr_state			(curr_state)
-	//,.a_bhv_vld_r			(a_bhv_vld_r)
     );
 	 
 	status_beh_stacker_cage_check#(
@@ -441,6 +447,17 @@ module ec_stacker_cage_check#(
 		.ec_chc_st       	(ec_chc_st		),
 		.c_circle_time		(c_gap_crl		),	
 		.task_time_cnt		(task_time_cnt	),	
+		.i_selchan						(param16[3:0]				),
+		.i_right_far_cage_mat_check  	(i_right_far_cage_mat_check ),
+		.i_right_hori_overrange      	(i_right_hori_overrange     ),
+		.i_left_near_cage_mat_check  	(i_left_near_cage_mat_check ),
+		.i_left_far_cage_mat_check   	(i_left_far_cage_mat_check  ),
+		.i_left_hori_overrange       	(i_left_hori_overrange      ),
+		.i_right_near_cage_mat_cher  	(i_right_near_cage_mat_cher ),
+		.i_mat_arr                   	(i_mat_arr                  ),
+		.i_left_verti_overrange      	(i_left_verti_overrange     ),
+		.i_height_overrange          	(i_height_overrange         ),
+		.i_right_verti_overrange     	(i_right_verti_overrange    ),
 		.a_pre_sta_allow	(a_pre_sta_allow),	
 		.a_post_sta_allow	(a_post_sta_allow),	
 		.b_pre_sta_allow	(b_pre_sta_allow),	

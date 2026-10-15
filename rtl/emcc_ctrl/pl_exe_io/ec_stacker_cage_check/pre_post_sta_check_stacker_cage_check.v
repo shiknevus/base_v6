@@ -54,6 +54,19 @@ module pre_post_sta_check_stacker_cage_check#(
 		
 		,input 		[19:0] 				c_circle_time	
 		,input 		[19:0]				task_time_cnt	
+		
+		,input		[3:0]				i_selchan	
+		
+		,input 							i_right_far_cage_mat_check 
+		,input 							i_right_hori_overrange     
+		,input 							i_left_near_cage_mat_check 
+		,input 							i_left_far_cage_mat_check  
+		,input 							i_left_hori_overrange      
+		,input 							i_right_near_cage_mat_cher 
+		,input 							i_mat_arr                  
+		,input 							i_left_verti_overrange     
+		,input 							i_height_overrange         
+		,input 							i_right_verti_overrange    
 
 		,output	reg	[A_BHA_NUM-1:0]		a_pre_sta_allow	
 		,output	reg	[A_BHA_NUM-1:0]		a_post_sta_allow
@@ -67,15 +80,49 @@ module pre_post_sta_check_stacker_cage_check#(
 	//---------------------------------  Channel A check -------------------------------------//
 	//========================================================================================//
 
-	
+	wire slot_mat = (i_selchan==1) ? i_right_near_cage_mat_cher   :
+					(i_selchan==2) ? i_right_far_cage_mat_check  	:
+					(i_selchan==3) ? i_left_near_cage_mat_check	:
+					(i_selchan==4) ? i_left_far_cage_mat_check	: 1'b0;
+					
+	wire over = i_left_hori_overrange  | i_left_verti_overrange
+				| i_right_hori_overrange | i_right_verti_overrange | i_height_overrange;
+
 	//pre status
 	always@(posedge clk_i)
 	begin
-		if(rst_i || !a_en) begin
+		if(rst_i || !a_en)
 			a_pre_sta_allow <= {A_BHA_NUM{1'b0}};
-		end else begin
-			a_pre_sta_allow <= {A_BHA_NUM{1'b1}};
-		end
+		else
+			//yes Material Detected
+			if(i_mat_arr)
+				a_pre_sta_allow[0] <= 1;
+			else
+				a_pre_sta_allow[0] <= 0;
+		
+			//no Material Detected
+			if(~i_mat_arr)
+				a_pre_sta_allow[1] <= 1;
+			else
+				a_pre_sta_allow[1] <= 0;
+		
+			//yes Left-Right Material Detected
+			if(slot_mat)
+				a_pre_sta_allow[2] <= 1;
+			else
+				a_pre_sta_allow[2] <= 0;
+		
+			//no Left-Right Material Detected
+			if(~slot_mat)
+				a_pre_sta_allow[3] <= 1;
+			else
+				a_pre_sta_allow[3] <= 0;
+		
+			//Over-limit Detection
+			if(~over)
+				a_pre_sta_allow[4] <= 1;
+			else
+				a_pre_sta_allow[4] <= 0;
 	end
 
 	//post status 

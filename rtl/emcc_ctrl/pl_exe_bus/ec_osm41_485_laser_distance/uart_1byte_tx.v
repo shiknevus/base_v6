@@ -1,7 +1,7 @@
 //2026/9/20
 //cgliu
 
-module uart_tx(
+module uart_1byte_tx(
     input	      	i_clk     
     ,input         	i_rst     
     ,input         	i_tx_vld
