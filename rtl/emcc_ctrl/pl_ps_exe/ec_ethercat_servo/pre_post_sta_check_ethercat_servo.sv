@@ -93,7 +93,7 @@ module pre_post_sta_check_ethercat_servo#(
 	assign	a_pre_sta[19] = (a_bhv_id == 20) && device_safe;//[safe]
 	assign	a_pre_sta[20] = (a_bhv_id == 21) && device_safe;//[safe]
 	assign	a_pre_sta[29] = (a_bhv_id == 30);   // GETPOS: always allowed
-
+	assign	a_pre_sta[30] = (a_bhv_id == 31);   
 	always@(posedge clk_i)
 	begin
 		integer i;
@@ -117,7 +117,7 @@ module pre_post_sta_check_ethercat_servo#(
 	assign	a_post_sta[19] = (a_bhv_id == 20);
 	assign	a_post_sta[20] = (a_bhv_id == 21);
 	assign	a_post_sta[29] = (a_bhv_id == 30);
-
+	assign	a_post_sta[30] = (a_bhv_id == 31);
 	reg [7:0] a_bhv_id_d;
 	always@(posedge clk_i) a_bhv_id_d <= a_bhv_id;
 

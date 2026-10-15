@@ -703,19 +703,19 @@ module emcc_mst_top #(
           .i_user_de             (rs485_1_user_de        )
     );
 	
-	ila_top_485 ila_top_485 (
-	.clk(prot_clk), // input wire clk
+//	ila_top_485 ila_top_485 (
+//	.clk(prot_clk), // input wire clk
     
     
-	.probe0(rs485_1_tx				), // input wire [0:0]  probe0  
-	.probe1(rs485_1_rx				), // input wire [0:0]  probe1 
-	.probe2(rs485_1_de				), // input wire [0:0]  probe2 
-	.probe3(rs485_1_user_req[1]  	), // input wire [0:0]  probe3 
-	.probe4(rs485_1_user_grant[1]	), // input wire [0:0]  probe4 
-	.probe5(rs485_1_user_tx[1]   	), // input wire [0:0]  probe5 
-	.probe6(rs485_1_user_rx[1]   	), // input wire [0:0]  probe6 
-	.probe7(rs485_1_user_de[1]   	) // input wire [0:0]  probe7
-	);
+//	.probe0(rs485_1_tx				), // input wire [0:0]  probe0  
+//	.probe1(rs485_1_rx				), // input wire [0:0]  probe1 
+//	.probe2(rs485_1_de				), // input wire [0:0]  probe2 
+//	.probe3(rs485_1_user_req[1]  	), // input wire [0:0]  probe3 
+//	.probe4(rs485_1_user_grant[1]	), // input wire [0:0]  probe4 
+//	.probe5(rs485_1_user_tx[1]   	), // input wire [0:0]  probe5 
+//	.probe6(rs485_1_user_rx[1]   	), // input wire [0:0]  probe6 
+//	.probe7(rs485_1_user_de[1]   	) // input wire [0:0]  probe7
+//	);
 
 	//-------------- rs485 Arbiter module -------------------
 

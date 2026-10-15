@@ -48,7 +48,7 @@ module ec_ethercat_servo#(
     );
 	
 //----------------------------------------------------- user logic begin -----------------------------------------------------//
-	localparam		A_BHA_NUM	=	30 ;	// beh: 1home 2zero 3pos 4point 5rel 6vel 7vstop 8vread 9pread 10status 15torque 16tread
+	localparam		A_BHA_NUM	=	31 ;	// beh: 1home 2zero 3pos 4point 5rel 6vel 7vstop 8vread 9pread 10status 15torque 16tread
 	localparam		B_BHA_NUM	=	108;	
 	localparam		C_BHA_NUM	=	150;
 //----------------------------------------------------- user logic end -------------------------------------------------------//
