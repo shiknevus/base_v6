@@ -47,11 +47,33 @@ module axi_cache(
     wire                    buf_empty;
     wire                    buf_rd_en;
     wire                    buf_full;
+    reg                     drop;
+    reg     [10:0]          buf_lvl;
+    wire                    buf_cut;
+    reg                     out_valid;
+    reg     [BUF_WIDTH-1:0] out_dat;
     wire    [BUF_WIDTH-1:0] buf_rd_dat;
     
-    assign  buf_wr_en   =   s_axi_tvalid & s_axi_tready;
-    assign  buf_wr_dat  =   {1'b0,s_axi_tlast,s_axi_tdata[31:0]};
-    assign  s_axi_tready = ~buf_full;
+    assign  s_axi_tready = drop ? 1'b1 : ~buf_full;
+    assign  buf_cut      = !s_axi_tlast && (buf_lvl >= BUF_DEPTH-1);
+    assign  buf_wr_en    = s_axi_tvalid & s_axi_tready & !drop;
+    assign  buf_wr_dat   = {1'b0,s_axi_tlast | buf_cut,s_axi_tdata[31:0]};
+    always @(posedge clk) begin
+        if (reset) begin
+            drop    <= 1'b0;
+            buf_lvl <= 'd0;
+        end else begin
+            if (s_axi_tvalid && s_axi_tready && s_axi_tlast)
+                drop <= 1'b0;
+            else if (s_axi_tvalid && s_axi_tready && buf_cut)
+                drop <= 1'b1;
+            case ({buf_wr_en,buf_rd_en})
+                2'b10: buf_lvl <= buf_lvl + 1'b1;
+                2'b01: buf_lvl <= buf_lvl - 1'b1;
+                default: buf_lvl <= buf_lvl;
+            endcase
+        end
+    end
     gen_fifo
     #(
          .BUF_DWIDTH    (BUF_WIDTH  )
@@ -69,10 +91,20 @@ module axi_cache(
             ,.full      (buf_full   )
             ,.empty     (buf_empty  )
         );
-    assign  buf_rd_en       =   !buf_empty & m_axi_tready;
-    assign  m_axi_tvalid    =   !buf_empty;
-    assign  m_axi_tlast     =   buf_rd_dat[32] & !buf_empty;
-    assign  m_axi_tdata     =   buf_rd_dat[31:0];
+    assign  buf_rd_en       =   !buf_empty & (!out_valid | m_axi_tready);   // FWFT: dout valid in the pop cycle
+    always @(posedge clk) begin
+        if (reset) begin
+            out_valid  <= 1'b0;
+            out_dat    <= 'd0;
+        end else if (buf_rd_en) begin
+            out_valid  <= 1'b1;
+            out_dat    <= buf_rd_dat;
+        end else if (m_axi_tready)
+            out_valid  <= 1'b0;
+    end
+    assign  m_axi_tvalid    =   out_valid;
+    assign  m_axi_tlast     =   out_dat[32] & out_valid;
+    assign  m_axi_tdata     =   out_dat[31:0];
     assign  m_axi_tkeep     =   4'hf;
 endmodule
 

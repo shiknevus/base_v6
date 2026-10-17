@@ -76,6 +76,7 @@ module ethcat_axi_rout #
 	reg	[2:0]		wk_state;
 	
 	wire        m_cache_tvalid_0;
+    wire        s_cache_tready_0;
     reg         m_cache_tready_0;
     wire [3:0]  m_cache_tkeep_0;
     wire        m_cache_tlast_0;
@@ -86,6 +87,7 @@ module ethcat_axi_rout #
     wire        m_cache_tlast_1;
     wire [31:0] m_cache_tdata_1;
 	wire		m_cache_tvalid_1;
+    wire        s_cache_tready_1;
 	reg	 [2:0]	stu;
 	reg	 [23:0]	cycle;
 	
@@ -348,7 +350,7 @@ module ethcat_axi_rout #
             ,.reset         (rst    			)
 
             ,.s_axi_tvalid  (s_axi_rx_tvalid_0  )
-            ,.s_axi_tready  ( 					)//s_axi_rx_tready_0
+            ,.s_axi_tready  (s_cache_tready_0)
             ,.s_axi_tkeep   (s_axi_rx_tkeep_0   )
             ,.s_axi_tlast   (s_axi_rx_tlast_0   )
             ,.s_axi_tdata   (s_axi_rx_tdata_0   )
@@ -367,7 +369,7 @@ module ethcat_axi_rout #
             ,.reset         (rst    			)
 
             ,.s_axi_tvalid  (s_axi_rx_tvalid_1	)
-            ,.s_axi_tready  ( 					)//s_axi_rx_tready_1
+            ,.s_axi_tready  (s_cache_tready_1)
             ,.s_axi_tkeep   (s_axi_rx_tkeep_1   )
             ,.s_axi_tlast   (s_axi_rx_tlast_1   )
             ,.s_axi_tdata   (s_axi_rx_tdata_1   )

@@ -219,7 +219,8 @@ module slv_app_send
                 work_cnt_done <= (work_cnt == 5 - 1) ? 1'b1 : 1'b0;
             end
             STM_RD_DAT:begin
-                work_cnt_done <= (work_cnt == (each_dg_len>>3) - 1) ? 1'b1 : 1'b0;
+                work_cnt_done <= (each_dg_len <= 16'd7) ||
+                                 (work_cnt >= ((each_dg_len>>3) - 1)) ? 1'b1 : 1'b0;
 //                work_cnt_done <= (work_cnt == 511) ? 1'b1 : 1'b0;
             end
             default: begin

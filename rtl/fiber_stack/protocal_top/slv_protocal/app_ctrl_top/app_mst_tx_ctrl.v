@@ -291,7 +291,8 @@ module app_mst_tx_ctrl(
         endcase
     end
 
-    assign  last_ck_hb_sta  =   (ck_hb_sta_cnt == slv_sta_num - 1) ? 1'b1 : 1'b0;
+    assign  last_ck_hb_sta  =   (slv_sta_num == 0) ||
+                                 (ck_hb_sta_cnt >= (slv_sta_num - 1)) ? 1'b1 : 1'b0;
     assign  dg_hb_dst_addr = ck_hb_sta_cnt;
     
     //

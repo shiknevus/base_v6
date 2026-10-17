@@ -220,7 +220,7 @@ module datagram_tx_rd(
                 if(work_cnt_d2  ==  0)begin
                     m_app_tx_tdata[7:0]     <=  8'hff;
                     m_app_tx_tdata[15:8]    <=  datagram_dst_addr[23:16];
-                    m_app_tx_tdata[31:16]   <=  16'h5555;//Ê±¼ä´Á
+                    m_app_tx_tdata[31:16]   <=  16'h5555;// timestamp
                 end else begin
                     m_app_tx_tdata  <=  32'haaaa_5550 + datagram_dst_addr[23:16];
                 end

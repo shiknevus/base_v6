@@ -31,7 +31,7 @@ module datagram_tx_ctrl(
     ,input  [7:0]       datagram_tx_cmd
     ,input  [15:0]      datagram_tx_len
     ,   (* MARK_DEBUG="true" *)input  [7:0]       datagram_tx_num
-    ,input  [15:0]      datagram_tx_uuid
+    ,input  [16:0]      datagram_tx_uuid
 
     ,output reg             prot_send_req
     ,input  wire            prot_send_ack
