@@ -89,7 +89,7 @@ module proactive_beh_slv_pul_axis#(
 	,input		[31:0]			rcfg_spd_max      	//maximum speed
 	,input		[31:0]			rcfg_acc_max      	//maximum acceleration
 	,input		[31:0]			rcfg_dec_max      	//maximum deceleration
-	,input		[31:0]			rcfg_touch_dec     	//home org/1st limit touch deceleration
+	,input		[31:0]			rcfg_touch_dec     	//home org touch deceleration
 	,input		[31:0]			rcfg_touch_spd     	//home creep speed after org touch
 	,input signed [31:0]		rcfg_pos_max = 32'sd0	// signed upper soft limit
 	,input signed [31:0]		rcfg_pos_min = 32'sd0	// signed lower soft limit

@@ -81,7 +81,7 @@ module proactive_beh_pul_axis#(
 	,input		[31:0]			rcfg_spd_max      	//maximum speed
 	,input		[31:0]			rcfg_acc_max      	//maximum acceleration
 	,input		[31:0]			rcfg_dec_max      	//maximum deceleration
-	,input		[31:0]			rcfg_touch_dec     	//home org/1st limit touch deceleration
+	,input		[31:0]			rcfg_touch_dec     	//home org touch deceleration
 	,input		[31:0]			rcfg_touch_spd     	//home creep speed after org touch
 	,input signed [31:0]		rcfg_pos_max = 32'sd0	// signed upper soft limit
 	,input signed [31:0]		rcfg_pos_min = 32'sd0	// signed lower soft limit
@@ -723,8 +723,8 @@ reg  [31:0]  pos_pf_spd;
 reg  [31:0]  pos_pf_acc;
 reg  [31:0]  pos_pf_dec;
 
-wire [31:0]  home_qstop_dec = (touch_dec_eff > dec_max_eff) ? dec_max_eff : touch_dec_eff; // org/1st limit touch, change by szzhang 20260929
-wire [31:0]  pos_quickstop_dec = ((a_bhv_id_r == 8'd1) && home_pf_quickstop)
+wire [31:0]  home_qstop_dec = (touch_dec_eff > dec_max_eff) ? dec_max_eff : touch_dec_eff; // org touch only, change by szzhang 20261015
+wire [31:0]  pos_quickstop_dec = ((a_bhv_id_r == 8'd1) && home_pf_touchstop)
                               ? home_qstop_dec
                               : dec_max_eff;
 reg          pos_quickstop;

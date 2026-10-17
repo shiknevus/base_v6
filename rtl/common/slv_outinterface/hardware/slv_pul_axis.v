@@ -269,8 +269,8 @@ module slv_pul_axis
    wire home_pf_touchstop;
    wire home_pf_quickstop;
    wire home_limit_recover;
-   wire [31:0] home_qstop_dec = (touch_dec_eff > dec_max_eff) ? dec_max_eff : touch_dec_eff; // org/1st limit touch, change by szzhang 20260929
-   wire [31:0] pos_quickstop_dec = ((cur_beha == 1) && home_pf_quickstop) ? home_qstop_dec : dec_max_eff;
+   wire [31:0] home_qstop_dec = (touch_dec_eff > dec_max_eff) ? dec_max_eff : touch_dec_eff; // org touch only, change by szzhang 20261015
+   wire [31:0] pos_quickstop_dec = ((cur_beha == 1) && home_pf_touchstop) ? home_qstop_dec : dec_max_eff;
    reg          pos_quickstop;
    reg  [31:0]  pos_pf_mode;
    reg          pos_pf_start;
