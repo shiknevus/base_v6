@@ -98,6 +98,7 @@
 	reg [C_S_AXI_DATA_WIDTH-1 : 0] 	axi_rdata;
 	reg [1 : 0] 	axi_rresp;
 	reg  	axi_rvalid;
+	reg 	rd_drain;   // previous read's rd_vld pipeline not yet empty
 
 	// Example-specific design signals
 	// local parameter for addressing 32 bit / 64 bit C_S_AXI_DATA_WIDTH
@@ -299,7 +300,7 @@
 	    end 
 	  else
 	    begin    
-	      if (~axi_arready && S_AXI_ARVALID)
+	      if (~axi_arready && S_AXI_ARVALID && ~rd_drain && ~axi_rvalid)
 	        begin
 	          // indicates that the slave has acceped the valid read address
 	          axi_arready <= slv_reg_rd_vld;
@@ -315,7 +316,10 @@
 	end       
 
     always @( posedge S_AXI_ACLK ) begin
-        slv_reg_re  <=  S_AXI_ARVALID;
+        if ( S_AXI_ARESETN == 1'b0 )
+            slv_reg_re <= 1'b0;
+        else
+            slv_reg_re <= S_AXI_ARVALID & ~rd_drain;
     end
     
     always @( * )begin
@@ -352,6 +356,16 @@
 	        end                
 	    end
 	end    
+
+	// Clear the read-request pipeline before accepting another address.
+	always @( posedge S_AXI_ACLK ) begin
+	  if ( S_AXI_ARESETN == 1'b0 )
+	    rd_drain <= 1'b0;
+	  else if (axi_arready && S_AXI_ARVALID)
+	    rd_drain <= 1'b1;
+	  else if (~slv_reg_re && ~slv_reg_rd_vld)
+	    rd_drain <= 1'b0;
+	end
 
 	// Implement memory mapped register select and read logic generation
 	// Slave register read enable is asserted when valid address is available
