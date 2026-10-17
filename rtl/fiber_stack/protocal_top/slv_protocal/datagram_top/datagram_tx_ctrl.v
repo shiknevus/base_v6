@@ -87,7 +87,8 @@ module datagram_tx_ctrl(
                 end
                 STM_TX_HS:begin
                     if(prot_send_ack)begin
-                        wk_state  <=  STM_RD_DATAGRAM;
+                        if(datagram_tx_num == 0) wk_state <= STM_ALL_FINISH;
+                        else wk_state <= STM_RD_DATAGRAM;
                     end else begin
                         wk_state  <=  wk_state;
                     end
@@ -230,7 +231,7 @@ module datagram_tx_ctrl(
         endcase
     end
     
-    assign  last_slv_trsf = (slv_sta_cnt == (datagram_tx_num - 1)) ? 1'b1 : 1'b0;
+    assign  last_slv_trsf = (datagram_tx_num == 0 || slv_sta_cnt >= (datagram_tx_num - 1)) ? 1'b1 : 1'b0;
 
     always @(posedge clk)begin
         datagram_pl_len   <=  datagram_tx_len;

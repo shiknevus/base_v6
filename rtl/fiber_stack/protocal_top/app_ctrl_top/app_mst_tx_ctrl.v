@@ -175,7 +175,9 @@ module app_mst_tx_ctrl(
                         wk_state <= STM_POST_PRCS_DG;
                     end else if (one_ecat_frm_done & (ecat_frm_rslt == `ETHCAT_PRCS_CRC_FAIL))begin
                         wk_state <= STM_POST_PRCS_DG;
-                    end else if (one_ecat_frm_done & (ecat_frm_rslt == `ETHCAT_PRCS_SUCCESS) & 
+                    end else if (one_ecat_frm_done & (ecat_frm_rslt == `ETHCAT_PRCS_WKC_ERR))begin
+                        wk_state <= STM_END;    // duplicate station address: re-enumerate
+                    end else if (one_ecat_frm_done & (ecat_frm_rslt == `ETHCAT_PRCS_SUCCESS) &
                                  (rx_eth_type == `ETHCAT_TYPE_DATAGRAM))begin
                         wk_state <= STM_POST_PRCS_DG;
                     end else begin

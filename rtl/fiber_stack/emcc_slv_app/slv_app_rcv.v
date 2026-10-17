@@ -87,7 +87,7 @@ module slv_app_rcv
     reg [3:0]               app_rslt_wea;
     reg [RAM_AWIDTH-1:0]    app_rslt_addra;
     reg [RAM_DWIDTH-1:0]    app_rslt_dina;
-    reg [31:0]              rcv_uid_seen = 32'hffff_ffff; // uuid of last processed frame
+    reg [31:0]              rcv_uid_seen = 32'h0; // uuid of last processed frame
     reg [31:0]              work_cnt = 0;
 
     always @(posedge clk)begin
@@ -107,7 +107,8 @@ module slv_app_rcv
     
     always @(posedge clk) begin
         if(reset)begin
-          wk_state  <=  STM_IDLE;
+          wk_state     <=  STM_IDLE;
+          rcv_uid_seen <=  32'h0;
         end else begin
             case(wk_state)
                 STM_IDLE: begin
@@ -125,7 +126,7 @@ module slv_app_rcv
                     end
                 end
                 STM_CK_RCV_UID:begin
-                    if(rcv_buf_douta != rcv_uid_seen)begin // numeric compare vs last processed uuid, no miss window
+                    if(rcv_buf_douta != rcv_uid_seen && rcv_buf_douta != 32'd0 && each_dg_len != 16'd0)begin // numeric compare vs last processed uuid, no miss window
                         rcv_uid_seen <= rcv_buf_douta;
                         wk_state     <=  STM_GEN_TX_START;
                     end else begin
@@ -150,7 +151,7 @@ module slv_app_rcv
                     end
                 end
                 STM_RD_ONCE_END:begin
-                    if(slv_dg_index == (slv_sta_num_d2 - 1))begin
+                    if(slv_sta_num_d2 == 8'd0 || slv_dg_index >= (slv_sta_num_d2 - 1))begin
                         wk_state  <=  STM_RD_FINISH;
                     end else begin
                         wk_state  <=  STM_RD_DAT;
@@ -259,7 +260,7 @@ module slv_app_rcv
                 work_cnt_done <= (work_cnt == 5 - 1) ? 1'b1 : 1'b0;
             end
             STM_RD_DAT,STM_DRIVER_CFG:begin
-                work_cnt_done <= (work_cnt == (each_dg_len>>3) - 1) ? 1'b1 : 1'b0;
+                work_cnt_done <= (each_dg_len <= 16'd7) ? 1'b1 : ((work_cnt >= (each_dg_len>>3) - 1) ? 1'b1 : 1'b0);
 //                work_cnt_done <= (work_cnt == 511) ? 1'b1 : 1'b0;
             end
             default: begin
@@ -300,7 +301,7 @@ module slv_app_rcv
                 intf_tst_flag   <=  0;
             end
             STM_CK_RCV_UID:begin
-                if(rcv_buf_douta != rcv_uid_seen)begin
+                if(rcv_buf_douta != rcv_uid_seen && rcv_buf_douta != 32'd0 && each_dg_len != 16'd0)begin
                     intf_tst_flag       <=  (rcv_buf_douta[31:28] == 4'd1) ? 1'b1 : 1'b0;
                 end else begin
                     intf_tst_flag   <=  intf_tst_flag;

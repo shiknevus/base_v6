@@ -91,6 +91,7 @@ module mst_app_send
     reg link_success_d2;
     reg link_success_d3;
     reg link_success_r;
+    reg link_loss_r;
     reg ps_tx_req_d1;
     reg ps_tx_req_d2;
     reg ps_tx_req_r;
@@ -152,13 +153,14 @@ module mst_app_send
     end
 
     always @(posedge clk) begin
-        if(reset | link_success_r)begin
+        if(reset | link_success_r | link_loss_r)begin
           wk_state  <=  STM_IDLE;
         end else begin
             case(wk_state)
                 STM_IDLE: begin
                     if((link_success_d3 & ps_trsf_port_en_d2) & (~ps_tst_trsf_port_d2)) begin
-                        wk_state  <=  STM_TX_HS;
+                        if(slv_sta_num_d2 == 0) wk_state <= STM_IDLE;
+                        else wk_state <= STM_TX_HS;
                     end else if((link_success_d3 & ps_trsf_port_en_d2) & (ps_tst_trsf_port_d2)) begin
                         wk_state  <=  STM_WAIT_PS_REQ;
                     end else begin
@@ -196,7 +198,7 @@ module mst_app_send
                     end
                 end
                 STM_GEN_ONCE_END:begin
-                    if(slv_dg_index == (slv_sta_num_d2 - 1))begin
+                    if(slv_sta_num_d2 == 0 || slv_dg_index >= (slv_sta_num_d2 - 1))begin
                         wk_state  <=  STM_GEN_FINISH;
                     end else begin
                         wk_state  <=  STM_GEN_DAT;
@@ -332,10 +334,11 @@ module mst_app_send
     always @ ( * )begin
         case(wk_state)
             STM_GEN_DAT:begin
-                gen_dat_done <= (work_cnt == (each_dg_len>>3) - 1) ? 1'b1 : 1'b0;
+                gen_dat_done <= (each_dg_len <= 16'd7) ? 1'b1 : ((work_cnt >= (each_dg_len>>3) - 1) ? 1'b1 : 1'b0);
             end
             STM_RD_PS_DEPOT:begin
-                gen_dat_done <= (work_cnt == {slv_sta_num_d2,9'd0} - 1) ? 1'b1 : 1'b0;
+                    if(slv_sta_num_d2 == 0) gen_dat_done <= 1'b1;
+                    else gen_dat_done <= (work_cnt >= {slv_sta_num_d2,9'd0} - 1) ? 1'b1 : 1'b0;
             end
             STM_TX_POST_PRCS:begin
                 gen_dat_done <= (work_cnt == 31'd100 - 1) ? 1'b1 : 1'b0;
@@ -491,6 +494,7 @@ module mst_app_send
         link_success_d2 <=  link_success_d1;
         link_success_d3 <=  link_success_d2;
         link_success_r  <=  link_success_d2 & (~link_success_d3);
+        link_loss_r     <=  (~link_success_d2) & link_success_d3;
     end
     
     `ifdef SIM_PLATFORM_MST
@@ -501,7 +505,7 @@ module mst_app_send
     reg [31:0]  trsf_dly_cnt     =   'd0;
     reg         trsf_dly_cnt_en  =   'd0;
     always @(posedge clk)begin
-        if(reset)begin
+        if(reset | link_loss_r)begin
             trsf_dly_cnt_en <=  'd0;
         end else if (link_success_r) begin
             trsf_dly_cnt_en <=  'd1;
@@ -511,7 +515,7 @@ module mst_app_send
     end
     
     always @(posedge clk)begin
-        if(reset)begin
+        if(reset | link_loss_r)begin
             trsf_dly_cnt    <=  'd0;
         end else if (trsf_dly_cnt_en) begin
             if (trsf_dly_cnt == DLY_CYCLE_NUM) begin

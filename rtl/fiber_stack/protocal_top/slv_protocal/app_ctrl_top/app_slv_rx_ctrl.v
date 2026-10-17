@@ -140,7 +140,13 @@ module app_slv_rx_ctrl(
     reg         error_flag_d1       =   'd0;
     reg         error_flag_d2       =   'd0;
     reg         error_flag_prcs     =   'd0;
-    
+    reg [15:0]  brk_mk              =   'd0;    // dg0 line-end markers: [15:8] P0-side end addr+1, [7:0] P1-side end addr+1
+    wire        dg_adopt = (ethcat_type == `ETHCAT_TYPE_DATAGRAM) && (cfg_sta_addr == 8'hff) &&
+                           loop_link_success[1] &&                                              // upstream port up
+                           (datagram_addr[23:16] >= brk_mk[7:0]) &&                             // not before P1-side end
+                           ((brk_mk[15:8] == 8'd0) || (datagram_addr[23:16] > brk_mk[15:8])) && // not P0 half / dead gap
+                           (datagram_wkc + datagram_addr[23:16] == 8'h00); // unprocessed own dg arrives with wkc == -addr
+
     always @(posedge clk)begin
         wk_state_d1     <=  wk_state;
         wk_state_d2     <=  wk_state_d1;
@@ -303,7 +309,7 @@ module app_slv_rx_ctrl(
                             wk_state  <=  wk_state;
                         end
                     end else if ((ethcat_type == `ETHCAT_TYPE_DATAGRAM) | (ethcat_type == `ETHCAT_TYPE_HEARTBEAT))begin
-                        if(latency_cnt_done & (cfg_sta_addr == datagram_addr[31:16]))begin
+                        if(latency_cnt_done && ((cfg_sta_addr == datagram_addr[31:16]) || dg_adopt))begin
                             wk_state  <=  STM_WKC2DG_JUMP_ADDR;
                         end else if(latency_cnt_done & (cfg_sta_addr !== datagram_addr[31:16]))begin
                             wk_state  <=  STM_WKC2DH_JUMP_ADDR;
@@ -494,6 +500,11 @@ module app_slv_rx_ctrl(
     end
 
     always @(posedge clk) begin
+        if((wk_state == STM_DG_HD_PARSE) && (rx_dg_cnt == 0))
+            brk_mk  <=  datagram_addr[15:0];
+    end
+
+    always @(posedge clk) begin
         case(wk_state)
             STM_ECAT_HD_L,STM_DG_HD_L,STM_RD_DATAGRAM_L,STM_RD_WKC_L,STM_PRCS_WKC_L:begin
                 latency_cnt <=  latency_cnt + 1;
@@ -675,7 +686,10 @@ module app_slv_rx_ctrl(
             end
             STM_PRCS_WKC_L:begin
                 cache_din[31:8] <=  24'd0;
-                cache_din[7:0]  <=  datagram_wkc[7:0] + 1;
+                if ((ethcat_type == `ETHCAT_TYPE_INITIAL) || (cfg_sta_addr == datagram_addr[31:16]) || dg_adopt)
+                    cache_din[7:0] <= datagram_wkc[7:0] + 1;
+                else
+                    cache_din[7:0] <= datagram_wkc[7:0];
             end
             default: begin
                 cache_din   <=   0;
@@ -758,6 +772,9 @@ module app_slv_rx_ctrl(
         end else if((wk_state == STM_RD_DATAGRAM_L) && (ethcat_type == `ETHCAT_TYPE_INITIAL))begin
             cfg_sta_mode            <=  data_buf[2-0][7:0];
             cfg_sta_addr            <=  data_buf[2-0][15:8];
+            cfg_sta_addr_vld        <=  1'b1;
+        end else if((wk_state == STM_PRCS_WKC_L) && latency_cnt_done && dg_adopt)begin
+            cfg_sta_addr            <=  datagram_addr[31:16];
             cfg_sta_addr_vld        <=  1'b1;
         end else if(read_sta_addr_vld) begin
             cfg_sta_mode            <=  'd0;

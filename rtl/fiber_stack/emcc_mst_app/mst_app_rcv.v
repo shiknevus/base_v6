@@ -53,7 +53,7 @@ module mst_app_rcv
 );
 
     reg [31:0]  work_cnt = 0;
-    reg [31:0]  rcv_uid_seen = 32'hffff_ffff; // uuid of last processed frame
+    reg [31:0]  rcv_uid_seen = 32'h0; // uuid of last processed frame
     reg [3:0]   id_unmatch_cnt = 4'd0; // diagnostic: consecutive id-unmatched frames
 
     localparam  STM_IDLE        = 'd0;
@@ -103,7 +103,8 @@ module mst_app_rcv
     
     always @(posedge clk) begin
         if(reset)begin
-          wk_state  <=  STM_IDLE;
+          wk_state     <=  STM_IDLE;
+          rcv_uid_seen <=  32'h0;
         end else begin
             case(wk_state)
                 STM_IDLE: begin
@@ -121,7 +122,7 @@ module mst_app_rcv
                     end
                 end
                 STM_CK_RCV_UID:begin
-                    if(rcv_buf_douta != rcv_uid_seen)begin // numeric compare vs last processed uuid, no miss window
+                    if(rcv_buf_douta != rcv_uid_seen && rcv_buf_douta != 32'd0)begin // numeric compare vs last processed uuid, no miss window
                         rcv_uid_seen <= rcv_buf_douta;
                         if(rcv_buf_douta == cur_tx_trsf_pkg_id)begin
                             wk_state  <=  STM_TX_HS;
@@ -150,7 +151,7 @@ module mst_app_rcv
                     end
                 end
                 STM_RD_ONCE_END:begin
-                    if(slv_dg_index == (slv_sta_num_d2 - 1))begin
+                    if(slv_sta_num_d2 == 8'd0 || slv_dg_index >= (slv_sta_num_d2 - 1))begin
                         wk_state  <=  STM_RD_FINISH;
                     end else begin
                         wk_state  <=  STM_RD_DAT;
@@ -186,7 +187,7 @@ module mst_app_rcv
                 intf_tst_flag   <=  0;
             end
             STM_CK_RCV_UID:begin
-                if(rcv_buf_douta != rcv_uid_seen)begin
+                if(rcv_buf_douta != rcv_uid_seen && rcv_buf_douta != 32'd0)begin
                     intf_tst_flag       <=  (rcv_buf_douta[31:28] == 4'd1) ? 1'b1 : 1'b0;
                 end else begin
                     intf_tst_flag   <=  intf_tst_flag;
@@ -201,7 +202,7 @@ module mst_app_rcv
     always @(posedge clk) begin // clear on matched frame, count unmatched rounds
         if(reset)begin
             id_unmatch_cnt <= 4'd0;
-        end else if(wk_state == STM_CK_RCV_UID && rcv_buf_douta != rcv_uid_seen && rcv_buf_douta == cur_tx_trsf_pkg_id)begin
+        end else if(wk_state == STM_CK_RCV_UID && rcv_buf_douta != rcv_uid_seen && rcv_buf_douta != 32'd0 && rcv_buf_douta == cur_tx_trsf_pkg_id)begin
             id_unmatch_cnt <= 4'd0;
         end else if(wk_state == STM_ID_UNMATCH)begin
             id_unmatch_cnt <= id_unmatch_cnt + 4'd1;
@@ -281,9 +282,9 @@ module mst_app_rcv
             end
             STM_RD_DAT:begin
                 if(latch_ps_rd_depot_flag)begin//PS is reading depot,so APP only update commin IO part.
-                    gen_dat_done <= (work_cnt == `DEPOT_BIAS_RS232_1ST - 1) ? 1'b1 : 1'b0;
+                    gen_dat_done <= (work_cnt >= `DEPOT_BIAS_RS232_1ST - 1) ? 1'b1 : 1'b0;
                 end else begin//PS is not reading depot,so APP need update comman IO part and ps_depot.
-                    gen_dat_done <= (work_cnt == (each_dg_len>>3) - 1) ? 1'b1 : 1'b0;
+                    gen_dat_done <= (each_dg_len <= 16'd7) ? 1'b1 : ((work_cnt >= (each_dg_len>>3) - 1) ? 1'b1 : 1'b0);
                 end
             end
             default: begin

@@ -300,7 +300,10 @@ module app_slv_rx_ctrl(
                             wk_state  <=  wk_state;
                         end
                     end else if ((ethcat_type == `ETHCAT_TYPE_DATAGRAM) | (ethcat_type == `ETHCAT_TYPE_HEARTBEAT))begin
-                        if(latency_cnt_done & (cfg_sta_addr == datagram_addr[31:16]))begin
+                        if(latency_cnt_done &&
+                           ((cfg_sta_addr == datagram_addr[31:16]) ||
+                            ((ethcat_type == `ETHCAT_TYPE_DATAGRAM) &&
+                             (cfg_sta_addr == 8'hff) && (datagram_wkc + datagram_addr[23:16] == 8'h00))))begin
                             wk_state  <=  STM_WKC2DG_JUMP_ADDR;
                         end else if(latency_cnt_done & (cfg_sta_addr !== datagram_addr[31:16]))begin
                             wk_state  <=  STM_WKC2DH_JUMP_ADDR;
@@ -663,7 +666,13 @@ module app_slv_rx_ctrl(
             end
             STM_PRCS_WKC_L:begin
                 cache_din[31:8] <=  24'd0;
-                cache_din[7:0]  <=  datagram_wkc[7:0] + 1;
+                if ((ethcat_type == `ETHCAT_TYPE_INITIAL) ||
+                    (cfg_sta_addr == datagram_addr[31:16]) ||
+                    ((ethcat_type == `ETHCAT_TYPE_DATAGRAM) &&
+                     (cfg_sta_addr == 8'hff) && (datagram_wkc + datagram_addr[23:16] == 8'h00)))
+                    cache_din[7:0] <= datagram_wkc[7:0] + 1;
+                else
+                    cache_din[7:0] <= datagram_wkc[7:0];
             end
             default: begin
                 cache_din   <=   0;
@@ -746,6 +755,10 @@ module app_slv_rx_ctrl(
                      (ethcat_type == `ETHCAT_TYPE_INITIAL))begin
             cfg_sta_mode            <=  data_buf[2-1][7:0];
             cfg_sta_addr            <=  data_buf[2-1][15:8];
+        end else if((wk_state == STM_PRCS_WKC_L) && latency_cnt_done &&
+                    (ethcat_type == `ETHCAT_TYPE_DATAGRAM) &&
+                    (cfg_sta_addr == 8'hff) && (datagram_wkc + datagram_addr[23:16] == 8'h00))begin
+            cfg_sta_addr            <=  datagram_addr[31:16]; // unprocessed own dg arrives with wkc == -addr
         end else begin
             cfg_sta_mode            <=  cfg_sta_mode;
             cfg_sta_addr            <=  cfg_sta_addr;

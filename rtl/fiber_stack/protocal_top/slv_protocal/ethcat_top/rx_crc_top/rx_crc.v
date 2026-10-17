@@ -240,17 +240,10 @@ assign final_CRC = {
          CRC_RESET_r <= `DLY 1'b0;
 
   assign DST_RDY_N_US = DST_RDY_N_US_i;
-  assign DST_RDY_N_US_i = DST_RDY_N_DS || |count;
- 
-  //__deassert dst_rdy_n_us for 3 cycles after eof_n_us reception__//
-     
+  assign DST_RDY_N_US_i = DST_RDY_N_DS; // no post-EOF stall: back-to-back frames accepted
+
   always @(posedge CLK)
-    if (RESET)
-      count <=  `DLY 2'b00;
-    else if (!EOF_N_US & ll_valid)
-      count <=  `DLY 2'b01;
-    else if (|count & !DST_RDY_N_DS)
-      count <=  `DLY count >> 1;
+    count <= `DLY 2'b00;
      
   assign ll_valid = !SRC_RDY_N_US && !DST_RDY_N_US_i;
   always @(posedge CLK)

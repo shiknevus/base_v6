@@ -714,6 +714,14 @@ module app_mst_rx_ctrl(
         end
     end
 
+    reg wkc_err = 1'b0;    // some dg processed by more than one slave (expected wkc = 1 - index)
+    always @(posedge clk) begin
+        if(wk_state == STM_IDLE)
+            wkc_err <=  1'b0;
+        else if((wk_state == STM_RD_WKC_PARSE) && (ethcat_type == `ETHCAT_TYPE_DATAGRAM) && (datagram_wkc + rx_dg_cnt > 8'd1))
+            wkc_err <=  1'b1;
+    end
+
     always @(posedge clk) begin
         case(wk_state)
             STM_IDLE:begin
@@ -723,7 +731,7 @@ module app_mst_rx_ctrl(
                 ecat_frm_rslt   <=  `ETHCAT_PRCS_CRC_FAIL;
             end
             STM_RX_DONE:begin
-                ecat_frm_rslt   <=  `ETHCAT_PRCS_SUCCESS;
+                ecat_frm_rslt   <=  wkc_err ? `ETHCAT_PRCS_WKC_ERR : `ETHCAT_PRCS_SUCCESS;
             end
             default: begin
                 ecat_frm_rslt   <=  ecat_frm_rslt;
