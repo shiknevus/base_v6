@@ -22,7 +22,8 @@
 
 module ec_slv_pul_axis#(
 		parameter  				REG_SPACE_BIAS 		= 	2000	,
-		parameter  				REG_SPACE_SIZE 		= 	512	
+		parameter  				REG_SPACE_SIZE 		= 	512	,
+		parameter  [31:0]		IO_MAP 				= 	32'h0700_0000	// slave io map, default all remote
 )(
 		input					clk_i			,
 		input					rst				,
@@ -359,7 +360,7 @@ module ec_slv_pul_axis#(
 	,.param37				(param37		)
 	,.param38				(param38		)	//signed wheel spd
 	,.param38_vld			(param38_vld	)
-	//,.param39				(param39		)
+	,.param39				(param39		)	//S-curve jerk time ms
 	//,.param40				(param40		)
 	,.clr_pause				(b_clr_pause	)
 	,.clr_resume			(b_clr_resume	)
@@ -385,8 +386,8 @@ module ec_slv_pul_axis#(
 	,.param55               (param55		)	//slave echo of word0
 	,.param56               (param56		)	//slave debug word 12
 	,.param57               (param57		)	//slave debug word 13
-	,.param58               (param58		)	//slave debug word 14
-	,.param59               (param59		)	//slave debug word 15
+	,.param58               (param58		)	//slave fault bits (s2)
+	,.param59               (param59		)	//slave status (s1)
 	//,.param60               (param60		)
 	//,.param61               (param61		)
 	//,.param62               (param62		)
@@ -408,6 +409,7 @@ module ec_slv_pul_axis#(
 	wire home_completed;
 	proactive_beh_slv_pul_axis#(
 	.BHA_NUM 				(A_BHA_NUM  	 	)	//Number of active behaviors
+   ,.IO_MAP					(IO_MAP				)
 )proactive_beh_slv_pul_axis_u0(
     .clk_i                 	(clk_i				)
     ,.rst_i                	(rst_i				)
@@ -464,6 +466,7 @@ module ec_slv_pul_axis#(
     ,.rcfg_dec_max			(param3					)
     ,.rcfg_touch_dec		(param33				)
     ,.rcfg_touch_spd		(param4					)
+    ,.rcfg_s_time			(param39				)
     ,.rcfg_pos_max			(param31				)
     ,.rcfg_pos_min			(param32				)
 
