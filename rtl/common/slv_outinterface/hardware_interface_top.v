@@ -68,10 +68,56 @@ module hardware_interface_top
     localparam  bias_pul_motor3 = 202;
     localparam  bias_depot_end  = 218;
 
-    wire [511:0]     seg_m2s[3:0];      // pulse axis ABI v2 frames
-    wire [511:0]     seg_s2m[3:0];
+    wire             action_alarm[3:0];
+    wire             action_start[3:0];
+    wire             action_son[3:0];
+    wire             action_beat[3:0];
+    wire             action_busy[3:0];
+    wire             action_done[3:0];
+    wire             action_error[3:0];
+    wire             action_ack[3:0];
+    wire             pulse_done[3:0];
+    wire [7:0]       axis_alarm_code[3:0];
+    wire             servo_ready[3:0];
+    wire             servo_done[3:0];
+    wire             home_valid[3:0];
+    wire             device_alarm[3:0];
+    wire             device_beat[3:0];
+    wire             rctrl_drive_on[3:0];
+    wire             rctrl_drive_reset[3:0];
+    wire             rserv_dir[3:0];
+    wire             rcfg_pf_mode[3:0];
+    wire             i_pause[3:0];
+    wire [31:0]      r_pf_abspos[3:0];
+    wire [7:0]       cur_beha[3:0];
+    wire [31:0]      rserv_step_pulse[3:0];
+    wire [31:0]      rserv_target_pulse[3:0];
+    wire [31:0]      rcfg_home_spd[3:0];
+    wire [31:0]      rcfg_home_acc[3:0];
+    wire [31:0]      rcfg_home_dec[3:0];
+    wire [31:0]      rcfg_jog_spd[3:0];
+    wire [31:0]      rcfg_jog_acc[3:0];
+    wire [31:0]      rcfg_jog_dec[3:0];
+    wire [31:0]      rcfg_move_spd[3:0];
+    wire [31:0]      rcfg_move_acc[3:0];
+    wire [31:0]      rcfg_move_dec[3:0];
+    wire [31:0]      rcfg_spd_max[3:0];
+    wire [31:0]      rcfg_acc_max[3:0];
+    wire [31:0]      rcfg_dec_max[3:0];
+    wire [31:0]      rcfg_touch_dec[3:0];
+    wire [31:0]      rcfg_touch_spd[3:0];
+    wire             i_axis_limf[3:0];
+    wire             i_axis_limb[3:0];
+    wire             i_axis_zero[3:0];
+    wire             i_axis_abspos0[3:0];
+    wire [31:0]      axis_dbg12[3:0];   //debug s2m words 12..15, add by szzhang 20261012
+    wire [31:0]      axis_dbg13[3:0];
+    wire [31:0]      axis_dbg14[3:0];
+    wire [31:0]      axis_dbg15[3:0];
+    wire [31:0]      frame_w0[3:0];     //wheel, add by szzhang 20261013
     wire [3:0]       frame_end;
-    wire [3:0]       pm_sel[3:0];
+    wire [31:0]      wheel_spd[3:0];    // m2s word9
+    wire             wheel_active[3:0];
     wire [31:0]      rs232_uart_id[7:0];            //uart_id
     wire [3:0]       rs232_baud_rate[7:0];          
     wire             rs232_start_send[7:0];         
@@ -100,6 +146,14 @@ module hardware_interface_top
     reg  [31:0]      pul_motor1_buf[15:0];
     reg  [31:0]      pul_motor2_buf[15:0];
     reg  [31:0]      pul_motor3_buf[15:0];
+    reg              pul_motor0_frame_start;
+    reg              pul_motor1_frame_start;
+    reg              pul_motor2_frame_start;
+    reg              pul_motor3_frame_start;
+    reg              pul_motor0_action_seen;
+    reg              pul_motor1_action_seen;
+    reg              pul_motor2_action_seen;
+    reg              pul_motor3_action_seen;
     reg  [31:0]      rs232_ch0_buf[31:0];
     reg  [31:0]      rs232_ch1_buf[31:0];
     reg  [31:0]      rs232_ch2_buf[31:0];
@@ -134,30 +188,150 @@ module hardware_interface_top
     assign uart_rx_sel[7] = ((rd_msg_addr_d >= bias_rs232_ch7) & (rd_msg_addr_d < bias_rs485_ch8)) ? (rd_msg_addr_d - bias_rs232_ch7) : 0;
     assign uart_485_rx_sel = ((rd_msg_addr_d >= bias_rs485_ch8) & (rd_msg_addr_d < bias_pul_motor0)) ? (rd_msg_addr_d - bias_rs485_ch8) : 0;
 	assign slvbd_outio = {slvbd_outio_high,slvbd_outio_low};
+    assign action_alarm[0] = pul_motor0_buf[0][0] | pul_motor0_buf[0][7];
+    assign action_alarm[1] = pul_motor1_buf[0][0] | pul_motor1_buf[0][7];
+    assign action_alarm[2] = pul_motor2_buf[0][0] | pul_motor2_buf[0][7];
+    assign action_alarm[3] = pul_motor3_buf[0][0] | pul_motor3_buf[0][7];
+    assign action_start[0] = pul_motor0_frame_start;
+    assign action_start[1] = pul_motor1_frame_start;
+    assign action_start[2] = pul_motor2_frame_start;
+    assign action_start[3] = pul_motor3_frame_start;
+    assign servo_ready[0] = pul_motor0_buf[0][15];
+    assign servo_done[0] = pul_motor0_buf[0][14];
+    assign home_valid[0] = pul_motor0_buf[0][13];
+    assign action_son[0] = ~pul_motor0_buf[0][12];
+    assign servo_ready[1] = pul_motor1_buf[0][15];
+    assign servo_done[1] = pul_motor1_buf[0][14];
+    assign home_valid[1] = pul_motor1_buf[0][13];
+    assign action_son[1] = ~pul_motor1_buf[0][12];
+    assign servo_ready[2] = pul_motor2_buf[0][15];
+    assign servo_done[2] = pul_motor2_buf[0][14];
+    assign home_valid[2] = pul_motor2_buf[0][13];
+    assign action_son[2] = ~pul_motor2_buf[0][12];
+    assign servo_ready[3] = pul_motor3_buf[0][15];
+    assign servo_done[3] = pul_motor3_buf[0][14];
+    assign home_valid[3] = pul_motor3_buf[0][13];
+    assign action_son[3] = ~pul_motor3_buf[0][12];
+    assign i_axis_limf[0] = pul_motor0_buf[0][3];
+    assign i_axis_limf[1] = pul_motor1_buf[0][3];
+    assign i_axis_limf[2] = pul_motor2_buf[0][3];
+    assign i_axis_limf[3] = pul_motor3_buf[0][3];
+    assign i_axis_limb[0] = pul_motor0_buf[0][4];
+    assign i_axis_limb[1] = pul_motor1_buf[0][4];
+    assign i_axis_limb[2] = pul_motor2_buf[0][4];
+    assign i_axis_limb[3] = pul_motor3_buf[0][4];
+    assign i_axis_zero[0] = pul_motor0_buf[0][5];
+    assign i_axis_zero[1] = pul_motor1_buf[0][5];
+    assign i_axis_zero[2] = pul_motor2_buf[0][5];
+    assign i_axis_zero[3] = pul_motor3_buf[0][5];
+    assign action_beat[0] = pul_motor0_buf[0][6];
+    assign action_beat[1] = pul_motor1_buf[0][6];
+    assign action_beat[2] = pul_motor2_buf[0][6];
+    assign action_beat[3] = pul_motor3_buf[0][6];
+    assign i_pause[0] = pul_motor0_buf[0][8];
+    assign i_pause[1] = pul_motor1_buf[0][8];
+    assign i_pause[2] = pul_motor2_buf[0][8];
+    assign i_pause[3] = pul_motor3_buf[0][8];
+    assign rserv_dir[0] = pul_motor0_buf[0][10];
+    assign rserv_dir[1] = pul_motor1_buf[0][10];
+    assign rserv_dir[2] = pul_motor2_buf[0][10];
+    assign rserv_dir[3] = pul_motor3_buf[0][10];
+    assign rctrl_drive_reset[0] = ~pul_motor0_buf[0][11];
+    assign rctrl_drive_reset[1] = ~pul_motor1_buf[0][11];
+    assign rctrl_drive_reset[2] = ~pul_motor2_buf[0][11];
+    assign rctrl_drive_reset[3] = ~pul_motor3_buf[0][11];
+    assign rctrl_drive_on[0] = ~pul_motor0_buf[0][12];
+    assign rctrl_drive_on[1] = ~pul_motor1_buf[0][12];
+    assign rctrl_drive_on[2] = ~pul_motor2_buf[0][12];
+    assign rctrl_drive_on[3] = ~pul_motor3_buf[0][12];
+    assign i_axis_abspos0[0] = pul_motor0_buf[0][13];
+    assign i_axis_abspos0[1] = pul_motor1_buf[0][13];
+    assign i_axis_abspos0[2] = pul_motor2_buf[0][13];
+    assign i_axis_abspos0[3] = pul_motor3_buf[0][13];
+    assign rcfg_pf_mode[0] = pul_motor0_buf[0][14];
+    assign rcfg_pf_mode[1] = pul_motor1_buf[0][14];
+    assign rcfg_pf_mode[2] = pul_motor2_buf[0][14];
+    assign rcfg_pf_mode[3] = pul_motor3_buf[0][14];
+    assign cur_beha[0] = pul_motor0_buf[0][23:16];
+    assign cur_beha[1] = pul_motor1_buf[0][23:16];
+    assign cur_beha[2] = pul_motor2_buf[0][23:16];
+    assign cur_beha[3] = pul_motor3_buf[0][23:16];
+    assign rserv_step_pulse[0] = pul_motor0_buf[1];
+    assign rserv_step_pulse[1] = pul_motor1_buf[1];
+    assign rserv_step_pulse[2] = pul_motor2_buf[1];
+    assign rserv_step_pulse[3] = pul_motor3_buf[1];
+    assign rserv_target_pulse[0] = pul_motor0_buf[2];
+    assign rserv_target_pulse[1] = pul_motor1_buf[2];
+    assign rserv_target_pulse[2] = pul_motor2_buf[2];
+    assign rserv_target_pulse[3] = pul_motor3_buf[2];
+    assign rcfg_home_spd[0] = pul_motor0_buf[3];
+    assign rcfg_home_spd[1] = pul_motor1_buf[3];
+    assign rcfg_home_spd[2] = pul_motor2_buf[3];
+    assign rcfg_home_spd[3] = pul_motor3_buf[3];
+    assign rcfg_home_acc[0] = pul_motor0_buf[4];
+    assign rcfg_home_acc[1] = pul_motor1_buf[4];
+    assign rcfg_home_acc[2] = pul_motor2_buf[4];
+    assign rcfg_home_acc[3] = pul_motor3_buf[4];
+    assign rcfg_home_dec[0] = pul_motor0_buf[5];
+    assign rcfg_home_dec[1] = pul_motor1_buf[5];
+    assign rcfg_home_dec[2] = pul_motor2_buf[5];
+    assign rcfg_home_dec[3] = pul_motor3_buf[5];
+    assign rcfg_jog_spd[0] = pul_motor0_buf[3]; // word6 now touch_spd, change by szzhang 20261010
+    assign rcfg_jog_spd[1] = pul_motor1_buf[3];
+    assign rcfg_jog_spd[2] = pul_motor2_buf[3];
+    assign rcfg_jog_spd[3] = pul_motor3_buf[3];
+    assign rcfg_touch_spd[0] = pul_motor0_buf[6];
+    assign rcfg_touch_spd[1] = pul_motor1_buf[6];
+    assign rcfg_touch_spd[2] = pul_motor2_buf[6];
+    assign rcfg_touch_spd[3] = pul_motor3_buf[6];
+    assign rcfg_jog_acc[0] = pul_motor0_buf[7];
+    assign rcfg_jog_acc[1] = pul_motor1_buf[7];
+    assign rcfg_jog_acc[2] = pul_motor2_buf[7];
+    assign rcfg_jog_acc[3] = pul_motor3_buf[7];
+    assign rcfg_jog_dec[0] = pul_motor0_buf[8];
+    assign rcfg_jog_dec[1] = pul_motor1_buf[8];
+    assign rcfg_jog_dec[2] = pul_motor2_buf[8];
+    assign rcfg_jog_dec[3] = pul_motor3_buf[8];
+    assign rcfg_move_spd[0] = pul_motor0_buf[3]; // word9 now wheel spd, change by szzhang 20261013
+    assign rcfg_move_spd[1] = pul_motor1_buf[3];
+    assign rcfg_move_spd[2] = pul_motor2_buf[3];
+    assign rcfg_move_spd[3] = pul_motor3_buf[3];
+    assign rcfg_move_acc[0] = pul_motor0_buf[10];
+    assign rcfg_move_acc[1] = pul_motor1_buf[10];
+    assign rcfg_move_acc[2] = pul_motor2_buf[10];
+    assign rcfg_move_acc[3] = pul_motor3_buf[10];
+    assign rcfg_move_dec[0] = pul_motor0_buf[11];
+    assign rcfg_move_dec[1] = pul_motor1_buf[11];
+    assign rcfg_move_dec[2] = pul_motor2_buf[11];
+    assign rcfg_move_dec[3] = pul_motor3_buf[11];
+    assign rcfg_spd_max[0] = pul_motor0_buf[12];
+    assign rcfg_spd_max[1] = pul_motor1_buf[12];
+    assign rcfg_spd_max[2] = pul_motor2_buf[12];
+    assign rcfg_spd_max[3] = pul_motor3_buf[12];
+    assign rcfg_acc_max[0] = pul_motor0_buf[13];
+    assign rcfg_acc_max[1] = pul_motor1_buf[13];
+    assign rcfg_acc_max[2] = pul_motor2_buf[13];
+    assign rcfg_acc_max[3] = pul_motor3_buf[13];
+    assign rcfg_dec_max[0] = pul_motor0_buf[14];
+    assign rcfg_dec_max[1] = pul_motor1_buf[14];
+    assign rcfg_dec_max[2] = pul_motor2_buf[14];
+    assign rcfg_dec_max[3] = pul_motor3_buf[14];
+    assign rcfg_touch_dec[0] = pul_motor0_buf[15];
+    assign rcfg_touch_dec[1] = pul_motor1_buf[15];
+    assign rcfg_touch_dec[2] = pul_motor2_buf[15];
+    assign rcfg_touch_dec[3] = pul_motor3_buf[15];
+    assign frame_w0[0] = pul_motor0_buf[0];
+    assign frame_w0[1] = pul_motor1_buf[0];
+    assign frame_w0[2] = pul_motor2_buf[0];
+    assign frame_w0[3] = pul_motor3_buf[0];
     assign frame_end[0] = driver_cfg_wea && (driver_cfg_addra == (bias_pul_motor0 + 15));
     assign frame_end[1] = driver_cfg_wea && (driver_cfg_addra == (bias_pul_motor1 + 15));
     assign frame_end[2] = driver_cfg_wea && (driver_cfg_addra == (bias_pul_motor2 + 15));
     assign frame_end[3] = driver_cfg_wea && (driver_cfg_addra == (bias_pul_motor3 + 15));
-    assign seg_m2s[0] = {pul_motor0_buf[15], pul_motor0_buf[14], pul_motor0_buf[13], pul_motor0_buf[12],
-                         pul_motor0_buf[11], pul_motor0_buf[10], pul_motor0_buf[9],  pul_motor0_buf[8],
-                         pul_motor0_buf[7],  pul_motor0_buf[6],  pul_motor0_buf[5],  pul_motor0_buf[4],
-                         pul_motor0_buf[3],  pul_motor0_buf[2],  pul_motor0_buf[1],  pul_motor0_buf[0]};
-    assign seg_m2s[1] = {pul_motor1_buf[15], pul_motor1_buf[14], pul_motor1_buf[13], pul_motor1_buf[12],
-                         pul_motor1_buf[11], pul_motor1_buf[10], pul_motor1_buf[9],  pul_motor1_buf[8],
-                         pul_motor1_buf[7],  pul_motor1_buf[6],  pul_motor1_buf[5],  pul_motor1_buf[4],
-                         pul_motor1_buf[3],  pul_motor1_buf[2],  pul_motor1_buf[1],  pul_motor1_buf[0]};
-    assign seg_m2s[2] = {pul_motor2_buf[15], pul_motor2_buf[14], pul_motor2_buf[13], pul_motor2_buf[12],
-                         pul_motor2_buf[11], pul_motor2_buf[10], pul_motor2_buf[9],  pul_motor2_buf[8],
-                         pul_motor2_buf[7],  pul_motor2_buf[6],  pul_motor2_buf[5],  pul_motor2_buf[4],
-                         pul_motor2_buf[3],  pul_motor2_buf[2],  pul_motor2_buf[1],  pul_motor2_buf[0]};
-    assign seg_m2s[3] = {pul_motor3_buf[15], pul_motor3_buf[14], pul_motor3_buf[13], pul_motor3_buf[12],
-                         pul_motor3_buf[11], pul_motor3_buf[10], pul_motor3_buf[9],  pul_motor3_buf[8],
-                         pul_motor3_buf[7],  pul_motor3_buf[6],  pul_motor3_buf[5],  pul_motor3_buf[4],
-                         pul_motor3_buf[3],  pul_motor3_buf[2],  pul_motor3_buf[1],  pul_motor3_buf[0]};
-    assign pm_sel[0] = rd_msg_addr_d - bias_pul_motor0;
-    assign pm_sel[1] = rd_msg_addr_d - bias_pul_motor1;
-    assign pm_sel[2] = rd_msg_addr_d - bias_pul_motor2;
-    assign pm_sel[3] = rd_msg_addr_d - bias_pul_motor3;
+    assign wheel_spd[0] = pul_motor0_buf[9];
+    assign wheel_spd[1] = pul_motor1_buf[9];
+    assign wheel_spd[2] = pul_motor2_buf[9];
+    assign wheel_spd[3] = pul_motor3_buf[9];
 assign rs232_uart_id[0] = rs232_ch0_buf[0];
     assign rs232_uart_id[1] = rs232_ch1_buf[0];
     assign rs232_uart_id[2] = rs232_ch2_buf[0];
@@ -364,16 +538,72 @@ assign rs232_uart_id[0] = rs232_ch0_buf[0];
                     rs485_ch8_msg <= uart_485_rx_32data;
                 end
                 16'h009x: begin
-                    pul_motor0_msg <= seg_s2m[0][{pm_sel[0], 5'd0} +: 32];
+                    if(rd_msg_addr_d == (bias_pul_motor0+10)) begin
+                        pul_motor0_msg <= {15'd0,wheel_active[0],axis_alarm_code[0],action_ack[0],pulse_done[0],device_beat[0],o_dv_dir[0],device_alarm[0],action_error[0],action_done[0],action_busy[0]};
+                    end else if(rd_msg_addr_d == (bias_pul_motor0+11)) begin
+                        pul_motor0_msg <= r_pf_abspos[0];
+                    end else if(rd_msg_addr_d == (bias_pul_motor0+12)) begin
+                        pul_motor0_msg <= axis_dbg12[0];
+                    end else if(rd_msg_addr_d == (bias_pul_motor0+13)) begin
+                        pul_motor0_msg <= axis_dbg13[0];
+                    end else if(rd_msg_addr_d == (bias_pul_motor0+14)) begin
+                        pul_motor0_msg <= axis_dbg14[0];
+                    end else if(rd_msg_addr_d == (bias_pul_motor0+15)) begin
+                        pul_motor0_msg <= axis_dbg15[0];
+                    end else begin
+                        pul_motor0_msg <= pul_motor0_buf[rd_msg_addr_d - bias_pul_motor0];
+                    end
                 end
                 16'h00ax: begin
-                    pul_motor1_msg <= seg_s2m[1][{pm_sel[1], 5'd0} +: 32];
+                    if(rd_msg_addr_d == (bias_pul_motor1+10)) begin
+                        pul_motor1_msg <= {15'd0,wheel_active[1],axis_alarm_code[1],action_ack[1],pulse_done[1],device_beat[1],o_dv_dir[1],device_alarm[1],action_error[1],action_done[1],action_busy[1]};
+                    end else if(rd_msg_addr_d == (bias_pul_motor1+11)) begin
+                        pul_motor1_msg <= r_pf_abspos[1];
+                    end else if(rd_msg_addr_d == (bias_pul_motor1+12)) begin
+                        pul_motor1_msg <= axis_dbg12[1];
+                    end else if(rd_msg_addr_d == (bias_pul_motor1+13)) begin
+                        pul_motor1_msg <= axis_dbg13[1];
+                    end else if(rd_msg_addr_d == (bias_pul_motor1+14)) begin
+                        pul_motor1_msg <= axis_dbg14[1];
+                    end else if(rd_msg_addr_d == (bias_pul_motor1+15)) begin
+                        pul_motor1_msg <= axis_dbg15[1];
+                    end else begin
+                        pul_motor1_msg <= pul_motor1_buf[rd_msg_addr_d - bias_pul_motor1];
+                    end
                 end
                 16'h00bx: begin
-                    pul_motor2_msg <= seg_s2m[2][{pm_sel[2], 5'd0} +: 32];
+                    if(rd_msg_addr_d == (bias_pul_motor2+10)) begin
+                        pul_motor2_msg <= {15'd0,wheel_active[2],axis_alarm_code[2],action_ack[2],pulse_done[2],device_beat[2],o_dv_dir[2],device_alarm[2],action_error[2],action_done[2],action_busy[2]};
+                    end else if(rd_msg_addr_d == (bias_pul_motor2+11)) begin
+                        pul_motor2_msg <= r_pf_abspos[2];
+                    end else if(rd_msg_addr_d == (bias_pul_motor2+12)) begin
+                        pul_motor2_msg <= axis_dbg12[2];
+                    end else if(rd_msg_addr_d == (bias_pul_motor2+13)) begin
+                        pul_motor2_msg <= axis_dbg13[2];
+                    end else if(rd_msg_addr_d == (bias_pul_motor2+14)) begin
+                        pul_motor2_msg <= axis_dbg14[2];
+                    end else if(rd_msg_addr_d == (bias_pul_motor2+15)) begin
+                        pul_motor2_msg <= axis_dbg15[2];
+                    end else begin
+                        pul_motor2_msg <= pul_motor2_buf[rd_msg_addr_d - bias_pul_motor2];
+                    end
                 end
                 16'h00cx: begin
-                    pul_motor3_msg <= seg_s2m[3][{pm_sel[3], 5'd0} +: 32];
+                    if(rd_msg_addr_d == (bias_pul_motor3+10)) begin
+                        pul_motor3_msg <= {15'd0,wheel_active[3],axis_alarm_code[3],action_ack[3],pulse_done[3],device_beat[3],o_dv_dir[3],device_alarm[3],action_error[3],action_done[3],action_busy[3]};
+                    end else if(rd_msg_addr_d == (bias_pul_motor3+11)) begin
+                        pul_motor3_msg <= r_pf_abspos[3];
+                    end else if(rd_msg_addr_d == (bias_pul_motor3+12)) begin
+                        pul_motor3_msg <= axis_dbg12[3];
+                    end else if(rd_msg_addr_d == (bias_pul_motor3+13)) begin
+                        pul_motor3_msg <= axis_dbg13[3];
+                    end else if(rd_msg_addr_d == (bias_pul_motor3+14)) begin
+                        pul_motor3_msg <= axis_dbg14[3];
+                    end else if(rd_msg_addr_d == (bias_pul_motor3+15)) begin
+                        pul_motor3_msg <= axis_dbg15[3];
+                    end else begin
+                        pul_motor3_msg <= pul_motor3_buf[rd_msg_addr_d - bias_pul_motor3];
+                    end 
                 end
                 default: begin
                 end
@@ -381,6 +611,40 @@ assign rs232_uart_id[0] = rs232_ch0_buf[0];
         end    
     end
     
+    always @(posedge clk)begin
+        if (reset) begin
+            pul_motor0_frame_start <= 1'b0;
+            pul_motor1_frame_start <= 1'b0;
+            pul_motor2_frame_start <= 1'b0;
+            pul_motor3_frame_start <= 1'b0;
+            pul_motor0_action_seen <= 1'b0;
+            pul_motor1_action_seen <= 1'b0;
+            pul_motor2_action_seen <= 1'b0;
+            pul_motor3_action_seen <= 1'b0;
+        end else begin
+            pul_motor0_frame_start <= 1'b0;
+            pul_motor1_frame_start <= 1'b0;
+            pul_motor2_frame_start <= 1'b0;
+            pul_motor3_frame_start <= 1'b0;
+            if (driver_cfg_wea && (driver_cfg_addra == (bias_pul_motor0 + 15))) begin
+                pul_motor0_frame_start <= pul_motor0_buf[0][1] & ~pul_motor0_action_seen;
+                pul_motor0_action_seen <= pul_motor0_buf[0][1];
+            end
+            if (driver_cfg_wea && (driver_cfg_addra == (bias_pul_motor1 + 15))) begin
+                pul_motor1_frame_start <= pul_motor1_buf[0][1] & ~pul_motor1_action_seen;
+                pul_motor1_action_seen <= pul_motor1_buf[0][1];
+            end
+            if (driver_cfg_wea && (driver_cfg_addra == (bias_pul_motor2 + 15))) begin
+                pul_motor2_frame_start <= pul_motor2_buf[0][1] & ~pul_motor2_action_seen;
+                pul_motor2_action_seen <= pul_motor2_buf[0][1];
+            end
+            if (driver_cfg_wea && (driver_cfg_addra == (bias_pul_motor3 + 15))) begin
+                pul_motor3_frame_start <= pul_motor3_buf[0][1] & ~pul_motor3_action_seen;
+                pul_motor3_action_seen <= pul_motor3_buf[0][1];
+            end
+        end
+    end
+
     always @(posedge clk)begin
         if(reset | axi_flag | ~cfg_ok)begin  //force all-1 on fault  by szzhang 20260904
             slvbd_outio_low <= 32'hffff_ffff;
@@ -446,20 +710,69 @@ assign rs232_uart_id[0] = rs232_ch0_buf[0];
     generate	
 	   genvar i;
 	   for (i=0; i<4; i=i+1)begin: AXIS
-	   slv_seg_exec    slv_seg_exec_u
+	   slv_pul_axis    slv_pul_axis_u
 	   (
 		    .clk		   	         ( clk			        )
 		   ,.reset		 	         ( reset	            )
-		   ,.i_frame_end             ( frame_end[i]         )
-		   ,.i_m2s                   ( seg_m2s[i]           )
-		   ,.i_link_lost             ( axi_flag             )
-		   ,.i_di                    ( slvbd_inio           )
-		   ,.i_dv_ok                 ( i_dv_alarm[i]        )
-		   ,.o_s2m                   ( seg_s2m[i]           )
-		   ,.o_pulse                 ( o_dv_pulse[i]        )
-		   ,.o_dir                   ( o_dv_dir[i]          )
-		   ,.o_son                   ( o_dv_son[i]          )
-		   ,.o_rst                   ( o_dv_reset[i]        )
+		   
+		   ,.action_flag   	         ( axi_flag             )
+		   ,.action_alarm   	     ( action_alarm[i]      )
+		   ,.action_start   	     ( action_start[i]      )
+		   ,.action_son   	         ( action_son[i]        )
+		   ,.action_beat   	         ( action_beat[i]       )
+		   ,.device_alarm   	     ( device_alarm[i]      )
+		   ,.device_beat   	         ( device_beat[i]       )
+		   ,.action_error   	     ( action_error[i]      )
+		   ,.action_busy   	         ( action_busy[i]       )
+		   ,.action_done   	         ( action_done[i]       )
+		   ,.action_ack   	         ( action_ack[i]        )
+
+           ,.pulse_done              ( pulse_done[i] )
+           ,.r_pf_abspos   	         ( r_pf_abspos[i]       )
+           ,.cur_beha   	         ( cur_beha[i]          )
+		   ,.rctrl_drive_on   	     ( rctrl_drive_on[i]    )
+		   ,.rctrl_drive_reset   	 ( rctrl_drive_reset[i] )
+		   ,.rserv_dir   	         ( rserv_dir[i]         )
+		   ,.rcfg_pf_mode	         ( rcfg_pf_mode[i]	    )
+		   ,.rserv_step_pulse   	 ( rserv_step_pulse[i]  )
+		   ,.rserv_target_pulse   	 ( rserv_target_pulse[i])
+		   ,.rcfg_home_spd   	     ( rcfg_home_spd[i]     )
+		   ,.rcfg_home_acc   	     ( rcfg_home_acc[i]     )
+		   ,.rcfg_home_dec   	     ( rcfg_home_dec[i]     )
+		   ,.rcfg_jog_spd   	     ( rcfg_jog_spd[i]      )
+		   ,.rcfg_jog_acc	         ( rcfg_jog_acc[i]	    )
+		   ,.rcfg_jog_dec   	     ( rcfg_jog_dec[i]      )
+		   ,.rcfg_move_spd   	     ( rcfg_move_spd[i]     )
+		   ,.rcfg_move_acc   	     ( rcfg_move_acc[i]     )
+		   ,.rcfg_move_dec   	     ( rcfg_move_dec[i]     )
+		   ,.rcfg_spd_max	         ( rcfg_spd_max[i]	    )
+		   ,.rcfg_acc_max   	     ( rcfg_acc_max[i]      )
+		   ,.rcfg_dec_max   	     ( rcfg_dec_max[i]      )
+		   ,.rcfg_touch_dec         ( rcfg_touch_dec[i]     )
+		   ,.rcfg_touch_spd         ( rcfg_touch_spd[i]     )
+
+		   ,.i_axis_limf             ( i_axis_limf[i]       )
+		   ,.i_axis_limb             ( i_axis_limb[i]       )
+           ,.i_axis_zero             ( i_axis_zero[i]       )
+           ,.i_axis_abspos0          ( i_axis_abspos0[i]    )
+           ,.i_pause                 ( i_pause[i]           )
+           ,.i_servo_ready           ( servo_ready[i] )
+           ,.i_servo_done            ( servo_done[i] )
+           ,.i_home_valid            ( home_valid[i] )
+           ,.alarm_code              ( axis_alarm_code[i] )
+           ,.i_device_alarm          ( i_dv_alarm[i]        )
+           ,.o_device_pulse          ( o_dv_pulse[i]        )
+           ,.o_device_dir            ( o_dv_dir[i]          )
+           ,.o_device_reset          ( o_dv_reset[i]        )
+           ,.o_device_son            ( o_dv_son[i]          )
+           ,.o_dbg_w12               ( axis_dbg12[i]        )
+           ,.o_dbg_w13               ( axis_dbg13[i]        )
+           ,.o_dbg_w14               ( axis_dbg14[i]        )
+           ,.o_dbg_w15               ( axis_dbg15[i]        )
+           ,.i_frame_end             ( frame_end[i]         )
+           ,.i_frame_w0              ( frame_w0[i]          )
+           ,.i_wheel_spd             ( wheel_spd[i]         )
+           ,.o_wheel_active          ( wheel_active[i]      )
 	   );
 	   end
    endgenerate

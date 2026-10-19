@@ -21,7 +21,6 @@
 
 module proactive_beh_slv_pul_axis#(
     parameter                 	BHA_NUM = 2   		//Number of active behaviors
-   ,parameter        [31:0]     IO_MAP  = 32'h0700_0000	//slave io map (ABI v2 w13), default all remote
 )(
     input                       clk_i
     ,input                      rst_i
@@ -63,7 +62,7 @@ module proactive_beh_slv_pul_axis#(
     ,input      [4:0]           slv_board_id        //slave board id
     ,input						pul_motor_r_flag    //pul motor ready flag
     ,input						pul_motor_flag      //pul motor flag
-    ,output wire [31:0] 			m2s_pulm_msg        //message  master to slave
+    ,output reg [31:0] 			m2s_pulm_msg        //message  master to slave
     ,input 		[31:0] 			s2m_pulm_msg       	//message  slave to master
 	//io port end
 	//for post check start
@@ -92,7 +91,6 @@ module proactive_beh_slv_pul_axis#(
 	,input		[31:0]			rcfg_dec_max      	//maximum deceleration
 	,input		[31:0]			rcfg_touch_dec     	//home org touch deceleration
 	,input		[31:0]			rcfg_touch_spd     	//home creep speed after org touch
-	,input		[31:0]			rcfg_s_time = 32'd0	//S-curve jerk time ms, 0 = T-curve
 	,input signed [31:0]		rcfg_pos_max = 32'sd0	// signed upper soft limit
 	,input signed [31:0]		rcfg_pos_min = 32'sd0	// signed lower soft limit
 
@@ -119,24 +117,17 @@ module proactive_beh_slv_pul_axis#(
 
 
 
-    wire       seq_busy;
-    wire       seq_done;
-    wire       seq_error;
-    wire       seq_accepted;
-    wire [7:0] seq_alm;
-    wire       link_ready;
-    wire       abi_bad;
-    wire [31:0] st_s1;
-    reg        seq_owned;       // current behavior started the sequencer
+    wire       slv_action_error;
+    reg        action_accepted;
+    reg [31:0] s2m_10tmp;
     reg pulse_done_latched;
     wire is_move = (a_bhv_id_r == 3) || (a_bhv_id_r == 21);
     wire is_motion = is_move || (a_bhv_id_r == 1) || (a_bhv_id_r == 2) || (a_bhv_id_r == 20);
-    wire wheel_active = st_s1[6];   // slave velocity mode owns pulse
+    wire wheel_active = s2m_10tmp[16];   // slave wheel owns pulse
     wire limits_enabled = rcfg_pos_max > rcfg_pos_min;
     wire target_over_f = is_move && limits_enabled && ($signed(rserv_target_pulse) > rcfg_pos_max);
     wire target_over_b = is_move && limits_enabled && ($signed(rserv_target_pulse) < rcfg_pos_min);
-    wire [7:0] launch_alarm = !link_ready ? (abi_bad ? 8'd123 : 8'd119) :
-                              !dv_alarm ? 8'd108 :
+    wire [7:0] launch_alarm = !dv_alarm ? 8'd108 :
                               !i_servo_ready ? 8'd113 :
                               !i_drive_enabled ? 8'd115 :
                               wheel_active ? 8'd118 :
@@ -153,8 +144,6 @@ module proactive_beh_slv_pul_axis#(
     //114 Move not homed
     //115 Drive disabled
     //118 Handwheel active
-    //119 Slave link down
-    //123 Slave ABI mismatch
 
     reg [7:0]    	curr_state;
 	reg [7:0]    	curr_state_1d;
@@ -460,16 +449,15 @@ module proactive_beh_slv_pul_axis#(
     always @(posedge clk_i) begin
         if(rst_i || curr_state == S_IDLE) a_alm_num <= 0;
         else if(curr_state < S_ALERT_40 && (next_state == alert_next) && next_state != curr_state) begin
-            if(is_motion && !link_ready) a_alm_num <= abi_bad ? 8'd123 : 8'd119; // Slave link
-            else if(is_motion && !dv_alarm) a_alm_num <= 8'd108;     // Drive alarm
+            if(is_motion && !dv_alarm) a_alm_num <= 8'd108;          // Drive alarm
             else if(is_motion && !i_servo_ready) a_alm_num <= 8'd113;  // Servo not ready
-            else if(seq_accepted && i_axis_limf) a_alm_num <= 8'd109;  // Forward limit
-            else if(seq_accepted && i_axis_limb) a_alm_num <= 8'd110;  // Backward limit
+            else if(action_accepted && i_axis_limf) a_alm_num <= 8'd109;  // Forward limit
+            else if(action_accepted && i_axis_limb) a_alm_num <= 8'd110;  // Backward limit
             else if(i_stop) a_alm_num <= 8'd106;                       // Stop warning
             else if(!i_emerge_stop_signal) a_alm_num <= 8'd107;        // Emergency stop
             else if(launch_fault) a_alm_num <= launch_alarm;           // Launch fault
-            else if(seq_owned && seq_error && seq_alm != 0)
-                a_alm_num <= seq_alm;                                  // Slave/sequence alarm
+            else if(action_accepted && slv_action_error && s2m_10tmp[15:8] != 0)
+                a_alm_num <= s2m_10tmp[15:8];                         // Slave alarm
             else if(curr_state == S_BHA_POST_DET && action_error)
                 a_alm_num <= (a_bhv_id_r == 1) ? 8'd120 : is_move ? 8'd122 : 8'd121;
             else if(ack_tx_result == IRQ_NO_OK) a_alm_num <= ack_ps_alart_num; // PS alarm
@@ -518,163 +506,155 @@ module proactive_beh_slv_pul_axis#(
 //==============================================================================================================================//
 // behavior flags in S_EXE
 
+		reg        action_son;
+		reg        action_start;
 		reg        action_alarm;
+		reg        action_ack_base;
+
 		reg [3:0]  stop_frame_cnt;
 
-		// Slave board ABI v2 lives in pul_axis_link_if; behaviors are segment
-		// sequences in pul_axis_seq (doc/pul_axis_seg_abi_v2.md).
-		function [31:0] eff;
-		    input [31:0] v, d;
-		    eff = (v == 32'd0) ? d : v;
-		endfunction
-		wire [31:0] spd_max_eff   = eff(rcfg_spd_max,   32'd175000);	// defaults as v1 slave
-		wire [31:0] acc_max_eff   = eff(rcfg_acc_max,   32'd875000);
-		wire [31:0] dec_max_eff   = eff(rcfg_dec_max,   32'd875000);
-		wire [31:0] touch_dec_eff = eff(rcfg_touch_dec, 32'd87500);
-		wire [31:0] touch_spd_eff = eff(rcfg_touch_spd, 32'd2000);
-		wire        is_home = (a_bhv_id_r == 8'd1);
-		wire        is_jog  = (a_bhv_id_r == 8'd2) || (a_bhv_id_r == 8'd20);
-		wire [31:0] seg_spd = eff(is_home ? rcfg_home_spd : is_move ? rcfg_move_spd : rcfg_jog_spd, 32'd8750);
-		wire [31:0] seg_acc = eff(is_home ? rcfg_home_acc : is_move ? rcfg_move_acc : rcfg_jog_acc, 32'd175000);
-		wire [31:0] seg_dec = eff(is_home ? rcfg_home_dec : is_move ? rcfg_move_dec : rcfg_jog_dec, 32'd175000);
+		// m2s/s2m multi-cycle state machines
+		reg [3:0]  m2s_state;
+		reg [3:0]  s2m_state;
+		reg [31:0] slv_beat_cnt;
+		reg        action_beat;
+		reg        pul_motor_flag_d1;
+		reg        pul_motor_flag_d2;
+		reg [31:0] s2m_0tmp;
 
-		wire        ctl_stop = i_stop | ~i_emerge_stop_signal | ~a_en | action_alarm;
-		wire        soft_en  = limits_enabled && i_home_completed && !is_home && !is_jog;
-		wire [31:0] cfg_opt  = {rcfg_s_time[15:0], 8'd0, 6'd0, (rcfg_s_time[15:0] != 0) && !is_home, soft_en};
+		reg [31:0] s2m_11tmp;
+		reg [31:0] s2m_12tmp, s2m_13tmp, s2m_14tmp, s2m_15tmp;
 
-		// command channel: sequencer while busy, else handwheel VEL
-		wire        seq_cmd_req;
-		wire [3:0]  seq_cmd_op;
-		wire [31:0] seq_cmd_arg, seq_cmd_spd, seq_cmd_acc, seq_cmd_dec, seq_cmd_evt, seq_cmd_evt_dec, seq_cmd_lim_dec;
-		wire        cmd_rdy, cmd_ack, cmd_timeout;
-		wire [3:0]  cmd_result;
-		wire        rx_commit;
-		wire [31:0] st_s0, st_fault, st_io, st_s12, st_s13;
-		wire [31:0] st_pos;
-		wire [31:0] link_m2s_word0;
-		wire        link_m2s_frame_start;
-		wire [15:0] s2m_frm_cnt;
-		wire [11:0] m2s_frm_cnt;
+		wire       slv_action_busy;
+		wire       slv_action_done;
 
-		reg  [31:0] wheel_spd_r;
-		reg         wheel_pend;
-		reg         wheel_lock;
-		wire        wheel_req = wheel_pend && cmd_rdy && !seq_busy;
+		wire       slv_action_ack;
+		wire       o_dv_dir;
+		wire       o_dv_son;
+		wire       o_dv_reset;
+
+
+
 		always@(posedge clk_i) begin
 		    if(rst_i) begin
-		        wheel_spd_r <= 32'd0; wheel_pend <= 1'b0; wheel_lock <= 1'b0;
+		        slv_beat_cnt <= 32'd0;
+		        action_beat  <= 1'b0;
 		    end else begin
-		        if(wheel_req) wheel_pend <= 1'b0;
-		        if(ctl_stop && (wheel_active || wheel_pend)) begin
-		            wheel_lock <= 1'b1;            // stop: hold until a 0 write
-		            wheel_pend <= 1'b0;
-		        end else if(i_wheel_vld) begin
-		            if(i_wheel_spd == 32'd0) wheel_lock <= 1'b0;
-		            if((i_wheel_spd == 32'd0 || !wheel_lock) && !(ec_cha_st && is_motion && !wheel_active)) begin
-		                wheel_spd_r <= i_wheel_spd;
-		                wheel_pend  <= 1'b1;
-		            end
+		        slv_beat_cnt <= slv_beat_cnt + 1'b1;
+		        if(slv_beat_cnt >= 2000000) begin  
+		            slv_beat_cnt <= 32'd0;
+		            action_beat  <= ~action_beat;
 		        end
 		    end
 		end
 
-		pul_axis_link_if pul_axis_link_if_u0(
-		    .clk_i                 (clk_i),
-		    .rst_i                 (rst_i),
-		    .i_time_1ms_vld        (i_time_1ms_vld),
-		    .cmd_req               (seq_cmd_req | wheel_req),
-		    .cmd_op                (seq_busy ? seq_cmd_op      : 4'd3),
-		    .cmd_arg               (seq_busy ? seq_cmd_arg     : wheel_spd_r),
-		    .cmd_spd               (seq_busy ? seq_cmd_spd     : spd_max_eff),
-		    .cmd_acc               (seq_busy ? seq_cmd_acc     : eff(rcfg_jog_acc, 32'd175000)),
-		    .cmd_dec               (seq_busy ? seq_cmd_dec     : eff(rcfg_jog_dec, 32'd175000)),
-		    .cmd_evt               (seq_busy ? seq_cmd_evt     : 32'd0),
-		    .cmd_evt_dec           (seq_busy ? seq_cmd_evt_dec : 32'd0),
-		    .cmd_lim_dec           (seq_busy ? seq_cmd_lim_dec : 32'd0),
-		    .cmd_rdy               (cmd_rdy),
-		    .cmd_ack               (cmd_ack),
-		    .cmd_result            (cmd_result),
-		    .cmd_timeout           (cmd_timeout),
-		    .ctl_son               (~i_drive_on),       // b_son active low
-		    .ctl_rst               (~i_drive_reset),    // b_reset active low
-		    .ctl_pause             (i_pause),
-		    .ctl_stop              (ctl_stop),
-		    .ctl_qstop             (1'b0),
-		    .ctl_ext_abort         (~i_servo_ready),
-		    .io_limf               (i_axis_limf),
-		    .io_limb               (i_axis_limb),
-		    .io_org                (i_axis_zero),
-		    .cfg_spd_max           (spd_max_eff),
-		    .cfg_acc_max           (acc_max_eff),
-		    .cfg_dec_max           (dec_max_eff),
-		    .cfg_soft_max          (rcfg_pos_max),
-		    .cfg_soft_min          (rcfg_pos_min),
-		    .cfg_io_map            (IO_MAP),
-		    .cfg_opt               (cfg_opt),
-		    .link_ready            (link_ready),
-		    .abi_bad               (abi_bad),
-		    .rx_commit             (rx_commit),
-		    .st_s0                 (st_s0),
-		    .st_s1                 (st_s1),
-		    .st_fault              (st_fault),
-		    .st_pos                (st_pos),
-		    .st_io                 (st_io),
-		    .st_s12                (st_s12),
-		    .st_s13                (st_s13),
-		    .cur_slv_board_id      (cur_slv_board_id),
-		    .slv_board_id          (slv_board_id),
-		    .pul_motor_r_flag      (pul_motor_r_flag),
-		    .pul_motor_flag        (pul_motor_flag),
-		    .m2s_pulm_msg          (m2s_pulm_msg),
-		    .s2m_pulm_msg          (s2m_pulm_msg),
-		    .m2s_frame_start_o     (link_m2s_frame_start),
-		    .m2s_word0_o           (link_m2s_word0),
-		    .s2m_frame_count_o     (s2m_frm_cnt),
-		    .m2s_frame_count_o     (m2s_frm_cnt)
-		);
+		// wheel: write count -> word0[31:24], soft-limit block -> bit9/bit2, add by szzhang 20261013
+		reg  [7:0]  wheel_seq;
+		always@(posedge clk_i) begin
+		    if(rst_i)            wheel_seq <= 8'd0;
+		    else if(i_wheel_vld) wheel_seq <= wheel_seq + 1'b1;
+		end
+		wire wheel_blk_f = w_soft_lim_f && i_home_completed;
+		wire wheel_blk_b = w_soft_lim_b && i_home_completed;
 
-		pul_axis_seq pul_axis_seq_u0(
-		    .clk_i                 (clk_i),
-		    .rst_i                 (rst_i),
-		    .i_start               (curr_state == S_EXE && launch_ok && is_motion),
-		    .i_abort               (ctl_stop),
-		    .i_cancel              (curr_state == S_ACT_END_1),
-		    .i_bhv                 (a_bhv_id_r),
-		    .i_dir                 (rserv_dir),
-		    .i_step                (rserv_step_pulse),
-		    .i_target              (rserv_target_pulse),
-		    .i_spd                 (seg_spd),
-		    .i_acc                 (seg_acc),
-		    .i_dec                 (seg_dec),
-		    .i_touch_spd           (touch_spd_eff),
-		    .i_touch_dec           (touch_dec_eff),
-		    .i_dec_max             (dec_max_eff),
-		    .cmd_req               (seq_cmd_req),
-		    .cmd_op                (seq_cmd_op),
-		    .cmd_arg               (seq_cmd_arg),
-		    .cmd_spd               (seq_cmd_spd),
-		    .cmd_acc               (seq_cmd_acc),
-		    .cmd_dec               (seq_cmd_dec),
-		    .cmd_evt               (seq_cmd_evt),
-		    .cmd_evt_dec           (seq_cmd_evt_dec),
-		    .cmd_lim_dec           (seq_cmd_lim_dec),
-		    .cmd_rdy               (cmd_rdy),
-		    .cmd_ack               (cmd_ack),
-		    .cmd_result            (cmd_result),
-		    .cmd_timeout           (cmd_timeout),
-		    .rx_commit             (rx_commit),
-		    .st_s1                 (st_s1),
-		    .st_fault              (st_fault),
-		    .st_io                 (st_io),
-		    .o_busy                (seq_busy),
-		    .o_done                (seq_done),
-		    .o_error               (seq_error),
-		    .o_accepted            (seq_accepted),
-		    .o_alm                 (seq_alm)
-		);
+		wire [31:0] m2s_word0 = {
+									wheel_seq,
+									a_bhv_id_r,
+		                            i_servo_ready,
+		                            i_servo_done,
+		                            i_home_completed,
+									i_drive_on,
+		                            i_drive_reset,
+									rserv_dir,
+		                            wheel_blk_b,
+									i_pause,
+		                            i_stop|(~i_emerge_stop_signal)|(!a_en),
+									action_beat,
+		                            i_axis_zero,
+									i_axis_limb,
+		                            i_axis_limf,
+									wheel_blk_f,
+		                            action_start,
+									action_alarm
+									};
 
-		assign r_pf_abspos = st_pos;
-		assign dv_alarm    = st_io[3];	// slave drive alarm input, 1 = normal
+		always @(posedge clk_i) begin
+		    if (rst_i) begin
+		        m2s_state    <= 4'd0;
+		        m2s_pulm_msg <= 32'd0;
+		    end else begin
+		        case (m2s_state)
+		            4'd0:  m2s_pulm_msg <= m2s_word0;
+		            4'd1:  m2s_pulm_msg <= rserv_step_pulse;
+		            4'd2:  m2s_pulm_msg <= rserv_target_pulse;
+		            4'd3:  m2s_pulm_msg <= rcfg_home_spd;
+		            4'd4:  m2s_pulm_msg <= rcfg_home_acc;
+		            4'd5:  m2s_pulm_msg <= rcfg_home_dec;
+		            4'd6:  m2s_pulm_msg <= rcfg_touch_spd; // was jog_spd(=word3), change by szzhang 20261010
+		            4'd7:  m2s_pulm_msg <= rcfg_jog_acc;
+		            4'd8:  m2s_pulm_msg <= rcfg_jog_dec;
+		            4'd9:  m2s_pulm_msg <= i_wheel_spd;    // was move_spd(=word3), change by szzhang 20261013
+		            4'd10: m2s_pulm_msg <= rcfg_move_acc;
+		            4'd11: m2s_pulm_msg <= rcfg_move_dec;
+		            4'd12: m2s_pulm_msg <= rcfg_spd_max;
+		            4'd13: m2s_pulm_msg <= rcfg_acc_max;
+		            4'd14: m2s_pulm_msg <= rcfg_dec_max;
+		            4'd15: m2s_pulm_msg <= rcfg_touch_dec;
+		            default: m2s_pulm_msg <= 32'd0;
+		        endcase
+		        if ((m2s_state == 4'd0) && pul_motor_r_flag)
+		            m2s_state <= 4'd1;
+		        else if (m2s_state != 4'd0)
+		            m2s_state <= (m2s_state == 4'd15) ? 4'd0 : m2s_state + 1'b1;
+		    end
+		end
+
+		always@(posedge clk_i) begin
+		    if(rst_i) begin
+		        pul_motor_flag_d1 <= 1'b0;
+		        pul_motor_flag_d2 <= 1'b0;
+		        s2m_state <= 4'd0;
+		        s2m_0tmp  <= 32'd0;
+		        s2m_10tmp <= 32'd0;
+		        s2m_11tmp <= 32'd0;
+		        s2m_12tmp <= 32'd0;
+		        s2m_13tmp <= 32'd0;
+		        s2m_14tmp <= 32'd0;
+		        s2m_15tmp <= 32'd0;
+		    end else begin
+		        pul_motor_flag_d1 <= pul_motor_flag & (cur_slv_board_id == slv_board_id);
+		        pul_motor_flag_d2 <= pul_motor_flag_d1;
+
+		        if(pul_motor_flag_d2) begin
+		        // Re-align status sampling at the base-address response.
+		        s2m_0tmp  <= s2m_pulm_msg;
+		        s2m_state <= 4'd1;
+		        end else begin
+		        	case(s2m_state)
+		            	0: begin
+		            	    s2m_state <= 4'd0;
+		            	end
+		            	1,2,3,4,5,6,7,8,9: s2m_state <= s2m_state + 1'b1;  
+		            	10: begin
+		            	    s2m_10tmp <= s2m_pulm_msg;
+		            	    s2m_state <= 4'd11;
+		            	end
+		            	11: begin
+		            	    s2m_11tmp <= s2m_pulm_msg;
+		            	    s2m_state <= 4'd12;
+		            	end
+		            	12: begin s2m_12tmp <= s2m_pulm_msg; s2m_state <= 4'd13; end	// slave debug words
+		            	13: begin s2m_13tmp <= s2m_pulm_msg; s2m_state <= 4'd14; end
+		            	14: begin s2m_14tmp <= s2m_pulm_msg; s2m_state <= 4'd15; end
+		            	15: begin s2m_15tmp <= s2m_pulm_msg; s2m_state <= 4'd0;  end
+		            	default: s2m_state <= 4'd0;
+		        	endcase
+		        end
+			end
+		end
+		assign {dv_alarm, slv_action_error, slv_action_done, slv_action_busy} = s2m_10tmp[3:0];
+		assign slv_action_ack = s2m_10tmp[7];
+		assign r_pf_abspos  = s2m_11tmp;
 
 		wire w_soft_lim_en = (rcfg_pos_max > rcfg_pos_min) && (a_bhv_id_r != 8'd1);
 		assign w_soft_lim_f = w_soft_lim_en && (r_pf_abspos >= rcfg_pos_max);
@@ -684,13 +664,6 @@ module proactive_beh_slv_pul_axis#(
 		assign w_sw_move  = (a_bhv_id_r == 8'd3) || (a_bhv_id_r == 8'd21);
 		assign w_sw_fault = target_over_f | target_over_b;
 
-		always@(posedge clk_i) begin
-		    if(rst_i || (curr_state == S_IDLE))
-		        seq_owned <= 1'b0;
-		    else if(curr_state == S_EXE && launch_ok && is_motion)
-		        seq_owned <= 1'b1;
-		end
-
         reg done_latched;
 
         always @(posedge clk_i) begin
@@ -698,20 +671,20 @@ module proactive_beh_slv_pul_axis#(
                 done_latched <= 0;
                 pulse_done_latched <= 0;
             end else begin
-                if(seq_owned && seq_done) pulse_done_latched <= 1;
-                if(seq_owned && seq_done && i_servo_done && !action_error)
+                if(s2m_10tmp[6] && action_accepted) pulse_done_latched <= 1;
+                if(slv_action_done && action_accepted && !action_error)
                     done_latched <= 1;
                 if(action_error) done_latched <= 0;
             end
         end
-		assign action_busy  = seq_busy | st_s1[15];
+		assign action_busy  = slv_action_busy;
 		assign action_done  = done_latched;
-		assign action_error = (seq_owned & seq_error) | w_sw_fault;
+		assign action_error = (slv_action_error & action_accepted) | w_sw_fault;
 		reg stop_status_idle;
         always @(posedge clk_i) begin
             if(rst_i || curr_state != S_SLV_STOP_WAIT) stop_status_idle <= 0;
-            else if(rx_commit && stop_frame_cnt >= 2)
-                stop_status_idle <= !st_s1[15];
+            else if(s2m_state == 12 && stop_frame_cnt >= 2)
+                stop_status_idle <= !slv_action_busy;
         end
         assign slv_stop_ready = stop_status_idle;
 		assign alert_next     = action_issued ? S_SLV_STOP_WAIT : S_ALERT_40;
@@ -727,8 +700,31 @@ module proactive_beh_slv_pul_axis#(
 		    if(rst_i || (curr_state == S_IDLE) || (curr_state == S_EXE))
 		        stop_frame_cnt <= 4'd0;
 		    else if(curr_state == S_SLV_STOP_WAIT) begin
-		        if(link_m2s_frame_start && (stop_frame_cnt != 4'hF))
+		        if((m2s_state == 4'd0) && pul_motor_r_flag && (stop_frame_cnt != 4'hF))
 		            stop_frame_cnt <= stop_frame_cnt + 1'b1;
+		    end
+		end
+
+		always@(posedge clk_i) begin
+		    if(rst_i || !a_en) begin
+		        action_start     <= 1'b0;
+		        action_ack_base  <= 1'b0;
+		        action_accepted  <= 1'b0;
+		    end
+		    else if(curr_state == S_EXE && launch_ok) begin
+		        action_start    <= 1'b1;
+		        action_ack_base <= slv_action_ack;
+		        action_accepted <= 1'b0;
+		    end
+		    else if(curr_state == S_BHA_POST_DET) begin
+		        if(!action_accepted && (slv_action_ack != action_ack_base)) begin
+		            action_start    <= 1'b0;
+		            action_accepted <= 1'b1;
+		        end
+		    end
+		    else begin
+		        action_start    <= 1'b0;
+		        action_accepted <= 1'b0;
 		    end
 		end
 
@@ -745,29 +741,37 @@ module proactive_beh_slv_pul_axis#(
 		        action_alarm <= action_alarm;
 		end
 
-		// Debug frame counts are sourced from the link module; behavior keeps
-		// only the stop-wait timeout latch.
-		reg stop_wait_to;
+		// debug: frame liveness + stop-wait status, add by szzhang 20261012
+		reg [15:0] s2m_frm_cnt;
+		reg [11:0] m2s_frm_cnt;
+		reg        stop_wait_to;
 		always@(posedge clk_i) begin
-		    if(rst_i)
+		    if(rst_i) begin
+		        s2m_frm_cnt  <= 16'd0;
+		        m2s_frm_cnt  <= 12'd0;
 		        stop_wait_to <= 1'b0;
-		    else if(a_bhv_vld_r)
-		        stop_wait_to <= 1'b0;
-		    else if(curr_state == S_SLV_STOP_WAIT && timout && !slv_stop_ready)
-		        stop_wait_to <= 1'b1;
+		    end else begin
+		        if(pul_motor_flag_d2)
+		            s2m_frm_cnt <= s2m_frm_cnt + 1'b1;	// this board only
+		        if((m2s_state == 4'd0) && pul_motor_r_flag)
+		            m2s_frm_cnt <= m2s_frm_cnt + 1'b1;	// any board
+		        if(a_bhv_vld_r)
+		            stop_wait_to <= 1'b0;
+		        else if(curr_state == S_SLV_STOP_WAIT && timout && !slv_stop_ready)
+		            stop_wait_to <= 1'b1;
+		    end
 		end
-
-		assign dbg_s2m_o = {s2m_frm_cnt, st_s1[15:0]};
-		assign dbg_m2s_w0_o = link_m2s_word0;
-		assign dbg_s2m_w0_o = st_s0;
-		assign dbg_s2m_w12_o = st_s12;
-		assign dbg_s2m_w13_o = st_s13;
-		assign dbg_s2m_w14_o = st_fault;
-		assign dbg_s2m_w15_o = st_s1;
+		assign dbg_s2m_o = {s2m_frm_cnt, s2m_10tmp[15:0]};
+		assign dbg_m2s_w0_o = m2s_word0;
+		assign dbg_s2m_w0_o = s2m_0tmp;
+		assign dbg_s2m_w12_o = s2m_12tmp;
+		assign dbg_s2m_w13_o = s2m_13tmp;
+		assign dbg_s2m_w14_o = s2m_14tmp;
+		assign dbg_s2m_w15_o = s2m_15tmp;
 		assign dbg_ctl_o = {m2s_frm_cnt, stop_frame_cnt,
 		                    i_pause, i_stop, i_emerge_stop_signal, a_en,
-		                    stop_wait_to, timout, link_ready, action_issued,
-		                    seq_busy, action_alarm, seq_accepted, done_latched,
+		                    stop_wait_to, timout, action_ack_base, action_issued,
+		                    action_start, action_alarm, action_accepted, done_latched,
 		                    pulse_done_latched, stop_status_idle, latch_sta};
 //==============================================================================================================================//
 //----------------------------------------------------- user logic end -------------------------------------------------------//

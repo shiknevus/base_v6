@@ -109,7 +109,7 @@ module ps_rw_pl_reg_slv_pul_axis#(
 	,output		reg 	[31:0]		param37	
 	,output		reg 	[31:0]		param38		// signed wheel spd
 	,output		reg 				param38_vld
-	,output		reg 	[31:0]		param39		// S-curve jerk time ms, 0 = T-curve
+	//,output		reg 	[31:0]		param39	
 	//,output		reg 	[31:0]		param40	
 
 	,input						clr_pause
@@ -288,7 +288,7 @@ module ps_rw_pl_reg_slv_pul_axis#(
 			param37             <=	32'd0		;
 			param38             <=	32'd0		;
 			param38_vld         <=	1'b0		;
-			param39             <=	32'd0		;
+			//param39             <=	32'd0		;
 			//param40             <=	32'd0		;
 		end else begin
 			rst_en_n	    <=	(wr_task_vld && wr_task_addr == `RST_EN        	) ? i_st_wr_data[0] 	: rst_en_n      ;
@@ -368,7 +368,7 @@ module ps_rw_pl_reg_slv_pul_axis#(
 			param37         <= 	(wr_task_vld && wr_task_addr == `PARAM37		) ? i_st_wr_data		: param37	;
 			param38         <= 	(wr_task_vld && wr_task_addr == `PARAM38		) ? i_st_wr_data		: param38	;
 			param38_vld     <= 	(wr_task_vld && wr_task_addr == `PARAM38		) ? 1'b1: 1'b0;
-			param39         <= 	(wr_task_vld && wr_task_addr == `PARAM39		) ? i_st_wr_data		: param39	;
+			//param39         <= 	(wr_task_vld && wr_task_addr == `PARAM39		) ? i_st_wr_data		: param39	;
 			//param40         <= 	(wr_task_vld && wr_task_addr == `PARAM40		) ? i_st_wr_data		: param40	;
 		end
 	end
@@ -490,7 +490,7 @@ module ps_rw_pl_reg_slv_pul_axis#(
 		`PARAM36		:	o_st_rd_data <= param36				;
 		`PARAM37		:	o_st_rd_data <= param37				;
 		`PARAM38		:	o_st_rd_data <= param38				;
-		`PARAM39		:	o_st_rd_data <= param39				;
+		//`PARAM39		:	o_st_rd_data <= param39				;
 		//`PARAM40 		:	o_st_rd_data <= param40				;
 		
        default : o_st_rd_data <= 32'h7FFFFFFF;
